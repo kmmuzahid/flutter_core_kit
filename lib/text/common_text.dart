@@ -1,4 +1,4 @@
-import 'package:core_kit/initizalizer.dart' show CoreKit;
+import 'package:core_kit/initializer.dart' show CoreKit;
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auto_size_text/flutter_auto_size_text.dart';

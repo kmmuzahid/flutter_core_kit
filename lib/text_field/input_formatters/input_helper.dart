@@ -2,34 +2,9 @@ import 'package:core_kit/utils/core_kit_string.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'input_formatters/date_input_formatter.dart';
-import 'input_formatters/phone_input_formater.dart';
-
-enum ValidationType {
-  validateRequired,
-  validateEmail,
-  validatePhone,
-  validatePassword,
-  validateDate,
-  validateConfirmPassword,
-  validateURL,
-  validateNumber,
-  validateCreditCard,
-  validatePostalCode,
-  validateMinLength,
-  validateMaxLength,
-  validateCustomPattern,
-  validateDateRange,
-  validateAlphaNumeric,
-  validateUsername,
-  validateTime,
-  validateOTP,
-  validateCurrency,
-  validateIP,
-  validateFullName,
-  validateNID,
-  notRequired,
-}
+import 'date_input_formatter.dart';
+import 'phone_input_formater.dart';
+import '../validation_type.dart';
 
 class InputHelper {
   static List<TextInputFormatter> getInputFormatters(ValidationType type) {

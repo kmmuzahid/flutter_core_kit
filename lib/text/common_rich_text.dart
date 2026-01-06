@@ -3,7 +3,7 @@
  * @Date: 2026-01-05 11:41:53
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/initizalizer.dart';
+import 'package:core_kit/initializer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 

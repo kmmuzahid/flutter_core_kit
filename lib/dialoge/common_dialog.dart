@@ -1,6 +1,6 @@
 import 'package:core_kit/button/common_button.dart';
 import 'package:core_kit/form/custom_form.dart';
-import 'package:core_kit/initizalizer.dart';
+import 'package:core_kit/initializer.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';

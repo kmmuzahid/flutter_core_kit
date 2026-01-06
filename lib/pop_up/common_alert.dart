@@ -4,7 +4,7 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/button/common_button.dart';
-import 'package:core_kit/initizalizer.dart';
+import 'package:core_kit/initializer.dart';
 import 'package:flutter/material.dart';
 
 class CommonAlert {

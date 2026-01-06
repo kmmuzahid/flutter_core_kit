@@ -1,4 +1,4 @@
-import 'package:core_kit/initizalizer.dart';
+import 'package:core_kit/initializer.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

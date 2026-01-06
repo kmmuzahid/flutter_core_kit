@@ -1,4 +1,4 @@
-import 'package:core_kit/initizalizer.dart';
+import 'package:core_kit/initializer.dart';
 import 'package:flutter/material.dart';
 
 import '../text/common_text.dart';

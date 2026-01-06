@@ -13,7 +13,7 @@ import 'package:core_kit/commonTabBar/common_tab_bar.dart';
 import 'package:core_kit/image/common_image.dart';
 import 'package:core_kit/image/image_picker/common_image_picker.dart';
 import 'package:core_kit/image/image_picker/common_multi_image_picker.dart';
-import 'package:core_kit/initizalizer.dart';
+import 'package:core_kit/initializer.dart';
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/text/common_rich_text.dart';
 import 'package:core_kit/text/common_text.dart';

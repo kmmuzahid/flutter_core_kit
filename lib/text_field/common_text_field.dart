@@ -1,10 +1,11 @@
-import 'package:core_kit/initizalizer.dart';
-import 'package:core_kit/text_field/input_helper.dart';
+import 'package:core_kit/initializer.dart';
+import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../text/common_text.dart';
+import 'validation_type.dart';
 
 class CommonTextField extends StatefulWidget {
   const CommonTextField({
