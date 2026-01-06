@@ -1,4 +1,4 @@
-import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/initizalizer.dart';
 import 'package:core_kit/text_field/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';

@@ -3,7 +3,7 @@
  * @Date: 2026-01-05 16:03:11
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/initizalizer.dart';
 import 'package:core_kit/text_field/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/extension.dart';

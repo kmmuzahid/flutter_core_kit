@@ -4,7 +4,7 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:another_flushbar/flushbar.dart';
-import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/initizalizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 

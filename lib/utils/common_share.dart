@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/initizalizer.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
