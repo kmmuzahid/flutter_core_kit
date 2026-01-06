@@ -38,7 +38,7 @@ class CoreKit {
     normalColor: Colors.black,
   );
 
-  void init({
+  static void init({
     required BuildContext context,
     required Color backgroundColor,
     required NavigationBack back,
@@ -56,23 +56,23 @@ class CoreKit {
     String? backButtonAsset,
     PermissionHadlerColors? permissionHandlerColors,
   }) {
-    this.backgroundColor = backgroundColor;
-    this.back = back;
-    this.imageBaseUrl = imageBaseUrl;
-    this.navigatorKey = navigatorKey;
-    this.primaryColor = primaryColor;
-    this.onPrimaryColor = onPrimaryColor;
-    this.secondaryColor = secondaryColor;
-    this.outlineColor = outlineColor;
-    this.surfaceBG = surfaceBG;
-    this.fontFamily = fontFamily;
-    this.defaultTextStyle = defaultTextStyle;
-    this.backButtonAsset = backButtonAsset;
+    _instance.backgroundColor = backgroundColor;
+    _instance.back = back;
+    _instance.imageBaseUrl = imageBaseUrl;
+    _instance.navigatorKey = navigatorKey;
+    _instance.primaryColor = primaryColor;
+    _instance.onPrimaryColor = onPrimaryColor;
+    _instance.secondaryColor = secondaryColor;
+    _instance.outlineColor = outlineColor;
+    _instance.surfaceBG = surfaceBG;
+    _instance.fontFamily = fontFamily;
+    _instance.defaultTextStyle = defaultTextStyle;
+    _instance.backButtonAsset = backButtonAsset;
     CoreScreenUtils.init(context);
     if (permissionHandlerColors != null) {
-      this.permissionHandlerColors = permissionHandlerColors;
+      _instance.permissionHandlerColors = permissionHandlerColors;
     }
-    DioService.instance.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+    DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
   }
 }
 

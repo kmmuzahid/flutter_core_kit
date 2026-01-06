@@ -73,7 +73,7 @@ class DioService {
   String? getRefreshToken() => _tokenProvider.refreshToken();
 
   /// Create and initialize DioService
-  Future<DioService> init({
+  static Future<DioService> init({
     required DioServiceConfig config,
     required TokenProvider tokenProvider,
   }) async {

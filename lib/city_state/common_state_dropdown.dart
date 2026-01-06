@@ -65,11 +65,13 @@ class CommonStateDropdown extends StatelessWidget {
       }
     }
 
+    final List<String> stateList = [];
+
     if (selectedCountryData != null) {
-      for (final stateData in selectedCountryData) {
-        return stateData.entries.map((e) => e.key).toList();
+      for (final stateData in selectedCountryData) { 
+        stateList.addAll(stateData.entries.map((e) => e.key).toList());
       }
     }
-    return [];
+    return stateList;
   }
 }

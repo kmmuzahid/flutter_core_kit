@@ -12,16 +12,16 @@ class CommonCityDropDown extends StatelessWidget {
   const CommonCityDropDown({
     required this.onChange,
     super.key,
-    this.selectedState,
-    this.selectedCountry,
+    required this.selectedState,
+    required this.selectedCountry,
     this.initalCity,
     this.backgroundColor,
     this.fontStyle,
     this.hint = 'City',
     this.prefix,
   });
-  final String? selectedState;
-  final String? selectedCountry;
+  final String selectedState;
+  final String selectedCountry;
   final String? initalCity;
   final FontStyle? fontStyle;
   final Color? backgroundColor;
@@ -41,7 +41,7 @@ class CommonCityDropDown extends StatelessWidget {
       items: city,
       textStyle: CoreKit.instance.defaultTextStyle,
       borderColor: CoreKit.instance.outlineColor,
-      initalValue: selectedState != null && selectedCountry != null && initalCity != null
+      initalValue: initalCity != null
           ? city.firstWhere(
               (element) => element.key.trim().toLowerCase() == initalCity!.trim().toLowerCase(),
               orElse: () => city.first,

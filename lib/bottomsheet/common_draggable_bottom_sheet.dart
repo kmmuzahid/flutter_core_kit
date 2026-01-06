@@ -73,7 +73,7 @@ class _CommonDraggableBottomSheetState extends State<CommonDraggableBottomSheet>
         return AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           decoration: BoxDecoration(
-            color: CoreKit.instance.outlineColor,
+            color: CoreKit.instance.surfaceBG,
             borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
             boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
           ),
