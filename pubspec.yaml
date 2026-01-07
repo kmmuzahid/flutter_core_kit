@@ -1,0 +1,33 @@
+name: bloc_template_basic
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  core_kit:
+    path: C:\Users\KmMuzahid\Documents\others\core_kit
+  # core_kit:
+  #   git:
+  #     url: https://github.com/kmmuzahid/flutter_core_kit.git
+  #     ref: 1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  # flutter_lints:
+  # core_kit:
+  #   path: ../flutter_core_kit
+
+
+flutter:
+
+  uses-material-design: true
