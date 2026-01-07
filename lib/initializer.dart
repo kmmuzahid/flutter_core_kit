@@ -13,24 +13,34 @@ typedef NavigationBack = void Function();
 class CoreKit {
   // Private constructor
   CoreKit._();
+  static bool _isInitialized = false;
 
   // Singleton instance
   static final CoreKit _instance = CoreKit._();
   static CoreKit get instance => _instance;
 
+  ThemeData get theme => Theme.of(navigatorKey.currentState!.overlay!.context);
+
   // Configuration fields
-  late Color backgroundColor;
+  Color get backgroundColor {
+    return theme.scaffoldBackgroundColor;
+  }
+
   late NavigationBack back;
-  String? fontFamily;
-  TextStyle? defaultTextStyle;
+
+  String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
+
+  TextStyle? get defaultTextStyle => theme.textTheme.bodyMedium;
+
   late String imageBaseUrl;
   String? backButtonAsset;
   late GlobalKey<NavigatorState> navigatorKey;
-  late Color primaryColor;
-  late Color onPrimaryColor;
-  late Color secondaryColor;
-  late Color outlineColor;
-  late Color surfaceBG;
+
+  Color get primaryColor => theme.primaryColor;
+  Color get onPrimaryColor => theme.colorScheme.onPrimary;
+  Color get secondaryColor => theme.colorScheme.secondary;
+  Color get outlineColor => theme.colorScheme.outline;
+  Color get surfaceBG => theme.colorScheme.surface;
 
   PermissionHadlerColors permissionHandlerColors = PermissionHadlerColors(
     errorColor: Colors.red,
@@ -38,41 +48,36 @@ class CoreKit {
     normalColor: Colors.black,
   );
 
-  static void init({
-    required BuildContext context,
-    required Color backgroundColor,
+  static Widget init({
     required NavigationBack back,
     required String imageBaseUrl,
     required GlobalKey<NavigatorState> navigatorKey,
-    required Color primaryColor,
-    required Color onPrimaryColor,
-    required Color secondaryColor,
-    required Color outlineColor,
-    required Color surfaceBG,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
-    String? fontFamily,
-    TextStyle? defaultTextStyle,
     String? backButtonAsset,
     PermissionHadlerColors? permissionHandlerColors,
+    Widget? child,
   }) {
-    _instance.backgroundColor = backgroundColor;
+    if (_isInitialized) {
+      return _SetChild(child: child ?? SizedBox.shrink());
+    }
+    _isInitialized = true;
+    _instance.navigatorKey = navigatorKey;
     _instance.back = back;
     _instance.imageBaseUrl = imageBaseUrl;
-    _instance.navigatorKey = navigatorKey;
-    _instance.primaryColor = primaryColor;
-    _instance.onPrimaryColor = onPrimaryColor;
-    _instance.secondaryColor = secondaryColor;
-    _instance.outlineColor = outlineColor;
-    _instance.surfaceBG = surfaceBG;
-    _instance.fontFamily = fontFamily;
-    _instance.defaultTextStyle = defaultTextStyle;
     _instance.backButtonAsset = backButtonAsset;
-    CoreScreenUtils.init(context);
-    if (permissionHandlerColors != null) {
+if (permissionHandlerColors != null) {
       _instance.permissionHandlerColors = permissionHandlerColors;
     }
-    DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        CoreScreenUtils.init(context);
+        
+        DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+
+        return _SetChild(child: child ?? SizedBox.shrink());
+      },
+    );
   }
 }
 
@@ -86,4 +91,33 @@ class PermissionHadlerColors {
     required this.actionColor,
     required this.normalColor,
   });
+}
+
+class _SetChild extends StatefulWidget {
+  const _SetChild({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<_SetChild> createState() => _SetChildState();
+}
+
+class _SetChildState extends State<_SetChild> {
+  Widget child = SizedBox.shrink();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        child = widget.child;
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return child;
+  }
 }

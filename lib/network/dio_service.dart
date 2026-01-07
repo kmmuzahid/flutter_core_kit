@@ -55,6 +55,7 @@ class TokenProvider {
 class DioService {
   DioService._(this._dio, this._config, this._tokenProvider);
   static late DioService instance;
+  static bool _isInitialized = false;
 
   final Dio _dio;
   final DioServiceConfig _config;
@@ -77,6 +78,11 @@ class DioService {
     required DioServiceConfig config,
     required TokenProvider tokenProvider,
   }) async {
+    if (_isInitialized) {
+      return DioService.instance;
+    }
+    _isInitialized = true;
+    
     final dioInstance = Dio(
       dio.BaseOptions(
         baseUrl: config.baseUrl,

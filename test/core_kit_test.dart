@@ -31,19 +31,13 @@ void main() {
         home: Scaffold(
           body: LayoutBuilder(
             builder: (context, constraints) {
-              CoreKit.init(
-                context: context,
-                backgroundColor: Colors.white,
+              CoreKit.init( 
                 back: () {
                   navigatorKey.currentState?.pop();
                 },
                 imageBaseUrl: 'https://',
                 navigatorKey: navigatorKey,
-                primaryColor: Colors.white,
-                onPrimaryColor: Colors.white,
-                secondaryColor: Colors.white,
-                outlineColor: Colors.white,
-                surfaceBG: Colors.white,
+              
                 dioServiceConfig: DioServiceConfig(
                   baseUrl: 'https://jsonplaceholder.typicode.com',
                   refreshTokenEndpoint: 'https://jsonplaceholder.typicode.com',
