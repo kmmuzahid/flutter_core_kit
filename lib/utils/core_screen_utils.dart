@@ -3,6 +3,7 @@
  * @Date: 2026-01-05 11:39:59
  * @Email: km.muzahid@gmail.com
  */
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
 class CoreScreenUtils {
@@ -13,9 +14,9 @@ class CoreScreenUtils {
   static late double _designWidth;
   static late double _designHeight;
 
-  static void init(BuildContext context, {double width = 375, double height = 882}) {
-    _designWidth = width;
-    _designHeight = height;
+  static void init(BuildContext context) {
+    _designWidth = CoreKit.instance.designSize.width;
+    _designHeight = CoreKit.instance.designSize.height;
     size = MediaQuery.of(context).size;
   }
 

@@ -41,6 +41,7 @@ class CoreKit {
   Color get secondaryColor => theme.colorScheme.secondary;
   Color get outlineColor => theme.colorScheme.outline;
   Color get surfaceBG => theme.colorScheme.surface;
+  late Size designSize;
 
   PermissionHadlerColors permissionHandlerColors = PermissionHadlerColors(
     errorColor: Colors.red,
@@ -57,10 +58,12 @@ class CoreKit {
     String? backButtonAsset,
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
+    Size designSize = const Size(428, 926),
   }) {
     if (_isInitialized) {
       return _SetChild(child: child ?? SizedBox.shrink());
     }
+    _instance.designSize = designSize;
     _isInitialized = true;
     _instance.navigatorKey = navigatorKey;
     _instance.back = back;
