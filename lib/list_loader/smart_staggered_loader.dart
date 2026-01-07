@@ -27,12 +27,13 @@ class SmartStaggeredLoader extends StatefulWidget {
     this.appbar,
     this.onColapsAppbar,
     this.isSeperated = false,
+    this.limit = 20,
   });
 
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
   final void Function()? onRefresh;
-  final void Function()? onLoadMore;
+  final void Function(int page)? onLoadMore;
   final bool isLoading;
   final bool isLoadingMore;
   final bool isLoadDone;
@@ -47,6 +48,7 @@ class SmartStaggeredLoader extends StatefulWidget {
   final Widget? appbar;
   final Widget? onColapsAppbar;
   final bool isSeperated;
+  final int limit;
 
   @override
   State<SmartStaggeredLoader> createState() => _SmartStaggeredLoaderState();
@@ -62,9 +64,17 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   double _currentOffset = 0.0;
   double _position = 0.0;
 
+  int _page = 1;
+
+  int getNextPage() {
+    return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
+  }
+
+
   @override
   void initState() {
     super.initState();
+    _page = getNextPage();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) => _updateHeights());
@@ -87,7 +97,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
         !widget.isLoadingMore &&
         !widget.isLoadDone &&
         widget.itemCount > 0) {
-      widget.onLoadMore!();
+      widget.onLoadMore?.call(_page);
     }
   }
 

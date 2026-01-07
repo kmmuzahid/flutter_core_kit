@@ -20,19 +20,21 @@ class SmartListLoader extends StatefulWidget {
     this.padding,
     this.appbar,
     this.onColapsAppbar,
+    this.limit = 10,
     super.key,
   });
 
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
   final void Function()? onRefresh;
-  final void Function()? onLoadMore;
+  final void Function(int page)? onLoadMore;
   final bool isLoading;
   final bool isLoadDone;
   final bool isReverse;
   final EdgeInsetsGeometry? padding;
   final Widget? appbar;
   final Widget? onColapsAppbar;
+  final int limit;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -42,14 +44,22 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   final GlobalKey _appBarKey = GlobalKey();
   final GlobalKey _stickyKey = GlobalKey();
   late final ScrollController _scrollController;
-  
+
   double _appBarHeight = 0.0;
   double _stickyHeight = 0.0;
   double _currentOffset = 0.0;
 
+  int _page = 1;
+
+  int getNextPage() {
+    return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
+  }
+
+
   @override
   void initState() {
     super.initState();
+    _page = getNextPage();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) => _updateHeights());
@@ -66,7 +76,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final isAtEdge = widget.isReverse ? pos.pixels <= 100 : pos.pixels >= pos.maxScrollExtent - 200;
 
     if (isAtEdge && widget.onLoadMore != null && !widget.isLoading && !widget.isLoadDone) {
-      widget.onLoadMore!();
+      widget.onLoadMore!(_page);
     }
   }
 
