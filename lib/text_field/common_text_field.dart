@@ -20,7 +20,7 @@ class CommonTextField extends StatefulWidget {
     this.prefixText,
     this.paddingHorizontal = 16,
     this.paddingVertical = 14,
-    this.borderRadius = 12,
+    this.borderRadius,
     this.onSaved,
     this.onChanged,
     this.borderColor,
@@ -53,7 +53,7 @@ class CommonTextField extends StatefulWidget {
   final Color? borderColor;
   final double paddingHorizontal;
   final double paddingVertical;
-  final double borderRadius;
+  final double? borderRadius;
   final int? maxLength;
   final VoidCallback? onTap;
   final TextEditingController? controller;
@@ -111,7 +111,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
   }
 
   Color _iconColor() {
-    return _focusNode.hasFocus ? CoreKit.instance.primaryColor : CoreKit.instance.outlineColor;
+    return _focusNode.hasFocus ? CoreKit.instance.primaryColor : hintColor();
   }
 
   void _onSave(String? value) {
@@ -170,6 +170,11 @@ class _CommonTextFieldState extends State<CommonTextField> {
             )
           : _buildTextField(),
     );
+  }
+
+  Color hintColor() {
+    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
+        CoreKit.instance.outlineColor;
   }
 
   TextFormField _buildTextField() {
@@ -246,8 +251,9 @@ class _CommonTextFieldState extends State<CommonTextField> {
         fillColor: widget.backgroundColor,
         hintStyle: _getStyle(
           fontSize: 16.sp,
-          fontStyle: FontStyle.italic,
-          textColor: CoreKit.instance.outlineColor,
+          fontStyle:
+              CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ?? FontStyle.italic,
+          textColor: hintColor(),
         ),
         prefixIcon: widget.prefixText?.isNotEmpty == true
             ? Padding(
@@ -303,7 +309,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
 
   OutlineInputBorder _buildBorder({required Color color, double? width}) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(widget.borderRadius.r),
+      borderRadius: widget.borderRadius == null
+          ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
+                ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
+                      .borderRadius
+                : BorderRadius.circular(12)
+          : BorderRadius.circular(widget.borderRadius!.r),
       borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
     );
   }

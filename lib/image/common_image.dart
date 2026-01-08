@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:core_kit/initializer.dart';
-import 'package:core_kit/utils/app_log.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -75,8 +74,8 @@ class CommonImage extends StatelessWidget {
   Widget _buildNetworkImage() {
     final path = src.startsWith('http') ? src : '${CoreKit.instance.imageBaseUrl}$src';
     return CachedNetworkImage(
-      height: size ?? height,
-      width: size ?? width,
+      height: size?.w ?? height?.w,
+      width: size?.w ?? width?.w,
       imageUrl: path,
       fit: fill,
       imageBuilder: (context, imageProvider) => Container(
@@ -99,12 +98,12 @@ class CommonImage extends StatelessWidget {
     );
   }
 
-  Widget _buildSvgImage() {
+  Widget _buildSvgImage() { 
     return SvgPicture.asset(
       src,
       colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
-      height: size ?? height,
-      width: size ?? width,
+      height: size?.w ?? height?.w,
+      width: size?.w ?? width?.w,
       fit: fill,
     );
   }
@@ -113,8 +112,8 @@ class CommonImage extends StatelessWidget {
     return Image.file(
       File(src),
       color: imageColor,
-      height: size ?? height,
-      width: size ?? width,
+      height: size?.w ?? height?.w,
+      width: size?.w ?? width?.w,
       fit: fill,
     );
   }
@@ -125,8 +124,8 @@ class CommonImage extends StatelessWidget {
       child: Image.asset(
         src,
         color: imageColor,
-        height: size ?? height,
-        width: size ?? width,
+        height: size?.w ?? height?.w,
+        width: size?.w ?? width?.w,
         fit: fill,
         errorBuilder: (context, error, stackTrace) {
           AppLogger.error(error.toString(), tag: 'Common Image');

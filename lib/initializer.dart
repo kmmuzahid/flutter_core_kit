@@ -22,9 +22,7 @@ class CoreKit {
   ThemeData get theme => Theme.of(navigatorKey.currentState!.overlay!.context);
 
   // Configuration fields
-  Color get backgroundColor {
-    return theme.scaffoldBackgroundColor;
-  }
+
 
   late NavigationBack back;
 
@@ -33,9 +31,10 @@ class CoreKit {
   TextStyle? get defaultTextStyle => theme.textTheme.bodyMedium;
 
   late String imageBaseUrl;
-  String? backButtonAsset;
+  Widget? backButton;
   late GlobalKey<NavigatorState> navigatorKey;
 
+  Color get backgroundColor => theme.scaffoldBackgroundColor;
   Color get primaryColor => theme.primaryColor;
   Color get onPrimaryColor => theme.colorScheme.onPrimary;
   Color get secondaryColor => theme.colorScheme.secondary;
@@ -55,7 +54,7 @@ class CoreKit {
     required GlobalKey<NavigatorState> navigatorKey,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
-    String? backButtonAsset,
+    Widget? backButton,
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
     Size designSize = const Size(428, 926),
@@ -68,7 +67,7 @@ class CoreKit {
     _instance.navigatorKey = navigatorKey;
     _instance.back = back;
     _instance.imageBaseUrl = imageBaseUrl;
-    _instance.backButtonAsset = backButtonAsset;
+    _instance.backButton = backButton;
 if (permissionHandlerColors != null) {
       _instance.permissionHandlerColors = permissionHandlerColors;
     }

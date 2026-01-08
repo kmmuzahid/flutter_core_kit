@@ -3,7 +3,6 @@
  * @Date: 2026-01-05 11:21:15
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/image/common_image.dart';
 import 'package:core_kit/initializer.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
@@ -52,17 +51,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                     CoreKit.instance.back();
                   }
                 },
-                icon: CoreKit.instance.backButtonAsset == null
+                icon: CoreKit.instance.backButton == null
                     ? const Icon(Icons.arrow_back_ios, size: 25)
-                    : Padding(
-                        padding: EdgeInsets.only(left: 16),
-                        child: CommonImage(
-                          fill: BoxFit.contain,
-                          width: 25.w,
-                          height: 18.h,
-                          src: CoreKit.instance.backButtonAsset!,
-                        ),
-                      ),
+                    : CoreKit.instance.backButton!,
               ),
     actions: actions ?? _appBarActions(),
 

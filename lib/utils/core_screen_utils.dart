@@ -9,38 +9,26 @@ import 'package:flutter/material.dart';
 class CoreScreenUtils {
   CoreScreenUtils._();
 
-  static late Size size;
-
+  static late Size deviceSize;
   static late double _designWidth;
   static late double _designHeight;
 
   static void init(BuildContext context) {
+    deviceSize = MediaQuery.of(context).size;
     _designWidth = CoreKit.instance.designSize.width;
     _designHeight = CoreKit.instance.designSize.height;
-    size = MediaQuery.of(context).size;
   }
 
-  static double width({required num value}) {
-    final scaleWidth = size.width / _designWidth;
-    return value * scaleWidth;
+  static double _scale() {
+    return deviceSize.width / _designWidth < deviceSize.height / _designHeight
+        ? deviceSize.width / _designWidth
+        : deviceSize.height / _designHeight;
   }
 
-  static double height({required num value}) {
-    final scaleHeight = size.height / _designHeight;
-    return value * scaleHeight;
-  }
-
-  static double radius({required num value}) {
-    final scaleWidth = size.width / _designWidth;
-    final scaleHeight = size.height / _designHeight;
-    return value * (scaleWidth < scaleHeight ? scaleWidth : scaleHeight);
-  }
-
-  static double sp({required num value}) {
-    final scaleWidth = size.width / _designWidth;
-    final scaleHeight = size.height / _designHeight;
-    return value * (scaleWidth < scaleHeight ? scaleWidth : scaleHeight);
-  }
+  static double width({required num value}) => value * _scale();
+  static double height({required num value}) => value * _scale();
+  static double radius({required num value}) => value * _scale();
+  static double sp({required num value}) => value * _scale();
 }
 
 extension GapExtesntion on int {
