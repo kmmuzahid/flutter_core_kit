@@ -434,7 +434,7 @@ class DioService {
     response = await _dio.request(
       requestOptions.path,
       data: requestOptions.data,
-      queryParameters: requestOptions.queryParameters,
+      // queryParameters: requestOptions.queryParameters,
       options: requestOptions.options,
       cancelToken: cancelToken,
       onSendProgress: input.onSendProgress,

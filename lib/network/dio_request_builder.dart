@@ -18,6 +18,10 @@ class DioRequestBuilder {
     input.pathParams?.forEach(
       (k, v) => url = url.replaceAll('{$k}', Uri.encodeComponent(v.toString())),
     );
+     
+    if (input.queryParams?.isNotEmpty ?? false) {
+      url = "$url?${input.queryParams!.entries.map((e) => "${e.key}=${e.value}").join("&")}";
+    }
 
     final headers = {
       if (input.requiresToken && accessToken?.isNotEmpty == true)
@@ -89,8 +93,7 @@ class DioRequestBuilder {
 
     return _RequestOptionsData(
       path: url,
-      data: body,
-      queryParameters: input.queryParams,
+      data: body, 
       options: dio.Options(method: input.method.name, headers: headers, contentType: contentType),
     );
   }
@@ -99,13 +102,11 @@ class DioRequestBuilder {
 class _RequestOptionsData {
   _RequestOptionsData({
     required this.path,
-    required this.data,
-    required this.queryParameters,
+    required this.data, 
     required this.options,
   });
 
   final String path;
-  final dynamic data;
-  final Map<String, dynamic>? queryParameters;
+  final dynamic data; 
   final dio.Options options;
 }
