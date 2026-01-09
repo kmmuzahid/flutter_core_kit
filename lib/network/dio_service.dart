@@ -39,8 +39,8 @@ class DioServiceConfig {
 
 // Token provider interface - implement this in your app
 class TokenProvider {
-  String? Function() accessToken;
-  String? Function() refreshToken;
+  Future<String>? Function() accessToken;
+  Future<String>? Function() refreshToken;
   Future<void> Function(String accessToken, String refreshToken) updateTokens;
   Future<void> Function() clearTokens;
 
@@ -70,8 +70,8 @@ class DioService {
   bool get isServerOff => _isServerOff;
   bool get isNetworkOff => _isNetworkOff;
 
-  String? getAccessToken() => _tokenProvider.accessToken();
-  String? getRefreshToken() => _tokenProvider.refreshToken();
+  Future<String>? getAccessToken() => _tokenProvider.accessToken();
+  Future<String>? getRefreshToken() => _tokenProvider.refreshToken();
 
   /// Create and initialize DioService
   static Future<DioService> init({
@@ -287,7 +287,7 @@ class DioService {
   }
 
   Future<void> _injectToken(RequestOptions options) async {
-    final accessToken = _tokenProvider.accessToken();
+    final accessToken = await _tokenProvider.accessToken();
     if (accessToken?.isNotEmpty == true) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }
@@ -427,7 +427,7 @@ class DioService {
   }) async {
     final requestOptions = await DioRequestBuilder.instance.build(
       input: input,
-      accessToken: getAccessToken(),
+      accessToken: await getAccessToken(),
     );
 
     dio.Response response;
@@ -465,7 +465,7 @@ class DioService {
   }
 
   Future<void> _refreshTokenIfNeeded() async {
-    final refreshToken = _tokenProvider.refreshToken();
+    final refreshToken = await _tokenProvider.refreshToken();
 
     if (refreshToken?.isEmpty == true || refreshToken == null) {
       _log(_config, 'No refresh token available.', tag: 'DioService');
