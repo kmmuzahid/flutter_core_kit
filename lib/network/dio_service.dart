@@ -41,7 +41,7 @@ class DioServiceConfig {
 class TokenProvider {
   Future<String>? Function() accessToken;
   Future<String>? Function() refreshToken;
-  Future<void> Function(String accessToken, String refreshToken) updateTokens;
+  Future<void> Function(dynamic data) updateTokens;
   Future<void> Function() clearTokens;
 
   TokenProvider({
@@ -480,9 +480,8 @@ class DioService {
 
       if (response.body.isNotEmpty && (response.statusCode == 200 || response.statusCode == 201)) {
         final data = jsonDecode(response.body);
-        final access = data['data']['access_token'];
-        final refresh = data['data']['refresh_token'];
-        await _tokenProvider.updateTokens(access, refresh);
+         
+        await _tokenProvider.updateTokens(data['data']);
       } else if (response.statusCode == 401) {
         final data = jsonDecode(response.body);
         _showMessage(data['message'] ?? '', isError: true);

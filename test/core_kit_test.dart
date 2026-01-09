@@ -45,9 +45,9 @@ void main() {
                   enableDebugLogs: true,
                 ),
                 tokenProvider: TokenProvider(
-                  accessToken: () => 'accessToken',
-                  refreshToken: () => 'refreshToken',
-                  updateTokens: (accessToken, refreshToken) async {},
+                  accessToken: () async => 'accessToken',
+                  refreshToken: () async => 'refreshToken',
+                  updateTokens: (data) async {},
                   clearTokens: () async {},
                 ),
               );
