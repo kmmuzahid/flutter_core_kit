@@ -328,7 +328,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 suffixIconColor: _iconColor(),
 
                 focusedBorder: OutlineInputBorder(
-                  borderSide: getTheme.inputDecorationTheme.focusedBorder!.borderSide.copyWith(
+                  borderSide:
+                      (getTheme.inputDecorationTheme.focusedBorder?.borderSide ?? BorderSide())
+                          .copyWith(
                     color: widget.isReadOnly
                         ? (widget.borderColor ?? getTheme.dividerColor)
                         : getTheme.primaryColor,
@@ -338,14 +340,18 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 ),
 
                 errorBorder: OutlineInputBorder(
-                  borderSide: getTheme.inputDecorationTheme.errorBorder!.borderSide.copyWith(
+                  borderSide:
+                      (getTheme.inputDecorationTheme.errorBorder?.borderSide ?? BorderSide())
+                          .copyWith(
                     color: Colors.red,
                     width: widget.borderWidth.w,
                   ),
                   borderRadius: BorderRadius.circular(widget.borderRadius.r),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: getTheme.inputDecorationTheme.enabledBorder!.borderSide.copyWith(
+                  borderSide:
+                      (getTheme.inputDecorationTheme.enabledBorder?.borderSide ?? BorderSide())
+                          .copyWith(
                     color: widget.borderColor ?? getTheme.dividerColor,
                     width: widget.borderWidth.w,
                   ),
