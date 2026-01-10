@@ -162,6 +162,36 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     );
   }
 
+  TextStyle _getStyle({
+    FontWeight? fontWeight,
+    double? fontSize,
+    Color? textColor,
+    double? height,
+    FontStyle? fontStyle,
+  }) {
+    return TextStyle(
+      fontFamily: CoreKit.instance.fontFamily,
+      fontWeight: fontWeight,
+      fontSize: fontSize,
+      color: textColor,
+      height: height,
+      fontStyle: fontStyle,
+    );
+  }
+
+  Color hintColor() {
+    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
+        CoreKit.instance.outlineColor;
+  }
+
+  OutlineInputBorder _buildBorder({required Color color, double? width}) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(widget.borderRadius.r),
+      borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     // if (enableHtml) {
@@ -266,10 +296,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     return widget.showValidationMessage ? error : (error != null ? '' : null);
                   },
 
-              style: (getTheme.textTheme.bodyLarge ?? CoreKit.instance.defaultTextStyle)?.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 16.sp,
-              ),
+              style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
 
               expands: true, // expands to fill parent height
               decoration: InputDecoration(
@@ -277,12 +304,16 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 counterText: '',
 
                 errorMaxLines: 1,
-                errorStyle: const TextStyle(fontSize: 0, height: 0),
+                errorStyle: widget.showValidationMessage
+                    ? null
+                    : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
                 fillColor: widget.backgroundColor,
-                hintStyle: TextStyle(
+                hintStyle: _getStyle(
                   fontSize: 16.sp,
-                  color: CoreKit.instance.outlineColor,
-                  fontStyle: FontStyle.italic,
+                  fontStyle:
+                      CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
+                      FontStyle.italic,
+                  textColor: hintColor(),
                 ),
                 prefixIcon: Column(
                   children: [
@@ -327,37 +358,17 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 prefixIconColor: _iconColor(),
                 suffixIconColor: _iconColor(),
 
-                focusedBorder: OutlineInputBorder(
-                  borderSide:
-                      (getTheme.inputDecorationTheme.focusedBorder?.borderSide ?? BorderSide())
-                          .copyWith(
-                    color: widget.isReadOnly
-                        ? (widget.borderColor ?? getTheme.dividerColor)
-                        : getTheme.primaryColor,
-                    width: widget.borderWidth.w,
-                  ),
-                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                focusedBorder: _buildBorder(
+                  color: widget.isReadOnly
+                      ? (widget.borderColor ?? CoreKit.instance.outlineColor)
+                      : CoreKit.instance.primaryColor,
+                  width: widget.borderWidth.w,
                 ),
-
-                errorBorder: OutlineInputBorder(
-                  borderSide:
-                      (getTheme.inputDecorationTheme.errorBorder?.borderSide ?? BorderSide())
-                          .copyWith(
-                    color: Colors.red,
-                    width: widget.borderWidth.w,
-                  ),
-                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                enabledBorder: _buildBorder(
+                  color: widget.borderColor ?? CoreKit.instance.outlineColor,
+                  width: widget.borderWidth.w,
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      (getTheme.inputDecorationTheme.enabledBorder?.borderSide ?? BorderSide())
-                          .copyWith(
-                    color: widget.borderColor ?? getTheme.dividerColor,
-                    width: widget.borderWidth.w,
-                  ),
-
-                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
-                ),
+                errorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: widget.paddingHorizontal.w,
                   vertical: widget.paddingVertical.h,
@@ -377,4 +388,6 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
       ),
     );
   }
+
+
 }
