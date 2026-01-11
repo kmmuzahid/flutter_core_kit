@@ -55,7 +55,6 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -100,6 +99,30 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   Widget build(BuildContext context) {
     final isAppBarCollapsed = _currentOffset >= _appBarHeight;
 
+    final appbar = [
+      if (widget.appbar != null && _appBarHeight > 0 && _scrollController.position.pixels < 5)
+        SliverAppBar(
+          floating: true,
+          snap: true,
+          elevation: 0,
+          titleSpacing: widget.padding?.horizontal ?? 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          toolbarHeight: _appBarHeight,
+          automaticallyImplyLeading: false,
+          title: widget.appbar,
+        ),
+      if (widget.onColapsAppbar != null)
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyHeaderDelegate(
+            height: _stickyHeight,
+            visible: isAppBarCollapsed,
+            child: widget.onColapsAppbar!,
+          ),
+        ),
+    ];
+
     return Scaffold(
       body: Stack(
         children: [
@@ -121,30 +144,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
               reverse: widget.isReverse,
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               slivers: [
-                if (widget.appbar != null &&
-                    _appBarHeight > 0 &&
-                    _scrollController.position.pixels < 5)
-                  SliverAppBar(
-                    floating: true,
-                    snap: true,
-                    elevation: 0,
-                    titleSpacing: widget.padding?.horizontal ?? 0,
-                    scrolledUnderElevation: 0,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    toolbarHeight: _appBarHeight,
-                    automaticallyImplyLeading: false,
-                    title: widget.appbar,
-                  ),
-                if (widget.onColapsAppbar != null)
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickyHeaderDelegate(
-                      height: _stickyHeight,
-                      visible: isAppBarCollapsed,
-                      child: widget.onColapsAppbar!,
-                    ),
-                  ),
-
+                if (!widget.isReverse) ...appbar,
                 SliverPadding(
                   padding: widget.padding ?? EdgeInsets.zero,
                   sliver: SliverList(
@@ -161,6 +161,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
                     }, childCount: widget.itemCount + 1),
                   ),
                 ),
+                if (widget.isReverse) ...appbar,
               ],
             ),
           ),
