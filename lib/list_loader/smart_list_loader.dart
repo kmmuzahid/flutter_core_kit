@@ -96,14 +96,60 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     super.dispose();
   }
 
-  @override
+  /*
+ * @Author: Km Muzahid 
+ * @Date: 2026-01-11 16:20:00
+ * @Email: km.muzahid@gmail.com
+ */
+@override
   Widget build(BuildContext context) {
     final isAppBarCollapsed = _currentOffset >= _appBarHeight;
+
+    // Define components for reuse to avoid duplication
+    final appBarWidgets = [
+      if (widget.appbar != null && _appBarHeight > 0 && _scrollController.position.pixels < 5)
+        SliverAppBar(
+          floating: true,
+          snap: true,
+          elevation: 0,
+          titleSpacing: widget.padding?.horizontal ?? 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          toolbarHeight: _appBarHeight,
+          automaticallyImplyLeading: false,
+          title: widget.appbar,
+        ),
+      if (widget.onColapsAppbar != null)
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyHeaderDelegate(
+            height: _stickyHeight,
+            visible: isAppBarCollapsed,
+            child: widget.onColapsAppbar!,
+          ),
+        ),
+    ];
+
+    final listSliver = SliverPadding(
+      padding: widget.padding ?? EdgeInsets.zero,
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          if (!widget.isReverse && index == widget.itemCount || widget.isReverse && index == 0) {
+            return _buildFooter();
+          }
+          final actualIndex = widget.isReverse ? index - 1 : index;
+          if (actualIndex >= 0 && actualIndex < widget.itemCount) {
+            return widget.itemBuilder(context, actualIndex);
+          }
+          return null;
+        }, childCount: widget.itemCount + 1),
+      ),
+    );
 
     return Scaffold(
       body: Stack(
         children: [
-          // Measurement layer
+          // Measurement layer (Offstage does not need .h/.w as it is for logic)
           Offstage(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -121,74 +167,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
               reverse: widget.isReverse,
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               slivers: [
-                if (!widget.isReverse) ...[
-                  if (widget.appbar != null &&
-                      _appBarHeight > 0 &&
-                      _scrollController.position.pixels < 5)
-                    SliverAppBar(
-                      floating: true,
-                      snap: true,
-                      elevation: 0,
-                      titleSpacing: widget.padding?.horizontal ?? 0,
-                      scrolledUnderElevation: 0,
-                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                      toolbarHeight: _appBarHeight,
-                      automaticallyImplyLeading: false,
-                      title: widget.appbar,
-                    ),
-                  if (widget.onColapsAppbar != null)
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: _StickyHeaderDelegate(
-                        height: _stickyHeight,
-                        visible: isAppBarCollapsed,
-                        child: widget.onColapsAppbar!,
-                      ),
-                    ),
-                ],
+                if (widget.isReverse) listSliver else ...appBarWidgets,
 
-                SliverPadding(
-                  padding: widget.padding ?? EdgeInsets.zero,
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      if (!widget.isReverse && index == widget.itemCount ||
-                          widget.isReverse && index == 0) {
-                        return _buildFooter();
-                      }
-                      final actualIndex = widget.isReverse ? index - 1 : index;
-                      if (actualIndex >= 0 && actualIndex < widget.itemCount) {
-                        return widget.itemBuilder(context, actualIndex);
-                      }
-                      return null;
-                    }, childCount: widget.itemCount + 1),
-                  ),
-                ),
-
-                if (widget.isReverse) ...[
-                  if (widget.onColapsAppbar != null)
-                    SliverAppBar(
-                      floating: true,
-                      snap: true,
-                      elevation: 0,
-                      titleSpacing: widget.padding?.horizontal ?? 0,
-                      scrolledUnderElevation: 0,
-                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                      toolbarHeight: _appBarHeight,
-                      automaticallyImplyLeading: false,
-                      title: widget.appbar,
-                    ),
-                  if (widget.appbar != null &&
-                      _appBarHeight > 0 &&
-                      _scrollController.position.pixels < 5)
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: _StickyHeaderDelegate(
-                        height: _stickyHeight,
-                        visible: isAppBarCollapsed,
-                        child: widget.onColapsAppbar!,
-                      ),
-                    ),
-                ],
+                if (widget.isReverse) ...appBarWidgets.reversed else listSliver,
               ],
             ),
           ),
@@ -196,7 +177,6 @@ class _SmartListLoaderState extends State<SmartListLoader> {
       ),
     );
   }
-
   Widget _buildFooter() {
     if (widget.isLoading) {
       return const Padding(
