@@ -55,6 +55,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
   }
 
+
   @override
   void initState() {
     super.initState();
@@ -96,38 +97,13 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   }
 
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final isAppBarCollapsed = _currentOffset >= _appBarHeight;
-
-    // Define the slivers for the appbar/sticky header
-    final appbarSlivers = [
-      if (widget.appbar != null && _appBarHeight > 0 && _scrollController.position.pixels < 5)
-        SliverAppBar(
-          floating: true,
-          snap: true,
-          elevation: 0,
-          titleSpacing: widget.padding?.horizontal ?? 0,
-          scrolledUnderElevation: 0,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          toolbarHeight: _appBarHeight,
-          automaticallyImplyLeading: false,
-          title: widget.appbar,
-        ),
-      if (widget.onColapsAppbar != null)
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _StickyHeaderDelegate(
-            height: _stickyHeight,
-            visible: isAppBarCollapsed,
-            child: widget.onColapsAppbar!,
-          ),
-        ),
-    ];
 
     return Scaffold(
       body: Stack(
         children: [
-          // Measurement layer (using your .h extension logic where applicable)
+          // Measurement layer
           Offstage(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -144,36 +120,79 @@ Widget build(BuildContext context) {
               controller: _scrollController,
               reverse: widget.isReverse,
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-              slivers: [ 
-                if (widget.isReverse) _buildListSliver() else ...appbarSlivers,
+              slivers: [
+                if (!widget.isReverse) ...[
+                  if (widget.appbar != null &&
+                      _appBarHeight > 0 &&
+                      _scrollController.position.pixels < 5)
+                    SliverAppBar(
+                      floating: true,
+                      snap: true,
+                      elevation: 0,
+                      titleSpacing: widget.padding?.horizontal ?? 0,
+                      scrolledUnderElevation: 0,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      toolbarHeight: _appBarHeight,
+                      automaticallyImplyLeading: false,
+                      title: widget.appbar,
+                    ),
+                  if (widget.onColapsAppbar != null)
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickyHeaderDelegate(
+                        height: _stickyHeight,
+                        visible: isAppBarCollapsed,
+                        child: widget.onColapsAppbar!,
+                      ),
+                    ),
+                ],
 
-                if (widget.isReverse)
-                  ...appbarSlivers
-                      .reversed // Reverse the appbar order internally
-                else
-                  _buildListSliver(),
+                SliverPadding(
+                  padding: widget.padding ?? EdgeInsets.zero,
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      if (!widget.isReverse && index == widget.itemCount ||
+                          widget.isReverse && index == 0) {
+                        return _buildFooter();
+                      }
+                      final actualIndex = widget.isReverse ? index - 1 : index;
+                      if (actualIndex >= 0 && actualIndex < widget.itemCount) {
+                        return widget.itemBuilder(context, actualIndex);
+                      }
+                      return null;
+                    }, childCount: widget.itemCount + 1),
+                  ),
+                ),
+
+                if (widget.isReverse) ...[
+                  if (widget.onColapsAppbar != null)
+                    SliverAppBar(
+                      floating: true,
+                      snap: true,
+                      elevation: 0,
+                      titleSpacing: widget.padding?.horizontal ?? 0,
+                      scrolledUnderElevation: 0,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      toolbarHeight: _appBarHeight,
+                      automaticallyImplyLeading: false,
+                      title: widget.appbar,
+                    ),
+                  if (widget.appbar != null &&
+                      _appBarHeight > 0 &&
+                      _scrollController.position.pixels < 5)
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickyHeaderDelegate(
+                        height: _stickyHeight,
+                        visible: isAppBarCollapsed,
+                        child: widget.onColapsAppbar!,
+                      ),
+                    ),
+                ],
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildListSliver() {
-    return SliverPadding(
-      padding: widget.padding ?? EdgeInsets.zero,
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          if (!widget.isReverse && index == widget.itemCount || widget.isReverse && index == 0) {
-            return _buildFooter();
-          }
-          final actualIndex = widget.isReverse ? index - 1 : index;
-          if (actualIndex >= 0 && actualIndex < widget.itemCount) {
-            return widget.itemBuilder(context, actualIndex);
-          }
-          return null;
-        }, childCount: widget.itemCount + 1),
       ),
     );
   }
