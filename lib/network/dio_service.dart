@@ -4,7 +4,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:core_kit/utils/app_log.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +12,6 @@ import 'package:http/http.dart' as http;
 
 import 'dio_request_builder.dart';
 import 'request_input.dart';
-import 'response_state.dart';
 
 // Callback for request state changes
 typedef OnRequestStateChange<T> = void Function(ResponseState<T> state);
@@ -111,9 +110,9 @@ class DioService {
 
   void _showMessage(String message, {bool isError = false}) {
     if (isError) {
-      AppLogger.apiError(message, tag: 'dio');
+      showSnackBar(message, type: SnackBarType.error);
     } else {
-      AppLogger.apiDebug(message, tag: 'dio');
+      showSnackBar(message, type: SnackBarType.success);
     }
   }
 
