@@ -5,6 +5,7 @@
 /// LastEditTime: 2025-12-29 11:40:00
 library;
 
+import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -96,18 +97,28 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     super.dispose();
   }
 
-  /*
+/*
  * @Author: Km Muzahid 
- * @Date: 2026-01-11 16:20:00
+ * @Date: 2026-01-11 16:30:00
  * @Email: km.muzahid@gmail.com
  */
 @override
-  Widget build(BuildContext context) {
-    final isAppBarCollapsed = _currentOffset >= _appBarHeight;
+Widget build(BuildContext context) {
+    // Fix 1: Adjust collapse logic for reverse
+    // In reverse, _currentOffset increases as you scroll towards the "top" (older messages)
+    final isAppBarCollapsed = widget.isReverse
+        ? _scrollController.hasClients && _scrollController.offset > 20.h
+        : _currentOffset >= _appBarHeight;
 
-    // Define components for reuse to avoid duplication
+    // Fix 2: Adjust AppBar visibility trigger
+    // In reverse, we show the main appbar only when at the absolute bottom (pixels < 5)
+    final bool showMainAppBar =
+        widget.appbar != null &&
+        _appBarHeight > 0 &&
+        (_scrollController.hasClients ? _scrollController.position.pixels < 5 : true);
+
     final appBarWidgets = [
-      if (widget.appbar != null && _appBarHeight > 0 && _scrollController.position.pixels < 5)
+      if (showMainAppBar)
         SliverAppBar(
           floating: true,
           snap: true,
@@ -124,6 +135,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
           pinned: true,
           delegate: _StickyHeaderDelegate(
             height: _stickyHeight,
+            // If reverse, we want this visible as soon as we scroll away from the bottom
             visible: isAppBarCollapsed,
             child: widget.onColapsAppbar!,
           ),
@@ -149,7 +161,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     return Scaffold(
       body: Stack(
         children: [
-          // Measurement layer (Offstage does not need .h/.w as it is for logic)
+          // Measurement layer
           Offstage(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -167,8 +179,11 @@ class _SmartListLoaderState extends State<SmartListLoader> {
               reverse: widget.isReverse,
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               slivers: [
+                // If reverse, the list comes first (it starts from bottom)
+                // If not reverse, the appbar comes first
                 if (widget.isReverse) listSliver else ...appBarWidgets,
-
+              
+                // If reverse, the appbar is placed at the "end" (visual top)
                 if (widget.isReverse) ...appBarWidgets.reversed else listSliver,
               ],
             ),
@@ -177,6 +192,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
       ),
     );
   }
+
   Widget _buildFooter() {
     if (widget.isLoading) {
       return const Padding(
