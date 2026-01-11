@@ -96,10 +96,11 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   }
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
     final isAppBarCollapsed = _currentOffset >= _appBarHeight;
 
-    final appbar = [
+    // Define the slivers for the appbar/sticky header
+    final appbarSlivers = [
       if (widget.appbar != null && _appBarHeight > 0 && _scrollController.position.pixels < 5)
         SliverAppBar(
           floating: true,
@@ -126,7 +127,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     return Scaffold(
       body: Stack(
         children: [
-          // Measurement layer
+          // Measurement layer (using your .h extension logic where applicable)
           Offstage(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -143,29 +144,36 @@ class _SmartListLoaderState extends State<SmartListLoader> {
               controller: _scrollController,
               reverse: widget.isReverse,
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-              slivers: [
-                if (!widget.isReverse) ...appbar,
-                SliverPadding(
-                  padding: widget.padding ?? EdgeInsets.zero,
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      if (!widget.isReverse && index == widget.itemCount ||
-                          widget.isReverse && index == 0) {
-                        return _buildFooter();
-                      }
-                      final actualIndex = widget.isReverse ? index - 1 : index;
-                      if (actualIndex >= 0 && actualIndex < widget.itemCount) {
-                        return widget.itemBuilder(context, actualIndex);
-                      }
-                      return null;
-                    }, childCount: widget.itemCount + 1),
-                  ),
-                ),
-                if (widget.isReverse) ...appbar,
+              slivers: [ 
+                if (widget.isReverse) _buildListSliver() else ...appbarSlivers,
+
+                if (widget.isReverse)
+                  ...appbarSlivers
+                      .reversed // Reverse the appbar order internally
+                else
+                  _buildListSliver(),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildListSliver() {
+    return SliverPadding(
+      padding: widget.padding ?? EdgeInsets.zero,
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          if (!widget.isReverse && index == widget.itemCount || widget.isReverse && index == 0) {
+            return _buildFooter();
+          }
+          final actualIndex = widget.isReverse ? index - 1 : index;
+          if (actualIndex >= 0 && actualIndex < widget.itemCount) {
+            return widget.itemBuilder(context, actualIndex);
+          }
+          return null;
+        }, childCount: widget.itemCount + 1),
       ),
     );
   }
