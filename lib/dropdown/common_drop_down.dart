@@ -122,7 +122,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
             ).copyWith(color: CoreKit.instance.outlineColor, fontStyle: widget.fontStyle),
           ),
           icon: const Icon(Icons.arrow_drop_down),
-          dropdownColor: CoreKit.instance.surfaceBG,
+          dropdownColor: widget.backgroundColor ?? CoreKit.instance.surfaceBG,
           isExpanded: true,
           items: _items
               .map(
