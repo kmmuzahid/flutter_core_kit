@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../text/common_text.dart';
 import '../utils/core_screen_utils.dart';
 
+
+
 class CommonButton extends StatefulWidget {
   const CommonButton({
     required this.titleText,
@@ -20,8 +22,8 @@ class CommonButton extends StatefulWidget {
     this.isLoading = false,
     this.buttonWidth = 80,
     this.borderColor,
-    this.icon,
-    this.iconWidth,
+    this.prefix,
+    this.suffix,
   });
   final VoidCallback? onTap;
   final String titleText;
@@ -35,9 +37,9 @@ class CommonButton extends StatefulWidget {
   final double buttonHeight;
   final double buttonWidth;
   final bool isLoading;
-  final Widget? icon;
-  // Optional explicit icon width to make dynamic width precise when an icon is present
-  final double? iconWidth;
+  final Widget? prefix;
+  final Widget? suffix;
+
   final MainAxisAlignment alignment;
 
   @override
@@ -116,16 +118,11 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
               .size
               .width // Keep text width for layout consistency
         : textPainter.size.width;
-    final bool hasIcon = widget.icon != null;
-    final double computedIconWidth = hasIcon
-        ? (widget.iconWidth?.w ?? IconTheme.of(context).size ?? 24.0.w)
-        : 0.0;
-    final double iconSpacing = hasIcon ? 6.w : 0.0;
 
     // Border is painted inside the container; include its stroke on both sides
     final double borderStroke = (widget.borderWidth.w * 2);
     double buttonWidth =
-        contentWidth + horizontalPadding + computedIconWidth + iconSpacing + borderStroke + 8.w;
+        contentWidth + horizontalPadding + borderStroke + 8.w;
     buttonWidth = buttonWidth < widget.buttonWidth.w ? widget.buttonWidth.w : buttonWidth;
 
     return LayoutBuilder(
@@ -168,19 +165,21 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12.0.w, vertical: 6.0.h),
-                        child: Row(
-                          mainAxisAlignment: widget.alignment,
-                          children: [
-                            if (widget.icon != null) ...[widget.icon!, SizedBox(width: 6.w)],
+                        child: 
                             CommonText(
                               text: widget.titleText,
+                          preffix: widget.prefix,
+                          suffix: widget.suffix,
+                          textAlign: widget.alignment == MainAxisAlignment.center
+                              ? TextAlign.center
+                              : widget.alignment == MainAxisAlignment.start
+                              ? TextAlign.start
+                              : TextAlign.end,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               fontSize: widget.titleSize.sp,
                               textColor: widget.titleColor ?? CoreKit.instance.onPrimaryColor,
-                              fontWeight: widget.titleWeight,
-                            ),
-                          ],
+                          fontWeight: widget.titleWeight,
                         ),
                       ),
                     ),

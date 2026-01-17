@@ -63,8 +63,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   double _stickyHeight = 0.0;
   double _currentOffset = 0.0;
   double _position = 0.0;
-
-  int _page = 1;
+ 
 
   int getNextPage() {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
@@ -73,8 +72,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   @override
   void initState() {
-    super.initState();
-    _page = getNextPage();
+    super.initState(); 
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) => _updateHeights());
@@ -97,7 +95,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
         !widget.isLoadingMore &&
         !widget.isLoadDone &&
         widget.itemCount > 0) {
-      widget.onLoadMore?.call(_page);
+      widget.onLoadMore?.call(getNextPage());
     }
   }
 

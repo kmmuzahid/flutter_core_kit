@@ -49,9 +49,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   double _appBarHeight = 0.0;
   double _stickyHeight = 0.0;
   double _currentOffset = 0.0;
-
-  int _page = 1;
-
+ 
   int getNextPage() {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
   }
@@ -59,8 +57,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
 
   @override
   void initState() {
-    super.initState();
-    _page = getNextPage();
+    super.initState(); 
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) => _updateHeights());
@@ -77,7 +74,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final isAtEdge = widget.isReverse ? pos.pixels <= 100 : pos.pixels >= pos.maxScrollExtent - 200;
 
     if (isAtEdge && widget.onLoadMore != null && !widget.isLoading && !widget.isLoadDone) {
-      widget.onLoadMore!(_page);
+      widget.onLoadMore!(getNextPage());
     }
   }
 
