@@ -78,10 +78,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
   late bool _obscureText;
   int wordCount = 0;
   int lengthCount = 0;
+  late ThemeData theme;
 
   @override
   void initState() {
     super.initState();
+    theme = Theme.of(CoreKit.instance.navigatorKey.currentContext!);
     _obscureText =
         widget.validationType == ValidationType.validatePassword ||
         widget.validationType == ValidationType.validateConfirmPassword;
@@ -288,15 +290,24 @@ class _CommonTextFieldState extends State<CommonTextField> {
         suffixIconColor: _iconColor(),
         focusedBorder: _buildBorder(
           color: widget.isReadOnly
-              ? (widget.borderColor ?? CoreKit.instance.outlineColor)
-              : CoreKit.instance.primaryColor,
+              ? (widget.borderColor ??
+                    theme.inputDecorationTheme.disabledBorder?.borderSide.color ??
+                    CoreKit.instance.outlineColor)
+              : theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                    CoreKit.instance.primaryColor,
           width: widget.borderWidth.w,
         ),
         enabledBorder: _buildBorder(
-          color: widget.borderColor ?? CoreKit.instance.outlineColor,
+          color:
+              widget.borderColor ??
+              theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
+              CoreKit.instance.outlineColor,
           width: widget.borderWidth.w,
         ),
-        errorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
+        errorBorder: _buildBorder(
+          color: theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red,
+          width: widget.borderWidth.w,
+        ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: widget.paddingHorizontal.w,
           vertical: widget.paddingVertical.h,
@@ -314,7 +325,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
                 ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
                       .borderRadius
                 : BorderRadius.circular(12)
-          : BorderRadius.circular(widget.borderRadius!.r),
+          : BorderRadius.circular(widget.borderRadius?.r ?? 0),
       borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
     );
   }
