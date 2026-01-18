@@ -36,8 +36,7 @@ class CommonTextField extends StatefulWidget {
     this.borderWidth = 1.2,
     this.showValidationMessage = true,
     this.textAlign = TextAlign.left,
-    this.maxWords,
-    this.onInit,
+    this.maxWords, 
   });
 
   final double borderWidth;
@@ -65,8 +64,7 @@ class CommonTextField extends StatefulWidget {
   final String Function()? originalPassword;
   final Color? backgroundColor;
   final bool showValidationMessage;
-  final TextAlign textAlign;
-  final void Function(TextEditingController controller)? onInit;
+  final TextAlign textAlign; 
 
   final String? Function(String? value)? validation;
 
@@ -95,11 +93,15 @@ class _CommonTextFieldState extends State<CommonTextField> {
     if (widget.initialText != null) {
       _controller.text = widget.initialText ?? '';
     }
+    
 
     _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        _onSave(_controller.text);
+      }
       setState(() {});
     });
-    widget.onInit?.call(_controller);
+
   }
 
   @override
@@ -190,6 +192,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
       onTapOutside: (event) => _focusNode.unfocus(),
       enableInteractiveSelection: !widget.isReadOnly,
       obscureText: _obscureText,
+      onTapUpOutside: (event) {
+        _onSave(_controller.text);
+      },
+      
       readOnly: widget.isReadOnly,
       onChanged: widget.onChanged,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -247,6 +253,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
           },
       style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
       decoration: InputDecoration(
+      
         filled: true,
         counterText: '',
         errorMaxLines: widget.showValidationMessage ? 2 : 1,
