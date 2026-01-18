@@ -27,6 +27,7 @@ export 'package:core_kit/dialoge/common_dialog.dart';
 export 'package:core_kit/dropdown/common_drop_down.dart';
 // form
 export 'package:core_kit/form/custom_form.dart';
+export 'package:core_kit/form/form_builder.dart';
 //image
 export 'package:core_kit/image/common_image.dart';
 export 'package:core_kit/image/image_picker/common_image_picker.dart';

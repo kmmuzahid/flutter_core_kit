@@ -1,5 +1,11 @@
+/*
+ * @Author: Km Muzahid
+ * @Date: 2026-01-05 16:03:11
+ * @Email: km.muzahid@gmail.com
+ */
 import 'package:flutter/material.dart';
 
+@Deprecated('Use FormBuilder instead')
 class CustomForm extends StatefulWidget {
   const CustomForm({required this.builder, super.key});
 
