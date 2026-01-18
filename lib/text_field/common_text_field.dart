@@ -37,6 +37,7 @@ class CommonTextField extends StatefulWidget {
     this.showValidationMessage = true,
     this.textAlign = TextAlign.left,
     this.maxWords,
+    this.onInit,
   });
 
   final double borderWidth;
@@ -65,6 +66,7 @@ class CommonTextField extends StatefulWidget {
   final Color? backgroundColor;
   final bool showValidationMessage;
   final TextAlign textAlign;
+  final void Function(TextEditingController controller)? onInit;
 
   final String? Function(String? value)? validation;
 
@@ -97,6 +99,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
     _focusNode.addListener(() {
       setState(() {});
     });
+    widget.onInit?.call(_controller);
   }
 
   @override
