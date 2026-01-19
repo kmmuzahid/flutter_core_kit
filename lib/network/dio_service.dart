@@ -81,7 +81,7 @@ class DioService {
       return DioService.instance;
     }
     _isInitialized = true;
-    
+
     final dioInstance = Dio(
       dio.BaseOptions(
         baseUrl: config.baseUrl,
@@ -167,11 +167,11 @@ class DioService {
 
             _log(
               _config,
-              '🚀 [REQ:${options.method} ${options.path}] ID: $requestId\n'
-              '🔹 Headers: $headers\n'
-              '🔹 Query: ${options.queryParameters}\n'
-              '🔹 Data: ${options.data is FormData ? options.data.fields : options.data?.toString().substring(0, options.data.toString().length > 200 ? 200 : null)}',
-              tag: options.path,
+              '⛹️[REQ ID: $requestId]'
+              '🔥🔥 Headers: $headers\n'
+              '🔥 Query: ${options.queryParameters}\n'
+              '🔥 Data: ${options.data is FormData ? options.data.fields : options.data?.toString().substring(0, options.data.toString().length > 200 ? 200 : null)}',
+              tag: '${options.method}::${options.path} ',
             );
           }
           handler.next(options);
@@ -181,11 +181,12 @@ class DioService {
             final requestId = response.requestOptions.extra['requestId'];
             _log(
               _config,
-              '✅ [RES:${response.statusCode} ${response.requestOptions.method} ${response.requestOptions.path}] ID: $requestId\n'
-              '🔹 Status: ${response.statusCode} ${response.statusMessage}\n'
-              '🔹 Data: ${response.data.toString().substring(0, response.data.toString().length > 200 ? 200 : null)}'
+              '✅ [REQ ID: $requestId]'
+              '✨✨ Message: ${response.statusMessage}\n'
+              '✨ Data: ${response.data.toString().substring(0, response.data.toString().length > 200 ? 200 : null)}'
               '${response.data.toString().length > 200 ? '...' : ''}',
-              tag: response.requestOptions.path,
+              tag:
+                  '${response.requestOptions.method}:${response.statusCode}::${response.requestOptions.path}',
             );
           }
           handler.next(response);
@@ -198,11 +199,12 @@ class DioService {
           if (_config.enableDebugLogs) {
             _log(
               _config,
-              '❌ [ERR:$statusCode ${error.requestOptions.method} $path] ID: $requestId\n'
-              '🔹 Error: ${error.message}\n'
-              '🔹 Type: ${error.type}\n'
-              '🔹 Response: ${error.response?.data?.toString() ?? 'No response data'}',
-              tag: path,
+              '❌[REQ ID: $requestId]'
+              '☠️☠️ Error: ${error.message}\n'
+              '☠️ Type: ${error.type}\n'
+              '☠️ Response: ${error.response?.data?.toString() ?? 'No response data'}',
+              tag:
+                  '${error.requestOptions.method}:${error.response?.statusCode}::${error.requestOptions.path}',
               isError: true,
             );
           }
@@ -464,13 +466,17 @@ class DioService {
   }
 
   Future<void> _refreshTokenIfNeeded() async {
-    final refreshToken = await getRefreshToken(); 
+    final refreshToken = await getRefreshToken();
 
     if (refreshToken?.isEmpty == true || refreshToken == null) {
       _log(_config, 'No refresh token available.', tag: 'DioService');
       return;
     }
-
+    _log(
+      _config,
+      '🚀 Headers: {\'refreshtoken\': $refreshToken}\n',
+      tag: 'POST::${_config.refreshTokenEndpoint}',
+    );
     try {
       final response = await http.post(
         Uri.parse('${_config.baseUrl}${_config.refreshTokenEndpoint}'),
@@ -479,7 +485,7 @@ class DioService {
 
       if (response.body.isNotEmpty && (response.statusCode == 200 || response.statusCode == 201)) {
         final data = jsonDecode(response.body);
-         
+
         await _tokenProvider.updateTokens(data['data']);
       } else if (response.statusCode == 401) {
         final data = jsonDecode(response.body);
@@ -488,6 +494,12 @@ class DioService {
         _config.onLogout?.call();
         return;
       } else {
+        _log(
+          _config,
+          'Refresh token failed with status: ${response.statusCode}',
+          tag: 'Auth',
+          isError: true,
+        );
         throw Exception('Refresh token failed with status: ${response.statusCode}');
       }
     } on DioException catch (e) {
