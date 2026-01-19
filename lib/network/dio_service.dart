@@ -167,8 +167,8 @@ class DioService {
 
             _log(
               _config,
-              '⛹️[REQ ID: $requestId]'
-              '🔥🔥 Headers: $headers\n'
+              '⛹️ [REQ ID: $requestId]'
+              '🔥 🔥 Headers: $headers\n'
               '🔥 Query: ${options.queryParameters}\n'
               '🔥 Data: ${options.data is FormData ? options.data.fields : options.data?.toString().substring(0, options.data.toString().length > 200 ? 200 : null)}',
               tag: '${options.method}::${options.path} ',
@@ -181,8 +181,8 @@ class DioService {
             final requestId = response.requestOptions.extra['requestId'];
             _log(
               _config,
-              '✅ [REQ ID: $requestId]'
-              '✨✨ Message: ${response.statusMessage}\n'
+              '✅ [REQ ID: $requestId]\n'
+              '✨ ✨ Message: ${response.statusMessage}\n'
               '✨ Data: ${response.data.toString().substring(0, response.data.toString().length > 200 ? 200 : null)}'
               '${response.data.toString().length > 200 ? '...' : ''}',
               tag:
@@ -199,8 +199,8 @@ class DioService {
           if (_config.enableDebugLogs) {
             _log(
               _config,
-              '❌[REQ ID: $requestId]'
-              '☠️☠️ Error: ${error.message}\n'
+              '❌ [REQ ID: $requestId]\n'
+              '☠️ ☠️ Error: ${error.message}\n'
               '☠️ Type: ${error.type}\n'
               '☠️ Response: ${error.response?.data?.toString() ?? 'No response data'}',
               tag:
