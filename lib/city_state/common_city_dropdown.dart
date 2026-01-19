@@ -4,7 +4,6 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/dropdown/common_drop_down.dart';
-import 'package:core_kit/initializer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
@@ -19,6 +18,12 @@ class CommonCityDropDown extends StatelessWidget {
     this.fontStyle,
     this.hint = 'City',
     this.prefix,
+    this.borderColor,
+    this.textStyle,
+    this.isRequired = false,
+    this.isLoading = false,
+    this.borderRadius = 8,
+    this.enableInitalSelection = false,  
   });
   final String selectedState;
   final String selectedCountry;
@@ -28,28 +33,37 @@ class CommonCityDropDown extends StatelessWidget {
   final Function(String value) onChange;
   final String hint;
   final Widget? prefix;
+  final Color? borderColor;
+  final TextStyle? textStyle;
+  final bool isRequired;
+  final bool isLoading;
+  final double borderRadius;
+  final bool enableInitalSelection;  
   @override
   Widget build(BuildContext context) {
     final city = getTheCities(
-      country: selectedCountry ?? '',
-      state: selectedState ?? '',
+      country: selectedCountry,
+      state: selectedState,
     ).map((e) => MapEntry(e, e)).toList()..sort((a, b) => a.key.compareTo(b.key));
     return CommonDropDown<MapEntry<String, String>>(
       hint: hint,
       prefix: prefix,
       fontStyle: fontStyle,
+      
       items: city,
-      textStyle: CoreKit.instance.defaultTextStyle,
-      borderColor: CoreKit.instance.outlineColor,
+      textStyle: textStyle,
+      isLoading: isLoading,
+      borderRadius: borderRadius,
+      borderColor: borderColor,
       initalValue: initalCity != null
           ? city.firstWhere(
               (element) => element.key.trim().toLowerCase() == initalCity!.trim().toLowerCase(),
               orElse: () => city.first,
             )
           : null,
-      enableInitalSelection: false,
-      backgroundColor: backgroundColor ?? CoreKit.instance.surfaceBG,
-      isRequired: true,
+      enableInitalSelection: enableInitalSelection,
+      backgroundColor: backgroundColor,
+      isRequired: isRequired,
       onChanged: (states) {
         onChange(states?.value ?? '');
       },

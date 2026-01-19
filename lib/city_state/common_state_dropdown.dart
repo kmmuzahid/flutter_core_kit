@@ -4,7 +4,6 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/dropdown/common_drop_down.dart';
-import 'package:core_kit/initializer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
@@ -18,6 +17,12 @@ class CommonStateDropdown extends StatelessWidget {
     this.initialValue,
     this.isRequired = false,
     this.fontStyle = FontStyle.normal,
+    this.backgroundColor,
+    this.borderColor,
+    this.textStyle,
+    this.isLoading = false,
+    this.borderRadius = 8,
+    this.enableInitalSelection = false,
   });
 
   final String countryName;
@@ -28,6 +33,13 @@ class CommonStateDropdown extends StatelessWidget {
   final bool isRequired;
   final FontStyle fontStyle;
 
+  final Color? borderColor;
+  final Color? backgroundColor;
+  final TextStyle? textStyle;
+  final bool isLoading;
+  final double borderRadius;
+  final bool enableInitalSelection;  
+
   @override
   Widget build(BuildContext context) {
     final state = getStates(country: countryName).map((e) => MapEntry(e, e)).toList()
@@ -37,13 +49,15 @@ class CommonStateDropdown extends StatelessWidget {
       key: const Key('Location_united_states'),
       hint: hint,
       prefix: prefix,
+      borderRadius: borderRadius,
+      isLoading: isLoading,
+      backgroundColor: backgroundColor, 
       fontStyle: fontStyle,
       items: state,
-      textStyle: CoreKit.instance.defaultTextStyle,
-      borderColor: CoreKit.instance.outlineColor,
+      textStyle: textStyle,
+      borderColor: borderColor,
       initalValue: initialValue,
-      enableInitalSelection: false,
-      backgroundColor: CoreKit.instance.surfaceBG,
+      enableInitalSelection: enableInitalSelection, 
       isRequired: isRequired,
       onChanged: onChanged,
       nameBuilder: (states) {

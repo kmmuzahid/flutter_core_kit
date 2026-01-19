@@ -464,7 +464,7 @@ class DioService {
   }
 
   Future<void> _refreshTokenIfNeeded() async {
-    final refreshToken = await _tokenProvider.refreshToken();
+    final refreshToken = await getRefreshToken(); 
 
     if (refreshToken?.isEmpty == true || refreshToken == null) {
       _log(_config, 'No refresh token available.', tag: 'DioService');

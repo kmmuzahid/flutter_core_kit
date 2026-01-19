@@ -45,10 +45,12 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
   late AnimationController _controller;
   T? _selectedItem;
   String? fontFamily = CoreKit.instance.fontFamily;
+  late ThemeData theme;
   late List<T> _items;
 
   @override
   void initState() {
+    theme = Theme.of(CoreKit.instance.navigatorKey.currentContext!);
     super.initState();
     _items = widget.items;
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
@@ -96,7 +98,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
   Widget build(BuildContext context) {
     final borderColor = widget.isLoading
         ? CoreKit.instance.primaryColor
-        : widget.borderColor ?? CoreKit.instance.outlineColor;
+        : (widget.borderColor ?? theme.inputDecorationTheme.border?.borderSide.color) ??
+              CoreKit.instance.outlineColor;
 
     return Stack(
       alignment: Alignment.center,
@@ -166,10 +169,11 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
   }
 
   InputDecoration _buildInputDecoration(BuildContext context, Color borderColor) {
+    final backgroundColor = widget.backgroundColor ?? theme.inputDecorationTheme.fillColor;
     return InputDecoration(
       isDense: true,
-      filled: widget.backgroundColor != null,
-      fillColor: widget.backgroundColor,
+      filled: backgroundColor != null,
+      fillColor: backgroundColor,
       prefixIcon: widget.prefix != null
           ? Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
