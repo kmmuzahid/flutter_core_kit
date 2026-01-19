@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:core_kit/core_kit.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'dio_request_builder.dart';
@@ -40,14 +39,12 @@ class DioServiceConfig {
 class TokenProvider {
   Future<String>? Function() accessToken;
   Future<String>? Function() refreshToken;
-  Future<void> Function(dynamic data) updateTokens;
-  Future<void> Function() clearTokens;
+  Future<void> Function(dynamic data) updateTokens; 
 
   TokenProvider({
     required this.accessToken,
     required this.refreshToken,
-    required this.updateTokens,
-    required this.clearTokens,
+    required this.updateTokens, 
   });
 }
 
@@ -150,6 +147,33 @@ class DioService {
     }
   }
 
+  Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
+    await _injectToken(requestOptions);
+
+    final options = Options(
+      method: requestOptions.method,
+      headers: Map<String, dynamic>.from(requestOptions.headers),
+      responseType: requestOptions.responseType,
+      contentType: requestOptions.contentType,
+      followRedirects: requestOptions.followRedirects,
+      validateStatus: requestOptions.validateStatus,
+      receiveTimeout: requestOptions.receiveTimeout,
+      sendTimeout: requestOptions.sendTimeout,
+      extra: requestOptions.extra,
+    );
+
+    return _dio.request(
+      requestOptions.path,
+      data: requestOptions.data,
+      queryParameters: requestOptions.queryParameters,
+      options: options,
+      cancelToken: requestOptions.cancelToken,
+      onSendProgress: requestOptions.onSendProgress,
+      onReceiveProgress: requestOptions.onReceiveProgress,
+    );
+  }
+
+
   void _addInterceptors() {
     _dio.interceptors.add(
       QueuedInterceptorsWrapper(
@@ -167,10 +191,10 @@ class DioService {
 
             _log(
               _config,
-              '⛹️ [REQ ID: $requestId]'
-              '🔥  🔥  Headers: $headers\n'
-              '🔥  Query: ${options.queryParameters}\n'
-              '🔥  Data: ${options.data is FormData ? options.data.fields : options.data?.toString().substring(0, options.data.toString().length > 200 ? 200 : null)}',
+              '🕊️ [REQ ID: $requestId]'
+              '🕊️  🕊️  Headers: $headers\n'
+              '🕊️  Query: ${options.queryParameters}\n'
+              '🕊️  Data: ${options.data is FormData ? options.data.fields : options.data?.toString().substring(0, options.data.toString().length > 200 ? 200 : null)}',
               tag: '${options.method}::${options.path} ',
             );
           }
@@ -181,10 +205,9 @@ class DioService {
             final requestId = response.requestOptions.extra['requestId'];
             _log(
               _config,
-              '✅ [REQ ID: $requestId]\n'
-              '✨  ✨  Message: ${response.statusMessage}\n'
-              '✨  Data: ${response.data.toString().substring(0, response.data.toString().length > 200 ? 200 : null)}'
-              '${response.data.toString().length > 200 ? '...' : ''}',
+              '✨ [REQ ID: $requestId]\n'
+              '✨ ✨  Message: ${response.statusMessage}\n'
+              '✨  Data: ${response.data}',
               tag:
                   '${response.requestOptions.method}:${response.statusCode}::${response.requestOptions.path}',
             );
@@ -229,8 +252,10 @@ class DioService {
                   '🔹 Request ID: $requestId',
                   tag: 'Auth',
                 );
-                final response = await _dio.fetch(error.requestOptions);
-                handler.resolve(response);
+
+                final response = await _retry(error.requestOptions);
+                handler.resolve(response); 
+                
               } catch (e) {
                 _log(
                   _config,
@@ -239,8 +264,7 @@ class DioService {
                   '🔹 Error: $e',
                   tag: 'Auth',
                   isError: true,
-                );
-                await _tokenProvider.clearTokens();
+                ); 
                 _config.onLogout?.call();
                 handler.reject(error);
               } finally {
@@ -275,8 +299,7 @@ class DioService {
               '401 received from refresh token endpoint. Logging out.',
               tag: 'Auth',
               isError: true,
-            );
-            await _tokenProvider.clearTokens();
+            ); 
             _config.onLogout?.call();
             handler.reject(error);
           } else {
@@ -442,9 +465,9 @@ class DioService {
       onReceiveProgress: input.onReceiveProgress,
     );
 
-    if (kDebugMode) {
-      _log(_config, response.data.toString(), tag: input.endpoint);
-    }
+    // if (kDebugMode) {
+    //   _log(_config, response.data.toString(), tag: input.endpoint);
+    // }
 
     final parsed = response.data['data'] != null ? responseBuilder(response.data['data']) : null;
 
@@ -489,8 +512,7 @@ class DioService {
         await _tokenProvider.updateTokens(data['data']);
       } else if (response.statusCode == 401) {
         final data = jsonDecode(response.body);
-        _showMessage(data['message'] ?? '', isError: true);
-        await _tokenProvider.clearTokens();
+        _showMessage(data['message'] ?? '', isError: true); 
         _config.onLogout?.call();
         return;
       } else {
