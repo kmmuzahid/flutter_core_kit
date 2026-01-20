@@ -2,14 +2,14 @@
 // ignore_for_file: avoid_annotating_with_dynamic
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/network/dio_interceptor.dart';
+import 'package:core_kit/network/dio_request_builder.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
 
-import 'dio_request_builder.dart';
+import 'dio_utils.dart';
 import 'request_input.dart';
 
 // Callback for request state changes
@@ -27,6 +27,7 @@ class DioServiceConfig {
 
   DioServiceConfig({
     required this.baseUrl,
+    ///Refresh token endpoint must be post method
     required this.refreshTokenEndpoint,
     this.connectTimeout = const Duration(seconds: 15),
     this.receiveTimeout = const Duration(seconds: 15),
@@ -49,25 +50,13 @@ class TokenProvider {
 }
 
 class DioService {
-  DioService._(this._dio, this._config, this._tokenProvider);
+  DioService._(this._dio, this._config);
   static late DioService instance;
   static bool _isInitialized = false;
 
   final Dio _dio;
   final DioServiceConfig _config;
-  final TokenProvider _tokenProvider;
-  Completer<void>? _refreshCompleter;
-  final List<_QueuedRequest> _queue = [];
-  bool _isServerOff = false;
-  bool _isNetworkOff = false;
-  bool _hasShownNetworkError = false;
-  DateTime? _lastServerShutdown;
-
-  bool get isServerOff => _isServerOff;
-  bool get isNetworkOff => _isNetworkOff;
-
-  Future<String>? getAccessToken() => _tokenProvider.accessToken();
-  Future<String>? getRefreshToken() => _tokenProvider.refreshToken();
+  
 
   /// Create and initialize DioService
   static Future<DioService> init({
@@ -87,235 +76,25 @@ class DioService {
       ),
     );
 
-    final instance = DioService._(dioInstance, config, tokenProvider);
-    instance._addInterceptors();
-
+    final instance = DioService._(dioInstance, config);
+    //inteceptor added
+    DioInterceptor(
+      dio: instance._dio,
+      config: instance._config,
+      tokenProvider: tokenProvider,
+    ).intercept();
+    //request builder initialized
+    DioRequestBuilder.instance.init(tokenProvider: tokenProvider, dio: dioInstance);
+    //instance created for DioService
     DioService.instance = instance;
-    _log(config, 'DioService has been created', tag: 'dio');
+    //logging
+    DioUtils.log(config, 'DioService has been created', tag: 'dio');
     return instance;
   }
 
-  static void _log(DioServiceConfig config, String message, {String? tag, bool isError = false}) {
-    if (!config.enableDebugLogs) return;
-
-    if (isError) {
-      AppLogger.apiError(message, tag: tag);
-    } else {
-      AppLogger.apiDebug(message, tag: tag);
-    }
-  }
-
-  void _showMessage(String message, {bool isError = false}) {
-    if (isError) {
-      showSnackBar(message, type: SnackBarType.error);
-    } else {
-      showSnackBar(message, type: SnackBarType.success);
-    }
-  }
-
-  Future<bool> _isNetworkAvailable() async {
-    try {
-      final response = await http
-          .get(Uri.parse('https://clients3.google.com/generate_204'))
-          .timeout(const Duration(seconds: 3));
-      return response.statusCode == 204;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<void> _checkAndHandleNetworkStatus() async {
-    final hasNetwork = await _isNetworkAvailable();
-
-    if (!hasNetwork) {
-      if (!_isNetworkOff) {
-        _isNetworkOff = true;
-        if (!_hasShownNetworkError) {
-          _hasShownNetworkError = true;
-          _showMessage('No internet connection', isError: true);
-        }
-      }
-      return;
-    }
-
-    if (_isServerOff) {
-      _isServerOff = false;
-    }
-    if (_isNetworkOff) {
-      _isNetworkOff = false;
-      _hasShownNetworkError = false;
-    }
-  }
-
-  Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
-    await _injectToken(requestOptions);
-
-    final options = Options(
-      method: requestOptions.method,
-      headers: Map<String, dynamic>.from(requestOptions.headers),
-      responseType: requestOptions.responseType,
-      contentType: requestOptions.contentType,
-      followRedirects: requestOptions.followRedirects,
-      validateStatus: requestOptions.validateStatus,
-      receiveTimeout: requestOptions.receiveTimeout,
-      sendTimeout: requestOptions.sendTimeout,
-      extra: requestOptions.extra,
-    );
-
-    return _dio.request(
-      requestOptions.path,
-      data: requestOptions.data,
-      queryParameters: requestOptions.queryParameters,
-      options: options,
-      cancelToken: requestOptions.cancelToken,
-      onSendProgress: requestOptions.onSendProgress,
-      onReceiveProgress: requestOptions.onReceiveProgress,
-    );
-  }
 
 
-  void _addInterceptors() {
-    _dio.interceptors.add(
-      QueuedInterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final requestId = DateTime.now().millisecondsSinceEpoch;
-          options.extra['requestId'] = requestId;
 
-          if (options.extra['requiresToken'] ?? true) {
-            await _injectToken(options);
-          }
-
-          if (_config.enableDebugLogs) {
-            final headers = Map<String, dynamic>.from(options.headers)
-              ..removeWhere((key, _) => key == 'authorization');
-
-            _log(
-              _config,
-              '🕊️ [REQ ID: $requestId]'
-              '🕊️  🕊️  Headers: $headers\n'
-              '🕊️  Query: ${options.queryParameters}\n'
-              '🕊️  Data: ${options.data is FormData ? options.data.fields : options.data?.toString().substring(0, options.data.toString().length > 200 ? 200 : null)}',
-              tag: '${options.method}::${options.path} ',
-            );
-          }
-          handler.next(options);
-        },
-        onResponse: (response, handler) {
-          if (_config.enableDebugLogs) {
-            final requestId = response.requestOptions.extra['requestId'];
-            _log(
-              _config,
-              '✨ [REQ ID: $requestId]\n'
-              '✨ ✨  Message: ${response.statusMessage}\n'
-              '✨  Data: ${response.data}',
-              tag:
-                  '${response.requestOptions.method}:${response.statusCode}::${response.requestOptions.path}',
-            );
-          }
-          handler.next(response);
-        },
-        onError: (DioException error, handler) async {
-          final requestId = error.requestOptions.extra['requestId'] as int? ?? 0;
-          final statusCode = error.response?.statusCode;
-          final path = error.requestOptions.path;
-
-          if (_config.enableDebugLogs) {
-            _log(
-              _config,
-              '❌ [REQ ID: $requestId]\n'
-              '☠️  ☠️  Error: ${error.message}\n'
-              '☠️  Type: ${error.type}\n'
-              '☠️  Response: ${error.response?.data?.toString() ?? 'No response data'}',
-              tag:
-                  '${error.requestOptions.method}:${error.response?.statusCode}::${error.requestOptions.path}',
-              isError: true,
-            );
-          }
-
-          await _checkAndHandleNetworkStatus();
-
-          if (statusCode == 401 && path != _config.refreshTokenEndpoint) {
-            if (_refreshCompleter == null) {
-              _refreshCompleter = Completer<void>();
-              _log(
-                _config,
-                '🔄 [AUTH] Token expired. Attempting to refresh...\n'
-                '🔹 Request ID: $requestId',
-                tag: 'Auth',
-              );
-
-              try {
-                await _refreshTokenIfNeeded();
-                _log(
-                  _config,
-                  '🔄 [AUTH] Token refresh successful\n'
-                  '🔹 Request ID: $requestId',
-                  tag: 'Auth',
-                );
-
-                final response = await _retry(error.requestOptions);
-                handler.resolve(response); 
-                
-              } catch (e) {
-                _log(
-                  _config,
-                  '❌ [AUTH] Token refresh failed\n'
-                  '🔹 Request ID: $requestId\n'
-                  '🔹 Error: $e',
-                  tag: 'Auth',
-                  isError: true,
-                ); 
-                _config.onLogout?.call();
-                handler.reject(error);
-              } finally {
-                _refreshCompleter?.complete();
-                _refreshCompleter = null;
-                _processQueue();
-              }
-            } else {
-              final responseCompleter = Completer<dio.Response>();
-              _queue.add(_QueuedRequest(error.requestOptions, responseCompleter));
-              return responseCompleter.future.then(handler.resolve).catchError((
-                Object err,
-                StackTrace stackTrace,
-              ) {
-                if (err is DioException) {
-                  handler.reject(err);
-                } else {
-                  handler.reject(
-                    DioException(
-                      requestOptions: error.requestOptions,
-                      error: err,
-                      stackTrace: stackTrace,
-                      message: err.toString(),
-                    ),
-                  );
-                }
-              });
-            }
-          } else if (statusCode == 401 && path == _config.refreshTokenEndpoint) {
-            _log(
-              _config,
-              '401 received from refresh token endpoint. Logging out.',
-              tag: 'Auth',
-              isError: true,
-            ); 
-            _config.onLogout?.call();
-            handler.reject(error);
-          } else {
-            handler.next(error);
-          }
-        },
-      ),
-    );
-  }
-
-  Future<void> _injectToken(RequestOptions options) async {
-    final accessToken = await _tokenProvider.accessToken();
-    if (accessToken?.isNotEmpty == true) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
-    }
-  }
 
   Future<ResponseState<T?>> request<T>({
     required RequestInput input,
@@ -329,26 +108,30 @@ class DioService {
     final cancelToken = CancelToken();
 
     if (debug) {
-      return await _requestBuilder(
+      return await DioRequestBuilder.instance.build(
         input: input,
         responseBuilder: responseBuilder,
         cancelToken: cancelToken,
         showMessage: showMessage,
+        retryCount: retryCount,
+        maxRetry: maxRetry,
       );
     }
 
     try {
-      return await _requestBuilder(
+      return await DioRequestBuilder.instance.build(
         showMessage: showMessage,
         input: input,
         responseBuilder: responseBuilder,
         cancelToken: cancelToken,
+        retryCount: retryCount,
+        maxRetry: maxRetry,
       );
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
-        _log(_config, 'Request cancelled: ${e.message}', tag: input.endpoint);
+        DioUtils.log(_config, 'Request cancelled: ${e.message}', tag: input.endpoint);
         if (showMessage) {
-          _showMessage(e.message ?? '', isError: true);
+          DioUtils.showMessage(e.message ?? '', isError: true);
         }
         return ResponseState(
           data: null,
@@ -369,6 +152,7 @@ class DioService {
             retryCount: retryCount + 1,
             maxRetry: maxRetry,
             showMessage: showMessage,
+            
             isRetry: true,
           );
         }
@@ -384,7 +168,7 @@ class DioService {
               ? e.response!.data['message'].toString()
               : e.response!.statusMessage;
           if (showMessage) {
-            _showMessage(message ?? '', isError: true);
+            DioUtils.showMessage(message ?? '', isError: true);
           }
           return ResponseState(
             data: parsed,
@@ -394,7 +178,7 @@ class DioService {
             statusCode: e.response!.statusCode,
           );
         } catch (parseError) {
-          _log(
+          DioUtils.log(
             _config,
             'Failed to parse error response: $parseError',
             tag: input.endpoint,
@@ -404,7 +188,11 @@ class DioService {
       }
 
       if (_shouldRetry(e) && retryCount < maxRetry) {
-        _log(_config, 'Retrying request (attempt ${retryCount + 1})...', tag: input.endpoint);
+        DioUtils.log(
+          _config,
+          'Retrying request (attempt ${retryCount + 1})...',
+          tag: input.endpoint,
+        );
         await Future.delayed(const Duration(milliseconds: 300));
         return request(
           input: input,
@@ -412,17 +200,18 @@ class DioService {
           retryCount: retryCount + 1,
           maxRetry: maxRetry,
         );
-      } else if (retryCount == maxRetry &&
-          !_isServerOff &&
-          (_lastServerShutdown == null ||
-              _lastServerShutdown!.isBefore(DateTime.now().subtract(const Duration(minutes: 1))))) {
-        _lastServerShutdown = DateTime.now();
-        _showMessage('Server is currently unavailable. Please try again later.', isError: true);
-        _isServerOff = true;
       }
+      //  else if (retryCount == maxRetry &&
+      //     !_isServerOff &&
+      //     (_lastServerShutdown == null ||
+      //         _lastServerShutdown!.isBefore(DateTime.now().subtract(const Duration(minutes: 1))))) {
+      //   _lastServerShutdown = DateTime.now();
+      //   DioUtils.showMessage('Server is currently unavailable. Please try again later.', isError: true);
+      //   _isServerOff = true;
+      // }
 
       final err = _parseError(e);
-      _log(_config, 'Request failed: $err', tag: input.endpoint, isError: true);
+      DioUtils.log(_config, 'Request failed: $err', tag: input.endpoint, isError: true);
       return ResponseState(
         data: null,
         message: e.message,
@@ -432,7 +221,7 @@ class DioService {
       );
     } catch (e) {
       final err = e.toString();
-      _log(_config, 'Unknown error occurred: $err', tag: input.endpoint, isError: true);
+      DioUtils.log(_config, 'Unknown error occurred: $err', tag: input.endpoint, isError: true);
       return ResponseState(
         data: null,
         isSuccess: false,
@@ -443,105 +232,8 @@ class DioService {
     }
   }
 
-  Future<ResponseState<T?>> _requestBuilder<T>({
-    required RequestInput input,
-    required T? Function(dynamic data) responseBuilder,
-    required CancelToken cancelToken,
-    required bool showMessage,
-  }) async {
-    final requestOptions = await DioRequestBuilder.instance.build(
-      input: input,
-      accessToken: await getAccessToken(),
-    );
 
-    dio.Response response;
-    response = await _dio.request(
-      requestOptions.path,
-      data: requestOptions.data,
-      // queryParameters: requestOptions.queryParameters,
-      options: requestOptions.options,
-      cancelToken: cancelToken,
-      onSendProgress: input.onSendProgress,
-      onReceiveProgress: input.onReceiveProgress,
-    );
 
-    // if (kDebugMode) {
-    //   _log(_config, response.data.toString(), tag: input.endpoint);
-    // }
-
-    final parsed = response.data['data'] != null ? responseBuilder(response.data['data']) : null;
-
-    final message = response.data is Map && response.data['message'] != null
-        ? response.data['message'].toString()
-        : response.statusMessage;
-
-    if (showMessage && (response.statusCode == 200 || response.statusCode == 201)) {
-      _showMessage(message ?? '', isError: false);
-    }
-
-    return ResponseState(
-      data: parsed,
-      message: message,
-      isSuccess: response.data['success'],
-      cancelToken: cancelToken,
-      statusCode: response.statusCode,
-    );
-  }
-
-  Future<void> _refreshTokenIfNeeded() async {
-    final refreshToken = await getRefreshToken();
-
-    if (refreshToken?.isEmpty == true || refreshToken == null) {
-      _log(_config, 'No refresh token available.', tag: 'DioService');
-      return;
-    }
-    _log(
-      _config,
-      '🚀 Headers: {\'refreshtoken\': $refreshToken}\n',
-      tag: 'POST::${_config.refreshTokenEndpoint}',
-    );
-    try {
-      final response = await http.post(
-        Uri.parse('${_config.baseUrl}${_config.refreshTokenEndpoint}'),
-        headers: {'refreshtoken': refreshToken},
-      );
-
-      if (response.body.isNotEmpty && (response.statusCode == 200 || response.statusCode == 201)) {
-        final data = jsonDecode(response.body);
-
-        await _tokenProvider.updateTokens(data['data']);
-      } else if (response.statusCode == 401) {
-        final data = jsonDecode(response.body);
-        _showMessage(data['message'] ?? '', isError: true); 
-        _config.onLogout?.call();
-        return;
-      } else {
-        _log(
-          _config,
-          'Refresh token failed with status: ${response.statusCode}',
-          tag: 'Auth',
-          isError: true,
-        );
-        throw Exception('Refresh token failed with status: ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      _log(_config, 'DioException during token refresh: ${e.message}', tag: 'Auth', isError: true);
-      throw Exception('Refresh token failed: ${e.message}');
-    } catch (e) {
-      _log(_config, 'Error during token refresh: $e', tag: 'Auth', isError: true);
-      throw Exception('Refresh token failed: $e');
-    }
-  }
-
-  void _processQueue() {
-    while (_queue.isNotEmpty) {
-      final req = _queue.removeAt(0);
-      _dio
-          .fetch(req.requestOptions)
-          .then(req.completer.complete)
-          .catchError(req.completer.completeError);
-    }
-  }
 
   bool _shouldRetry(DioException e) =>
       e.type == DioExceptionType.connectionTimeout ||
@@ -564,9 +256,3 @@ class DioService {
   }
 }
 
-class _QueuedRequest {
-  _QueuedRequest(this.requestOptions, this.completer);
-
-  final RequestOptions requestOptions;
-  final Completer<dio.Response> completer;
-}

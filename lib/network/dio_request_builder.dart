@@ -1,18 +1,81 @@
 import 'dart:convert';
 
+import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/response_state.dart' show ResponseState;
 import 'package:core_kit/utils/extension.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'dio_utils.dart';
 import 'request_input.dart';
 
 class DioRequestBuilder {
   DioRequestBuilder._();
   static final instance = DioRequestBuilder._();
+  late TokenProvider _tokenProvider;
+
+  late Dio _dio;
+  void init({required TokenProvider tokenProvider, required Dio dio}) {
+    _tokenProvider = tokenProvider;
+    _dio = dio;
+  }
+
+  Future<ResponseState<T?>> build<T>({
+    required RequestInput input,
+    required T? Function(dynamic data) responseBuilder,
+    required CancelToken cancelToken,
+    required bool showMessage,
+    required int retryCount,
+    required int maxRetry,
+  }) async {
+    final requestOptions = await _buildOptions(
+      input: input,
+      accessToken: await _tokenProvider.accessToken(),
+      retryCount: retryCount,
+      maxRetry: maxRetry,
+    );
+
+    dio.Response response;
+    response = await _dio.request(
+      requestOptions.path,
+      data: requestOptions.data,
+      // queryParameters: requestOptions.queryParameters,
+      options: requestOptions.options,
+      cancelToken: cancelToken,
+      onSendProgress: input.onSendProgress,
+      onReceiveProgress: input.onReceiveProgress,
+    );
+
+    // if (kDebugMode) {
+    //   DioUtils.log(_config, response.data.toString(), tag: input.endpoint);
+    // }
+
+    final parsed = response.data['data'] != null ? responseBuilder(response.data['data']) : null;
+
+    final message = response.data is Map && response.data['message'] != null
+        ? response.data['message'].toString()
+        : response.statusMessage;
+
+    if (showMessage && (response.statusCode == 200 || response.statusCode == 201)) {
+      DioUtils.showMessage(message ?? '', isError: false);
+    }
+
+    return ResponseState(
+      data: parsed,
+      message: message,
+      isSuccess: response.data['success'],
+      cancelToken: cancelToken,
+      statusCode: response.statusCode,
+    );
+  }
+
   // ignore: library_private_types_in_public_api
-  Future<_RequestOptionsData> build({
+  Future<_RequestOptionsData> _buildOptions({
     required RequestInput input,
     required String? accessToken,
+    required int retryCount,
+    required int maxRetry,
   }) async {
     String url = input.endpoint;
     input.pathParams?.forEach(
@@ -78,8 +141,7 @@ class DioRequestBuilder {
             // }
           }
         }
-      }
-      print(form.toString());
+      } 
       contentType = 'multipart/form-data';
       formData = dio.FormData.fromMap(form);
       body = formData;
@@ -94,7 +156,12 @@ class DioRequestBuilder {
     return _RequestOptionsData(
       path: url,
       data: body, 
-      options: dio.Options(method: input.method.name, headers: headers, contentType: contentType),
+      options: dio.Options(
+        extra: {'retryCount': retryCount, 'maxRetry': maxRetry},
+        method: input.method.name,
+        headers: headers,
+        contentType: contentType,
+      ),
     );
   }
 }
