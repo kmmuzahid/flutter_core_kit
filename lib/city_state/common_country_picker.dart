@@ -1,18 +1,17 @@
 /*
  * @Author: Km Muzahid
- * @Date: 2026-01-05 14:19:18
+ * @Date: 2026-01-20 12:57:02
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/dropdown/common_drop_down.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
-class CommonStateDropdown extends StatelessWidget {
-  const CommonStateDropdown({
+class CommonCountryPicker extends StatelessWidget {
+  const CommonCountryPicker({
     super.key,
-    this.hint = 'State',
+    this.hint = 'Country',
     this.prefix,
-    required this.countryName,
     required this.onChanged,
     this.initialValue,
     this.isRequired = false,
@@ -26,7 +25,6 @@ class CommonStateDropdown extends StatelessWidget {
     this.contentPadding,
   });
 
-  final String countryName;
   final Widget? prefix;
   final String hint;
   final void Function(MapEntry<String, String>?) onChanged;
@@ -39,27 +37,27 @@ class CommonStateDropdown extends StatelessWidget {
   final TextStyle? textStyle;
   final bool isLoading;
   final double borderRadius;
-  final bool enableInitalSelection;  
+  final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
   @override
   Widget build(BuildContext context) {
-    final state = getStates(country: countryName).map((e) => MapEntry(e, e)).toList()
+    final state = getStates().map((e) => MapEntry(e, e)).toList()
       ..sort((a, b) => a.key.compareTo(b.key));
 
     return CommonDropDown<MapEntry<String, String>>(
-      key: const Key('Location_united_states'),
+      key: const Key('Country_picker'),
       hint: hint,
       prefix: prefix,
       contentPadding: contentPadding,
       borderRadius: borderRadius,
       isLoading: isLoading,
-      backgroundColor: backgroundColor, 
+      backgroundColor: backgroundColor,
       fontStyle: fontStyle,
       items: state,
       textStyle: textStyle,
       borderColor: borderColor,
       initalValue: initialValue,
-      enableInitalSelection: enableInitalSelection, 
+      enableInitalSelection: enableInitalSelection,
       isRequired: isRequired,
       onChanged: onChanged,
       nameBuilder: (states) {
@@ -68,26 +66,15 @@ class CommonStateDropdown extends StatelessWidget {
     );
   }
 
-  List<String> getStates({required String country}) {
-    if (country.isEmpty) {
-      return [];
-    }
-    List<Map<String, dynamic>>? selectedCountryData;
+  List<String> getStates() {
+    List<String> stateList = [];
 
     for (final countryData in allStatesWithCities) {
-      if (countryData is Map<String, dynamic> && countryData.containsKey(country)) {
-        selectedCountryData = countryData[country];
-        break;
+      if (countryData is Map<String, dynamic>) {
+        stateList.addAll(countryData.keys);
       }
     }
 
-    final List<String> stateList = [];
-
-    if (selectedCountryData != null) {
-      for (final stateData in selectedCountryData) { 
-        stateList.addAll(stateData.entries.map((e) => e.key).toList());
-      }
-    }
     return stateList;
   }
 }

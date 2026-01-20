@@ -23,7 +23,8 @@ class CommonCityDropDown extends StatelessWidget {
     this.isRequired = false,
     this.isLoading = false,
     this.borderRadius = 8,
-    this.enableInitalSelection = false,  
+    this.enableInitalSelection = false,
+    this.contentPadding,  
   });
   final String selectedState;
   final String selectedCountry;
@@ -39,6 +40,7 @@ class CommonCityDropDown extends StatelessWidget {
   final bool isLoading;
   final double borderRadius;
   final bool enableInitalSelection;  
+  final EdgeInsets? contentPadding;
   @override
   Widget build(BuildContext context) {
     final city = getTheCities(
@@ -49,7 +51,7 @@ class CommonCityDropDown extends StatelessWidget {
       hint: hint,
       prefix: prefix,
       fontStyle: fontStyle,
-      
+      contentPadding: contentPadding,
       items: city,
       textStyle: textStyle,
       isLoading: isLoading,

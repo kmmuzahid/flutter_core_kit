@@ -20,6 +20,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.enableInitalSelection = true,
     super.key,
     this.fontStyle,
+    this.contentPadding,
   });
 
   final String hint;
@@ -36,6 +37,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final bool enableInitalSelection;
   final T? initalValue;
   final FontStyle? fontStyle;
+  final EdgeInsets? contentPadding;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -181,7 +183,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
             )
           : null,
       prefixIconConstraints: const BoxConstraints(),
-      contentPadding: EdgeInsets.only(left: 10.w, right: 2.w, top: 14.w, bottom: 14.w),
+      contentPadding:
+          widget.contentPadding ?? EdgeInsets.only(left: 10.w, right: 2.w, top: 14.w, bottom: 14.w),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(widget.borderRadius.r)),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: borderColor, width: 1.w),
