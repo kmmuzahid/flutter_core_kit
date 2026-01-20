@@ -16,14 +16,18 @@ void showSnackBar(
   Duration? customDuration, // Added option for manual control
 }) {
   SchedulerBinding.instance.addPostFrameCallback((_) {
-    final context = CoreKit.instance.navigatorKey.currentContext;
+    final navigator = CoreKit.instance.navigatorKey.currentState;
+    if (navigator == null) return;
+
+    // 2. Use the overlay context so it stays visible during pushes/pops
+    final context = navigator.overlay?.context;
     if (context == null) return;
 
     final (backgroundColor, foregroundColor, iconData) = _getSnackBarTheme(type);
 
     // SMART LOGIC: Auto-calculate duration based on text length
     // Base 3 seconds + 1 second for every 20 characters
-    final int calculatedSeconds = 3 + (text.length ~/ 20);
+    final int calculatedSeconds = 3 + (text.length ~/ 60);
     final Duration displayDuration = customDuration ?? Duration(seconds: calculatedSeconds);
 
     Flushbar(
