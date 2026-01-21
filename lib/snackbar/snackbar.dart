@@ -27,8 +27,8 @@ void showSnackBar(
 
     // SMART LOGIC: Auto-calculate duration based on text length
     // Base 3 seconds + 1 second for every 20 characters
-    final int calculatedSeconds = 3 + (text.length ~/ 60);
-    final Duration displayDuration = customDuration ?? Duration(seconds: calculatedSeconds);
+    final int calculatedSeconds = 1100 + (text.length * 10);
+    final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedSeconds);
 
     Flushbar(
       messageText: Text(
