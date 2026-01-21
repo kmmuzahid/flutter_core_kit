@@ -47,8 +47,7 @@ void main() {
                 tokenProvider: TokenProvider(
                   accessToken: () async => 'accessToken',
                   refreshToken: () async => 'refreshToken',
-                  updateTokens: (data) async {},
-                  clearTokens: () async {},
+                  updateTokens: (data) async {}, 
                 ),
               );
               return child;

@@ -13,72 +13,96 @@ enum SnackBarType { success, error, warning, info }
 void showSnackBar(
   String text, {
   required SnackBarType type,
-  Duration? customDuration, // Added option for manual control
+  Duration? customDuration,
 }) {
   SchedulerBinding.instance.addPostFrameCallback((_) {
     final navigator = CoreKit.instance.navigatorKey.currentState;
     if (navigator == null) return;
 
-    // 2. Use the overlay context so it stays visible during pushes/pops
     final context = navigator.overlay?.context;
     if (context == null) return;
 
-    final (backgroundColor, foregroundColor, iconData) = _getSnackBarTheme(type);
+    // 1. Extract Global Theme Properties
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final snackBarTheme = theme.snackBarTheme;
+    
+    // 2. Map semantic colors from the ColorScheme
+    final (accentColor, iconData) = _getSemanticColors(type, colorScheme);
 
-    // SMART LOGIC: Auto-calculate duration based on text length
-    // Base 3 seconds + 1 second for every 20 characters
-    final int calculatedSeconds = 1100 + (text.length * 10);
-    final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedSeconds);
+    // Dynamic duration logic
+    final int calculatedMs = 2000 + (text.length * 25);
+    final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedMs);
 
     Flushbar(
       messageText: Text(
         text,
-        style: TextStyle(color: foregroundColor, fontWeight: FontWeight.w600, fontSize: 14),
+        style:
+            snackBarTheme.contentTextStyle?.copyWith(
+              // 'onSurface' ensures text is readable on the background
+              color: colorScheme.onSurface.withOpacity(0.85),
+              fontWeight: FontWeight.w500,
+            ) ??
+            TextStyle(
+              color: colorScheme.onSurface.withOpacity(0.85),
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
       ),
-      backgroundColor: backgroundColor,
+      // 'surface' is the standard professional background for cards/popups
+      backgroundColor: snackBarTheme.backgroundColor ?? colorScheme.surface,
       flushbarPosition: FlushbarPosition.BOTTOM,
       
-      // Progress Indicator helps users see how much time is left
-      // showProgressIndicator: true,
-      progressIndicatorBackgroundColor: foregroundColor.withOpacity(0.1),
-      // progressIndicatorValueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
+      leftBarIndicatorColor: accentColor,
+      icon: Icon(iconData, color: accentColor, size: 24),
       
-      leftBarIndicatorColor: foregroundColor,
-      icon: Icon(iconData, color: foregroundColor, size: 28),
-      
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      borderRadius: BorderRadius.circular(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
+      borderRadius:
+          (snackBarTheme.shape as RoundedRectangleBorder?)?.borderRadius.resolve(
+            Directionality.of(context),
+          ) ??
+          BorderRadius.circular(12),
       
       boxShadows: [
         BoxShadow(
-          color: foregroundColor.withOpacity(0.12),
-          blurRadius: 12,
-          offset: const Offset(0, 5),
+          // Use onSurface opacity for shadow to adapt to Light/Dark modes
+          color: colorScheme.onSurface.withOpacity(0.08),
+          blurRadius: 20,
+          offset: const Offset(0, 8),
         ),
       ],
       
-      borderColor: foregroundColor.withOpacity(0.15),
-      borderWidth: 1,
+      borderColor: accentColor.withOpacity(0.2),
+      borderWidth: 1.5,
 
-      // --- Time Settings ---
       duration: displayDuration,
-      animationDuration: const Duration(milliseconds: 300),
+      animationDuration: const Duration(milliseconds: 400),
       isDismissible: true,
       dismissDirection: FlushbarDismissDirection.VERTICAL,
     ).show(context);
   });
 }
 
-(Color, Color, IconData) _getSnackBarTheme(SnackBarType type) {
+/// Extracts semantic colors strictly from the App's ColorScheme
+(Color, IconData) _getSemanticColors(SnackBarType type, ColorScheme colorScheme) {
   switch (type) {
     case SnackBarType.success:
-      return (const Color(0xFFF0FDF4), const Color(0xFF166534), Icons.check_circle_rounded);
+      // In Material 3, Success is usually handled by a custom 'tertiary' or a 'primary' shade
+      // If you haven't defined a success color, emerald is the professional standard.
+      return (const Color(0xFF10B981), Icons.check_circle_outline_rounded);
+      
     case SnackBarType.error:
-      return (const Color(0xFFFEF2F2), const Color(0xFF991B1B), Icons.error_rounded);
+      // Standard Material Error color
+      return (colorScheme.error, Icons.error_outline_rounded);
+      
     case SnackBarType.warning:
-      return (const Color(0xFFFFFBEB), const Color(0xFF92400E), Icons.warning_rounded);
+      // 'outlineVariant' or 'tertiary' is often used for warnings in clean designs
+      return (colorScheme.tertiary, Icons.info_outline_rounded);
+
+    case SnackBarType.info:
     default:
-      return (const Color(0xFFEFF6FF), const Color(0xFF1E40AF), Icons.info_rounded);
+      // Standard brand Primary color
+      return (colorScheme.primary, Icons.info_outline_rounded);
   }
 }
