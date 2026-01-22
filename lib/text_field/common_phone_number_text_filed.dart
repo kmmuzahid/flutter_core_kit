@@ -35,7 +35,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
     this.borderRadius,
     required this.textInputAction,
     this.hint = 'Enter your phone number',
-    this.enablePicker = true,
+    this.pickerDialogStyle,
   });
 
   final String initalCountryCode;
@@ -57,7 +57,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
   final bool showValidationMessage;
   final TextAlign textAlign;
   final String hint;
-  final bool enablePicker;
+  final PickerDialogStyle? pickerDialogStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +67,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
 
     return IntlPhoneField(
       initialCountryCode: initalCountryCode,
+      
       
       controller: controller,
       readOnly: isReadOnly,
@@ -120,14 +121,14 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
           ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
 
       // Ensures the vertical line between flag and text is clean
-      showCountryFlag: enablePicker,
+      showCountryFlag: true,
       textAlignVertical: TextAlignVertical.center,
       onChanged: countryChange,
 
       // Picker Dialog styling
-      pickerDialogStyle: !enablePicker
-          ? null
-          : PickerDialogStyle(
+      pickerDialogStyle:
+          pickerDialogStyle ??
+          PickerDialogStyle(
         backgroundColor: theme.scaffoldBackgroundColor,
         searchFieldInputDecoration: InputDecoration(
           hintText: hint,
