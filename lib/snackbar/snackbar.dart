@@ -59,7 +59,7 @@ void showSnackBar(
       behavior: SnackBarBehavior.floating,
       duration: displayDuration,
     );
-    CoreKit.instance.navigatorKey.currentState?.showSnackBar(snackBar); 
+    ScaffoldMessenger.of(CoreKit.instance.navigatorKey.currentContext!).showSnackBar(snackBar); 
 
     //   Flushbar(
     //     messageText: Text(
