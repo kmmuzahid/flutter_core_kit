@@ -120,7 +120,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
           ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
 
       // Ensures the vertical line between flag and text is clean
-      showCountryFlag: true,
+      showCountryFlag: enablePicker,
       textAlignVertical: TextAlignVertical.center,
       onChanged: countryChange,
 
