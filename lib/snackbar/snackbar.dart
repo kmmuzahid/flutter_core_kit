@@ -37,7 +37,12 @@ void showSnackBar(
       padding:
           snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: accentColor, width: 10)),
+        border: Border(
+          left: BorderSide(color: accentColor, width: 10),
+          right: BorderSide(color: accentColor, width: 1),
+          top: BorderSide(color: accentColor, width: 1),
+          bottom: BorderSide(color: accentColor, width: 1),
+        ),
       ),
       child: Row(
         children: [
