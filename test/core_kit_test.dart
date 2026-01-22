@@ -36,7 +36,7 @@ void main() {
                   // navigatorKey.currentState?.context.
                 },
                 imageBaseUrl: 'https://',
-                navigatorKey: navigatorKey,
+                scaffoldMessangeKey: navigatorKey,
               
                 dioServiceConfig: DioServiceConfig(
                   baseUrl: 'https://jsonplaceholder.typicode.com',

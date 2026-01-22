@@ -7,7 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-ThemeData get getTheme => Theme.of(CoreKit.instance.navigatorKey.currentContext!);
+ThemeData get getTheme => Theme.of(CoreKit.instance.scaffoldMessangerKey.currentContext!);
 
 extension StringCasingExtension on String {
   String capitalizeEachWord() {

@@ -51,7 +51,7 @@ class PermissionHandlerHelper {
     final fontFamily = CoreKit.instance.fontFamily;
 
     return showDialog(
-      context: CoreKit.instance.navigatorKey.currentState!.context,
+      context: CoreKit.instance.scaffoldMessangerKey.currentState!.context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(

@@ -13,7 +13,7 @@ void showSnackBar(
   required SnackBarType type,
   Duration? customDuration,
 }) {
-    final navigator = CoreKit.instance.navigatorKey.currentState;
+  final navigator = CoreKit.instance.scaffoldMessangerKey.currentState;
     if (navigator == null) return;
 
     final context = navigator.context; 
@@ -64,7 +64,7 @@ void showSnackBar(
       
       duration: displayDuration,
     );
-    CoreKit.instance.navigatorKey.currentState?.showSnackBar(snackBar); 
+  CoreKit.instance.scaffoldMessangerKey.currentState?.showSnackBar(snackBar); 
 
     //   Flushbar(
     //     messageText: Text(
