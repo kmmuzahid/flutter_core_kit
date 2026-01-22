@@ -35,6 +35,7 @@ void showSnackBar(
     final snackBar = SnackBar(
       content: Row(
         children: [
+          Container(color: accentColor, width: 15),
           Icon(iconData, color: accentColor, size: 24),
           const SizedBox(width: 10),
           Expanded(
@@ -59,7 +60,7 @@ void showSnackBar(
       behavior: SnackBarBehavior.floating,
       duration: displayDuration,
     );
-    ScaffoldMessenger.of(CoreKit.instance.navigatorKey.currentContext!).showSnackBar(snackBar); 
+    CoreKit.instance.navigatorKey.currentState?.showSnackBar(snackBar); 
 
     //   Flushbar(
     //     messageText: Text(
