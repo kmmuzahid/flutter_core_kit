@@ -3,7 +3,6 @@
  * @Date: 2026-01-05 16:41:00
  * @Email: km.muzahid@gmail.com
  */
-import 'package:another_flushbar/flushbar.dart';
 import 'package:core_kit/initializer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -33,53 +32,82 @@ void showSnackBar(
     final int calculatedMs = 2000 + (text.length * 25);
     final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedMs);
 
-    Flushbar(
-      messageText: Text(
-        text,
-        style:
-            snackBarTheme.contentTextStyle?.copyWith(
-              // 'onSurface' ensures text is readable on the background
-              color: colorScheme.onSurface.withOpacity(0.85),
-              fontWeight: FontWeight.w500,
-            ) ??
-            TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.85),
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
+    final snackBar = SnackBar(
+      content: Row(
+        children: [
+          Icon(iconData, color: accentColor, size: 24),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style:
+                  theme.snackBarTheme.contentTextStyle ??
+                  TextStyle(
+                    color: colorScheme.onSurface.withOpacity(0.85),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
             ),
+          ),
+        ],
       ),
-      // 'surface' is the standard professional background for cards/popups
       backgroundColor: snackBarTheme.backgroundColor ?? colorScheme.surface,
-      flushbarPosition: FlushbarPosition.BOTTOM,
-      
-      leftBarIndicatorColor: accentColor,
-      icon: Icon(iconData, color: accentColor, size: 24),
-      
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding:
+          snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
-      borderRadius:
-          (snackBarTheme.shape as RoundedRectangleBorder?)?.borderRadius.resolve(
-            Directionality.of(context),
-          ) ??
-          BorderRadius.circular(12),
-      
-      boxShadows: [
-        BoxShadow(
-          // Use onSurface opacity for shadow to adapt to Light/Dark modes
-          color: colorScheme.onSurface.withOpacity(0.08),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
-        ),
-      ],
-      
-      borderColor: accentColor.withOpacity(0.2),
-      borderWidth: 1.5,
-
+      shape: snackBarTheme.shape ?? RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      behavior: SnackBarBehavior.floating,
       duration: displayDuration,
-      animationDuration: const Duration(milliseconds: 400),
-      isDismissible: true,
-      dismissDirection: FlushbarDismissDirection.VERTICAL,
-    ).show(context);
+    );
+    CoreKit.instance.navigatorKey.currentState?.showSnackBar(snackBar); 
+
+    //   Flushbar(
+    //     messageText: Text(
+    //       text,
+    //       style:
+    //           snackBarTheme.contentTextStyle?.copyWith(
+    //             // 'onSurface' ensures text is readable on the background
+    //             color: colorScheme.onSurface.withOpacity(0.85),
+    //             fontWeight: FontWeight.w500,
+    //           ) ??
+    //           TextStyle(
+    //             color: colorScheme.onSurface.withOpacity(0.85),
+    //             fontWeight: FontWeight.w500,
+    //             fontSize: 14,
+    //           ),
+    //     ),
+    //     // 'surface' is the standard professional background for cards/popups
+    //     backgroundColor: snackBarTheme.backgroundColor ?? colorScheme.surface,
+    //     flushbarPosition: FlushbarPosition.BOTTOM,
+
+    //     leftBarIndicatorColor: accentColor,
+    //     icon: Icon(iconData, color: accentColor, size: 24),
+      
+    //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    //     margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
+    //     borderRadius:
+    //         (snackBarTheme.shape as RoundedRectangleBorder?)?.borderRadius.resolve(
+    //           Directionality.of(context),
+    //         ) ??
+    //         BorderRadius.circular(12),
+      
+    //     boxShadows: [
+    //       BoxShadow(
+    //         // Use onSurface opacity for shadow to adapt to Light/Dark modes
+    //         color: colorScheme.onSurface.withOpacity(0.08),
+    //         blurRadius: 20,
+    //         offset: const Offset(0, 8),
+    //       ),
+    //     ],
+      
+    //     borderColor: accentColor.withOpacity(0.2),
+    //     borderWidth: 1.5,
+
+    //     duration: displayDuration,
+    //     animationDuration: const Duration(milliseconds: 400),
+    //     isDismissible: true,
+    //     dismissDirection: FlushbarDismissDirection.VERTICAL,
+    //   ).show(context);
   });
 }
 
