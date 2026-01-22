@@ -40,6 +40,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.maxLength,
     this.maxWords,
     this.minLength = 0,
+    this.counterTextStyle,
     this.minWords = 0,
   });
 
@@ -73,6 +74,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final int? maxWords;
   final int minLength;
   final int minWords; 
+  final TextStyle? counterTextStyle;
 
   final String? Function(String? value)? validation;
 
@@ -394,11 +396,13 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
          
           Row(
             children: [
-              if ((widget.minLength > 0 || (widget.minWords > 0)))
+              if ((widget.minLength != lengthCount && widget.minLength > 0) ||
+                  (widget.minWords != wordCount && widget.minWords > 0))
                 Text(
                   (widget.minLength > 0)
                       ? '$lengthCount/${widget.minLength}'
                       : '$wordCount/${widget.minWords}',
+                  style: widget.counterTextStyle,
                 ),
 
               const Spacer(), 
@@ -407,6 +411,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                   (widget.maxLength ?? 0) > 0
                       ? '$lengthCount/${widget.maxLength}'
                       : '$wordCount/${widget.maxWords}',
+                  style: widget.counterTextStyle,
                 ),
             ],
           ),
