@@ -21,6 +21,7 @@ class CommonDropDown<T> extends StatefulWidget {
     super.key,
     this.fontStyle,
     this.contentPadding,
+    this.selectedItemBuilder,
   });
 
   final String hint;
@@ -38,6 +39,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final T? initalValue;
   final FontStyle? fontStyle;
   final EdgeInsets? contentPadding;
+  final Widget Function(T value)? selectedItemBuilder;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -108,6 +110,15 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
       children: [
         DropdownButtonFormField<T>(
           style: _getTextStyle(context),
+          selectedItemBuilder: (context) {
+            return _items.map((item) {
+              return widget.selectedItemBuilder?.call(item) ??
+                  CommonText(
+                    text: widget.nameBuilder(item).toString(),
+                    style: _getTextStyle(context),
+                  );
+            }).toList();
+          },
           onSaved: widget.onChanged,
           validator: (value) {
             if (widget.isRequired &&
