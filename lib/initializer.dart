@@ -19,7 +19,7 @@ class CoreKit {
   static final CoreKit _instance = CoreKit._();
   static CoreKit get instance => _instance;
 
-  ThemeData get theme => Theme.of(navigatorKey.currentState!.overlay!.context);
+  ThemeData get theme => Theme.of(navigatorKey.currentState!.context);
 
   // Configuration fields
 
@@ -32,7 +32,7 @@ class CoreKit {
 
   late String imageBaseUrl;
   Widget? backButton;
-  late GlobalKey<NavigatorState> navigatorKey;
+  late GlobalKey<ScaffoldMessengerState> navigatorKey;
 
   Color get backgroundColor => theme.scaffoldBackgroundColor;
   Color get primaryColor => theme.primaryColor;
@@ -51,7 +51,7 @@ class CoreKit {
   static Widget init({
     required NavigationBack back,
     required String imageBaseUrl,
-    required GlobalKey<NavigatorState> navigatorKey,
+    required GlobalKey<ScaffoldMessengerState> navigatorKey,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
     Widget? backButton,

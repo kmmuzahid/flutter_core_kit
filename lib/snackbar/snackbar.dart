@@ -19,8 +19,7 @@ void showSnackBar(
     final navigator = CoreKit.instance.navigatorKey.currentState;
     if (navigator == null) return;
 
-    final context = navigator.overlay?.context;
-    if (context == null) return;
+    final context = navigator.context; 
 
     // 1. Extract Global Theme Properties
     final theme = Theme.of(context);

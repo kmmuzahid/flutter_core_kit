@@ -20,20 +20,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<ScaffoldMessengerState> navigatorKey = GlobalKey<ScaffoldMessengerState>();
 
   setUpAll(() {});
 
   Future<void> pumpWidget(WidgetTester tester, Widget child) async {
     await tester.pumpWidget(
       MaterialApp(
-        navigatorKey: navigatorKey,
+        scaffoldMessengerKey: navigatorKey,
         home: Scaffold(
           body: LayoutBuilder(
             builder: (context, constraints) {
               CoreKit.init( 
                 back: () {
-                  navigatorKey.currentState?.pop();
+                  // navigatorKey.currentState?.context.
                 },
                 imageBaseUrl: 'https://',
                 navigatorKey: navigatorKey,
