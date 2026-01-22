@@ -5,7 +5,6 @@
  */
 import 'package:core_kit/initializer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 enum SnackBarType { success, error, warning, info }
 
@@ -14,7 +13,6 @@ void showSnackBar(
   required SnackBarType type,
   Duration? customDuration,
 }) {
-  SchedulerBinding.instance.addPostFrameCallback((_) {
     final navigator = CoreKit.instance.navigatorKey.currentState;
     if (navigator == null) return;
 
@@ -33,11 +31,14 @@ void showSnackBar(
     final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedMs);
 
     final snackBar = SnackBar(
-      content: Row(
+    content: Container(
+      decoration: BoxDecoration(
+        border: Border(left: BorderSide(color: accentColor, width: 10)),
+      ),
+      child: Row(
         children: [
-          Container(color: accentColor, width: 15),
           Icon(iconData, color: accentColor, size: 24),
-          const SizedBox(width: 10),
+          const SizedBox(width: 5),
           Expanded(
             child: Text(
               text,
@@ -51,6 +52,7 @@ void showSnackBar(
             ),
           ),
         ],
+      ),
       ),
       backgroundColor: snackBarTheme.backgroundColor ?? colorScheme.surface,
       padding:
@@ -109,7 +111,7 @@ void showSnackBar(
     //     isDismissible: true,
     //     dismissDirection: FlushbarDismissDirection.VERTICAL,
     //   ).show(context);
-  });
+
 }
 
 /// Extracts semantic colors strictly from the App's ColorScheme
