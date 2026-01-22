@@ -31,7 +31,10 @@ void showSnackBar(
     final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedMs);
 
     final snackBar = SnackBar(
+    dismissDirection: DismissDirection.vertical,
+    behavior: SnackBarBehavior.floating,
     content: Container(
+      padding: snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       decoration: BoxDecoration(
         border: Border(left: BorderSide(color: accentColor, width: 10)),
       ),
@@ -55,11 +58,10 @@ void showSnackBar(
       ),
       ),
       backgroundColor: snackBarTheme.backgroundColor ?? colorScheme.surface,
-      padding:
-          snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    padding: EdgeInsets.zero,
       margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
       shape: snackBarTheme.shape ?? RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      behavior: SnackBarBehavior.floating,
+      
       duration: displayDuration,
     );
     CoreKit.instance.navigatorKey.currentState?.showSnackBar(snackBar); 

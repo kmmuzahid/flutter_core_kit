@@ -22,7 +22,7 @@ dependencies:
   permission_handler:
   dio:
   intl_phone_field_v2:
-  another_flushbar:
+  # another_flushbar:
   share_plus:
   
 
