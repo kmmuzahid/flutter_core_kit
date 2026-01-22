@@ -2,7 +2,6 @@ import 'package:core_kit/initializer.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
-import 'package:core_kit/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -40,6 +39,8 @@ class CommonMultilineTextField extends StatefulWidget {
     this.height = 100,
     this.maxLength,
     this.maxWords,
+    this.minLength = 0,
+    this.minWords = 0,
   });
 
   final double borderWidth;
@@ -70,6 +71,8 @@ class CommonMultilineTextField extends StatefulWidget {
   final bool enableHtml;
   final double height;
   final int? maxWords;
+  final int minLength;
+  final int minWords; 
 
   final String? Function(String? value)? validation;
 
@@ -284,11 +287,21 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                       originalPassword: widget.originalPassword?.call(),
                     );
 
-                    // Check word count if maxWords is set
-                    if (widget.maxWords != null && newValue.isNotEmpty) {
+                    if (newValue.isNotEmpty) {
+                      if (widget.minLength > 0 && newValue.length < widget.minLength) {
+                        error = 'Minimum ${widget.minLength} characters required';
+                      }
+
                       final wordCount = newValue.split(' ').length;
-                      if (wordCount - 1 > widget.maxWords!) {
-                        error = 'Maximum ${widget.maxWords} words allowed';
+
+                      if (widget.minWords > 0 && wordCount < widget.minWords) {
+                        error = 'Minimum ${widget.minWords} words required';
+                      }
+
+                      if (widget.maxWords != null) {
+                        if (wordCount - 1 > widget.maxWords!) {
+                          error = 'Maximum ${widget.maxWords} words allowed';
+                        }
                       }
                     }
 
@@ -378,12 +391,25 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               ),
             ),
           ),
-          if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
-            Text(
-              (widget.maxLength ?? 0) > 0
-                  ? '$lengthCount/${widget.maxLength}'
-                  : '$wordCount/${widget.maxWords}',
-            ).end,
+         
+          Row(
+            children: [
+              if ((widget.minLength > 0 || (widget.minWords > 0)))
+                Text(
+                  (widget.minLength > 0)
+                      ? '$lengthCount/${widget.minLength}'
+                      : '$wordCount/${widget.minWords}',
+                ),
+
+              const Spacer(), 
+              if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
+                Text(
+                  (widget.maxLength ?? 0) > 0
+                      ? '$lengthCount/${widget.maxLength}'
+                      : '$wordCount/${widget.maxWords}',
+                ),
+            ],
+          ),
         ],
       ),
     );
