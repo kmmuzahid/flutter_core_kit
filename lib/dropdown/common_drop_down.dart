@@ -29,7 +29,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final Color? backgroundColor;
   final TextStyle? textStyle;
   final Function(T? value) onChanged;
-  final String Function(T value) nameBuilder;
+  final dynamic Function(T value) nameBuilder;
   final bool isRequired;
   final bool isLoading;
   final double borderRadius;
@@ -129,14 +129,15 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
           icon: const Icon(Icons.arrow_drop_down),
           dropdownColor: widget.backgroundColor ?? CoreKit.instance.surfaceBG,
           isExpanded: true,
-          items: _items
-              .map(
-                (item) => DropdownMenuItem<T>(
-                  value: item,
-                  child: CommonText(text: widget.nameBuilder(item), style: _getTextStyle(context)),
-                ),
-              )
-              .toList(),
+          items: _items.map((item) {
+            final name = widget.nameBuilder(item);
+            return DropdownMenuItem<T>(
+              value: item,
+              child: name is Widget
+                  ? name
+                  : CommonText(text: name.toString(), style: _getTextStyle(context)),
+            );
+          }).toList(),
           onChanged: (T? newValue) {
             if (newValue == null) return;
 
