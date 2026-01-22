@@ -37,6 +37,7 @@ void showSnackBar(
       padding:
           snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
         border: Border(
           left: BorderSide(color: accentColor, width: 10),
           right: BorderSide(color: accentColor, width: 1),
