@@ -31,11 +31,19 @@ import 'package:flutter/material.dart';
 ///});
 
 class FormBuilder<T> extends StatefulWidget {
-  const FormBuilder({required this.builder, required this.entity, super.key});
+  const FormBuilder({
+    required this.builder,
+    required this.entity,
+    this.scrollPhysics,
+    this.scrollDirection = Axis.vertical,
+    super.key,
+  });
 
   final Widget Function(BuildContext context, GlobalKey<FormState> formKey, T entity) builder;
 
   final T entity;
+  final ScrollPhysics? scrollPhysics;
+  final Axis scrollDirection;
 
   @override
   State<FormBuilder<T>> createState() => _FormBuilderState<T>();
@@ -54,6 +62,14 @@ class _FormBuilderState<T> extends State<FormBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(key: _formKey, child: widget.builder(context, _formKey, entity));
+    final form = Form(key: _formKey, child: widget.builder(context, _formKey, entity));
+    if (widget.scrollPhysics is NeverScrollableScrollPhysics) {
+      return form;
+    }
+    return SingleChildScrollView(
+      physics: widget.scrollPhysics,
+      scrollDirection: widget.scrollDirection,
+      child: form,
+    );
   }
 }
