@@ -3,6 +3,10 @@ import 'package:intl/intl.dart';
 class CoreKitString {
   CoreKitString._(); // Prevent instantiation
 
+  // ===== Year =====
+  static const String yearRequired = 'Year is required';
+  static const String yearInvalid = 'Year must be exactly 4 digits';
+
   // ===== Generic =====
   static const String requiredField = 'This field is required';
 

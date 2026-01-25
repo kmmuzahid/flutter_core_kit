@@ -1,3 +1,8 @@
+/*
+ * @Author: Km Muzahid
+ * @Date: 2026-01-06 12:01:32
+ * @Email: km.muzahid@gmail.com
+ */
 enum ValidationType {
   validateRequired,
   validateEmail,
@@ -22,4 +27,5 @@ enum ValidationType {
   validateFullName,
   validateNID,
   notRequired,
+  validateYear
 }

@@ -2,9 +2,9 @@ import 'package:core_kit/utils/core_kit_string.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../validation_type.dart';
 import 'date_input_formatter.dart';
 import 'phone_input_formater.dart';
-import '../validation_type.dart';
 
 class InputHelper {
   static List<TextInputFormatter> getInputFormatters(ValidationType type) {
@@ -172,6 +172,8 @@ class InputHelper {
         return TextInputType.number;
       case ValidationType.notRequired:
         return TextInputType.text;
+      case ValidationType.validateYear:
+        return TextInputType.number;
     }
   }
 
@@ -255,8 +257,22 @@ class InputHelper {
         return _validateNID(value);
       case ValidationType.notRequired:
         return null;
+      case ValidationType.validateYear:
+        return _validateYear(value);
     }
   }
+
+  static String? _validateYear(String? value) {
+    final yearRegex = RegExp(r'^\d{4}$'); // Assuming year is exactly 4 digits
+    if (value == null || value.isEmpty) {
+      return CoreKitString.yearRequired;
+    }
+    if (!yearRegex.hasMatch(value)) {
+      return CoreKitString.yearInvalid;
+    }
+    return null; // Return null if year is valid
+  }
+
 
   static String? _validateNID(String? value) {
     final nidRegex = RegExp(r'^\d{12}$'); // Assuming NID is exactly 12 digits
