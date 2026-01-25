@@ -48,7 +48,10 @@ class CommonImage extends StatelessWidget {
         child: getImage(),
       );
     } catch (e) {
-      return _buildErrorWidget();
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius.r),
+        child: _buildErrorWidget(),
+      );
     }
   }
 
@@ -73,28 +76,30 @@ class CommonImage extends StatelessWidget {
 
   Widget _buildNetworkImage() {
     final path = src.startsWith('http') ? src : '${CoreKit.instance.imageBaseUrl}$src';
-    return CachedNetworkImage(
-      height: size?.w ?? height?.w,
-      width: size?.w ?? width?.w,
-      imageUrl: path,
-      fit: fill,
-      imageBuilder: (context, imageProvider) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(borderRadius),
-          image: DecorationImage(image: imageProvider, fit: fill),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius.r),
+      child: CachedNetworkImage(
+        height: size?.w ?? height?.w,
+        width: size?.w ?? width?.w,
+        imageUrl: path,
+        fit: fill,
+        imageBuilder: (context, imageProvider) => Container(
+          decoration: BoxDecoration( 
+            image: DecorationImage(image: imageProvider, fit: fill),
+          ),
         ),
-      ),
-      progressIndicatorBuilder: (context, url, downloadProgress) {
-        return Skeletonizer(
-          enabled: (downloadProgress.progress ?? 0) < 1,
-          child: Container(color: Colors.white),
-        );
-      },
-      errorWidget: (context, url, error) {
-        AppLogger.error(error.toString(), tag: 'Common Image');
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Skeletonizer(
+            enabled: (downloadProgress.progress ?? 0) < 1,
+            child: Container(color: Colors.white),
+          );
+        },
+        errorWidget: (context, url, error) {
+          AppLogger.error(error.toString(), tag: 'Common Image');
 
-        return _buildErrorWidget();
-      },
+          return _buildErrorWidget();
+        },
+      ),
     );
   }
 
