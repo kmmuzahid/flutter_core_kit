@@ -99,28 +99,34 @@ class CommonImage extends StatelessWidget {
   }
 
   Widget _buildSvgImage() { 
-    return SvgPicture.asset(
-      src,
-      colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
-      height: size?.w ?? height?.w,
-      width: size?.w ?? width?.w,
-      fit: fill,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius.r),
+      child: SvgPicture.asset(
+        src,
+        colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
+        height: size?.w ?? height?.w,
+        width: size?.w ?? width?.w,
+        fit: fill,
+      ),
     );
   }
 
   Widget _buildFileImage() {
-    return Image.file(
-      File(src),
-      color: imageColor,
-      height: size?.w ?? height?.w,
-      width: size?.w ?? width?.w,
-      fit: fill,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius.r),
+      child: Image.file(
+        File(src),
+        color: imageColor,
+        height: size?.w ?? height?.w,
+        width: size?.w ?? width?.w,
+        fit: fill,
+      ),
     );
   }
 
   Widget _buildPngImage() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
+      borderRadius: BorderRadius.circular(borderRadius.r),
       child: Image.asset(
         src,
         color: imageColor,

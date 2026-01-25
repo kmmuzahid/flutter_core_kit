@@ -63,7 +63,9 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
 
     if (_selectedItem != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onChanged(_selectedItem);
+        if (widget.enableInitalSelection) {
+          widget.onChanged(_selectedItem);
+        }
       });
     }
   }
@@ -96,6 +98,12 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
   TextStyle _getTextStyle(BuildContext context) {
     return widget.textStyle?.copyWith(fontFamily: fontFamily) ??
         TextStyle(fontFamily: fontFamily, fontSize: 16.sp, color: CoreKit.instance.outlineColor);
+  }
+
+  
+  Color hintColor() {
+    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
+        CoreKit.instance.outlineColor;
   }
 
   @override
@@ -135,7 +143,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
             text: widget.hint,
             style: _getTextStyle(
               context,
-            ).copyWith(color: CoreKit.instance.outlineColor, fontStyle: widget.fontStyle),
+            ).copyWith(color: hintColor(), fontStyle: widget.fontStyle),
           ),
           icon: const Icon(Icons.arrow_drop_down),
           dropdownColor: widget.backgroundColor ?? CoreKit.instance.surfaceBG,

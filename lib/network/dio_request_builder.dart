@@ -78,10 +78,15 @@ class DioRequestBuilder {
     required int maxRetry,
   }) async {
     String url = input.endpoint;
-    input.pathParams?.forEach(
-      (k, v) => url = url.replaceAll('{$k}', Uri.encodeComponent(v.toString())),
-    );
-     
+    if (input.pathParams?.isNotEmpty ?? false) {
+      for (int i = 0; i < input.pathParams!.length; i++) {
+        if (i == 0 && url.endsWith('/')) {
+          url = "$url${input.pathParams![i]}";
+        } else {
+          url = "$url/${input.pathParams![i]}";
+        }
+      }
+    }
     if (input.queryParams?.isNotEmpty ?? false) {
       url = "$url?${input.queryParams!.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }

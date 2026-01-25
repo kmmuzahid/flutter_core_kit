@@ -14,6 +14,7 @@ class CommonTabBar extends StatefulWidget {
     this.isExpanded = false,
     this.unselectedTextStyle,
     this.color,
+    this.initialIndex = 0,
   });
 
   final List<String> tabs;
@@ -28,6 +29,7 @@ class CommonTabBar extends StatefulWidget {
   final Function(int index)? onTabChange;
   final double spaceing;
   final Color? color;
+  final int initialIndex;
 
   @override
   State<CommonTabBar> createState() => _CommonTabBarState();
@@ -40,6 +42,7 @@ class _CommonTabBarState extends State<CommonTabBar> {
 
   @override
   void initState() {
+    _selectedIndex = widget.initialIndex;
     primaryColor = widget.color ?? CoreKit.instance.primaryColor;
     secondaryColor = widget.color ?? CoreKit.instance.primaryColor.withAlpha(30);
     super.initState();

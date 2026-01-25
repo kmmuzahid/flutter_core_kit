@@ -1,8 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
- 
+
 import 'package:dio/dio.dart';
-import 'package:image_picker/image_picker.dart';
 
 enum RequestMethod { GET, POST, PUT, DELETE, PATCH }
 
@@ -26,7 +25,7 @@ class RequestInput {
   });
   final String endpoint; 
   final RequestMethod method;
-  final Map<String, dynamic>? pathParams;
+  final List<String>? pathParams;
   final Map<String, dynamic>? queryParams;
   final Map<String, String>? headers;
   final Map<String, dynamic>? formFields;

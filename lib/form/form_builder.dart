@@ -5,31 +5,6 @@
  */
 import 'package:flutter/material.dart';
 
-///usage:
-///
-///FormBuilder<User>(
-///entity: User(),
-///builder: (context, formKey, user) {
-///  return Column(
-///    children: [
-///      TextFormField(
-///        initialValue: user.name,
-///        onChanged: (value) {
-///          user.name = value;
-///        },
-///      ),
-///      CommonButton(
-///        titleText: 'Submit',
-///        onTap: () {
-///          if (formKey.currentState!.validate()) {
-///            formKey.currentState!.save();
-///          }
-///        },
-///      ),
-///    ],
-///  );
-///});
-
 class FormBuilder<T> extends StatefulWidget {
   const FormBuilder({
     required this.builder,
