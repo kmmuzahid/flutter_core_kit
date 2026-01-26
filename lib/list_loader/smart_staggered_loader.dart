@@ -1,8 +1,11 @@
 /// Author: Km Muzahid
 /// Date: 2025-12-29
 /// Email: km.muzahid@gmail.com
+/// LastEditors: Km Muzahid
+/// LastEditTime: 2026-01-26 11:45:00
 library;
 
+import 'package:core_kit/utils/debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart'; 
 
@@ -62,29 +65,32 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   double _appBarHeight = 0.0;
   double _stickyHeight = 0.0;
   double _currentOffset = 0.0;
-  double _position = 0.0;
+  final Debouncer _debounce = Debouncer(milliseconds: 500);
+  bool _isContentScrollable = false;
  
-
   int getNextPage() {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
   }
-
 
   @override
   void initState() {
     super.initState(); 
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    SchedulerBinding.instance.addPostFrameCallback((_) => _updateHeights());
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _updateHeights();
+      _checkScrollability();
+    });
   }
 
   void _scrollListener() {
-    _position = _scrollController.position.pixels;
     if (!_scrollController.hasClients) return;
 
     setState(() {
       _currentOffset = _scrollController.offset;
     });
+
+    _checkScrollability();
 
     final pos = _scrollController.position;
     final isNearBottom = pos.pixels >= pos.maxScrollExtent - 200;
@@ -95,7 +101,24 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
         !widget.isLoadingMore &&
         !widget.isLoadDone &&
         widget.itemCount > 0) {
-      widget.onLoadMore?.call(getNextPage());
+      _debounce.run(() {
+        if (mounted) {
+          widget.onLoadMore!(getNextPage());
+        }
+      });
+    }
+  }
+
+  void _checkScrollability() {
+    if (!_scrollController.hasClients) return;
+
+    final pos = _scrollController.position;
+    final isScrollable = pos.maxScrollExtent > 0;
+
+    if (_isContentScrollable != isScrollable) {
+      setState(() {
+        _isContentScrollable = isScrollable;
+      });
     }
   }
 
@@ -117,7 +140,21 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   @override
   Widget build(BuildContext context) {
-    final isAppBarCollapsed = _currentOffset >= _appBarHeight;
+    final isAppBarCollapsed =
+        _scrollController.hasClients && _currentOffset >= _appBarHeight && _isContentScrollable;
+
+    // Show main appbar when at top or content is not scrollable
+    final bool showMainAppBar =
+        widget.appbar != null &&
+        _appBarHeight > 0 &&
+        (_scrollController.hasClients
+            ? (_scrollController.offset < _appBarHeight || !_isContentScrollable)
+            : true);
+
+    // Show collapsed appbar when content is scrollable and scrolled past threshold
+    final bool showCollapsedAppBar =
+        widget.onColapsAppbar != null &&
+        ((isAppBarCollapsed && _isContentScrollable) || (!showMainAppBar && _isContentScrollable));
 
     return Scaffold(
       body: Stack(
@@ -132,73 +169,85 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
             ),
           ),
 
-          RefreshIndicator(
-            onRefresh: () async => widget.onRefresh?.call(),
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics:
-                  widget.physics ??
-                  const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-              slivers: [
-                if (widget.appbar != null && _position < 10)
-                  SliverAppBar(
-                    floating: true,
-                    snap: true,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
-                    toolbarHeight: _appBarHeight,
-                    automaticallyImplyLeading: false,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    titleSpacing: 0,
-                    title: widget.appbar,
-                  ),
-
-                if (widget.onColapsAppbar != null)
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickyHeaderDelegate(
-                      height: _stickyHeight,
-                      visible: isAppBarCollapsed,
-                      child: widget.onColapsAppbar!,
-                    ),
-                  ),
-
-                if (widget.topWidget != null) SliverToBoxAdapter(child: widget.topWidget),
-
-                SliverPadding(
-                  padding: widget.padding ?? EdgeInsets.zero,
-                  sliver: widget.itemCount == 0 && !widget.isLoading
-                      ? const SliverFillRemaining(
-                          hasScrollBody: false,
-                          child: Center(child: Text('No data found')),
-                        )
-                      : SliverGrid(
-                          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            childAspectRatio: widget.aspectRatio,
-                            maxCrossAxisExtent: widget.maxCrossAxisExtent,
-                            mainAxisSpacing: widget.mainAxisSpacing,
-                            crossAxisSpacing: widget.isSeperated ? 0 : widget.crossAxisSpacing,
-                          ),
-                          delegate: SliverChildBuilderDelegate((context, index) {
-                            final child = widget.itemBuilder(context, index);
-                            if (widget.isSeperated) {
-                              return LayoutBuilder(
-                                builder: (context, constraints) {
-                                  return _seprated(index, child, constraints.maxWidth);
-                                },
-                              );
-                            }
-                            return child;
-                          }, childCount: widget.itemCount),
-                        ),
-                ),
-
-                SliverToBoxAdapter(child: _buildFooter()),
-              ],
-            ),
-          ),
+          widget.onRefresh != null
+              ? RefreshIndicator(
+                  onRefresh: () async => widget.onRefresh?.call(),
+                  // Disable refresh when content doesn't fill the screen
+                  notificationPredicate: (notification) {
+                    if (!_isContentScrollable) {
+                      return false;
+                    }
+                    return notification.depth == 0;
+                  },
+                  child: _buildScrollView(showMainAppBar, showCollapsedAppBar),
+                )
+              : _buildScrollView(showMainAppBar, showCollapsedAppBar),
         ],
       ),
+    );
+  }
+
+  Widget _buildScrollView(bool showMainAppBar, bool showCollapsedAppBar) {
+    return CustomScrollView(
+      controller: _scrollController,
+      physics:
+          widget.physics ?? const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      slivers: [
+        if (showMainAppBar)
+          SliverAppBar(
+            floating: true,
+            snap: true,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            toolbarHeight: _appBarHeight,
+            automaticallyImplyLeading: false,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            titleSpacing: 0,
+            title: widget.appbar,
+          ),
+
+        if (showCollapsedAppBar)
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _StickyHeaderDelegate(
+              height: _stickyHeight,
+              visible: true,
+              child: widget.onColapsAppbar!,
+            ),
+          ),
+
+        if (widget.topWidget != null) SliverToBoxAdapter(child: widget.topWidget),
+
+        SliverPadding(
+          padding: widget.padding ?? EdgeInsets.zero,
+          sliver: widget.itemCount == 0 && !widget.isLoading
+              ? const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: Text('No data found')),
+                )
+              : SliverGrid(
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    childAspectRatio: widget.aspectRatio,
+                    maxCrossAxisExtent: widget.maxCrossAxisExtent,
+                    mainAxisSpacing: widget.mainAxisSpacing,
+                    crossAxisSpacing: widget.isSeperated ? 0 : widget.crossAxisSpacing,
+                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final child = widget.itemBuilder(context, index);
+                    if (widget.isSeperated) {
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          return _seprated(index, child, constraints.maxWidth);
+                        },
+                      );
+                    }
+                    return child;
+                  }, childCount: widget.itemCount),
+                ),
+        ),
+
+        SliverToBoxAdapter(child: _buildFooter()),
+      ],
     );
   }
 

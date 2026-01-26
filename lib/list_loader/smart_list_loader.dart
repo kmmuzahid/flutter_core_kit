@@ -2,10 +2,11 @@
 /// Date: 2025-12-29
 /// Email: km.muzahid@gmail.com
 /// LastEditors: Km Muzahid
-/// LastEditTime: 2025-12-29 11:40:00
+/// LastEditTime: 2026-01-26 11:40:00
 library;
 
 import 'package:core_kit/utils/core_screen_utils.dart';
+import 'package:core_kit/utils/debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -45,22 +46,26 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   final GlobalKey _appBarKey = GlobalKey();
   final GlobalKey _stickyKey = GlobalKey();
   late final ScrollController _scrollController;
+  final Debouncer _debounce = Debouncer(milliseconds: 500);
 
   double _appBarHeight = 0.0;
   double _stickyHeight = 0.0;
   double _currentOffset = 0.0;
- 
+  bool _isContentScrollable = false;
+
   int getNextPage() {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
   }
 
-
   @override
   void initState() {
-    super.initState(); 
+    super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    SchedulerBinding.instance.addPostFrameCallback((_) => _updateHeights());
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _updateHeights();
+      _checkScrollability();
+    });
   }
 
   void _scrollListener() {
@@ -70,11 +75,30 @@ class _SmartListLoaderState extends State<SmartListLoader> {
       _currentOffset = _scrollController.offset;
     });
 
+    _checkScrollability();
+
     final pos = _scrollController.position;
     final isAtEdge = widget.isReverse ? pos.pixels <= 100 : pos.pixels >= pos.maxScrollExtent - 200;
 
     if (isAtEdge && widget.onLoadMore != null && !widget.isLoading && !widget.isLoadDone) {
-      widget.onLoadMore!(getNextPage());
+      _debounce.run(() {
+        if (mounted) {
+          widget.onLoadMore!(getNextPage());
+        }
+      });
+    }
+  }
+
+  void _checkScrollability() {
+    if (!_scrollController.hasClients) return;
+
+    final pos = _scrollController.position;
+    final isScrollable = pos.maxScrollExtent > 0;
+
+    if (_isContentScrollable != isScrollable) {
+      setState(() {
+        _isContentScrollable = isScrollable;
+      });
     }
   }
 
@@ -94,25 +118,32 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     super.dispose();
   }
 
-/*
- * @Author: Km Muzahid 
- * @Date: 2026-01-11 16:30:00
- * @Email: km.muzahid@gmail.com
- */
-@override
-Widget build(BuildContext context) {
-    // Fix 1: Adjust collapse logic for reverse
-    // In reverse, _currentOffset increases as you scroll towards the "top" (older messages)
+  @override
+  Widget build(BuildContext context) {
+    // For reverse mode (chat-like), collapse when scrolled away from bottom
+    // For normal mode, collapse when scrolled past appbar height
     final isAppBarCollapsed = widget.isReverse
         ? _scrollController.hasClients && _scrollController.offset > 20.h
-        : _currentOffset >= _appBarHeight;
+        : _scrollController.hasClients && _currentOffset >= _appBarHeight;
 
-    // Fix 2: Adjust AppBar visibility trigger
-    // In reverse, we show the main appbar only when at the absolute bottom (pixels < 5)
+    // Show main appbar based on scroll position
+    // In reverse: show when at bottom (pixels < 5 or not scrollable)
+    // In normal: show when at top or not scrollable
     final bool showMainAppBar =
         widget.appbar != null &&
         _appBarHeight > 0 &&
-        (_scrollController.hasClients ? _scrollController.position.pixels < 5 : true);
+        (_scrollController.hasClients
+            ? (widget.isReverse
+                  ? (_scrollController.position.pixels < 5 || !_isContentScrollable)
+                  : (_scrollController.offset < _appBarHeight || !_isContentScrollable))
+            : true);
+
+    // Show collapsed appbar when:
+    // - Content is scrollable AND we've scrolled away from the top/bottom
+    // - OR when main appbar is hidden
+    final bool showCollapsedAppBar =
+        widget.onColapsAppbar != null &&
+        ((isAppBarCollapsed && _isContentScrollable) || (!showMainAppBar && _isContentScrollable));
 
     final appBarWidgets = [
       if (showMainAppBar)
@@ -127,13 +158,12 @@ Widget build(BuildContext context) {
           automaticallyImplyLeading: false,
           title: widget.appbar,
         ),
-      if (widget.onColapsAppbar != null)
+      if (showCollapsedAppBar)
         SliverPersistentHeader(
           pinned: true,
           delegate: _StickyHeaderDelegate(
             height: _stickyHeight,
-            // If reverse, we want this visible as soon as we scroll away from the bottom
-            visible: isAppBarCollapsed,
+            visible: true,
             child: widget.onColapsAppbar!,
           ),
         ),
@@ -169,24 +199,34 @@ Widget build(BuildContext context) {
             ),
           ),
 
-          RefreshIndicator(
-            onRefresh: () async => widget.onRefresh?.call(),
-            child: CustomScrollView(
-              controller: _scrollController,
-              reverse: widget.isReverse,
-              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-              slivers: [
-                // If reverse, the list comes first (it starts from bottom)
-                // If not reverse, the appbar comes first
-                if (widget.isReverse) listSliver else ...appBarWidgets,
-              
-                // If reverse, the appbar is placed at the "end" (visual top)
-                if (widget.isReverse) ...appBarWidgets.reversed else listSliver,
-              ],
-            ),
-          ),
+          // Only show RefreshIndicator if onRefresh is provided
+          widget.onRefresh != null
+              ? RefreshIndicator(
+                  onRefresh: () async => widget.onRefresh?.call(),
+                  // Disable refresh when content doesn't fill the screen in reverse mode
+                  notificationPredicate: (notification) {
+                    if (widget.isReverse && !_isContentScrollable) {
+                      return false;
+                    }
+                    return notification.depth == 0;
+                  },
+                  child: _buildScrollView(appBarWidgets, listSliver),
+                )
+              : _buildScrollView(appBarWidgets, listSliver),
         ],
       ),
+    );
+  }
+
+  Widget _buildScrollView(List<Widget> appBarWidgets, Widget listSliver) {
+    return CustomScrollView(
+      controller: _scrollController,
+      reverse: widget.isReverse,
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      slivers: [
+        if (widget.isReverse) listSliver else ...appBarWidgets,
+        if (widget.isReverse) ...appBarWidgets.reversed else listSliver,
+      ],
     );
   }
 

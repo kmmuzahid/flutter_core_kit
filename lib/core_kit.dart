@@ -69,6 +69,7 @@ export 'package:core_kit/utils/app_utils.dart';
 export 'package:core_kit/utils/common_share.dart';
 // export 'package:core_kit/utils/core_kit_string.dart';
 export 'package:core_kit/utils/core_screen_utils.dart';
+export 'package:core_kit/utils/debouncer.dart';
 export 'package:core_kit/utils/extension.dart';
 export 'package:core_kit/utils/permission_handler_helper.dart';
 
