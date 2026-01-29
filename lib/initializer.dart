@@ -14,7 +14,11 @@ class PasswordObscureIcon {
   final Widget show;
   final Widget hide;
   final EdgeInsetsGeometry padding;
-  PasswordObscureIcon({required this.show, required this.hide, required this.padding});
+  PasswordObscureIcon({
+    required this.show,
+    required this.hide,
+    this.padding = const EdgeInsetsDirectional.only(end: 10),
+  });
 }
 
 class CoreKit {
@@ -30,16 +34,11 @@ class CoreKit {
 
   // Configuration fields
 
-
   late NavigationBack back;
 
   String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
 
-  PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
-    padding: EdgeInsetsDirectional.only(end: 10.w),
-    show: const Icon(Icons.visibility, size: 20),
-    hide: const Icon(Icons.visibility_off, size: 20),
-  );
+  late PasswordObscureIcon passWordObscureIcon;
 
   TextStyle? get defaultTextStyle => theme.textTheme.bodyMedium;
 
@@ -72,27 +71,33 @@ class CoreKit {
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
     Size designSize = const Size(428, 926),
-  }) { 
+  }) {
+    _instance.designSize = designSize;
     if (_isInitialized) {
       return _SetChild(child: child ?? SizedBox.shrink());
     }
-    _instance.passWordObscureIcon = passwordObscureIcon ?? _instance.passWordObscureIcon;
-    _instance.designSize = designSize;
     _isInitialized = true;
     _instance.navigatorKey = navigatorKey;
     _instance.back = back;
     _instance.imageBaseUrl = imageBaseUrl;
     _instance.backButton = backButton;
-if (permissionHandlerColors != null) {
+    if (permissionHandlerColors != null) {
       _instance.permissionHandlerColors = permissionHandlerColors;
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        CoreScreenUtils.init(context);
-        
-        DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+        CoreScreenUtils.init(context).then((value) {
+          DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+          _instance.passWordObscureIcon =
+              passwordObscureIcon ??
+              PasswordObscureIcon(
+                padding: EdgeInsetsDirectional.only(end: 10.w),
+                show: const Icon(Icons.visibility, size: 20),
+                hide: const Icon(Icons.visibility_off, size: 20),
+              );
+        });
 
-        return _SetChild(child: child ?? SizedBox.shrink());
+        return child ?? SizedBox.shrink();
       },
     );
   }

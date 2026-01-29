@@ -13,7 +13,7 @@ class CoreScreenUtils {
   static late double _designWidth;
   static late double _designHeight;
 
-  static void init(BuildContext context) {
+  static Future<void> init(BuildContext context) async {
     deviceSize = MediaQuery.of(context).size;
     _designWidth = CoreKit.instance.designSize.width;
     _designHeight = CoreKit.instance.designSize.height;
