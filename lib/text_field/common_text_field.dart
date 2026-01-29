@@ -83,7 +83,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
   @override
   void initState() {
     super.initState();
-    theme = Theme.of(CoreKit.instance.scaffoldMessangerKey.currentContext!);
+    theme = Theme.of(CoreKit.instance.navigatorKey.currentContext!);
     _obscureText =
         widget.validationType == ValidationType.validatePassword ||
         widget.validationType == ValidationType.validateConfirmPassword;

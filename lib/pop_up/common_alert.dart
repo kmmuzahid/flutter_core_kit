@@ -37,7 +37,7 @@ class CommonAlert {
 
   Future<dynamic> _alertBuilder() {
     return showDialog(
-      context: CoreKit.instance.scaffoldMessangerKey.currentContext!,
+      context: CoreKit.instance.navigatorKey.currentContext!,
       builder: (c) => AlertDialog(
         title: Text(title, style: CoreKit.instance.defaultTextStyle),
         actionsAlignment: MainAxisAlignment.center,

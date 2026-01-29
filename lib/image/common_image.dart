@@ -34,7 +34,7 @@ class CommonImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     try {
-      if (src.isEmpty) return const SizedBox();
+      if (src.isEmpty) return placeholder();
 
       if (!enableGrayscale) return getImage();
 
@@ -53,6 +53,17 @@ class CommonImage extends StatelessWidget {
         child: _buildErrorWidget(),
       );
     }
+  }
+
+Widget placeholder() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius.r),
+      child: SizedBox(
+        height: size?.w ?? height?.w,
+        width: size?.w ?? width?.w,
+        child: Container(color: CoreKit.instance.theme.colorScheme.surface),
+      ),
+    );
   }
 
   Widget getImage() {

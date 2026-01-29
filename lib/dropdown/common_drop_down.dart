@@ -54,7 +54,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
 
   @override
   void initState() {
-    theme = Theme.of(CoreKit.instance.scaffoldMessangerKey.currentContext!);
+    theme = Theme.of(CoreKit.instance.navigatorKey.currentContext!);
     super.initState();
     _items = widget.items;
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
