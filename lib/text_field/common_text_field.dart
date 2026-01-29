@@ -64,7 +64,7 @@ class CommonTextField extends StatefulWidget {
   final String Function()? originalPassword;
   final Color? backgroundColor;
   final bool showValidationMessage;
-  final TextAlign textAlign; 
+  final TextAlign textAlign;
 
   final String? Function(String? value)? validation;
 
@@ -344,11 +344,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
     return GestureDetector(
       onTap: _togglePasswordVisibility,
       child: Padding(
-        padding: EdgeInsetsDirectional.only(end: 10.w),
-        child: Icon(
-          _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-          size: 20.sp,
-        ),
+        padding: CoreKit.instance.passWordObscureIcon.padding,
+        child: _obscureText
+            ? CoreKit.instance.passWordObscureIcon.hide
+            : CoreKit.instance.passWordObscureIcon.show,
       ),
     );
   }

@@ -10,6 +10,13 @@ import 'package:flutter/material.dart';
 
 typedef NavigationBack = void Function();
 
+class PasswordObscureIcon {
+  final Widget show;
+  final Widget hide;
+  final EdgeInsetsGeometry padding;
+  PasswordObscureIcon({required this.show, required this.hide, required this.padding});
+}
+
 class CoreKit {
   // Private constructor
   CoreKit._();
@@ -27,6 +34,12 @@ class CoreKit {
   late NavigationBack back;
 
   String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
+
+  PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
+    padding: EdgeInsetsDirectional.only(end: 10.w),
+    show: const Icon(Icons.visibility, size: 20),
+    hide: const Icon(Icons.visibility_off, size: 20),
+  );
 
   TextStyle? get defaultTextStyle => theme.textTheme.bodyMedium;
 
@@ -54,6 +67,7 @@ class CoreKit {
     required GlobalKey<NavigatorState> navigatorKey,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
+    PasswordObscureIcon? passwordObscureIcon,
     Widget? backButton,
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
@@ -62,6 +76,7 @@ class CoreKit {
     if (_isInitialized) {
       return _SetChild(child: child ?? SizedBox.shrink());
     }
+    _instance.passWordObscureIcon = passwordObscureIcon ?? _instance.passWordObscureIcon;
     _instance.designSize = designSize;
     _isInitialized = true;
     _instance.navigatorKey = navigatorKey;

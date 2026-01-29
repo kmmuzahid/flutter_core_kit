@@ -41,20 +41,24 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     actionsPadding: const EdgeInsets.only(bottom: 10),
     leading: hideBack
         ? const SizedBox.shrink()
-        : leading ??
-              IconButton(
-                onPressed: () {
-                  if (onBackPress != null) {
-                    onBackPress!();
-                  }
-                  if (!disableBack) {
-                    CoreKit.instance.back();
-                  }
-                },
-                icon: CoreKit.instance.backButton == null
-                    ? const Icon(Icons.arrow_back_ios, size: 25)
-                    : CoreKit.instance.backButton!,
-              ),
+        : Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: GestureDetector(
+              onTap: () {
+                if (onBackPress != null) {
+                  onBackPress!();
+                }
+                if (!disableBack) {
+                  CoreKit.instance.back();
+                }
+              },
+              child:
+                  leading ??
+                  (CoreKit.instance.backButton == null
+                      ? const Icon(Icons.arrow_back_ios, size: 25)
+                      : CoreKit.instance.backButton!),
+            ),
+          ),
     actions: actions ?? _appBarActions(),
 
     title:
