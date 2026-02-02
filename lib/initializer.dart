@@ -44,6 +44,8 @@ class CoreKit {
 
   late String imageBaseUrl;
   Widget? backButton;
+  Icon backIcon = const Icon(Icons.arrow_back_ios, size: 25);
+  
   late GlobalKey<NavigatorState> navigatorKey;
 
   Color get backgroundColor => theme.scaffoldBackgroundColor;
@@ -63,6 +65,7 @@ class CoreKit {
   static Widget init({
     required NavigationBack back,
     required String imageBaseUrl,
+    Icon backIcon = const Icon(Icons.arrow_back_ios, size: 25),
     required GlobalKey<NavigatorState> navigatorKey,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
@@ -73,6 +76,7 @@ class CoreKit {
     Size designSize = const Size(428, 926),
   }) {
     _instance.designSize = designSize;
+    _instance.backIcon = backIcon;
     if (_isInitialized) {
       return _SetChild(child: child ?? SizedBox.shrink());
     }
