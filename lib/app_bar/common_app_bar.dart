@@ -79,7 +79,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       leadingWidth: leadingWidth,
 
       leading: hideBack
-          ? null
+          ? SizedBox.shrink()
           : SafeArea(
               child: Container(
                 alignment: leadingAlignment,
