@@ -323,8 +323,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     ? null
                     : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
                 fillColor: widget.backgroundColor,
-                hintStyle: _getStyle(
-                  fontSize: 16.sp,
+                hintStyle: _getStyle( 
                   fontStyle:
                       CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
                       FontStyle.italic,
