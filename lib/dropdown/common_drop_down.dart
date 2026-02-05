@@ -22,6 +22,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.fontStyle,
     this.contentPadding,
     this.selectedItemBuilder,
+    this.hintStyle,
   });
 
   final String hint;
@@ -40,6 +41,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final FontStyle? fontStyle;
   final EdgeInsets? contentPadding;
   final Widget Function(T value)? selectedItemBuilder;
+  final TextStyle? hintStyle;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -141,9 +143,16 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
           decoration: _buildInputDecoration(context, borderColor),
           hint: CommonText(
             text: widget.hint,
-            style: _getTextStyle(
-              context,
-            ).copyWith(color: hintColor(), fontStyle: widget.fontStyle),
+            style:
+                widget.hintStyle ??
+                _getTextStyle(context,
+                  
+                ).copyWith(
+                  color: hintColor(),
+                  fontSize:
+                      CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
+                  fontStyle: widget.fontStyle,
+                ),
           ),
           icon: const Icon(Icons.arrow_drop_down),
           dropdownColor: widget.backgroundColor ?? CoreKit.instance.surfaceBG,
