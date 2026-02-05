@@ -36,6 +36,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
     required this.textInputAction,
     this.hint = 'Enter your phone number',
     this.pickerDialogStyle,
+    this.hintStyle,
   });
 
   final String initalCountryCode;
@@ -57,6 +58,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
   final bool showValidationMessage;
   final TextAlign textAlign;
   final String hint;
+  final TextStyle? hintStyle;
   final PickerDialogStyle? pickerDialogStyle;
 
   @override
@@ -132,10 +134,44 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
         backgroundColor: theme.scaffoldBackgroundColor,
         searchFieldInputDecoration: InputDecoration(
           hintText: hint,
+              hintStyle:
+                  hintStyle ??
+                  _getStyle(
+                    fontSize:
+                        CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
+                    fontStyle:
+                        CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
+                        FontStyle.italic,
+                    textColor: hintColor(),
+                  ),
           suffixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );
   }
+
+  TextStyle _getStyle({
+    FontWeight? fontWeight,
+    double? fontSize,
+    Color? textColor,
+    double? height,
+    FontStyle? fontStyle,
+  }) {
+    return TextStyle(
+      fontFamily: CoreKit.instance.fontFamily,
+      fontWeight: fontWeight,
+      fontSize: fontSize,
+      color: textColor,
+      height: height,
+      fontStyle: fontStyle,
+    );
+  }
+
+  Color hintColor() {
+    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
+        CoreKit.instance.outlineColor;
+  }
+
+  
 }

@@ -162,7 +162,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     final luminance = backgroundColor.computeLuminance();
 
     // Return white for dark backgrounds, black for light backgrounds
-    return luminance > 0.5 ? Colors.black : Colors.white;
+    return luminance > 0.7 ? Colors.black : Colors.white;
   }
 
   List<Widget> _appBarActions() => [];

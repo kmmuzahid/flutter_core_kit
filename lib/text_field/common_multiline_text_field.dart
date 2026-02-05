@@ -42,6 +42,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.minLength = 0,
     this.counterTextStyle,
     this.minWords = 0,
+    this.hintStyle,
   });
 
   final double borderWidth;
@@ -75,6 +76,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final int minLength;
   final int minWords; 
   final TextStyle? counterTextStyle;
+  final TextStyle? hintStyle;
 
   final String? Function(String? value)? validation;
 
@@ -323,7 +325,11 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     ? null
                     : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
                 fillColor: widget.backgroundColor,
-                hintStyle: _getStyle( 
+                hintStyle:
+                    widget.hintStyle ??
+                    _getStyle(
+                      fontSize:
+                          CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
                   fontStyle:
                       CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
                       FontStyle.italic,

@@ -38,6 +38,7 @@ class CommonTextField extends StatefulWidget {
     this.textAlign = TextAlign.left,
     this.passwordObscureIcon,
     this.maxWords, 
+    this.hintStyle,
   });
 
   final double borderWidth;
@@ -67,6 +68,7 @@ class CommonTextField extends StatefulWidget {
   final bool showValidationMessage;
   final TextAlign textAlign;
   final PasswordObscureIcon? passwordObscureIcon;
+  final TextStyle? hintStyle;
 
   final String? Function(String? value)? validation;
 
@@ -263,8 +265,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
             ? null
             : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
         fillColor: widget.backgroundColor,
-        hintStyle: _getStyle(
-          fontSize: 16.sp,
+        hintStyle:
+            widget.hintStyle ??
+            _getStyle(
+              fontSize: CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
           fontStyle:
               CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ?? FontStyle.italic,
           textColor: hintColor(),
