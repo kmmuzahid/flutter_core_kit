@@ -43,6 +43,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.counterTextStyle,
     this.minWords = 0,
     this.hintStyle,
+    this.multilineLimitHintBuilder,
   });
 
   final double borderWidth;
@@ -77,6 +78,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final int minWords; 
   final TextStyle? counterTextStyle;
   final TextStyle? hintStyle;
+  final MultilineHintLimitBuilder? multilineLimitHintBuilder;
 
   final String? Function(String? value)? validation;
 
@@ -403,21 +405,45 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
             children: [
               if ((widget.minLength != lengthCount && widget.minLength > 0) ||
                   (widget.minWords != wordCount && widget.minWords > 0))
-                Text(
+             
                   (widget.minLength > 0)
-                      ? '$lengthCount/${widget.minLength}'
-                      : '$wordCount/${widget.minWords}',
-                  style: widget.counterTextStyle,
-                ),
+                    ? (widget.multilineLimitHintBuilder?.minimumHint != null
+                          ? widget.multilineLimitHintBuilder!.minimumHint(
+                              lengthCount,
+                              widget.minLength,
+                            )
+                          : Text(
+                              '$lengthCount/${widget.minLength}',
+                              style: widget.counterTextStyle,
+                            ))
+                    : (widget.multilineLimitHintBuilder?.minimumHint != null
+                          ? widget.multilineLimitHintBuilder!.minimumHint(
+                              wordCount,
+                              widget.minWords,
+                            )
+                          : Text('$wordCount/${widget.minWords}', style: widget.counterTextStyle)),
+                  
 
               const Spacer(), 
               if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
-                Text(
+                 
                   (widget.maxLength ?? 0) > 0
-                      ? '$lengthCount/${widget.maxLength}'
-                      : '$wordCount/${widget.maxWords}',
-                  style: widget.counterTextStyle,
-                ),
+                    ? (widget.multilineLimitHintBuilder?.maximumHint != null
+                          ? widget.multilineLimitHintBuilder!.maximumHint(
+                              lengthCount,
+                              widget.maxLength!,
+                            )
+                          : Text(
+                              '$lengthCount/${widget.maxLength}',
+                              style: widget.counterTextStyle,
+                            ))
+                    : (widget.multilineLimitHintBuilder?.maximumHint != null
+                          ? widget.multilineLimitHintBuilder!.maximumHint(
+                              wordCount,
+                              widget.maxWords!,
+                            )
+                          : Text('$wordCount/${widget.maxWords}', style: widget.counterTextStyle)),
+                  
             ],
           ),
         ],
@@ -426,4 +452,12 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   }
 
 
+}
+
+
+class MultilineHintLimitBuilder {
+  final Widget Function(int currentLength, int limit) minimumHint;
+  final Widget Function(int currentLength, int limit) maximumHint;
+
+  MultilineHintLimitBuilder({required this.minimumHint, required this.maximumHint});
 }
