@@ -29,7 +29,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleColor,
     this.leadingAlignment = Alignment.center,
   });
-  
+
   final String? title;
   final Widget? titleWidget;
   final Function()? onBackPress;
@@ -104,7 +104,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                           : CoreKit.instance.backButton!),
                 ),
               ),
-          ),
+            ),
       actions: actions ?? _appBarActions(),
 
       // Use title only when no custom alignment is needed
@@ -160,9 +160,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Color _getContrastColor(Color backgroundColor) {
     // Calculate relative luminance
     final luminance = backgroundColor.computeLuminance();
-
+    print(luminance);
     // Return white for dark backgrounds, black for light backgrounds
-    return luminance > 0.7 ? Colors.black : Colors.white;
+    return luminance > 0.96 ? Colors.black : Colors.white;
   }
 
   List<Widget> _appBarActions() => [];
