@@ -6,6 +6,7 @@
 
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
+import 'package:core_kit/utils/permission_helper.dart';
 import 'package:flutter/material.dart';
 
 typedef NavigationBack = void Function();
@@ -25,6 +26,8 @@ class CoreKit {
   // Private constructor
   CoreKit._();
   static bool _isInitialized = false;
+
+  PermissionHelperConfig permissionHelperConfig = PermissionHelperConfig();
 
   // Singleton instance
   static final CoreKit _instance = CoreKit._();
@@ -74,11 +77,15 @@ class CoreKit {
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
     Size designSize = const Size(428, 926),
+    PermissionHelperConfig? permissionHelperStrings,
   }) {
     _instance.designSize = designSize;
     _instance.backIcon = backIcon;
     if (_isInitialized) {
       return _SetChild(child: child ?? SizedBox.shrink());
+    }
+    if (permissionHelperStrings != null) {
+      _instance.permissionHelperConfig = permissionHelperStrings;
     }
     _isInitialized = true;
     _instance.navigatorKey = navigatorKey;

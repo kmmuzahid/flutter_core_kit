@@ -5,12 +5,21 @@ import 'package:core_kit/utils/app_log.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-@Deprecated('Use PermissionHelper instead')
-class PermissionHandlerHelper {
-  const PermissionHandlerHelper({required this.permission});
-  final Permission permission;
+/// A helper class for handling permission requests.
+class PermissionHelper {
+  const PermissionHelper();
 
-  Future<bool> getStatus() async {
+  /// Requests permission from the user.
+  ///
+  /// [permission] The permission to request.
+  ///
+  /// Returns `true` if the permission is granted, `false` otherwise.
+  ///
+  /// Example:
+  /// ```dart
+  /// final status = await PermissionHelper.request(Permission.camera);
+  /// ```
+  static Future<bool> request(Permission permission) async {
     bool currentStatus = false;
 
     if ((permission == Permission.photos || permission == Permission.storage) &&
@@ -35,7 +44,7 @@ class PermissionHandlerHelper {
         );
 
         if (status.isPermanentlyDenied) {
-          _dialog();
+          _dialog(permission);
         }
 
         return false;
@@ -45,7 +54,7 @@ class PermissionHandlerHelper {
     return true;
   }
 
-  Future<dynamic> _dialog() {
+  static Future<dynamic> _dialog(Permission permission) {
     final errorColor = CoreKit.instance.permissionHandlerColors.errorColor;
     final actionColor = CoreKit.instance.permissionHandlerColors.actionColor;
     final normalColor = CoreKit.instance.permissionHandlerColors.normalColor;
@@ -60,7 +69,7 @@ class PermissionHandlerHelper {
             Icon(Icons.warning_amber_rounded, color: errorColor),
             const SizedBox(width: 8),
             Text(
-              'Permission Denied',
+              CoreKit.instance.permissionHelperConfig.permissionDenied,
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontWeight: FontWeight.bold,
@@ -80,7 +89,7 @@ class PermissionHandlerHelper {
                 children: [
                   TextSpan(
                     text:
-                        '❌ ${_getPermissionName(permission)} permission is permanently denied.\n\n',
+                        '❌ ${_getPermissionName(permission)} ${CoreKit.instance.permissionHelperConfig.permissionIsPermanentlyDenied}\n\n',
                     style: TextStyle(
                       fontFamily: fontFamily,
                       color: errorColor,
@@ -88,11 +97,11 @@ class PermissionHandlerHelper {
                     ),
                   ),
                   TextSpan(
-                    text: '✅ To fix this, please go to ',
+                    text: '✅ ${CoreKit.instance.permissionHelperConfig.toFixThisPleaseGoTo} ',
                     style: TextStyle(fontFamily: fontFamily, color: normalColor),
                   ),
                   TextSpan(
-                    text: 'App Settings',
+                    text: CoreKit.instance.permissionHelperConfig.openSettings,
                     style: TextStyle(
                       fontFamily: fontFamily,
                       color: actionColor,
@@ -101,7 +110,8 @@ class PermissionHandlerHelper {
                     ),
                   ),
                   TextSpan(
-                    text: ' and allow the permission manually.',
+                    text:
+                        ' ${CoreKit.instance.permissionHelperConfig.andAllowThePermissionManually}',
                     style: TextStyle(fontFamily: fontFamily, color: normalColor),
                   ),
                 ],
@@ -117,7 +127,7 @@ class PermissionHandlerHelper {
             },
             icon: Icon(Icons.settings, color: actionColor),
             label: Text(
-              'Open Settings',
+              CoreKit.instance.permissionHelperConfig.openSettings,
               style: TextStyle(
                 fontFamily: fontFamily,
                 color: actionColor,
@@ -128,7 +138,7 @@ class PermissionHandlerHelper {
           TextButton(
             onPressed: CoreKit.instance.back,
             child: Text(
-              'Cancel',
+              CoreKit.instance.permissionHelperConfig.cancel,
               style: TextStyle(fontFamily: fontFamily, color: Colors.grey[700]),
             ),
           ),
@@ -137,7 +147,7 @@ class PermissionHandlerHelper {
     );
   }
 
-  String _getPermissionName(Permission permission) {
+  static String _getPermissionName(Permission permission) {
     switch (permission) {
       case Permission.location:
       case Permission.locationWhenInUse:
@@ -169,4 +179,22 @@ class PermissionHandlerHelper {
         return permission.toString().split('.').last; // fallback
     }
   }
+}
+
+class PermissionHelperConfig {
+  final String permissionDenied;
+  final String openSettings;
+  final String cancel;
+  final String permissionIsPermanentlyDenied;
+  final String toFixThisPleaseGoTo;
+  final String andAllowThePermissionManually;
+
+  const PermissionHelperConfig({
+    this.permissionDenied = 'Permission Denied',
+    this.openSettings = 'Open Settings',
+    this.cancel = 'Cancel',
+    this.permissionIsPermanentlyDenied = 'Permission is permanently denied.',
+    this.toFixThisPleaseGoTo = 'To fix this, please go to ',
+    this.andAllowThePermissionManually = 'and allow the permission manually.',
+  });
 }
