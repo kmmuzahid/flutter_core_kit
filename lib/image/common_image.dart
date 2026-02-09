@@ -18,6 +18,7 @@ class CommonImage extends StatelessWidget {
     this.defaultImage,
     this.enableGrayscale = false,
     super.key,
+    this.borderRadiusCustom,
   });
   final String src;
   final String? defaultImage;
@@ -28,8 +29,11 @@ class CommonImage extends StatelessWidget {
   final double? size;
   final bool enableGrayscale;
   final BoxFit fill;
+  final BorderRadius? borderRadiusCustom;
 
-  void checkImageType() {}
+  BorderRadius getBorderRadius() {
+    return borderRadiusCustom ?? BorderRadius.circular(borderRadius.r);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +53,7 @@ class CommonImage extends StatelessWidget {
       );
     } catch (e) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius.r),
+        borderRadius: getBorderRadius(),
         child: _buildErrorWidget(),
       );
     }
@@ -57,7 +61,7 @@ class CommonImage extends StatelessWidget {
 
 Widget placeholder() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius.r),
+      borderRadius: getBorderRadius(),
       child: SizedBox(
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
@@ -88,7 +92,7 @@ Widget placeholder() {
   Widget _buildNetworkImage() {
     final path = src.startsWith('http') ? src : '${CoreKit.instance.imageBaseUrl}$src';
     return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius.r),
+      borderRadius: getBorderRadius(),
       child: CachedNetworkImage(
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
@@ -116,7 +120,7 @@ Widget placeholder() {
 
   Widget _buildSvgImage() { 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius.r),
+      borderRadius: getBorderRadius(),
       child: SvgPicture.asset(
         src,
         colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
@@ -129,7 +133,7 @@ Widget placeholder() {
 
   Widget _buildFileImage() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius.r),
+      borderRadius: getBorderRadius(),
       child: Image.file(
         File(src),
         color: imageColor,
@@ -142,7 +146,7 @@ Widget placeholder() {
 
   Widget _buildPngImage() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius.r),
+      borderRadius: getBorderRadius(),
       child: Image.asset(
         src,
         color: imageColor,
