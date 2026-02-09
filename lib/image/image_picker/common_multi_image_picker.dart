@@ -62,12 +62,7 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
       var files = (await _picker.pickMultiImage(limit: widget.limit));
       if (files.isEmpty) return;
 
-      if (widget.limit != null) {
-        if (files.length > widget.limit!) {
-          files = files.take(widget.limit!).toList();
-        }
-      }
-      
+   
 
       final existingNames = _images.map((img) => p.basename(img.path)).toSet();
       final newFiles = files.where((file) {
@@ -76,8 +71,14 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
       }).toList();
 
       if (newFiles.isNotEmpty) {
-        setState(() {
           _images.addAll(newFiles);
+        setState(() {
+          if (widget.limit != null) {
+            if (_images.length > widget.limit!) {
+              _images = _images.take(widget.limit!).toList();
+            }
+          }
+      
           widget.field.didChange(_images.map((x) => x.path).toList());
         });
       }
