@@ -25,6 +25,8 @@ class CommonButton extends StatefulWidget {
     this.prefix,
     this.suffix,
     this.elevation,
+    this.gradient,
+    this.padding,
   });
   final VoidCallback? onTap;
   final String titleText;
@@ -42,6 +44,8 @@ class CommonButton extends StatefulWidget {
   final Widget? suffix;
   final MainAxisAlignment alignment;
   final double? elevation;
+  final Gradient? gradient;
+  final EdgeInsetsGeometry? padding;
 
   @override
   State<CommonButton> createState() => _CommonButtonState();
@@ -115,8 +119,8 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     final borderWidth = widget.borderWidth?.w ?? themeBorderWidth ?? 1.5;
     final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
-    final horizontalPadding = themePadding?.horizontal ?? 24.0;
-    final verticalPadding = themePadding?.vertical ?? 12.0;
+    final horizontalPadding = themePadding?.horizontal ?? widget.padding?.horizontal ?? 24.0;
+    final verticalPadding = themePadding?.vertical ?? widget.padding?.vertical ?? 12.0;
     final backgroundColor =
         widget.buttonColor ?? themeBackgroundColor ?? CoreKit.instance.primaryColor;
     final foregroundColor = widget.titleColor ?? titleColor ?? CoreKit.instance.onPrimaryColor;
@@ -219,6 +223,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
                     ? disabledBackgroundColor
                     : backgroundColor,
               ),
+             
               foregroundColor: WidgetStateProperty.resolveWith(
                 (states) => states.contains(WidgetState.disabled)
                     ? disabledForegroundColor
