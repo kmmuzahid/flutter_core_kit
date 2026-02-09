@@ -151,7 +151,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
           floating: true,
           snap: true,
           elevation: 0,
-          titleSpacing: widget.padding?.horizontal ?? 0,
+          titleSpacing: 0,
           scrolledUnderElevation: 0,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           toolbarHeight: _appBarHeight,
