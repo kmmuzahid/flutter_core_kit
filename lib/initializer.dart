@@ -87,7 +87,7 @@ class CoreKit {
 
     if (permissionHelperStrings != null) {
       _instance.permissionHelperConfig = permissionHelperStrings;
-    } 
+    }
     _instance.navigatorKey = navigatorKey;
     _instance.back = back;
     _instance.imageBaseUrl = imageBaseUrl;
@@ -95,18 +95,38 @@ class CoreKit {
     if (permissionHandlerColors != null) {
       _instance.permissionHandlerColors = permissionHandlerColors;
     }
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        CoreScreenUtils.init(context).then((value) {
-          DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
-          if (passwordObscureIcon != null) {
-            _instance.passWordObscureIcon = passwordObscureIcon;
-          }
-        });
+    // CoreScreenUtils.init(navigatorKey.currentContext!).then((value) {
+    //   if (passwordObscureIcon != null) {
+    //     _instance.passWordObscureIcon = passwordObscureIcon;
+    //   }
+    //   DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+    // });
 
-        return child ?? SizedBox.shrink();
-      },
+    return _SetChild(
+      dioServiceConfig: dioServiceConfig,
+      tokenProvider: tokenProvider,
+      passwordObscureIcon: passwordObscureIcon,
+      child: child ?? SizedBox.shrink(),
     );
+
+    // return _SetChild(
+    //   dioServiceConfig: dioServiceConfig,
+    //   tokenProvider: tokenProvider,
+    //   passwordObscureIcon: passwordObscureIcon,
+    //   child: child ?? SizedBox.shrink(),
+    // );
+    // return LayoutBuilder(
+    //   builder: (context, constraints) {
+    //     CoreScreenUtils.init(context).then((value) {
+    //       DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+    //       if (passwordObscureIcon != null) {
+    //         _instance.passWordObscureIcon = passwordObscureIcon;
+    //       }
+    //     });
+
+    //     return child ?? SizedBox.shrink();
+    //   },
+    // );
   }
 }
 
@@ -123,23 +143,39 @@ class PermissionHadlerColors {
 }
 
 class _SetChild extends StatefulWidget {
-  const _SetChild({super.key, required this.child});
+  const _SetChild({
+    super.key,
+    required this.child,
+    required this.dioServiceConfig,
+    required this.tokenProvider,
+    required this.passwordObscureIcon,
+  });
   final Widget child;
+  final DioServiceConfig dioServiceConfig;
+  final TokenProvider tokenProvider;
+  final PasswordObscureIcon? passwordObscureIcon;
 
   @override
   State<_SetChild> createState() => _SetChildState();
 }
 
 class _SetChildState extends State<_SetChild> {
-  Widget child = SizedBox.shrink();
+  bool isReady = false;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        child = widget.child;
+      CoreScreenUtils.init(context).then((value) {
+        if (widget.passwordObscureIcon != null) {
+          CoreKit.instance.passWordObscureIcon = widget.passwordObscureIcon!;
+        }
+        DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
+      });
+      Future.delayed(const Duration(milliseconds: 300), () {
         if (mounted) {
-          setState(() {});
+          setState(() {
+            isReady = true;
+          });
         }
       });
     });
@@ -147,6 +183,10 @@ class _SetChildState extends State<_SetChild> {
 
   @override
   Widget build(BuildContext context) {
-    return child;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return isReady ? widget.child : Container();
+      },
+    );
   }
 }

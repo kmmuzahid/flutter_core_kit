@@ -75,7 +75,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final double height;
   final int? maxWords;
   final int minLength;
-  final int minWords; 
+  final int minWords;
   final TextStyle? counterTextStyle;
   final TextStyle? hintStyle;
   final MultilineHintLimitBuilder? multilineLimitHintBuilder;
@@ -92,6 +92,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   late bool _obscureText;
   int wordCount = 0;
   int lengthCount = 0;
+  bool _isErrorMessageShown = false;
 
   // bool get _hasController => widget.controller != null;
 
@@ -118,6 +119,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   // Add this helper method to clean the text
   String _cleanText(String text) {
     if (text.trim().isEmpty) return text;
+
     // Remove HTML tags
     String cleaned = text.replaceAll(RegExp(r'<[^>]*>'), '');
     // Replace multiple spaces with a single space
@@ -200,7 +202,6 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     // if (enableHtml) {
@@ -226,6 +227,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               textAlignVertical: TextAlignVertical.top,
               readOnly: widget.isReadOnly,
               maxLines: null,
+              
               scrollPhysics: const BouncingScrollPhysics(),
               inputFormatters: [
                 ...InputHelper.getInputFormatters(widget.validationType),
@@ -310,6 +312,14 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                         }
                       }
                     }
+ 
+                    // setState(() {
+                    if (error == null || error == '') {
+                      _isErrorMessageShown = false;
+                    } else {
+                      _isErrorMessageShown = true;
+                    }
+                    // });
 
                     // Return the error to show the error border, but return null for the message if showValidationMessage is false
                     return widget.showValidationMessage ? error : (error != null ? '' : null);
@@ -321,22 +331,22 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               decoration: InputDecoration(
                 filled: true,
                 counterText: '',
+                
+                 
 
-                errorMaxLines: 1,
-                errorStyle: widget.showValidationMessage
-                    ? null
-                    : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
+                // errorMaxLines: 1,
+                errorStyle: _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
                 fillColor: widget.backgroundColor,
                 hintStyle:
                     widget.hintStyle ??
                     _getStyle(
                       fontSize:
                           CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
-                  fontStyle:
-                      CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
-                      FontStyle.italic,
-                  textColor: hintColor(),
-                ),
+                      fontStyle:
+                          CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
+                          FontStyle.italic,
+                      textColor: hintColor(),
+                    ),
                 prefixIcon: Column(
                   children: [
                     widget.prefixText?.isNotEmpty == true
@@ -391,59 +401,27 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                   width: widget.borderWidth.w,
                 ),
                 errorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: widget.paddingHorizontal.w,
-                  vertical: widget.paddingVertical.h,
+                contentPadding: EdgeInsets.only(
+                  left: widget.paddingHorizontal.w,
+                  right: widget.paddingHorizontal.w,
+                  top: widget.paddingVertical.h,
+                  bottom: widget.paddingVertical.h,
                 ),
                 hintText: widget.hintText,
                 labelText: widget.labelText,
               ),
             ),
           ),
-         
+          
           Row(
             children: [
-              if ((widget.minLength != lengthCount && widget.minLength > 0) ||
-                  (widget.minWords != wordCount && widget.minWords > 0))
-             
-                  (widget.minLength > 0)
-                    ? (widget.multilineLimitHintBuilder?.minimumHint != null
-                          ? widget.multilineLimitHintBuilder!.minimumHint(
-                              lengthCount,
-                              widget.minLength,
-                            )
-                          : Text(
-                              '$lengthCount/${widget.minLength}',
-                              style: widget.counterTextStyle,
-                            ))
-                    : (widget.multilineLimitHintBuilder?.minimumHint != null
-                          ? widget.multilineLimitHintBuilder!.minimumHint(
-                              wordCount,
-                              widget.minWords,
-                            )
-                          : Text('$wordCount/${widget.minWords}', style: widget.counterTextStyle)),
-                  
+              if (((widget.minLength != lengthCount && widget.minLength > 0) ||
+                  (widget.minWords != wordCount && widget.minWords > 0)))
+                _minimumHintBuilder(),
 
-              const Spacer(), 
+              const Spacer(),
               if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
-                 
-                  (widget.maxLength ?? 0) > 0
-                    ? (widget.multilineLimitHintBuilder?.maximumHint != null
-                          ? widget.multilineLimitHintBuilder!.maximumHint(
-                              lengthCount,
-                              widget.maxLength!,
-                            )
-                          : Text(
-                              '$lengthCount/${widget.maxLength}',
-                              style: widget.counterTextStyle,
-                            ))
-                    : (widget.multilineLimitHintBuilder?.maximumHint != null
-                          ? widget.multilineLimitHintBuilder!.maximumHint(
-                              wordCount,
-                              widget.maxWords!,
-                            )
-                          : Text('$wordCount/${widget.maxWords}', style: widget.counterTextStyle)),
-                  
+                _maximumHintBuilder(),
             ],
           ),
         ],
@@ -451,9 +429,26 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     );
   }
 
+  Widget _maximumHintBuilder() {
+    return (widget.maxLength ?? 0) > 0
+        ? (widget.multilineLimitHintBuilder?.maximumHint != null
+              ? widget.multilineLimitHintBuilder!.maximumHint(lengthCount, widget.maxLength!)
+              : Text('$lengthCount/${widget.maxLength}', style: widget.counterTextStyle))
+        : (widget.multilineLimitHintBuilder?.maximumHint != null
+              ? widget.multilineLimitHintBuilder!.maximumHint(wordCount, widget.maxWords!)
+              : Text('$wordCount/${widget.maxWords}', style: widget.counterTextStyle));
+  }
 
+  Widget _minimumHintBuilder() {
+    return (widget.minLength > 0)
+        ? (widget.multilineLimitHintBuilder?.minimumHint != null
+              ? widget.multilineLimitHintBuilder!.minimumHint(lengthCount, widget.minLength)
+              : Text('$lengthCount/${widget.minLength}', style: widget.counterTextStyle))
+        : (widget.multilineLimitHintBuilder?.minimumHint != null
+              ? widget.multilineLimitHintBuilder!.minimumHint(wordCount, widget.minWords)
+              : Text('$wordCount/${widget.minWords}', style: widget.counterTextStyle));
+  }
 }
-
 
 class MultilineHintLimitBuilder {
   final Widget Function(int currentLength, int limit) minimumHint;

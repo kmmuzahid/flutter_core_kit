@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import '../text/common_text.dart';
 import 'validation_type.dart';
 
+enum BorderType { outline, underline }
+
 class CommonTextField extends StatefulWidget {
   const CommonTextField({
     required this.validationType,
@@ -39,6 +41,7 @@ class CommonTextField extends StatefulWidget {
     this.passwordObscureIcon,
     this.maxWords, 
     this.hintStyle,
+    this.borderType = BorderType.outline,
   });
 
   final double borderWidth;
@@ -71,6 +74,7 @@ class CommonTextField extends StatefulWidget {
   final TextStyle? hintStyle;
 
   final String? Function(String? value)? validation;
+  final BorderType borderType;
 
   @override
   State<CommonTextField> createState() => _CommonTextFieldState();
@@ -334,7 +338,18 @@ class _CommonTextFieldState extends State<CommonTextField> {
     );
   }
 
-  OutlineInputBorder _buildBorder({required Color color, double? width}) {
+  InputBorder _buildBorder({required Color color, double? width}) {
+    if (widget.borderType == BorderType.underline) {
+      return UnderlineInputBorder(
+        borderRadius: widget.borderRadius == null
+            ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
+                  ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
+                        .borderRadius
+                  : BorderRadius.circular(12)
+            : BorderRadius.circular(widget.borderRadius?.r ?? 0),
+        borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+      );
+    }
     return OutlineInputBorder(
       borderRadius: widget.borderRadius == null
           ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
