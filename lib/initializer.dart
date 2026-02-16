@@ -41,7 +41,7 @@ class CoreKit {
   String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
 
   PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
-    padding: EdgeInsetsDirectional.only(end: 10),
+    padding: const EdgeInsetsDirectional.only(end: 10),
     show: const Icon(Icons.visibility, size: 20),
     hide: const Icon(Icons.visibility_off, size: 20),
   );
@@ -95,39 +95,15 @@ class CoreKit {
     if (permissionHandlerColors != null) {
       _instance.permissionHandlerColors = permissionHandlerColors;
     }
-    // CoreScreenUtils.init(navigatorKey.currentContext!).then((value) {
-    //   if (passwordObscureIcon != null) {
-    //     _instance.passWordObscureIcon = passwordObscureIcon;
-    //   }
-    //   DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
-    // });
 
-    // return _SetChild(
-    //   dioServiceConfig: dioServiceConfig,
-    //   tokenProvider: tokenProvider,
-    //   passwordObscureIcon: passwordObscureIcon,
-    //   child: child ?? SizedBox.shrink(),
-    // );
-
-    // return _SetChild(
-    //   dioServiceConfig: dioServiceConfig,
-    //   tokenProvider: tokenProvider,
-    //   passwordObscureIcon: passwordObscureIcon,
-    //   child: child ?? SizedBox.shrink(),
-    // );
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return CoreScreenUtils(context).init(
-          dioServiceConfig,
-          tokenProvider,
-          passwordObscureIcon,
-          child ?? Scaffold(body: Container()),
-        );
-      },
+    return _SetChild(
+      dioServiceConfig: dioServiceConfig,
+      tokenProvider: tokenProvider,
+      passwordObscureIcon: passwordObscureIcon,
+      child: child ?? const SizedBox.shrink(),
     );
   }
 }
-
 
 class PermissionHadlerColors {
   final Color errorColor;
@@ -147,7 +123,7 @@ class _SetChild extends StatefulWidget {
     required this.child,
     required this.dioServiceConfig,
     required this.tokenProvider,
-    required this.passwordObscureIcon,
+    this.passwordObscureIcon,
   });
   final Widget child;
   final DioServiceConfig dioServiceConfig;
@@ -159,32 +135,23 @@ class _SetChild extends StatefulWidget {
 }
 
 class _SetChildState extends State<_SetChild> {
-  bool isReady = false;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // CoreScreenUtils.init(context).then((value) {
-      //   if (widget.passwordObscureIcon != null) {
-      //     CoreKit.instance.passWordObscureIcon = widget.passwordObscureIcon!;
-      //   }
-      //   DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
-      // });
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          setState(() {
-            isReady = true;
-          });
-        }
-      });
-    });
+    
+    if (widget.passwordObscureIcon != null) {
+      CoreKit.instance.passWordObscureIcon = widget.passwordObscureIcon!;
+    }
+    
+    DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return isReady ? widget.child : Container();
+        CoreScreenUtils.init(context, () {});
+        return widget.child;
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:core_kit/initializer.dart';
 import 'package:core_kit/text/common_text.dart';
+import 'package:core_kit/text_field/common_text_field.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.backgroundColor,
     this.textStyle,
     this.isLoading = false,
-    this.borderRadius = 12,
+    this.borderRadius,
     this.prefix,
     this.initalValue,
     this.enableInitalSelection = true,
@@ -23,6 +24,8 @@ class CommonDropDown<T> extends StatefulWidget {
     this.contentPadding,
     this.selectedItemBuilder,
     this.hintStyle,
+    this.borderType = BorderType.outline,
+    this.borderWidth = 1.2,
   });
 
   final String hint;
@@ -34,7 +37,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final dynamic Function(T value) nameBuilder;
   final bool isRequired;
   final bool isLoading;
-  final double borderRadius;
+  final double? borderRadius;
   final Widget? prefix;
   final bool enableInitalSelection;
   final T? initalValue;
@@ -42,6 +45,8 @@ class CommonDropDown<T> extends StatefulWidget {
   final EdgeInsets? contentPadding;
   final Widget Function(T value)? selectedItemBuilder;
   final TextStyle? hintStyle;
+  final BorderType borderType;
+  final double borderWidth;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -189,7 +194,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
                   painter: _BorderLoaderPainter(
                     _controller.value,
                     borderColor,
-                    widget.borderRadius,
+                    _buildBorder(color: borderColor),
                   ),
                 );
               },
@@ -199,6 +204,28 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
     );
   }
 
+  InputBorder _buildBorder({required Color color, double? width}) {
+    if (widget.borderType == BorderType.underline) {
+      return UnderlineInputBorder(
+        borderRadius: _borderRadious(),
+        borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+      );
+    }
+    return OutlineInputBorder(
+      borderRadius: _borderRadious(),
+      borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+    );
+  }
+
+  BorderRadius _borderRadious() {
+    return widget.borderRadius == null
+        ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
+              ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
+                    .borderRadius
+              : BorderRadius.circular(12)
+        : BorderRadius.circular(widget.borderRadius?.r ?? 0);
+  }
+  
   InputDecoration _buildInputDecoration(BuildContext context, Color borderColor) {
     final backgroundColor = widget.backgroundColor ?? theme.inputDecorationTheme.fillColor;
     return InputDecoration(
@@ -214,15 +241,9 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
       prefixIconConstraints: const BoxConstraints(),
       contentPadding:
           widget.contentPadding ?? EdgeInsets.only(left: 10.w, right: 2.w, top: 14.w, bottom: 14.w),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(widget.borderRadius.r)),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: borderColor, width: 1.w),
-        borderRadius: BorderRadius.circular(widget.borderRadius.r),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: borderColor, width: 1.w),
-        borderRadius: BorderRadius.circular(widget.borderRadius.r),
-      ),
+      border: _buildBorder(color: borderColor),
+      enabledBorder: _buildBorder(color: borderColor),
+      focusedBorder: _buildBorder(color: borderColor),
     );
   }
 
@@ -235,27 +256,40 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
 }
 
 class _BorderLoaderPainter extends CustomPainter {
-  _BorderLoaderPainter(this.progress, this.color, this.borderRadius);
   final double progress;
   final Color color;
-  final double borderRadius;
+  final InputBorder inputBorder;
+
+  _BorderLoaderPainter(this.progress, this.color, this.inputBorder);
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    final path = Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(borderRadius)));
+
+    // Get correct path for ANY InputBorder type
+    Path path = inputBorder.getInnerPath(rect);
+
+    if (inputBorder is UnderlineInputBorder) {
+      path = Path();
+      path.moveTo(rect.bottomLeft.dx, rect.bottomLeft.dy);
+      path.lineTo(rect.bottomRight.dx, rect.bottomRight.dy);
+    }
 
     final paint = Paint()
       ..color = color
       ..strokeWidth = 2.w
       ..style = PaintingStyle.stroke;
 
-    final dashWidth = 50.0.w;
-    final dashSpace = 1.0.w;
-    final totalLength = dashWidth + dashSpace;
+    const double dashWidthFactor = 0.02;
+    const double dashSpaceFactor = 0.08;
+
     final pathMetrics = path.computeMetrics();
 
     for (final metric in pathMetrics) {
+      final dashWidth = metric.length * dashWidthFactor;
+      final dashSpace = metric.length * dashSpaceFactor;
+      final totalLength = dashWidth + dashSpace;
+
       double distance = progress * metric.length;
 
       while (distance < metric.length) {
@@ -267,6 +301,9 @@ class _BorderLoaderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _BorderLoaderPainter oldDelegate) =>
-      oldDelegate.progress != progress;
+  bool shouldRepaint(covariant _BorderLoaderPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.color != color ||
+        oldDelegate.inputBorder != inputBorder;
+  }
 }

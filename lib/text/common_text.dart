@@ -1,7 +1,6 @@
 import 'package:core_kit/initializer.dart' show CoreKit;
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auto_size_text/flutter_auto_size_text.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 class CommonText extends StatelessWidget {
@@ -113,35 +112,15 @@ class CommonText extends StatelessWidget {
   }
 
   String _formatNumbersInText(String text) {
-    // This regex matches decimal numbers with one or more digits before and after the decimal point
     return text.replaceAllMapped(RegExp(r'\d+\.\d+'), (match) {
       final number = double.tryParse(match.group(0) ?? '0') ?? 0;
-      // Always format to exactly 2 decimal places for decimal numbers
       return number.toStringAsFixed(2);
     });
   }
 
   Widget _textField(BuildContext context) {
     final effectiveTextStyle = getStyle();
-    final double step = stepGranularity > 0 ? stepGranularity : 1.0;
-    final double baseMin = preventScaling
-        ? (effectiveTextStyle.fontSize ?? 12.0)
-        : (minFontSize > 0 ? minFontSize : 8.0);
-    final double baseMax = preventScaling
-        ? (effectiveTextStyle.fontSize ?? 24.0)
-        : (maxAutoFontSize ?? effectiveTextStyle.fontSize ?? 24.0);
-
-    // Helper functions for quantizing font sizes
-    double qFloor(double value, double step) => (value / step).floor() * step;
-    double qCeil(double value, double step) => (value / step).ceil() * step;
-
-    final double adjustedMin = qFloor(baseMin, step);
-    double adjustedMax = qCeil(baseMax, step);
-    if (adjustedMax < adjustedMin) {
-      adjustedMax = adjustedMin;
-    }
-
-    final effectiveOverflow = overflow ?? TextOverflow.clip;
+    final effectiveOverflow = overflow ?? TextOverflow.ellipsis;
     final formattedData = _formatNumbersInText(text);
 
     Widget buildText() {
@@ -184,12 +163,16 @@ class CommonText extends StatelessWidget {
         );
       }
 
+      // For description text - no resizing
       if (isDescription) {
         return Text(
           formattedData,
           textAlign: textAlign,
           textDirection: textDirection ?? TextDirection.ltr,
           style: effectiveTextStyle,
+          maxLines: maxLines,
+          overflow: effectiveOverflow,
+          softWrap: softWrap ?? true,
         );
       }
 
@@ -217,18 +200,21 @@ class CommonText extends StatelessWidget {
             ),
           );
         } else {
-          return AutoSizeText(
-            formattedData,
-            maxLines: maxLines,
-            overflow: effectiveOverflow,
-            textAlign: textAlign,
-            softWrap: softWrap ?? true,
-            textDirection: textDirection ?? TextDirection.ltr,
-            style: effectiveTextStyle,
-            minFontSize: adjustedMin,
-            maxFontSize: adjustedMax,
-            stepGranularity: step,
-            wrapWords: true,
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return _AdaptiveText(
+                text: formattedData,
+                style: effectiveTextStyle,
+                maxLines: maxLines!,
+                textAlign: textAlign,
+                overflow: effectiveOverflow,
+                softWrap: softWrap ?? true,
+                textDirection: textDirection ?? TextDirection.ltr,
+                minFontSize: minFontSize,
+                maxFontSize: maxAutoFontSize ?? effectiveTextStyle.fontSize ?? 24.0,
+                availableWidth: constraints.maxWidth,
+              );
+            },
           );
         }
       }
@@ -244,20 +230,21 @@ class CommonText extends StatelessWidget {
           style: effectiveTextStyle,
         );
       } else {
-        return FittedBox(
-          fit: BoxFit.scaleDown,
-          child: AutoSizeText(
-            formattedData,
-            maxLines: 1,
-            overflow: effectiveOverflow,
-            textAlign: textAlign,
-            textDirection: textDirection ?? TextDirection.ltr,
-            style: effectiveTextStyle,
-            minFontSize: adjustedMin,
-            maxFontSize: adjustedMax,
-            stepGranularity: step,
-            wrapWords: false,
-          ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: _getAlignment(),
+              child: Text(
+                formattedData,
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                textAlign: textAlign,
+                textDirection: textDirection ?? TextDirection.ltr,
+                style: effectiveTextStyle,
+              ),
+            );
+          },
         );
       }
     }
@@ -274,6 +261,20 @@ class CommonText extends StatelessWidget {
     );
   }
 
+  Alignment _getAlignment() {
+    switch (textAlign) {
+      case TextAlign.left:
+      case TextAlign.start:
+        return Alignment.centerLeft;
+      case TextAlign.right:
+      case TextAlign.end:
+        return Alignment.centerRight;
+      case TextAlign.center:
+      default:
+        return Alignment.center;
+    }
+  }
+
   bool _isHtml(String input) {
     final htmlRegex = RegExp(r'<[^>]+>', multiLine: true, caseSensitive: false);
     return htmlRegex.hasMatch(input);
@@ -282,10 +283,8 @@ class CommonText extends StatelessWidget {
   TextStyle getStyle() {
     final double effectiveFontSize = fontSize ?? style?.fontSize ?? 12.0;
 
-    // Base style — either provided or default to theme.bodyMedium
     TextStyle baseStyle = style ?? const TextStyle();
 
-    // Apply style overrides while keeping fontFamily from theme
     baseStyle = baseStyle.copyWith(
       fontFamily: CoreKit.instance.fontFamily,
       fontSize: effectiveFontSize,
@@ -296,11 +295,90 @@ class CommonText extends StatelessWidget {
       decorationColor: decorationColor ?? baseStyle.decorationColor,
     );
 
-    // Optional: recalc line height if textHeight is provided
     final double? fontHeight = textHeight != null
         ? (textHeight! / effectiveFontSize)
         : baseStyle.height;
 
     return baseStyle.copyWith(height: fontHeight);
+  }
+}
+
+class _AdaptiveText extends StatelessWidget {
+  const _AdaptiveText({
+    required this.text,
+    required this.style,
+    required this.maxLines,
+    required this.textAlign,
+    required this.overflow,
+    required this.softWrap,
+    required this.textDirection,
+    required this.minFontSize,
+    required this.maxFontSize,
+    required this.availableWidth,
+  });
+
+  final String text;
+  final TextStyle style;
+  final int maxLines;
+  final TextAlign textAlign;
+  final TextOverflow overflow;
+  final bool softWrap;
+  final TextDirection textDirection;
+  final double minFontSize;
+  final double maxFontSize;
+  final double availableWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    if (availableWidth == double.infinity || availableWidth <= 0) {
+      return Text(
+        text,
+        style: style,
+        maxLines: maxLines,
+        textAlign: textAlign,
+        overflow: overflow,
+        softWrap: softWrap,
+        textDirection: textDirection,
+      );
+    }
+
+    double fontSize = maxFontSize;
+    final baseFontSize = style.fontSize ?? 14.0;
+
+    // Binary search for optimal font size
+    double low = minFontSize;
+    double high = maxFontSize;
+
+    while (high - low > 0.5) {
+      final mid = (low + high) / 2;
+      final testStyle = style.copyWith(fontSize: mid);
+
+      final span = TextSpan(text: text, style: testStyle);
+      final tp = TextPainter(
+        text: span,
+        maxLines: maxLines,
+        textAlign: textAlign,
+        textDirection: textDirection,
+      );
+
+      tp.layout(maxWidth: availableWidth);
+
+      if (tp.didExceedMaxLines || tp.width > availableWidth) {
+        high = mid;
+      } else {
+        low = mid;
+        fontSize = mid;
+      }
+    }
+
+    return Text(
+      text,
+      style: style.copyWith(fontSize: fontSize),
+      maxLines: maxLines,
+      textAlign: textAlign,
+      overflow: overflow,
+      softWrap: softWrap,
+      textDirection: textDirection,
+    );
   }
 }
