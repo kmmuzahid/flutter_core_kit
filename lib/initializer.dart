@@ -25,7 +25,6 @@ class PasswordObscureIcon {
 class CoreKit {
   // Private constructor
   CoreKit._();
-  static bool _isInitialized = false;
 
   PermissionHelperConfig permissionHelperConfig = PermissionHelperConfig();
 
@@ -41,14 +40,18 @@ class CoreKit {
 
   String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
 
-  late PasswordObscureIcon passWordObscureIcon;
+  PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
+    padding: EdgeInsetsDirectional.only(end: 10),
+    show: const Icon(Icons.visibility, size: 20),
+    hide: const Icon(Icons.visibility_off, size: 20),
+  );
 
   TextStyle? get defaultTextStyle => theme.textTheme.bodyMedium;
 
   late String imageBaseUrl;
   Widget? backButton;
   Icon backIcon = const Icon(Icons.arrow_back_ios, size: 25);
-  
+
   late GlobalKey<NavigatorState> navigatorKey;
 
   Color get backgroundColor => theme.scaffoldBackgroundColor;
@@ -81,13 +84,10 @@ class CoreKit {
   }) {
     _instance.designSize = designSize;
     _instance.backIcon = backIcon;
-    if (_isInitialized) {
-      return _SetChild(child: child ?? SizedBox.shrink());
-    }
+
     if (permissionHelperStrings != null) {
       _instance.permissionHelperConfig = permissionHelperStrings;
-    }
-    _isInitialized = true;
+    } 
     _instance.navigatorKey = navigatorKey;
     _instance.back = back;
     _instance.imageBaseUrl = imageBaseUrl;
@@ -99,13 +99,9 @@ class CoreKit {
       builder: (context, constraints) {
         CoreScreenUtils.init(context).then((value) {
           DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
-          _instance.passWordObscureIcon =
-              passwordObscureIcon ??
-              PasswordObscureIcon(
-                padding: EdgeInsetsDirectional.only(end: 10.w),
-                show: const Icon(Icons.visibility, size: 20),
-                hide: const Icon(Icons.visibility_off, size: 20),
-              );
+          if (passwordObscureIcon != null) {
+            _instance.passWordObscureIcon = passwordObscureIcon;
+          }
         });
 
         return child ?? SizedBox.shrink();
