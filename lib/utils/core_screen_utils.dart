@@ -6,18 +6,32 @@
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
-class CoreScreenUtils {
-  CoreScreenUtils._();
+class CoreScreenUtils { 
 
   static late Size deviceSize;
   static late double _designWidth;
   static late double _designHeight;
 
-  static Future<void> init(BuildContext context) async {
+  CoreScreenUtils(BuildContext context) {
     deviceSize = MediaQuery.of(context).size;
     _designWidth = CoreKit.instance.designSize.width;
-    _designHeight = CoreKit.instance.designSize.height;
+    _designHeight = CoreKit.instance.designSize.height; 
+   
   }
+  
+  Widget init(
+    DioServiceConfig dioServiceConfig,
+    TokenProvider tokenProvider,
+    PasswordObscureIcon? passwordObscureIcon,
+    Widget child,
+  ) {
+    DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
+    if (passwordObscureIcon != null) {
+      CoreKit.instance.passWordObscureIcon = passwordObscureIcon;
+    }
+    return child;
+  }
+  
 
   static double _scale() {
     return deviceSize.width / _designWidth < deviceSize.height / _designHeight

@@ -102,12 +102,12 @@ class CoreKit {
     //   DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
     // });
 
-    return _SetChild(
-      dioServiceConfig: dioServiceConfig,
-      tokenProvider: tokenProvider,
-      passwordObscureIcon: passwordObscureIcon,
-      child: child ?? SizedBox.shrink(),
-    );
+    // return _SetChild(
+    //   dioServiceConfig: dioServiceConfig,
+    //   tokenProvider: tokenProvider,
+    //   passwordObscureIcon: passwordObscureIcon,
+    //   child: child ?? SizedBox.shrink(),
+    // );
 
     // return _SetChild(
     //   dioServiceConfig: dioServiceConfig,
@@ -115,20 +115,19 @@ class CoreKit {
     //   passwordObscureIcon: passwordObscureIcon,
     //   child: child ?? SizedBox.shrink(),
     // );
-    // return LayoutBuilder(
-    //   builder: (context, constraints) {
-    //     CoreScreenUtils.init(context).then((value) {
-    //       DioService.init(config: dioServiceConfig, tokenProvider: tokenProvider);
-    //       if (passwordObscureIcon != null) {
-    //         _instance.passWordObscureIcon = passwordObscureIcon;
-    //       }
-    //     });
-
-    //     return child ?? SizedBox.shrink();
-    //   },
-    // );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return CoreScreenUtils(context).init(
+          dioServiceConfig,
+          tokenProvider,
+          passwordObscureIcon,
+          child ?? Scaffold(body: Container()),
+        );
+      },
+    );
   }
 }
+
 
 class PermissionHadlerColors {
   final Color errorColor;
@@ -165,12 +164,12 @@ class _SetChildState extends State<_SetChild> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      CoreScreenUtils.init(context).then((value) {
-        if (widget.passwordObscureIcon != null) {
-          CoreKit.instance.passWordObscureIcon = widget.passwordObscureIcon!;
-        }
-        DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
-      });
+      // CoreScreenUtils.init(context).then((value) {
+      //   if (widget.passwordObscureIcon != null) {
+      //     CoreKit.instance.passWordObscureIcon = widget.passwordObscureIcon!;
+      //   }
+      //   DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
+      // });
       Future.delayed(const Duration(milliseconds: 300), () {
         if (mounted) {
           setState(() {
