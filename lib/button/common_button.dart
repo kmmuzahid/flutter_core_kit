@@ -242,6 +242,15 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
               elevation: WidgetStateProperty.all(buttonElevation),
               overlayColor: WidgetStateProperty.all(Colors.transparent),
               splashFactory: NoSplash.splashFactory,
+              backgroundBuilder: (context, state, child) {
+                if (widget.gradient == null) {
+                  return child ?? SizedBox.shrink();
+                }
+                return Container(
+                  decoration: BoxDecoration(gradient: widget.gradient),
+                  child: child,
+                );
+              },
             ),
             child: CommonText(
               text: widget.titleText,
