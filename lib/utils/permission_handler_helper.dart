@@ -113,7 +113,7 @@ class PermissionHandlerHelper {
           TextButton.icon(
             onPressed: () {
               openAppSettings();
-              CoreKit.instance.back();
+              CoreKit.instance.appbarConfig.getBack.call();
             },
             icon: Icon(Icons.settings, color: actionColor),
             label: Text(
@@ -126,7 +126,7 @@ class PermissionHandlerHelper {
             ),
           ),
           TextButton(
-            onPressed: CoreKit.instance.back,
+            onPressed: CoreKit.instance.appbarConfig.getBack,
             child: Text(
               'Cancel',
               style: TextStyle(fontFamily: fontFamily, color: Colors.grey[700]),

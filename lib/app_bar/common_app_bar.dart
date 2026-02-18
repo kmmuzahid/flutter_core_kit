@@ -3,10 +3,51 @@
  * @Date: 2026-01-05 11:21:15
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/initializer.dart';
-import 'package:core_kit/text/common_text.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
+
+class AppbarConfig {
+  /// ()=> Get.back() or Navigator.pop(context) etc
+  final Function()? onBack;
+  Function() get getBack => () {
+    onBack?.call() ?? CoreKit.instance.navigatorKey.currentState?.pop();
+    if (onBack == null) {
+      AppLogger.debug("Screen Popped using Navigator");
+    }
+  };
+
+  /// Default back icon
+  final Icon backIcon;
+
+  /// Custom back button. If null, backIcon will be used
+  final Widget? backButton;
+
+  /// Custom decoration. If null, default background color will be used
+  final BoxDecoration? decoration;
+
+  /// Custom background color. If null, default background color will be used
+  final Color? backgroundColor;
+
+  /// Custom height. If null, default height will be used
+  final double? height;
+
+  /// Custom icon color. If null, default icon color will be used
+  final Color? iconColor;
+
+  /// Custom title color
+  final Color? titleColor;
+
+  AppbarConfig({
+    this.onBack,
+    this.backIcon = const Icon(Icons.arrow_back_ios, size: 25),
+    this.backButton,
+    this.decoration,
+    this.backgroundColor,
+    this.height,
+    this.iconColor,
+    this.titleColor,
+  });
+}
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CommonAppBar({
@@ -16,18 +57,14 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleWidget,
     this.leading,
     this.actions,
-    this.isCenterTitle = true,
-    this.backgroundColor,
+    this.isCenterTitle = true, 
     this.hideBack = false,
     this.disableBack = false,
-    this.linearGradientBackground,
-    this.height,
     this.titleAlignment = Alignment.center,
-    this.bottomLeftRadius = 0,
-    this.bottomRightRadius = 0,
-    this.iconColor,
-    this.titleColor,
+    // this.bottomLeftRadius = 0,
+    // this.bottomRightRadius = 0,
     this.leadingAlignment = Alignment.center,
+    this.appbarConfig,
   });
 
   final String? title;
@@ -35,46 +72,56 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Function()? onBackPress;
   final Widget? leading;
   final List<Widget>? actions;
-  final bool isCenterTitle;
-  final Color? backgroundColor;
+  final bool isCenterTitle; 
   final bool hideBack;
   final bool disableBack;
-  final LinearGradient? linearGradientBackground;
-  final double? height;
   final AlignmentGeometry? titleAlignment;
-  final double bottomLeftRadius;
-  final double bottomRightRadius;
-  final Color? iconColor;
-  final Color? titleColor;
+  // final double bottomLeftRadius;
+  // final double bottomRightRadius;
+
   final AlignmentGeometry leadingAlignment;
+  final AppbarConfig? appbarConfig;
 
   @override
-  Size get preferredSize => Size.fromHeight(height?.h ?? kToolbarHeight.h);
+  Size get preferredSize => Size.fromHeight(
+    (appbarConfig?.height?.h ?? CoreKit.instance.appbarConfig.height?.h) ?? kToolbarHeight.h,
+  );
 
   @override
   Widget build(BuildContext context) {
     // Determine the effective background color
-    final effectiveBackgroundColor = backgroundColor ?? CoreKit.instance.backgroundColor;
+
+    AppbarConfig config = AppbarConfig(
+      onBack: appbarConfig?.onBack ?? CoreKit.instance.appbarConfig.getBack,
+      backIcon: appbarConfig?.backIcon ?? CoreKit.instance.appbarConfig.backIcon,
+      backButton: appbarConfig?.backButton ?? CoreKit.instance.appbarConfig.backButton,
+      decoration: appbarConfig?.decoration ?? CoreKit.instance.appbarConfig.decoration,
+      backgroundColor:
+          appbarConfig?.backgroundColor ?? CoreKit.instance.appbarConfig.backgroundColor,
+      height: appbarConfig?.height ?? CoreKit.instance.appbarConfig.height,
+      iconColor: appbarConfig?.iconColor ?? CoreKit.instance.appbarConfig.iconColor,
+      titleColor: appbarConfig?.titleColor ?? CoreKit.instance.appbarConfig.titleColor,
+    );
+
+    final effectiveBackgroundColor = config.backgroundColor ?? CoreKit.instance.backgroundColor;
 
     // Calculate contrast color for icons and text
     final contrastColor = _getContrastColor(effectiveBackgroundColor);
 
     // Calculate leading width
     final leadingWidth = hideBack ? 0.0 : 56.0.w;
-
-    // Calculate actions width (approximate)
-    final actionsWidth = (actions?.length ?? 0) * 56.0.w;
+ 
 
     final appBar = AppBar(
-      backgroundColor: linearGradientBackground != null
+      backgroundColor: config.decoration != null
           ? Colors.transparent
           : effectiveBackgroundColor,
       centerTitle: titleAlignment == null ? isCenterTitle : false,
-      toolbarHeight: height ?? kToolbarHeight,
+      toolbarHeight: config.height?.h ?? kToolbarHeight,
 
       // Set icon theme for leading and actions
-      iconTheme: IconThemeData(color: iconColor ?? contrastColor),
-      actionsIconTheme: IconThemeData(color: iconColor ?? contrastColor),
+      iconTheme: IconThemeData(color: config.iconColor ?? contrastColor),
+      actionsIconTheme: IconThemeData(color: config.iconColor ?? contrastColor),
 
       leadingWidth: leadingWidth,
 
@@ -90,18 +137,18 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onBackPress!();
                     }
                     if (!disableBack) {
-                      CoreKit.instance.back();
+                      config.getBack();
                     }
                   },
                   child:
                       leading ??
-                      (CoreKit.instance.backButton == null
+                      (config.backButton == null
                           ? Icon(
-                              CoreKit.instance.backIcon.icon,
-                              size: CoreKit.instance.backIcon.size ?? 25.w,
-                              color: iconColor ?? contrastColor,
+                              config.backIcon.icon,
+                              size: config.backIcon.size ?? 25.w,
+                              color: config.iconColor ?? contrastColor,
                             )
-                          : CoreKit.instance.backButton!),
+                          : config.backButton!),
                 ),
               ),
             ),
@@ -114,14 +161,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                   text: title ?? '',
                   fontWeight: FontWeight.w600,
                   fontSize: 18.sp,
-                  textColor: titleColor ?? contrastColor,
+                  textColor: config.titleColor ?? contrastColor,
                 ))
           : null,
 
       flexibleSpace: Container(
-        decoration: linearGradientBackground != null
-            ? BoxDecoration(gradient: linearGradientBackground)
-            : null,
+        decoration: config.decoration,
         child: titleAlignment != null
             ? SafeArea(
                 child: Align(
@@ -132,26 +177,26 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                         text: title ?? '',
                         fontWeight: FontWeight.w600,
                         fontSize: 18.sp,
-                        textColor: titleColor ?? contrastColor,
+                        textColor: config.titleColor ?? contrastColor,
                       ),
                 ),
               )
-            : linearGradientBackground != null
+            : config.decoration != null
             ? const SizedBox.shrink()
             : null,
       ),
     );
 
     // Apply bottom border radius if specified
-    if (bottomLeftRadius > 0 || bottomRightRadius > 0) {
-      return ClipRRect(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(bottomLeftRadius),
-          bottomRight: Radius.circular(bottomRightRadius),
-        ),
-        child: appBar,
-      );
-    }
+    // if (bottomLeftRadius > 0 || bottomRightRadius > 0) {
+    //   return ClipRRect(
+    //     borderRadius: BorderRadius.only(
+    //       bottomLeft: Radius.circular(bottomLeftRadius),
+    //       bottomRight: Radius.circular(bottomRightRadius),
+    //     ),
+    //     child: appBar,
+    //   );
+    // }
 
     return appBar;
   }
@@ -160,7 +205,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Color _getContrastColor(Color backgroundColor) {
     // Calculate relative luminance
     final luminance = backgroundColor.computeLuminance();
-    print(luminance);
     // Return white for dark backgrounds, black for light backgrounds
     return luminance > 0.96 ? Colors.black : Colors.white;
   }

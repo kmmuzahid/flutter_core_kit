@@ -50,7 +50,7 @@ class CommonAlert {
               buttonHeight: 35,
               buttonColor: cancelButtonColor ?? Colors.red,
               titleColor: cancelTitleColor ?? Colors.white,
-              onTap: CoreKit.instance.back,
+              onTap: CoreKit.instance.appbarConfig.getBack,
             ),
           if (disableActionButton == false)
             IntrinsicWidth(
@@ -60,7 +60,7 @@ class CommonAlert {
                 buttonColor: actionButtonColor ?? Colors.green,
                 titleColor: actionTitleColor ?? Colors.white,
                 onTap: () {
-                  CoreKit.instance.back();
+                  CoreKit.instance.appbarConfig.getBack.call();
                   onTap();
                 },
               ),

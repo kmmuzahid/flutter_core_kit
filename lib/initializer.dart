@@ -4,6 +4,7 @@
  * @Email: km.muzahid@gmail.com
  */
 
+import 'package:core_kit/app_bar/common_app_bar.dart';
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/permission_helper.dart';
@@ -22,6 +23,8 @@ class PasswordObscureIcon {
   });
 }
 
+
+
 class CoreKit {
   // Private constructor
   CoreKit._();
@@ -35,8 +38,8 @@ class CoreKit {
   ThemeData get theme => Theme.of(navigatorKey.currentContext!);
 
   // Configuration fields
-
-  late NavigationBack back;
+  
+  late AppbarConfig appbarConfig;
 
   String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
 
@@ -49,8 +52,6 @@ class CoreKit {
   TextStyle? get defaultTextStyle => theme.textTheme.bodyMedium;
 
   late String imageBaseUrl;
-  Widget? backButton;
-  Icon backIcon = const Icon(Icons.arrow_back_ios, size: 25);
 
   late GlobalKey<NavigatorState> navigatorKey;
 
@@ -68,33 +69,29 @@ class CoreKit {
     normalColor: Colors.black,
   );
 
-  static Widget init({
-    required NavigationBack back,
+  static Widget init({ 
     required String imageBaseUrl,
-    Icon backIcon = const Icon(Icons.arrow_back_ios, size: 25),
     required GlobalKey<NavigatorState> navigatorKey,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
-    PasswordObscureIcon? passwordObscureIcon,
-    Widget? backButton,
+    PasswordObscureIcon? passwordObscureIcon, 
+    AppbarConfig? appbarConfig,
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
     Size designSize = const Size(428, 926),
     PermissionHelperConfig? permissionHelperStrings,
   }) {
-    _instance.designSize = designSize;
-    _instance.backIcon = backIcon;
+    _instance.designSize = designSize; 
 
     if (permissionHelperStrings != null) {
       _instance.permissionHelperConfig = permissionHelperStrings;
     }
-    _instance.navigatorKey = navigatorKey;
-    _instance.back = back;
-    _instance.imageBaseUrl = imageBaseUrl;
-    _instance.backButton = backButton;
+    _instance.navigatorKey = navigatorKey; 
+    _instance.imageBaseUrl = imageBaseUrl; 
     if (permissionHandlerColors != null) {
       _instance.permissionHandlerColors = permissionHandlerColors;
     }
+    _instance.appbarConfig = appbarConfig ?? AppbarConfig();
 
     return _SetChild(
       dioServiceConfig: dioServiceConfig,

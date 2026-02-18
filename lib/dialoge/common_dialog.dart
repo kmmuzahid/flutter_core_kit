@@ -98,11 +98,11 @@ Column _body(
                 if (formKey.currentState?.validate() ?? false) {
                   formKey.currentState?.save();
                   onConfirm.call();
-                  CoreKit.instance.back();
+                  CoreKit.instance.appbarConfig.getBack();
                 }
               } else {
                 onConfirm.call();
-                CoreKit.instance.back();
+                CoreKit.instance.appbarConfig.getBack();
               }
             },
           ),
@@ -112,7 +112,7 @@ Column _body(
             titleText: cancel,
             onTap: () {
               onCancel?.call();
-              CoreKit.instance.back();
+              CoreKit.instance.appbarConfig.getBack();
             },
           ),
         ],
