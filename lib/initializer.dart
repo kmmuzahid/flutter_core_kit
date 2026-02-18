@@ -8,7 +8,7 @@ import 'package:core_kit/app_bar/common_app_bar.dart';
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/permission_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 
 typedef NavigationBack = void Function();
 
@@ -80,7 +80,7 @@ class CoreKit {
     Widget? child,
     Size designSize = const Size(428, 926),
     PermissionHelperConfig? permissionHelperStrings,
-  }) {
+  }) { 
     _instance.designSize = designSize; 
 
     if (permissionHelperStrings != null) {

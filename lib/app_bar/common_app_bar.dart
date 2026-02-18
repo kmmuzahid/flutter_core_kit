@@ -57,7 +57,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleWidget,
     this.leading,
     this.actions,
-    this.isCenterTitle = true, 
+    this.isCenterTitle = true,
     this.hideBack = false,
     this.disableBack = false,
     this.titleAlignment = Alignment.center,
@@ -72,7 +72,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Function()? onBackPress;
   final Widget? leading;
   final List<Widget>? actions;
-  final bool isCenterTitle; 
+  final bool isCenterTitle;
   final bool hideBack;
   final bool disableBack;
   final AlignmentGeometry? titleAlignment;
@@ -95,7 +95,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       onBack: appbarConfig?.onBack ?? CoreKit.instance.appbarConfig.getBack,
       backIcon: appbarConfig?.backIcon ?? CoreKit.instance.appbarConfig.backIcon,
       backButton: appbarConfig?.backButton ?? CoreKit.instance.appbarConfig.backButton,
-      decoration: appbarConfig?.decoration ?? CoreKit.instance.appbarConfig.decoration,
+      decoration: (appbarConfig?.backgroundColor != null && appbarConfig?.decoration == null)
+          ? null
+          : appbarConfig?.decoration ?? CoreKit.instance.appbarConfig.decoration,
       backgroundColor:
           appbarConfig?.backgroundColor ?? CoreKit.instance.appbarConfig.backgroundColor,
       height: appbarConfig?.height ?? CoreKit.instance.appbarConfig.height,
@@ -110,12 +112,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     // Calculate leading width
     final leadingWidth = hideBack ? 0.0 : 56.0.w;
- 
 
     final appBar = AppBar(
-      backgroundColor: config.decoration != null
-          ? Colors.transparent
-          : effectiveBackgroundColor,
+      backgroundColor: config.decoration != null ? Colors.transparent : effectiveBackgroundColor,
       centerTitle: titleAlignment == null ? isCenterTitle : false,
       toolbarHeight: config.height?.h ?? kToolbarHeight,
 
