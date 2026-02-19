@@ -97,7 +97,7 @@ class CoreKit {
       dioServiceConfig: dioServiceConfig,
       tokenProvider: tokenProvider,
       passwordObscureIcon: passwordObscureIcon,
-      child: child ?? const SizedBox.shrink(),
+      child: child ?? Scaffold(body: Container(color: _instance.backgroundColor)),
     );
   }
 }
