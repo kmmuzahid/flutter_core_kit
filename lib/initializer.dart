@@ -8,7 +8,7 @@ import 'package:core_kit/app_bar/common_app_bar.dart';
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/permission_helper.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 
 typedef NavigationBack = void Function();
 
@@ -23,8 +23,6 @@ class PasswordObscureIcon {
   });
 }
 
-
-
 class CoreKit {
   // Private constructor
   CoreKit._();
@@ -38,7 +36,7 @@ class CoreKit {
   ThemeData get theme => Theme.of(navigatorKey.currentContext!);
 
   // Configuration fields
-  
+
   late AppbarConfig appbarConfig;
 
   String? get fontFamily => theme.textTheme.bodyMedium?.fontFamily;
@@ -69,35 +67,41 @@ class CoreKit {
     normalColor: Colors.black,
   );
 
-  static Widget init({ 
+  static Widget init({
     required String imageBaseUrl,
     required GlobalKey<NavigatorState> navigatorKey,
     required DioServiceConfig dioServiceConfig,
     required TokenProvider tokenProvider,
-    PasswordObscureIcon? passwordObscureIcon, 
+    PasswordObscureIcon? passwordObscureIcon,
     AppbarConfig? appbarConfig,
     PermissionHadlerColors? permissionHandlerColors,
     Widget? child,
     Size designSize = const Size(428, 926),
     PermissionHelperConfig? permissionHelperStrings,
-  }) { 
-    _instance.designSize = designSize; 
+  }) {
+    // _instance.designSize = designSize;
 
-    if (permissionHelperStrings != null) {
-      _instance.permissionHelperConfig = permissionHelperStrings;
-    }
-    _instance.navigatorKey = navigatorKey; 
-    _instance.imageBaseUrl = imageBaseUrl; 
-    if (permissionHandlerColors != null) {
-      _instance.permissionHandlerColors = permissionHandlerColors;
-    }
-    _instance.appbarConfig = appbarConfig ?? AppbarConfig();
+    // if (permissionHelperStrings != null) {
+    //   _instance.permissionHelperConfig = permissionHelperStrings;
+    // }
+    // _instance.navigatorKey = navigatorKey;
+    // _instance.imageBaseUrl = imageBaseUrl;
+    // if (permissionHandlerColors != null) {
+    //   _instance.permissionHandlerColors = permissionHandlerColors;
+    // }
+    // _instance.appbarConfig = appbarConfig ?? AppbarConfig();
 
     return _SetChild(
+      designSize: designSize,
+      permissionHelperStrings: permissionHelperStrings,
+      permissionHandlerColors: permissionHandlerColors,
+      appbarConfig: appbarConfig,
+      navigatorKey: navigatorKey,
+      imageBaseUrl: imageBaseUrl,
       dioServiceConfig: dioServiceConfig,
       tokenProvider: tokenProvider,
       passwordObscureIcon: passwordObscureIcon,
-      child: child ?? Scaffold(body: Container(color: _instance.backgroundColor)),
+      child: child,
     );
   }
 }
@@ -120,36 +124,74 @@ class _SetChild extends StatefulWidget {
     required this.child,
     required this.dioServiceConfig,
     required this.tokenProvider,
+    required this.designSize,
+    required this.permissionHelperStrings,
+    required this.permissionHandlerColors,
+    required this.appbarConfig,
     this.passwordObscureIcon,
+    required this.navigatorKey,
+    required this.imageBaseUrl,
   });
-  final Widget child;
+  final Widget? child;
   final DioServiceConfig dioServiceConfig;
   final TokenProvider tokenProvider;
   final PasswordObscureIcon? passwordObscureIcon;
+  final Size designSize;
+  final PermissionHelperConfig? permissionHelperStrings;
+  final PermissionHadlerColors? permissionHandlerColors;
+  final AppbarConfig? appbarConfig;
+  final GlobalKey<NavigatorState> navigatorKey;
+  final String imageBaseUrl;
 
   @override
   State<_SetChild> createState() => _SetChildState();
 }
 
 class _SetChildState extends State<_SetChild> {
+  final CoreKit _instance = CoreKit.instance;
+
+  bool isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    CoreScreenUtils.init(context, () {});
+  }
+
   @override
   void initState() {
     super.initState();
-    
-    if (widget.passwordObscureIcon != null) {
-      CoreKit.instance.passWordObscureIcon = widget.passwordObscureIcon!;
+
+    _instance.designSize = widget.designSize;
+
+    if (widget.permissionHelperStrings != null) {
+      _instance.permissionHelperConfig = widget.permissionHelperStrings!;
     }
-    
+    _instance.navigatorKey = widget.navigatorKey;
+    _instance.imageBaseUrl = widget.imageBaseUrl;
+    if (widget.permissionHandlerColors != null) {
+      _instance.permissionHandlerColors = widget.permissionHandlerColors!;
+    }
+    _instance.appbarConfig = widget.appbarConfig ?? AppbarConfig();
+
+    if (widget.passwordObscureIcon != null) {
+      _instance.passWordObscureIcon = widget.passwordObscureIcon!;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      CoreScreenUtils.init(context, () {
+
     DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
+        setState(() {
+          isInitialized = true;
+        });
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        CoreScreenUtils.init(context, () {});
-        return widget.child;
-      },
-    );
+    return isInitialized
+        ? widget.child ?? Container()
+        : Scaffold(body: widget.child ?? Container());
   }
 }
