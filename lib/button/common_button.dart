@@ -243,6 +243,12 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
               overlayColor: WidgetStateProperty.all(Colors.transparent),
               splashFactory: NoSplash.splashFactory,
               backgroundBuilder: (context, state, child) {
+                if (widget.buttonColor != null) {
+                  return Container(
+                    decoration: BoxDecoration(color: widget.buttonColor),
+                    child: child,
+                  );
+                }
                 if (widget.gradient != null) {
                   return Container(
                   decoration: BoxDecoration(gradient: widget.gradient),
