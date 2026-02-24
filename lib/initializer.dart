@@ -173,6 +173,13 @@ class _SetChildState extends State<_SetChild> {
       _instance.permissionHandlerColors = widget.permissionHandlerColors!;
     }
     _instance.appbarConfig = widget.appbarConfig ?? AppbarConfig();
+    if (widget.appbarConfig?.onBack == null) {
+      _instance.appbarConfig = _instance.appbarConfig.copyWith(
+        onBack: () {
+          Navigator.pop(context);
+        },
+      );
+    }
 
     if (widget.passwordObscureIcon != null) {
       _instance.passWordObscureIcon = widget.passwordObscureIcon!;

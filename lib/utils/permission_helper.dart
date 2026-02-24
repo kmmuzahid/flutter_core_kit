@@ -123,7 +123,7 @@ class PermissionHelper {
           TextButton.icon(
             onPressed: () {
               openAppSettings();
-              CoreKit.instance.appbarConfig.getBack.call();
+              CoreKit.instance.appbarConfig.getBack?.call();
             },
             icon: Icon(Icons.settings, color: actionColor),
             label: Text(

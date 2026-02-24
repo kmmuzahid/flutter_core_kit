@@ -9,12 +9,7 @@ import 'package:flutter/material.dart';
 class AppbarConfig {
   /// ()=> Get.back() or Navigator.pop(context) etc
   final Function()? onBack;
-  Function() get getBack => () {
-    onBack?.call() ?? CoreKit.instance.navigatorKey.currentState?.pop();
-    if (onBack == null) {
-      AppLogger.debug("Screen Popped using Navigator");
-    }
-  };
+  Function()? get getBack => onBack;
 
   /// Default back icon
   final Icon backIcon;
@@ -47,6 +42,28 @@ class AppbarConfig {
     this.iconColor,
     this.titleColor,
   });
+
+  AppbarConfig copyWith({
+    Function()? onBack,
+    Icon? backIcon,
+    Widget? backButton,
+    BoxDecoration? decoration,
+    Color? backgroundColor,
+    double? height,
+    Color? iconColor,
+    Color? titleColor,
+  }) {
+    return AppbarConfig(
+      onBack: onBack ?? this.onBack,
+      backIcon: backIcon ?? this.backIcon,
+      backButton: backButton ?? this.backButton,
+      decoration: decoration ?? this.decoration,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      height: height ?? this.height,
+      iconColor: iconColor ?? this.iconColor,
+      titleColor: titleColor ?? this.titleColor,
+    );
+  }
 }
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -136,7 +153,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onBackPress!();
                     }
                     if (!disableBack) {
-                      config.getBack();
+                      config.getBack?.call();
                     }
                   },
                   child:

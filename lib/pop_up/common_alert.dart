@@ -60,7 +60,7 @@ class CommonAlert {
                 buttonColor: actionButtonColor ?? Colors.green,
                 titleColor: actionTitleColor ?? Colors.white,
                 onTap: () {
-                  CoreKit.instance.appbarConfig.getBack.call();
+                  CoreKit.instance.appbarConfig.getBack?.call();
                   onTap();
                 },
               ),
