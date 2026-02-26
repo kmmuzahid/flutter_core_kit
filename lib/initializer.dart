@@ -172,21 +172,21 @@ class _SetChildState extends State<_SetChild> {
     if (widget.permissionHandlerColors != null) {
       _instance.permissionHandlerColors = widget.permissionHandlerColors!;
     }
-    _instance.appbarConfig = widget.appbarConfig ?? AppbarConfig();
-    if (widget.appbarConfig?.onBack == null) {
-      _instance.appbarConfig = _instance.appbarConfig.copyWith(
-        onBack: () {
-          Navigator.pop(context);
-        },
-      );
-    }
+  
 
     if (widget.passwordObscureIcon != null) {
       _instance.passWordObscureIcon = widget.passwordObscureIcon!;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       CoreScreenUtils.init(context, () {
-
+        _instance.appbarConfig = widget.appbarConfig ?? AppbarConfig();
+        if (_instance.appbarConfig.onBack == null) {
+      _instance.appbarConfig = _instance.appbarConfig.copyWith(
+        onBack: () {
+          Navigator.pop(context);
+        },
+      );
+        }
     DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
         setState(() {
           isInitialized = true;

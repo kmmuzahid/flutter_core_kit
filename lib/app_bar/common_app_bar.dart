@@ -27,10 +27,20 @@ class AppbarConfig {
   final double? height;
 
   /// Custom icon color. If null, default icon color will be used
-  final Color? iconColor;
+  final Color Function()? iconColor;
 
   /// Custom title color
-  final Color? titleColor;
+  final Color Function()? titleColor;
+
+  final List<Widget> actions;
+
+  final AlignmentGeometry? titleAlignment;
+
+  final AlignmentGeometry? leadingAlignment;
+
+  final AlignmentGeometry? actionAlignment;
+
+  
 
   AppbarConfig({
     this.onBack,
@@ -41,6 +51,10 @@ class AppbarConfig {
     this.height,
     this.iconColor,
     this.titleColor,
+    this.actions = const [],
+    this.titleAlignment,
+    this.leadingAlignment,
+    this.actionAlignment
   });
 
   AppbarConfig copyWith({
@@ -50,8 +64,9 @@ class AppbarConfig {
     BoxDecoration? decoration,
     Color? backgroundColor,
     double? height,
-    Color? iconColor,
-    Color? titleColor,
+    Color Function()? iconColor,
+    Color Function()? titleColor,
+    List<Widget>? actions,
   }) {
     return AppbarConfig(
       onBack: onBack ?? this.onBack,
@@ -62,6 +77,7 @@ class AppbarConfig {
       height: height ?? this.height,
       iconColor: iconColor ?? this.iconColor,
       titleColor: titleColor ?? this.titleColor,
+      actions: actions ?? this.actions,
     );
   }
 }
@@ -72,31 +88,18 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.onBackPress,
     this.titleWidget,
-    this.leading,
-    this.actions,
-    this.isCenterTitle = true,
+    this.leading, 
     this.hideBack = false,
     this.disableBack = false,
-    this.titleAlignment = Alignment.center,
-    // this.bottomLeftRadius = 0,
-    // this.bottomRightRadius = 0,
-    this.leadingAlignment = Alignment.center,
     this.appbarConfig,
   });
 
   final String? title;
   final Widget? titleWidget;
   final Function()? onBackPress;
-  final Widget? leading;
-  final List<Widget>? actions;
-  final bool isCenterTitle;
+  final Widget? leading; 
   final bool hideBack;
   final bool disableBack;
-  final AlignmentGeometry? titleAlignment;
-  // final double bottomLeftRadius;
-  // final double bottomRightRadius;
-
-  final AlignmentGeometry leadingAlignment;
   final AppbarConfig? appbarConfig;
 
   @override
@@ -104,25 +107,40 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     (appbarConfig?.height?.h ?? CoreKit.instance.appbarConfig.height?.h) ?? kToolbarHeight.h,
   );
 
+
+
   @override
   Widget build(BuildContext context) {
     // Determine the effective background color
 
-    AppbarConfig config = AppbarConfig(
-      onBack: appbarConfig?.onBack ?? CoreKit.instance.appbarConfig.getBack,
-      backIcon: appbarConfig?.backIcon ?? CoreKit.instance.appbarConfig.backIcon,
-      backButton: appbarConfig?.backButton ?? CoreKit.instance.appbarConfig.backButton,
-      decoration: (appbarConfig?.backgroundColor != null && appbarConfig?.decoration == null)
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        AppbarConfig config = AppbarConfig(
+          onBack: appbarConfig?.onBack ?? CoreKit.instance.appbarConfig.getBack,
+          backIcon: appbarConfig?.backIcon ?? CoreKit.instance.appbarConfig.backIcon,
+          backButton: appbarConfig?.backButton ?? CoreKit.instance.appbarConfig.backButton,
+          decoration: (appbarConfig?.backgroundColor != null && appbarConfig?.decoration == null)
           ? null
-          : appbarConfig?.decoration ?? CoreKit.instance.appbarConfig.decoration,
+              : appbarConfig?.decoration ?? CoreKit.instance.appbarConfig.decoration,
       backgroundColor:
-          appbarConfig?.backgroundColor ?? CoreKit.instance.appbarConfig.backgroundColor,
-      height: appbarConfig?.height ?? CoreKit.instance.appbarConfig.height,
-      iconColor: appbarConfig?.iconColor ?? CoreKit.instance.appbarConfig.iconColor,
-      titleColor: appbarConfig?.titleColor ?? CoreKit.instance.appbarConfig.titleColor,
+              appbarConfig?.backgroundColor ?? CoreKit.instance.appbarConfig.backgroundColor,
+          height: appbarConfig?.height ?? CoreKit.instance.appbarConfig.height,
+          iconColor: appbarConfig?.iconColor ?? CoreKit.instance.appbarConfig.iconColor,
+          titleColor: appbarConfig?.titleColor ?? CoreKit.instance.appbarConfig.titleColor,
+          actions: appbarConfig?.actions.isNotEmpty == true
+              ? appbarConfig!.actions
+              : CoreKit.instance.appbarConfig.actions,
+
+          titleAlignment:
+              appbarConfig?.titleAlignment ?? CoreKit.instance.appbarConfig.titleAlignment,
+          leadingAlignment:
+              appbarConfig?.leadingAlignment ?? CoreKit.instance.appbarConfig.leadingAlignment,
+          actionAlignment:
+              appbarConfig?.actionAlignment ?? CoreKit.instance.appbarConfig.actionAlignment
     );
 
-    final effectiveBackgroundColor = config.backgroundColor ?? CoreKit.instance.backgroundColor;
+        final effectiveBackgroundColor =
+            config.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor;
 
     // Calculate contrast color for icons and text
     final contrastColor = _getContrastColor(effectiveBackgroundColor);
@@ -130,94 +148,106 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     // Calculate leading width
     final leadingWidth = hideBack ? 0.0 : 56.0.w;
 
+        final leadingWidget =
+            leading ??
+            (config.backButton == null
+                ? Icon(
+                    config.backIcon.icon,
+                    size: config.backIcon.size ?? 25.w,
+                    color: config.iconColor?.call() ?? contrastColor,
+                  )
+                : config.backButton!);
+
     final appBar = AppBar(
       backgroundColor: config.decoration != null ? Colors.transparent : effectiveBackgroundColor,
-      centerTitle: titleAlignment == null ? isCenterTitle : false,
+     
       toolbarHeight: config.height?.h ?? kToolbarHeight,
 
       // Set icon theme for leading and actions
-      iconTheme: IconThemeData(color: config.iconColor ?? contrastColor),
-      actionsIconTheme: IconThemeData(color: config.iconColor ?? contrastColor),
+          iconTheme: IconThemeData(color: config.iconColor?.call() ?? contrastColor),
+          actionsIconTheme: IconThemeData(color: config.iconColor?.call() ?? contrastColor),
 
       leadingWidth: leadingWidth,
 
-      leading: hideBack
-          ? SizedBox.shrink()
-          : SafeArea(
-              child: Container(
-                alignment: leadingAlignment,
-                padding: EdgeInsets.only(left: 10.0.w),
-                child: GestureDetector(
-                  onTap: () {
-                    if (onBackPress != null) {
-                      onBackPress!();
-                    }
-                    if (!disableBack) {
-                      config.getBack?.call();
-                    }
-                  },
-                  child:
-                      leading ??
-                      (config.backButton == null
-                          ? Icon(
-                              config.backIcon.icon,
-                              size: config.backIcon.size ?? 25.w,
-                              color: config.iconColor ?? contrastColor,
-                            )
-                          : config.backButton!),
+          leading: null,
+          actions: const [],
+
+      // Use title only when no custom alignment is needed
+          title: null,
+          
+
+          flexibleSpace: Container(
+            decoration: config.decoration,
+            height: preferredSize.height,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
+                child: Row(
+                  children: [
+                    // Leading
+                    if (!hideBack)
+                      Align(
+                        alignment: config.leadingAlignment ?? .topLeft,
+                        child: _getLeading(config, leadingWidget),
+                      ),
+
+                    // Title
+                    Expanded(
+                      child: Align(
+                        alignment: config.titleAlignment ?? Alignment.centerLeft,
+                        child:
+                            titleWidget ??
+                            CommonText(
+                              text: title ?? '',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18.sp,
+                              textColor: config.titleColor?.call() ?? contrastColor,
+                            ),
+                      ),
+                    ),
+
+                    // Actions
+                    if (config.actions.isNotEmpty)
+                      Align(
+                        alignment: config.actionAlignment ?? .topRight,
+                        child: Row(mainAxisSize: MainAxisSize.min, children: config.actions),
+                      ),
+                  ],
                 ),
               ),
             ),
-      actions: actions ?? _appBarActions(),
-
-      // Use title only when no custom alignment is needed
-      title: titleAlignment == null
-          ? (titleWidget ??
-                CommonText(
-                  text: title ?? '',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18.sp,
-                  textColor: config.titleColor ?? contrastColor,
-                ))
-          : null,
-
-      flexibleSpace: Container(
-        decoration: config.decoration,
-        child: titleAlignment != null
-            ? SafeArea(
-                child: Align(
-                  alignment: titleAlignment!,
-                  child:
-                      titleWidget ??
-                      CommonText(
-                        text: title ?? '',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18.sp,
-                        textColor: config.titleColor ?? contrastColor,
-                      ),
-                ),
-              )
-            : config.decoration != null
-            ? const SizedBox.shrink()
-            : null,
-      ),
+          )
     );
 
-    // Apply bottom border radius if specified
-    // if (bottomLeftRadius > 0 || bottomRightRadius > 0) {
-    //   return ClipRRect(
-    //     borderRadius: BorderRadius.only(
-    //       bottomLeft: Radius.circular(bottomLeftRadius),
-    //       bottomRight: Radius.circular(bottomRightRadius),
-    //     ),
-    //     child: appBar,
-    //   );
-    // }
-
-    return appBar;
+        return appBar;
+      },
+    );
   }
 
-  /// Calculate contrast color based on background brightness
+  Widget _getLeading(AppbarConfig config, Widget leadingWidget) {
+    return hideBack
+        ? SizedBox.shrink()
+        : SafeArea(
+            bottom: false,
+            child: Container(
+              padding: EdgeInsets.only(left: 10.0.w),
+              child: GestureDetector(
+                onTap: () {
+                  if (onBackPress != null) {
+                    onBackPress!();
+                  }
+                  if (!disableBack) {
+                    config.getBack?.call();
+                  }
+                },
+                child: leadingWidget,
+              ),
+            ),
+          );
+  }
+
+  // / Calculate contrast color based on background brightness
   Color _getContrastColor(Color backgroundColor) {
     // Calculate relative luminance
     final luminance = backgroundColor.computeLuminance();
@@ -225,5 +255,5 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return luminance > 0.96 ? Colors.black : Colors.white;
   }
 
-  List<Widget> _appBarActions() => [];
+  
 }
