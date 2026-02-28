@@ -40,6 +40,8 @@ class AppbarConfig {
 
   final AlignmentGeometry? actionAlignment;
 
+  final double titleSpacing;
+
   AppbarConfig({
     this.onBack,
     this.backIcon = const Icon(Icons.arrow_back_ios, size: 25),
@@ -53,6 +55,7 @@ class AppbarConfig {
     this.titleAlignment,
     this.leadingAlignment,
     this.actionAlignment,
+    this.titleSpacing = 0
   });
 
   AppbarConfig copyWith({
@@ -133,6 +136,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               appbarConfig?.leadingAlignment ?? CoreKit.instance.appbarConfig.leadingAlignment,
           actionAlignment:
               appbarConfig?.actionAlignment ?? CoreKit.instance.appbarConfig.actionAlignment,
+          titleSpacing: appbarConfig?.titleSpacing ?? CoreKit.instance.appbarConfig.titleSpacing,
         );
 
         final effectiveBackgroundColor =
@@ -157,9 +161,10 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         final appBar = AppBar(
           backgroundColor: config.decoration != null
               ? Colors.transparent
-              : effectiveBackgroundColor,
+              : effectiveBackgroundColor, 
 
           toolbarHeight: config.height?.h ?? kToolbarHeight,
+          titleSpacing: config.titleSpacing,
 
           // Set icon theme for leading and actions
           iconTheme: IconThemeData(color: config.iconColor?.call() ?? contrastColor),
