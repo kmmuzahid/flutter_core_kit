@@ -243,18 +243,17 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
               overlayColor: WidgetStateProperty.all(Colors.transparent),
               splashFactory: NoSplash.splashFactory,
               backgroundBuilder: (context, state, child) {
-                if (widget.buttonColor != null) {
+                if (widget.buttonColor != null || widget.gradient != null) {
                   return Container(
-                    decoration: BoxDecoration(color: widget.buttonColor),
+                    decoration: BoxDecoration(
+                      color: widget.buttonColor,
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      border: Border.all(color: borderColor, width: borderWidth),
+                    ),
                     child: child,
                   );
                 }
-                if (widget.gradient != null) {
-                  return Container(
-                  decoration: BoxDecoration(gradient: widget.gradient),
-                  child: child,
-                );
-                }
+              
                 return CoreKit.instance.theme.elevatedButtonTheme.style?.backgroundBuilder?.call(
                       context,
                       state,
