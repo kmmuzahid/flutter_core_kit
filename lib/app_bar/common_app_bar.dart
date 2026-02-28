@@ -32,7 +32,7 @@ class AppbarConfig {
   /// Custom title color
   final Color Function()? titleColor;
 
-  final List<Widget> actions;
+  final List<Widget>? actions;
 
   final AlignmentGeometry? titleAlignment;
 
@@ -51,7 +51,7 @@ class AppbarConfig {
     this.height,
     this.iconColor,
     this.titleColor,
-    this.actions = const [],
+    this.actions,
     this.titleAlignment,
     this.leadingAlignment,
     this.actionAlignment,
@@ -68,6 +68,10 @@ class AppbarConfig {
     Color Function()? iconColor,
     Color Function()? titleColor,
     List<Widget>? actions,
+    AlignmentGeometry? titleAlignment,
+    AlignmentGeometry? leadingAlignment,
+    AlignmentGeometry? actionAlignment,
+    double? titleSpacing,
   }) {
     return AppbarConfig(
       onBack: onBack ?? this.onBack,
@@ -79,6 +83,10 @@ class AppbarConfig {
       iconColor: iconColor ?? this.iconColor,
       titleColor: titleColor ?? this.titleColor,
       actions: actions ?? this.actions,
+      titleAlignment: titleAlignment ?? this.titleAlignment,
+      leadingAlignment: leadingAlignment ?? this.leadingAlignment,
+      actionAlignment: actionAlignment ?? this.actionAlignment,
+      titleSpacing: titleSpacing ?? this.titleSpacing,
     );
   }
 }
@@ -109,9 +117,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    // Determine the effective background color
-
+  Widget build(BuildContext context) { 
     return LayoutBuilder(
       builder: (context, constraints) {
         AppbarConfig config = AppbarConfig(
@@ -126,7 +132,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           height: appbarConfig?.height ?? CoreKit.instance.appbarConfig.height,
           iconColor: appbarConfig?.iconColor ?? CoreKit.instance.appbarConfig.iconColor,
           titleColor: appbarConfig?.titleColor ?? CoreKit.instance.appbarConfig.titleColor,
-          actions: appbarConfig?.actions.isNotEmpty == true
+          actions: appbarConfig?.actions != null
               ? appbarConfig!.actions
               : CoreKit.instance.appbarConfig.actions,
 
@@ -137,7 +143,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           actionAlignment:
               appbarConfig?.actionAlignment ?? CoreKit.instance.appbarConfig.actionAlignment,
           titleSpacing: appbarConfig?.titleSpacing ?? CoreKit.instance.appbarConfig.titleSpacing,
-        );
+        ); 
 
         final effectiveBackgroundColor =
             config.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor;
@@ -172,7 +178,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
  
           
           leading: _isAppbarShrinked ? _leadingAppbar(config, leadingWidget) : null,
-          actions: _isAppbarShrinked ? appbarConfig?.actions : null,
+          actions: _isAppbarShrinked ? config?.actions : null,
 
           // Use title only when no custom alignment is needed
           title: _isAppbarShrinked ? _titleBuilder(config, contrastColor) : null,
@@ -205,10 +211,10 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
 
                     // Actions
-                    if (config.actions.isNotEmpty)
+                          if (config.actions?.isNotEmpty == true)
                       Align(
                         alignment: config.actionAlignment ?? .topRight,
-                        child: Row(mainAxisSize: MainAxisSize.min, children: config.actions),
+                              child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
                       ),
                   ],
                 ),

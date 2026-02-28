@@ -187,6 +187,7 @@ class _SetChildState extends State<_SetChild> {
         },
       );
         }
+        
     DioService.init(config: widget.dioServiceConfig, tokenProvider: widget.tokenProvider);
         setState(() {
           isInitialized = true;
