@@ -118,113 +118,89 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) { 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        AppbarConfig config = AppbarConfig(
-          onBack: appbarConfig?.onBack ?? CoreKit.instance.appbarConfig.getBack,
-          backIcon: appbarConfig?.backIcon ?? CoreKit.instance.appbarConfig.backIcon,
-          backButton: appbarConfig?.backButton ?? CoreKit.instance.appbarConfig.backButton,
-          decoration: (appbarConfig?.backgroundColor != null && appbarConfig?.decoration == null)
-              ? null
-              : appbarConfig?.decoration ?? CoreKit.instance.appbarConfig.decoration,
-          backgroundColor:
-              appbarConfig?.backgroundColor ?? CoreKit.instance.appbarConfig.backgroundColor,
-          height: appbarConfig?.height ?? CoreKit.instance.appbarConfig.height,
-          iconColor: appbarConfig?.iconColor ?? CoreKit.instance.appbarConfig.iconColor,
-          titleColor: appbarConfig?.titleColor ?? CoreKit.instance.appbarConfig.titleColor,
-          actions: appbarConfig?.actions != null
-              ? appbarConfig!.actions
-              : CoreKit.instance.appbarConfig.actions,
+    // Merge local config with the global one from CoreKit.
+    // Properties defined in `appbarConfig` will override the global ones.
+    final AppbarConfig config = CoreKit.instance.appbarConfig.copyWith(
+      onBack: appbarConfig?.onBack,
+      backIcon: appbarConfig?.backIcon,
+      backButton: appbarConfig?.backButton,
+      decoration: appbarConfig?.decoration,
+      backgroundColor: appbarConfig?.backgroundColor,
+      height: appbarConfig?.height,
+      iconColor: appbarConfig?.iconColor,
+      titleColor: appbarConfig?.titleColor,
+      actions: appbarConfig?.actions,
+      titleAlignment: appbarConfig?.titleAlignment,
+      leadingAlignment: appbarConfig?.leadingAlignment,
+      actionAlignment: appbarConfig?.actionAlignment,
+      titleSpacing: appbarConfig?.titleSpacing,
+    );
 
-          titleAlignment:
-              appbarConfig?.titleAlignment ?? CoreKit.instance.appbarConfig.titleAlignment,
-          leadingAlignment:
-              appbarConfig?.leadingAlignment ?? CoreKit.instance.appbarConfig.leadingAlignment,
-          actionAlignment:
-              appbarConfig?.actionAlignment ?? CoreKit.instance.appbarConfig.actionAlignment,
-          titleSpacing: appbarConfig?.titleSpacing ?? CoreKit.instance.appbarConfig.titleSpacing,
-        ); 
+    // Determine the background color for calculating text/icon contrast.
+    // We prioritize a solid background color. If a complex decoration (like a gradient)
+    // is used, the user should provide explicit icon/title colors for readability.
+    final Color effectiveBackgroundColorForContrast =
+        config.backgroundColor ??
+        Theme.of(context).appBarTheme.backgroundColor ??
+        Theme.of(context).scaffoldBackgroundColor;
 
-        final effectiveBackgroundColor =
-            config.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor;
+    final contrastColor = _getContrastColor(effectiveBackgroundColorForContrast);
 
-        // Calculate contrast color for icons and text
-        final contrastColor = _getContrastColor(effectiveBackgroundColor);
-
-        // Calculate leading width
-        final leadingWidth = hideBack ? 0.0 : 56.0.w;
-
-        final leadingWidget =
-            leading ??
-            (config.backButton == null
-                ? Icon(
-                    config.backIcon.icon,
-                    size: config.backIcon.size ?? 25.w,
-                    color: config.iconColor?.call() ?? contrastColor,
-                  )
-                : config.backButton!);
-
-        final appBar = AppBar(
-          backgroundColor: config.decoration != null
-              ? Colors.transparent
-              : effectiveBackgroundColor, 
-
-          toolbarHeight: config.height?.h ?? kToolbarHeight,
-          titleSpacing: config.titleSpacing,
-
-          // Set icon theme for leading and actions
-          iconTheme: IconThemeData(color: config.iconColor?.call() ?? contrastColor),
-          actionsIconTheme: IconThemeData(color: config.iconColor?.call() ?? contrastColor),
- 
-          
-          leading: _isAppbarShrinked ? _leadingAppbar(config, leadingWidget) : null,
-          actions: _isAppbarShrinked ? config?.actions : null,
-
-          // Use title only when no custom alignment is needed
-          title: _isAppbarShrinked ? _titleBuilder(config, contrastColor) : null,
-
-          flexibleSpace: _isAppbarShrinked
-              ? null
-              : Container(
-            decoration: config.decoration,
-                  height: kToolbarHeight,
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.w),
-                child: Row(
-                  children: [
-                    // Leading
-                    if (!hideBack)
-                      Align(
-                        alignment: config.leadingAlignment ?? .topLeft,
-                        child: _getLeading(config, leadingWidget),
-                      ),
-
-                    // Title
-                    Expanded(
-                      child: Align(
-                        alignment: config.titleAlignment ?? Alignment.centerLeft,
-                        child:
-                            _titleBuilder(config, contrastColor),
-                      ),
-                    ),
-
-                    // Actions
-                          if (config.actions?.isNotEmpty == true)
-                      Align(
-                        alignment: config.actionAlignment ?? .topRight,
-                              child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-                ),
+    // Determine the final decoration for the app bar container.
+    // A provided `decoration` takes precedence over `backgroundColor`.
+    final Decoration finalDecoration =
+        config.decoration ??
+        BoxDecoration(
+          color:
+              config.backgroundColor ??
+              Theme.of(context).appBarTheme.backgroundColor ??
+              Theme.of(context).scaffoldBackgroundColor,
         );
 
-        return appBar;
-      },
+    final leadingButton = _buildLeadingButton(config, contrastColor);
+
+    // Use Material for elevation and to ensure ink splashes from buttons are visible.
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        height: preferredSize.height,
+        decoration: finalDecoration,
+        child: SafeArea(
+          bottom: false,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // --- Leading Widget ---
+              if (!hideBack)
+                Align(
+                  alignment: config.leadingAlignment ?? Alignment.centerLeft,
+                  child: leadingButton,
+                ),
+
+              // --- Title Widget ---
+              Align(
+                alignment: config.titleAlignment ?? Alignment.center,
+                child: Padding(
+                  // Add horizontal padding to prevent title from overlapping
+                  // with leading/action buttons.
+                  padding: EdgeInsets.symmetric(horizontal: 56.w),
+                  child: _titleBuilder(config, contrastColor),
+                ),
+              ),
+
+              // --- Action Widgets ---
+              if (config.actions?.isNotEmpty == true)
+                Align(
+                  alignment: config.actionAlignment ?? Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -238,50 +214,39 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         );
   }
 
-  bool get _isAppbarShrinked => preferredSize.height <= 80;
+  Widget _buildLeadingButton(AppbarConfig config, Color contrastColor) {
+    if (hideBack) return const SizedBox.shrink();
 
-  Widget _leadingAppbar(AppbarConfig config, Widget leadingWidget) {
-    return hideBack
-        ? SizedBox.shrink()
-        : GestureDetector(
-            onTap: () {
-              if (onBackPress != null) {
-                onBackPress!();
-              }
-              if (!disableBack) {
-                config.getBack?.call();
-              }
-            },
-            child: Container(padding: EdgeInsets.only(left: 10), child: leadingWidget),
-          );
-  }
+    final Widget buttonContent =
+        leading ?? // 1. Use widget provided to CommonAppBar
+        config.backButton ?? // 2. Use widget from AppbarConfig
+        Icon(
+          // 3. Use default icon
+          config.backIcon.icon,
+          size: config.backIcon.size ?? 25.w,
+          color: config.iconColor?.call() ?? contrastColor,
+        );
 
-  Widget _getLeading(AppbarConfig config, Widget leadingWidget) {
-    return hideBack
-        ? SizedBox.shrink()
-        : SafeArea(
-            bottom: false, 
-            child: GestureDetector(
-              onTap: () {
-                if (onBackPress != null) {
-                  onBackPress!();
-                }
-                if (!disableBack) {
-                  config.getBack?.call();
-                }
-              },
-              child: Padding(padding: const EdgeInsets.only(left: 10),
-                child: leadingWidget,
-              ),
-            ),
-          );
+    return GestureDetector(
+      onTap: () {
+        onBackPress?.call();
+        if (!disableBack) {
+          config.onBack?.call();
+        }
+      },
+      child: Container(
+        color: Colors.transparent, // For better hit-testing on transparent areas
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: buttonContent,
+      ),
+    );
   }
 
   // / Calculate contrast color based on background brightness
   Color _getContrastColor(Color backgroundColor) {
     // Calculate relative luminance
     final luminance = backgroundColor.computeLuminance();
-    // Return white for dark backgrounds, black for light backgrounds
-    return luminance > 0.96 ? Colors.black : Colors.white;
+    // A threshold of 0.5 is standard for distinguishing light from dark.
+    return luminance > 0.5 ? Colors.black : Colors.white;
   }
 }
