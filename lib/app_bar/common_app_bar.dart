@@ -5,7 +5,7 @@
  */
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 class AppbarConfig {
   /// ()=> Get.back() or Navigator.pop(context) etc
   final Function()? onBack;
@@ -159,8 +159,14 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     final leadingButton = _buildLeadingButton(config, contrastColor);
 
+    
+
     // Use Material for elevation and to ensure ink splashes from buttons are visible.
-    return Material(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarIconBrightness: contrastColor == Colors.white ? Brightness.light : Brightness.dark,
+      ),
+      child: Material(
       color: Colors.transparent,
       child: Container(
         height: preferredSize.height,
@@ -200,6 +206,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
