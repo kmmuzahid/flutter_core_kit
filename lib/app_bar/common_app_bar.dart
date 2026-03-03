@@ -173,8 +173,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         decoration: finalDecoration,
         child: SafeArea(
           bottom: false,
-          child: Stack(
-            alignment: Alignment.center,
+            child: Row( 
             children: [
               // --- Leading Widget ---
               if (!hideBack)
@@ -183,16 +182,16 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: leadingButton,
                 ),
 
+                if (config.titleSpacing > 0) SizedBox(width: config.titleSpacing.w),
+
               // --- Title Widget ---
-              Align(
-                alignment: config.titleAlignment ?? Alignment.center,
-                child: Padding(
-                  // Add horizontal padding to prevent title from overlapping
-                  // with leading/action buttons.
-                  padding: EdgeInsets.symmetric(horizontal: 56.w),
+                Expanded(
+                  child: Align(
+                    alignment: config.titleAlignment ?? Alignment.center,
                   child: _titleBuilder(config, contrastColor),
+               
+                  ),
                 ),
-              ),
 
               // --- Action Widgets ---
               if (config.actions?.isNotEmpty == true)
