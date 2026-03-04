@@ -18,7 +18,7 @@ class AppbarConfig {
   final Widget? backButton;
 
   /// Custom decoration. If null, default background color will be used
-  final BoxDecoration? decoration;
+  final BoxDecoration Function()? decoration;
 
   /// Custom background color. If null, default background color will be used
   final Color? backgroundColor;
@@ -62,7 +62,7 @@ class AppbarConfig {
     Function()? onBack,
     Icon? backIcon,
     Widget? backButton,
-    BoxDecoration? decoration,
+    BoxDecoration Function()? decoration,
     Color? backgroundColor,
     double? height,
     Color Function()? iconColor,
@@ -146,15 +146,17 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     final contrastColor = _getContrastColor(effectiveBackgroundColorForContrast);
 
+    final backgroundColor =
+        config.backgroundColor ??
+        Theme.of(context).appBarTheme.backgroundColor ??
+        Theme.of(context).scaffoldBackgroundColor;
+
     // Determine the final decoration for the app bar container.
     // A provided `decoration` takes precedence over `backgroundColor`.
     final Decoration finalDecoration =
-        config.decoration ??
+        config.decoration?.call() ??
         BoxDecoration(
-          color:
-              config.backgroundColor ??
-              Theme.of(context).appBarTheme.backgroundColor ??
-              Theme.of(context).scaffoldBackgroundColor,
+          color: backgroundColor,
         );
 
     final leadingButton = _buildLeadingButton(config, contrastColor);
@@ -164,15 +166,17 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     // Use Material for elevation and to ensure ink splashes from buttons are visible.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
         statusBarIconBrightness: contrastColor == Colors.white ? Brightness.light : Brightness.dark,
       ),
       child: Material(
       color: Colors.transparent,
-      child: Container(
-        height: preferredSize.height,
-        decoration: finalDecoration,
         child: SafeArea(
+          top: true,
           bottom: false,
+          child: Container(
+        height: preferredSize.height,
+            decoration: finalDecoration,
             child: Row( 
             children: [
               // --- Leading Widget ---
@@ -203,9 +207,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
             ],
+            ),
           ),
-        ),
-      ),
+        )
       ),
     );
   }
