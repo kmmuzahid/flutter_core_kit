@@ -401,6 +401,8 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                   width: widget.borderWidth.w,
                 ),
                 errorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
+                focusedErrorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
+                
                 contentPadding: EdgeInsets.only(
                   left: widget.paddingHorizontal.w,
                   right: widget.paddingHorizontal.w,
