@@ -15,6 +15,7 @@ class CommonPopupMenu extends StatefulWidget {
     this.triggerIcon = Icons.more_vert,
     this.onPrimaryColor,
     this.primaryColor,
+    this.menuTextStyle
   }) : assert(
          icons == null || icons.length == items.length,
          'If icons are provided, they must match the length of items',
@@ -29,6 +30,7 @@ class CommonPopupMenu extends StatefulWidget {
   final IconData triggerIcon;
   final Color? onPrimaryColor;
   final Color? primaryColor;
+  final TextStyle? menuTextStyle;
 
   @override
   State<CommonPopupMenu> createState() => _SelectablePopupMenuState();
@@ -66,7 +68,10 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
             children: [
               if (widget.icons != null) Icon(widget.icons![index], size: 18.w),
               if (widget.icons != null) SizedBox(width: 8.w),
-              Text(widget.items[index], style: CoreKit.instance.defaultTextStyle),
+              Text(
+                widget.items[index],
+                style: widget.menuTextStyle ?? CoreKit.instance.defaultTextStyle,
+              ),
             ],
           ),
         );
@@ -114,7 +119,7 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
         if (widget.showIconTrigger)
           IconButton(
             key: _iconTriggerKey,
-            icon: Icon(widget.triggerIcon),
+            icon: Icon(widget.triggerIcon, color: widget.onPrimaryColor),
             onPressed: () => _showPopupMenu(context, _iconTriggerKey),
           ),
       ],

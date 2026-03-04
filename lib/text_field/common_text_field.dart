@@ -42,6 +42,8 @@ class CommonTextField extends StatefulWidget {
     this.maxWords, 
     this.hintStyle,
     this.borderType = BorderType.outline,
+    this.suffixBuilder,
+    this.prefixBuilder,
   });
 
   final double borderWidth;
@@ -75,6 +77,8 @@ class CommonTextField extends StatefulWidget {
 
   final String? Function(String? value)? validation;
   final BorderType borderType;
+  final Widget? Function(TextEditingController controller, FocusNode focusNode)? suffixBuilder;
+  final Widget? Function(TextEditingController controller, FocusNode focusNode)? prefixBuilder;
 
   @override
   State<CommonTextField> createState() => _CommonTextFieldState();
@@ -87,6 +91,14 @@ class _CommonTextFieldState extends State<CommonTextField> {
   int wordCount = 0;
   int lengthCount = 0;
   late ThemeData theme;
+
+  Widget? _getPrefix() {
+    return widget.prefixBuilder?.call(_controller, _focusNode) ?? widget.prefixIcon;
+  }
+
+  Widget? getSuffix() {
+    return widget.suffixBuilder?.call(_controller, _focusNode) ?? widget.suffixIcon;
+  }
 
   @override
   void initState() {
@@ -276,6 +288,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
           fontStyle:
               CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ?? FontStyle.italic,
           textColor: hintColor(),
+            ),
+        //prefix
+        prefixIconConstraints: BoxConstraints(
+          maxWidth: (widget.prefixIcon == null && widget.prefixBuilder == null)
+              ? widget.paddingHorizontal
+              : double.infinity,
         ),
         prefixIcon: widget.prefixText?.isNotEmpty == true
             ? Padding(
@@ -284,16 +302,17 @@ class _CommonTextFieldState extends State<CommonTextField> {
               )
             : Padding(
                 padding: EdgeInsets.only(left: 10.w, right: widget.paddingHorizontal),
-                child: widget.prefixIcon,
+                child: _getPrefix(),
               ),
+      
+        //sufix
+     
         suffixIconConstraints: BoxConstraints(
           maxWidth:
-              widget.suffixIcon == null && widget.validationType != ValidationType.validatePassword
+              (widget.suffixIcon == null && widget.suffixBuilder == null) &&
+                  widget.validationType != ValidationType.validatePassword
               ? widget.paddingHorizontal
               : double.infinity,
-        ),
-        prefixIconConstraints: BoxConstraints(
-          maxWidth: widget.prefixIcon == null ? widget.paddingHorizontal : double.infinity,
         ),
         suffixIcon: widget.showActionButton
             ? GestureDetector(
@@ -304,8 +323,9 @@ class _CommonTextFieldState extends State<CommonTextField> {
             ? (_buildPasswordSuffixIcon())
             : Padding(
                 padding: EdgeInsets.only(right: 10, left: widget.paddingHorizontal),
-                child: widget.suffixIcon,
+                child: getSuffix(),
               ),
+
         prefixIconColor: _iconColor(),
         suffixIconColor: _iconColor(),
         focusedBorder: _buildBorder(
