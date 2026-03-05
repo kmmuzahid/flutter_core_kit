@@ -9,6 +9,21 @@ import 'package:intl/intl.dart';
 
 ThemeData get getTheme => Theme.of(CoreKit.instance.navigatorKey.currentContext!);
 
+extension FormStateX on GlobalKey<FormState> {
+  bool validateAndSave() {
+    save();
+    return validate();
+  }
+
+  void save() {
+    currentState?.save();
+  }
+
+  bool validate() {
+    return currentState?.validate() ?? false;
+  }
+}
+
 extension StringCasingExtension on String {
   String capitalizeEachWord() {
     if (isEmpty) return this;
