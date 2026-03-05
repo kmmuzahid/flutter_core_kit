@@ -75,6 +75,7 @@ export 'package:core_kit/utils/extension.dart';
 export 'package:core_kit/utils/permission_handler_helper.dart';
 export 'package:core_kit/utils/permission_helper.dart';
 export 'package:flutter_svg/flutter_svg.dart';
+export 'package:image_picker/image_picker.dart';
 export 'package:permission_handler/permission_handler.dart';
  
 
