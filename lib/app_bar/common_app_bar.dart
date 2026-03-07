@@ -42,6 +42,8 @@ class AppbarConfig {
 
   final double titleSpacing;
 
+  final EdgeInsets leadingPadding;
+
   AppbarConfig({
     this.onBack,
     this.backIcon = const Icon(Icons.arrow_back_ios, size: 25),
@@ -55,7 +57,8 @@ class AppbarConfig {
     this.titleAlignment,
     this.leadingAlignment,
     this.actionAlignment,
-    this.titleSpacing = 0
+    this.titleSpacing = 0,
+    this.leadingPadding = const EdgeInsets.symmetric(horizontal: 16.0),
   });
 
   AppbarConfig copyWith({
@@ -72,6 +75,7 @@ class AppbarConfig {
     AlignmentGeometry? leadingAlignment,
     AlignmentGeometry? actionAlignment,
     double? titleSpacing,
+    EdgeInsets? leadingPadding,
   }) {
     return AppbarConfig(
       onBack: onBack ?? this.onBack,
@@ -87,6 +91,7 @@ class AppbarConfig {
       leadingAlignment: leadingAlignment ?? this.leadingAlignment,
       actionAlignment: actionAlignment ?? this.actionAlignment,
       titleSpacing: titleSpacing ?? this.titleSpacing,
+      leadingPadding: leadingPadding ?? this.leadingPadding,
     );
   }
 }
@@ -134,6 +139,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       leadingAlignment: appbarConfig?.leadingAlignment,
       actionAlignment: appbarConfig?.actionAlignment,
       titleSpacing: appbarConfig?.titleSpacing,
+      leadingPadding: appbarConfig?.leadingPadding,
     );
 
     // Determine the background color for calculating text/icon contrast.
@@ -246,7 +252,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
       child: Container(
         color: Colors.transparent, // For better hit-testing on transparent areas
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: config.leadingPadding,
         child: buttonContent,
       ),
     );
