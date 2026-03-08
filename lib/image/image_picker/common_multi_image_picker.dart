@@ -51,7 +51,7 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
   @override
   void initState() {
     super.initState();
-    _images = widget.field.value ?? [];
+    _images = _images = List<XFile>.from(widget.field.value ?? []);
   }
 
   void _pickImages() async {
