@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
 
-class CommonMultiImagePickerFormField extends FormField<List<String>> {
+class CommonMultiImagePickerFormField extends FormField<List<XFile>> {
   CommonMultiImagePickerFormField({
     super.key,
     bool isMulti = true,
@@ -15,9 +15,9 @@ class CommonMultiImagePickerFormField extends FormField<List<String>> {
     super.onSaved,
     super.validator,
     AutovalidateMode super.autovalidateMode = AutovalidateMode.disabled,
-    List<String> super.initialValue = const [],
+    List<XFile> super.initialValue = const [],
   }) : super(
-         builder: (FormFieldState<List<String>> field) {
+         builder: (FormFieldState<List<XFile>> field) {
            return _CommonMultiImagePickerField(
              field: field,
              isMulti: isMulti,
@@ -35,7 +35,7 @@ class _CommonMultiImagePickerField extends StatefulWidget {
     required this.limit,
     required this.isFullScreenEnabled,
   });
-  final FormFieldState<List<String>> field;
+  final FormFieldState<List<XFile>> field;
   final bool isMulti;
   final int? limit;
   final bool isFullScreenEnabled;
@@ -51,7 +51,7 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
   @override
   void initState() {
     super.initState();
-    _images = widget.field.value?.map(XFile.new).toList() ?? [];
+    _images = widget.field.value ?? [];
   }
 
   void _pickImages() async {
@@ -79,7 +79,7 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
             }
           }
       
-          widget.field.didChange(_images.map((x) => x.path).toList());
+          widget.field.didChange(_images);
         });
       }
     } else {
@@ -90,7 +90,7 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
         _images
           ..clear()
           ..add(file);
-        widget.field.didChange(_images.map((x) => x.path).toList());
+        widget.field.didChange(_images);
       });
     }
   }
@@ -98,7 +98,7 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
   void _removeImage(int index) {
     setState(() {
       _images.removeAt(index);
-      widget.field.didChange(_images.map((x) => x.path).toList());
+      widget.field.didChange(_images);
     });
   }
 
