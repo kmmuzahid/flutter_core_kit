@@ -76,6 +76,11 @@ class _SnackBarRoute extends PageRoute {
   });
 
   @override
+  Future<RoutePopDisposition> willPop() async {
+    return RoutePopDisposition.doNotPop;
+  }
+
+  @override
   Color get barrierColor => Colors.transparent;
 
   @override
