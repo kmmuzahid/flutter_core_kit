@@ -145,12 +145,11 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     // Determine the background color for calculating text/icon contrast.
     // We prioritize a solid background color. If a complex decoration (like a gradient)
     // is used, the user should provide explicit icon/title colors for readability.
-    final Color effectiveBackgroundColorForContrast =
-        config.backgroundColor ??
-        Theme.of(context).appBarTheme.backgroundColor ??
-        Theme.of(context).scaffoldBackgroundColor;
+    // final Color effectiveBackgroundColorForContrast =
+    //     config.backgroundColor ??
+    //     Theme.of(context).appBarTheme.backgroundColor ??
+    //     Theme.of(context).scaffoldBackgroundColor;
 
-    final contrastColor = _getContrastColor(effectiveBackgroundColorForContrast);
 
     final backgroundColor =
         config.backgroundColor ??
@@ -165,6 +164,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: backgroundColor,
         );
 
+    final contrastColor = resolveTextColorFromDecoration(finalDecoration);
     final leadingButton = _buildLeadingButton(config, contrastColor);
 
     
@@ -175,14 +175,13 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: contrastColor == Colors.white ? Brightness.light : Brightness.dark,
       ),
-      child: Material(
-      color: Colors.transparent,
+      child: Container(
+        decoration: finalDecoration,
         child: SafeArea(
           top: true,
           bottom: false,
-          child: Container(
-        height: preferredSize.height,
-            decoration: finalDecoration,
+          child: SizedBox(
+            height: preferredSize.height,
             child: Row( 
             children: [
               // --- Leading Widget ---
@@ -258,11 +257,60 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // / Calculate contrast color based on background brightness
-  Color _getContrastColor(Color backgroundColor) {
-    // Calculate relative luminance
-    final luminance = backgroundColor.computeLuminance();
-    // A threshold of 0.5 is standard for distinguishing light from dark.
+  // // / Calculate contrast color based on background brightness
+  // Color _getContrastColor(Color backgroundColor) {
+  //   // Calculate relative luminance
+  //   final luminance = backgroundColor.computeLuminance();
+  //   // A threshold of 0.5 is standard for distinguishing light from dark.
+  //   return luminance > 0.5 ? Colors.black : Colors.white;
+  // }
+
+  Color resolveTextColorFromDecoration(Decoration? decoration) {
+    if (decoration == null) {
+      return Colors.black;
+    }
+
+    if (decoration is BoxDecoration) {
+      if (decoration.color != null) {
+        return _textFromColor(decoration.color!);
+      }
+
+      if (decoration.gradient != null) {
+        return _textFromGradient(decoration.gradient!);
+      }
+    }
+
+    if (decoration is ShapeDecoration) {
+      if (decoration.color != null) {
+        return _textFromColor(decoration.color!);
+      }
+
+      if (decoration.gradient != null) {
+        return _textFromGradient(decoration.gradient!);
+      }
+    }
+
+    if (decoration is FlutterLogoDecoration) {
+      return Colors.black;
+    }
+
+    return Colors.black;
+  }
+
+  Color _textFromColor(Color color) {
+    final luminance = color.computeLuminance();
     return luminance > 0.5 ? Colors.black : Colors.white;
+  }
+
+Color _textFromGradient(Gradient gradient) {
+    double luminance = 0;
+
+    for (final color in gradient.colors) {
+      luminance += color.computeLuminance();
+    }
+
+    final avg = luminance / gradient.colors.length;
+
+    return avg > 0.5 ? Colors.black : Colors.white;
   }
 }
