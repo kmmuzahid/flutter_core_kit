@@ -101,7 +101,11 @@ Widget getImage() {
   }
 
   Widget _buildNetworkImage() {
-    final path = src.startsWith('http') ? src : '${CoreKit.instance.imageBaseUrl}$src';
+    final path = src.startsWith('http')
+        ? src
+        : src.startsWith('/')
+        ? '${CoreKit.instance.imageBaseUrl}$src'
+        : '${CoreKit.instance.imageBaseUrl}/$src';
     return ClipRRect(
       borderRadius: getBorderRadius(),
       child: CachedNetworkImage(
