@@ -123,7 +123,7 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
           final (accentColor, iconData) = _getSemanticColors(widget.type, colorScheme);
 
           return IgnorePointer(
-            ignoring: true,
+            ignoring: false,
             child: Material(
               color: Colors.transparent,
               child: Align(

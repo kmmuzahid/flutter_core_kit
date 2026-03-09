@@ -36,6 +36,7 @@ class CommonImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     try {
       if (src.isEmpty) return placeholder();
 
@@ -121,7 +122,7 @@ Widget getImage() {
         progressIndicatorBuilder: (context, url, downloadProgress) {
           return Skeletonizer(
             enabled: (downloadProgress.progress ?? 0) < 1,
-            child: Container(color: Colors.white),
+            child: Container(color: CoreKit.instance.theme.colorScheme.outline),
           );
         },
         errorWidget: (context, url, error) {
