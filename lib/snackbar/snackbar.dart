@@ -8,230 +8,188 @@ import 'package:flutter/material.dart';
 
 enum SnackBarType { success, error, warning, info }
 
-// Keep track of the current snackbar route
-PageRoute? _currentSnackBarRoute;
+OverlayEntry? _currentSnackBarEntry;
 
 void showSnackBar(String text, {required SnackBarType type, Duration? customDuration}) {
-  final context = CoreKit.instance.navigatorKey.currentContext;
-  if (context == null || !context.mounted) return;
+  final overlayState = CoreKit.instance.navigatorKey.currentState?.overlay;
+  if (overlayState == null) return;
 
-  final theme = CoreKit.instance.theme;
-  final colorScheme = theme.colorScheme;
-  final snackBarTheme = theme.snackBarTheme;
-
-  // Map semantic colors from the ColorScheme
-  final (accentColor, iconData) = _getSemanticColors(type, colorScheme);
-
-  // Dynamic duration logic
   final int calculatedMs = 2000 + (text.length * 25);
   final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedMs);
 
-  final navigator = Navigator.of(context, rootNavigator: true);
+  _currentSnackBarEntry?.remove();
+  _currentSnackBarEntry = null;
 
-  // Remove the previous snackbar if it exists
-  if (_currentSnackBarRoute != null) {
-    navigator.removeRoute(_currentSnackBarRoute!);
-    _currentSnackBarRoute = null;
-  }
+  late final OverlayEntry entry;
 
-  // Create and push the new snackbar route
-  final route = _SnackBarRoute(
-    text: text,
-    accentColor: accentColor,
-    iconData: iconData,
-    theme: theme,
-    colorScheme: colorScheme,
-    snackBarTheme: snackBarTheme,
-    duration: displayDuration,
+  entry = OverlayEntry(
+    builder: (_) => _SnackBarOverlay(
+      text: text,
+      type: type,
+      duration: displayDuration,
+      onDismiss: () {
+        entry.remove();
+        if (_currentSnackBarEntry == entry) {
+          _currentSnackBarEntry = null;
+        }
+      },
+    ),
   );
 
-  _currentSnackBarRoute = route;
-
-  navigator.push(route).then((_) {
-    // Clear the reference when the route is popped
-    if (_currentSnackBarRoute == route) {
-      _currentSnackBarRoute = null;
-    }
-  });
+  _currentSnackBarEntry = entry;
+  overlayState.insert(entry);
 }
 
-// Custom PageRoute for the snackbar
-class _SnackBarRoute extends PageRoute {
-  final String text;
-  final Color accentColor;
-  final IconData iconData;
-  final ThemeData theme;
-  final ColorScheme colorScheme;
-  final SnackBarThemeData snackBarTheme;
-  final Duration duration;
+// Always reads live theme from CoreKit — supports dynamic dark/light switching
+class _ThemeWrapper extends StatelessWidget {
+  final Widget child;
 
-  _SnackBarRoute({
-    required this.text,
-    required this.accentColor,
-    required this.iconData,
-    required this.theme,
-    required this.colorScheme,
-    required this.snackBarTheme,
-    required this.duration,
-  });
+  const _ThemeWrapper({required this.child});
 
   @override
-  Future<RoutePopDisposition> willPop() async {
-    return RoutePopDisposition.doNotPop;
-  }
-
-  @override
-  Color get barrierColor => Colors.transparent;
-
-  @override
-  String get barrierLabel => '';
-
-  @override
-  bool get opaque => false;
-
-  @override
-  bool get barrierDismissible => true;
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 300);
-
-  @override
-  bool get maintainState => false;
-
-  @override
-  Widget buildPage(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-  ) {
-    return _SnackBarPage(
-      text: text,
-      accentColor: accentColor,
-      iconData: iconData,
-      theme: theme,
-      colorScheme: colorScheme,
-      snackBarTheme: snackBarTheme,
-      duration: duration,
-      animation: animation,
-    );
+  Widget build(BuildContext context) {
+    return Theme(data: CoreKit.instance.theme, child: child);
   }
 }
 
-class _SnackBarPage extends StatefulWidget {
+class _SnackBarOverlay extends StatefulWidget {
   final String text;
-  final Color accentColor;
-  final IconData iconData;
-  final ThemeData theme;
-  final ColorScheme colorScheme;
-  final SnackBarThemeData snackBarTheme;
+  final SnackBarType type;
   final Duration duration;
-  final Animation<double> animation;
+  final VoidCallback onDismiss;
 
-  const _SnackBarPage({
+  const _SnackBarOverlay({
     required this.text,
-    required this.accentColor,
-    required this.iconData,
-    required this.theme,
-    required this.colorScheme,
-    required this.snackBarTheme,
+    required this.type,
     required this.duration,
-    required this.animation,
+    required this.onDismiss,
   });
 
   @override
-  State<_SnackBarPage> createState() => _SnackBarPageState();
+  State<_SnackBarOverlay> createState() => _SnackBarOverlayState();
 }
 
-class _SnackBarPageState extends State<_SnackBarPage> {
+class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Offset> _slideAnimation;
+  bool _isDismissing = false;
+
   @override
   void initState() {
     super.initState();
-    // Auto dismiss after duration
+
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+
+    // Exact same animation as original
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _controller.forward();
+
     Future.delayed(widget.duration, () {
+      if (mounted) _dismiss();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _dismiss() {
+    if (_isDismissing || !mounted) return;
+    _isDismissing = true;
+
+    _controller.reverse().then((_) {
       if (mounted) {
-        Navigator.of(context).pop();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          widget.onDismiss();
+        });
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {}, // Prevent taps from going through
-      child: Material(
-        color: Colors.transparent,
-        child: Stack(
-          children: [
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(parent: widget.animation, curve: Curves.easeOut)),
-                child: Dismissible(
-                  key: UniqueKey(),
-                  direction: DismissDirection.down,
-                  onDismissed: (_) {
-                    if (mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                    margin: widget.snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: widget.snackBarTheme.backgroundColor ?? widget.colorScheme.surface,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 10,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
+    return _ThemeWrapper(
+      child: Builder(
+        builder: (themeContext) {
+          final theme = Theme.of(themeContext);
+          final colorScheme = theme.colorScheme;
+          final snackBarTheme = theme.snackBarTheme;
+          final (accentColor, iconData) = _getSemanticColors(widget.type, colorScheme);
+
+          return IgnorePointer(
+            ignoring: true,
+            child: Material(
+              color: Colors.transparent,
+              child: Align(
+                // Replaces Stack + Positioned — avoids ParentData conflict on page push
+                // while achieving identical bottom positioning
+                alignment: Alignment.bottomCenter,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.down,
+                    onDismissed: (_) => _dismiss(),
                     child: Container(
-                      padding:
-                          widget.snackBarTheme.insetPadding ??
-                          const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                      padding: EdgeInsets.zero,
+                      margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border(
-                          left: BorderSide(color: widget.accentColor, width: 10),
-                          right: BorderSide(color: widget.accentColor, width: 1),
-                          top: BorderSide(color: widget.accentColor, width: 1),
-                          bottom: BorderSide(color: widget.accentColor, width: 1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(widget.iconData, color: widget.accentColor, size: 24),
-                          const SizedBox(width: 5),
-                          Expanded(
-                            child: Text(
-                              widget.text,
-                              style:
-                                  widget.theme.snackBarTheme.contentTextStyle ??
-                                  TextStyle(
-                                    color: widget.colorScheme.onSurface.withOpacity(0.85),
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                  ),
-                            ),
+                        color: snackBarTheme.backgroundColor ?? colorScheme.surface,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 4),
                           ),
                         ],
+                      ),
+                      child: Container(
+                        padding:
+                            snackBarTheme.insetPadding ??
+                            const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border(
+                            left: BorderSide(color: accentColor, width: 10),
+                            right: BorderSide(color: accentColor, width: 1),
+                            top: BorderSide(color: accentColor, width: 1),
+                            bottom: BorderSide(color: accentColor, width: 1),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(iconData, color: accentColor, size: 24),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                widget.text,
+                                style:
+                                    snackBarTheme.contentTextStyle ??
+                                    TextStyle(
+                                      color: colorScheme.onSurface.withOpacity(0.85),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -242,13 +200,10 @@ class _SnackBarPageState extends State<_SnackBarPage> {
   switch (type) {
     case SnackBarType.success:
       return (const Color(0xFF10B981), Icons.check_circle_outline_rounded);
-
     case SnackBarType.error:
       return (colorScheme.error, Icons.error_outline_rounded);
-
     case SnackBarType.warning:
       return (colorScheme.tertiary, Icons.info_outline_rounded);
-
     case SnackBarType.info:
     default:
       return (colorScheme.primary, Icons.info_outline_rounded);

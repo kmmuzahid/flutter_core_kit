@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CommonImage extends StatelessWidget {
@@ -69,19 +68,31 @@ Widget placeholder() {
       ),
     );
   }
+ 
 
-  Widget getImage() {
-    if (src.startsWith('assets/svg') || src.endsWith('.svg')) {
+Widget getImage() { 
+    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) && src.startsWith('assets/')) {
       return _buildSvgImage();
-    } else if (src.startsWith('assets/')) {
-      return _buildPngImage();
-    } else if (src.startsWith('http') || src.startsWith('/image')) {
-      return _buildNetworkImage();
-    } else {
-      return _buildFileImage();
     }
-  }
 
+    // Local files (all known prefixes)
+    const filePrefixes = [
+      '/storage', // Android
+      '/sdcard', // Android alias
+      '/data/user', // Android app private
+      '/data/data', // older Android private
+      '/var', // iOS
+      '/private/var', // older iOS
+    ];
+
+    if (src.startsWith('assets/') ||
+        filePrefixes.any((prefix) => src.startsWith(prefix)) ||
+        File(src).existsSync()) {
+      return src.startsWith('assets/') ? _buildPngImage() : _buildFileImage();
+  }
+ 
+    return _buildNetworkImage();
+  }
   Widget _buildErrorWidget() {
     if (defaultImage == null) {
       return const SizedBox();
