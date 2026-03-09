@@ -65,7 +65,7 @@ Widget placeholder() {
       child: SizedBox(
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
-        child: Container(color: CoreKit.instance.theme.colorScheme.surface),
+        child: Container(color: CoreKit.instance.theme.colorScheme.outline),
       ),
     );
   }
@@ -122,7 +122,7 @@ Widget getImage() {
         progressIndicatorBuilder: (context, url, downloadProgress) {
           return Skeletonizer(
             enabled: (downloadProgress.progress ?? 0) < 1,
-            child: Container(color: CoreKit.instance.theme.colorScheme.outline),
+            child: placeholder(),
           );
         },
         errorWidget: (context, url, error) {
