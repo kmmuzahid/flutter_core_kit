@@ -5,8 +5,7 @@
 /// LastEditTime: 2026-01-26 11:40:00
 library;
 
-import 'package:core_kit/utils/core_screen_utils.dart';
-import 'package:core_kit/utils/debouncer.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -198,6 +197,16 @@ class _SmartListLoaderState extends State<SmartListLoader> {
               ],
             ),
           ),
+
+          if (widget.itemCount == 0 && !widget.isLoading)
+            Center(
+              child: Image.asset(
+                'assets/images/empty_icon.png', // path inside the library
+                package: 'core_kit', // the library name as in pubspec.yaml
+                width: 100,
+                height: 100,
+              ),
+            ),
 
           // Only show RefreshIndicator if onRefresh is provided
           widget.onRefresh != null
