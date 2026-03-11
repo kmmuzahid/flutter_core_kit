@@ -282,7 +282,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
               overflow: TextOverflow.visible,
               fontSize: fontSize(elevatedButtonThemeData),
               textColor: foregroundColor,
-              fontWeight: widget.titleWeight,
+              fontWeight: textStyle.fontWeight,
             ),
           ),
         ),
