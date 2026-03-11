@@ -79,6 +79,7 @@ class AppbarConfig {
     AlignmentGeometry? actionAlignment,
     double? titleSpacing,
     EdgeInsets? leadingPadding,
+    Widget Function(String title)? titleBuilder,
   }) {
     return AppbarConfig(
       onBack: onBack ?? this.onBack,
@@ -95,6 +96,7 @@ class AppbarConfig {
       actionAlignment: actionAlignment ?? this.actionAlignment,
       titleSpacing: titleSpacing ?? this.titleSpacing,
       leadingPadding: leadingPadding ?? this.leadingPadding,
+      titleBuilder: titleBuilder ?? this.titleBuilder,
     );
   }
 }
@@ -143,6 +145,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       actionAlignment: appbarConfig?.actionAlignment,
       titleSpacing: appbarConfig?.titleSpacing,
       leadingPadding: appbarConfig?.leadingPadding,
+      titleBuilder: appbarConfig?.titleBuilder
     );
 
     // Determine the background color for calculating text/icon contrast.
