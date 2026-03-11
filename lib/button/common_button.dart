@@ -13,10 +13,10 @@ class CommonButton extends StatefulWidget {
     this.onTap,
     this.titleColor,
     this.buttonColor,
-    this.titleSize = 16,
+    this.titleSize,
     this.buttonRadius,
     this.alignment = MainAxisAlignment.center,
-    this.titleWeight = FontWeight.w600,
+    this.titleWeight,
     this.buttonHeight,
     this.borderWidth,
     this.isLoading = false,
@@ -34,8 +34,8 @@ class CommonButton extends StatefulWidget {
   final Color? buttonColor;
   final Color? borderColor;
   final double? borderWidth;
-  final double titleSize;
-  final FontWeight titleWeight;
+  final double? titleSize;
+  final FontWeight? titleWeight;
   final double? buttonRadius;
   final double? buttonHeight;
   final double? buttonWidth;
@@ -93,6 +93,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    
     final elevatedButtonTheme = Theme.of(context).elevatedButtonTheme;
 
     // Extract theme values
@@ -119,8 +120,10 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     final borderWidth = widget.borderWidth?.w ?? themeBorderWidth ?? 1.5;
     final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
-    final horizontalPadding = themePadding?.horizontal ?? widget.padding?.horizontal ?? 24.0;
-    final verticalPadding = themePadding?.vertical ?? widget.padding?.vertical ?? 12.0;
+
+    final horizontalPadding = widget.padding?.horizontal ?? themePadding?.horizontal ?? 24.0;
+    final verticalPadding = widget.padding?.vertical ?? themePadding?.vertical ?? 12.0;
+
     final backgroundColor =
         widget.buttonColor ?? themeBackgroundColor ?? CoreKit.instance.primaryColor;
     final foregroundColor = widget.titleColor ?? titleColor ?? CoreKit.instance.onPrimaryColor;
@@ -139,8 +142,8 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
 
         final textStyle = (themeTextStyle ?? const TextStyle()).copyWith(
           fontFamily: CoreKit.instance.fontFamily,
-          fontSize: widget.titleSize.sp,
-          fontWeight: widget.titleWeight,
+          fontSize: fontSize(elevatedButtonTheme),
+          fontWeight: widget.titleWeight ?? themeTextStyle?.fontWeight ?? FontWeight.w600,
         );
 
         final double minRequiredWidth = _measureMinWidth(
@@ -180,6 +183,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
           height: minHeight,
           child: _buildButton(
             textStyle: textStyle,
+            elevatedButtonThemeData: elevatedButtonTheme,
             foregroundColor: foregroundColor,
             backgroundColor: backgroundColor,
             disabledBackgroundColor: disabledBackgroundColor,
@@ -198,6 +202,11 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
 
   }
 
+  double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
+    final themeTextStyle = elevatedButtonTheme.style?.textStyle?.resolve({});
+    return widget.titleSize?.sp ?? themeTextStyle?.fontSize?.sp ?? 16.sp;
+  }
+
   Widget _buildButton({
     required TextStyle textStyle,
     required Color foregroundColor,
@@ -211,6 +220,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     required double buttonElevation,
     required double horizontalPadding,
     required double verticalPadding,
+    required ElevatedButtonThemeData elevatedButtonThemeData
   }) {
     return Stack(
       children: [
@@ -270,7 +280,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
               suffix: widget.suffix,
               maxLines: 1,
               overflow: TextOverflow.visible,
-              fontSize: widget.titleSize.sp,
+              fontSize: fontSize(elevatedButtonThemeData),
               textColor: foregroundColor,
               fontWeight: widget.titleWeight,
             ),
