@@ -44,6 +44,8 @@ class AppbarConfig {
 
   final EdgeInsets leadingPadding;
 
+  final Widget Function(String title)? titleBuilder;
+
   AppbarConfig({
     this.onBack,
     this.backIcon = const Icon(Icons.arrow_back_ios, size: 25),
@@ -58,6 +60,7 @@ class AppbarConfig {
     this.leadingAlignment,
     this.actionAlignment,
     this.titleSpacing = 0,
+    this.titleBuilder,
     this.leadingPadding = const EdgeInsets.symmetric(horizontal: 16.0),
   });
 
@@ -221,6 +224,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _titleBuilder(AppbarConfig config, Color contrastColor) {
     return titleWidget ??
+        config.titleBuilder?.call(title ?? '') ??
         CommonText(
           text: title ?? '',
           fontWeight: FontWeight.w600,
