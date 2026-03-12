@@ -23,6 +23,7 @@ class SmartListLoader extends StatefulWidget {
     this.onColapsAppbar,
     this.limit = 10,
     super.key,
+    this.initalLoader
   });
 
   final int itemCount;
@@ -36,6 +37,7 @@ class SmartListLoader extends StatefulWidget {
   final Widget? appbar;
   final Widget? onColapsAppbar;
   final int limit;
+  final Widget? initalLoader;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -168,7 +170,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         ),
     ];
 
-    final listSliver = SliverPadding(
+    final listSliver = widget.initalLoader != null && widget.isLoading && widget.itemCount == 0
+        ? SliverToBoxAdapter(child: widget.initalLoader!)
+        : SliverPadding(
       padding: widget.padding ?? EdgeInsets.zero,
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate((context, index) {
