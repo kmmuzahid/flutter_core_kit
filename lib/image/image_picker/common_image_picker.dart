@@ -1,10 +1,5 @@
-import 'dart:io';
-
-import 'package:core_kit/utils/core_screen_utils.dart';
-import 'package:core_kit/utils/permission_handler_helper.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class CommonImagePicker extends StatefulWidget {
   const CommonImagePicker({
@@ -15,6 +10,7 @@ class CommonImagePicker extends StatefulWidget {
     this.pickerIcon = Icons.image,
     this.onSaved,
     this.validator,
+    this.src,
   });
 
   final double width;
@@ -23,6 +19,7 @@ class CommonImagePicker extends StatefulWidget {
   final IconData pickerIcon;
   final void Function(XFile?)? onSaved;
   final FormFieldValidator<XFile>? validator;
+  final String? src;
 
   @override
   State<CommonImagePicker> createState() => _CommonImagePickerState();
@@ -72,8 +69,11 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
                       border: Border.all(color: borderColor, width: 1.5),
                       color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     ),
-                    child: _selectedImages != null
-                        ? Image.file(File(_selectedImages!.path), fit: BoxFit.cover)
+                    child: _selectedImages != null || widget.src != null
+                        ? CommonImage(
+                            src: _selectedImages != null ? _selectedImages!.path : widget.src!,
+                            fill: BoxFit.cover,
+                          )
                         : Icon(
                             widget.pickerIcon,
                             size: widget.width / 1.8,
