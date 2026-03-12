@@ -122,46 +122,46 @@ class CommonText extends StatelessWidget {
     final effectiveTextStyle = getStyle();
     final effectiveOverflow = overflow ?? TextOverflow.ellipsis;
     final formattedData = _formatNumbersInText(text);
-
-    Widget buildText() {
-      // For HTML content
-      if (_isHtml(text)) {
+    final isHtml = _isHtml(text);
+    if (isHtml) {
         return Html(
           data: formattedData,
           style: {
-            'body': Style(
-              fontFamily: CoreKit.instance.fontFamily,
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              textOverflow: effectiveOverflow,
-              textAlign: textAlign,
-              fontSize: FontSize(effectiveTextStyle.fontSize ?? 16.0),
-              color: textColor,
-              fontWeight: fontWeight,
-            ),
-            'p': Style(
-              fontFamily: CoreKit.instance.fontFamily,
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              textAlign: textAlign,
-              textOverflow: effectiveOverflow,
-              fontSize: FontSize(effectiveTextStyle.fontSize ?? 20),
-              color: textColor,
-              fontWeight: fontWeight,
-            ),
-            'h1,h2,h3,h4,h5,h6': Style(
-              fontFamily: CoreKit.instance.fontFamily,
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              textAlign: textAlign,
-              textOverflow: effectiveOverflow,
-              fontSize: FontSize(effectiveTextStyle.fontSize ?? 25),
-              color: textColor,
-              fontWeight: fontWeight,
-            ),
+          'body': Style(
+            fontFamily: CoreKit.instance.fontFamily,
+            // margin: Margins.zero,
+            // padding: HtmlPaddings.zero,
+            // textOverflow: effectiveOverflow,
+            // textAlign: textAlign,
+            fontSize: FontSize(effectiveTextStyle.fontSize ?? 16.0),
+            color: textColor,
+            fontWeight: fontWeight,
+          ),
+          'p': Style(
+            fontFamily: CoreKit.instance.fontFamily,
+            // margin: Margins.zero,
+            // padding: HtmlPaddings.zero,
+            // textAlign: textAlign,
+            fontSize: FontSize(effectiveTextStyle.fontSize ?? 20),
+            color: textColor,
+            fontWeight: fontWeight,
+          ),
+          'h1,h2,h3,h4,h5,h6': Style(
+            fontFamily: CoreKit.instance.fontFamily,
+            // margin: Margins.zero,
+            // padding: HtmlPaddings.zero,
+            // textAlign: textAlign,
+            fontSize: FontSize(effectiveTextStyle.fontSize ?? 25),
+            color: textColor,
+            fontWeight: fontWeight,
+          ),
           },
         );
       }
+
+    Widget buildText() {
+      // For HTML content
+     
 
       // For description text - no resizing
       if (isDescription) {
