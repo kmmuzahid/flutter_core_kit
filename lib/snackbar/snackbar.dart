@@ -122,66 +122,64 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
           final snackBarTheme = theme.snackBarTheme;
           final (accentColor, iconData) = _getSemanticColors(widget.type, colorScheme);
 
-          return IgnorePointer(
-            ignoring: false,
-            child: Material(
-              color: Colors.transparent,
-              child: Align(
-                // Replaces Stack + Positioned — avoids ParentData conflict on page push
-                // while achieving identical bottom positioning
-                alignment: Alignment.bottomCenter,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Dismissible(
-                    key: UniqueKey(),
-                    direction: DismissDirection.down,
-                    onDismissed: (_) => _dismiss(),
+          return Material(
+            color: Colors.transparent,
+            child: Align(
+              heightFactor: 1,
+              // Replaces Stack + Positioned — avoids ParentData conflict on page push
+              // while achieving identical bottom positioning
+              alignment: Alignment.bottomCenter,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.down,
+                  onDismissed: (_) => _dismiss(),
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                    margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: snackBarTheme.backgroundColor ?? colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     child: Container(
-                      padding: EdgeInsets.zero,
-                      margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
+                      padding:
+                          snackBarTheme.insetPadding ??
+                          const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: snackBarTheme.backgroundColor ?? colorScheme.surface,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                            offset: const Offset(0, 4),
+                        border: Border(
+                          left: BorderSide(color: accentColor, width: 10),
+                          right: BorderSide(color: accentColor, width: 1),
+                          top: BorderSide(color: accentColor, width: 1),
+                          bottom: BorderSide(color: accentColor, width: 1),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(iconData, color: accentColor, size: 24),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              widget.text,
+                              style:
+                                  snackBarTheme.contentTextStyle ??
+                                  TextStyle(
+                                    color: colorScheme.onSurface.withOpacity(0.85),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                            ),
                           ),
                         ],
-                      ),
-                      child: Container(
-                        padding:
-                            snackBarTheme.insetPadding ??
-                            const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border(
-                            left: BorderSide(color: accentColor, width: 10),
-                            right: BorderSide(color: accentColor, width: 1),
-                            top: BorderSide(color: accentColor, width: 1),
-                            bottom: BorderSide(color: accentColor, width: 1),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(iconData, color: accentColor, size: 24),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Text(
-                                widget.text,
-                                style:
-                                    snackBarTheme.contentTextStyle ??
-                                    TextStyle(
-                                      color: colorScheme.onSurface.withOpacity(0.85),
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ),

@@ -90,7 +90,9 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     _animationController.dispose();
     super.dispose();
   }
-
+EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
+    return padding.resolve(Directionality.of(context));
+  }
   @override
   Widget build(BuildContext context) {
     
@@ -121,8 +123,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
 
-    final horizontalPadding = widget.padding?.horizontal ?? themePadding?.horizontal ?? 24.0;
-    final verticalPadding = widget.padding?.vertical ?? themePadding?.vertical ?? 12.0;
+    
 
     final backgroundColor =
         widget.buttonColor ?? themeBackgroundColor ?? CoreKit.instance.primaryColor;
@@ -134,6 +135,13 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     final disabledForegroundColor =
         widget.titleColor ?? themeDisabledForegroundColor ?? foregroundColor;
     final buttonElevation = widget.elevation ?? themeElevation ?? 2.0;
+
+    final padding = toEdgeInsets(
+      context,
+      widget.padding ??
+          themePadding ??
+          const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -149,7 +157,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
         final double minRequiredWidth = _measureMinWidth(
           context: context,
           textStyle: textStyle,
-          horizontalPadding: horizontalPadding,
+          padding: padding,
         );
 
         final double themeMinWidth = themeMinSize?.width ?? 88.0;
@@ -193,8 +201,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
             loaderColor: loaderColor,
             borderWidth: borderWidth,
             buttonElevation: buttonElevation,
-            horizontalPadding: horizontalPadding,
-            verticalPadding: verticalPadding,
+            padding: padding
           ),
         );
       },
@@ -218,8 +225,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     required Color borderColor,
     required double borderWidth,
     required double buttonElevation,
-    required double horizontalPadding,
-    required double verticalPadding,
+    required EdgeInsets padding,
     required ElevatedButtonThemeData elevatedButtonThemeData
   }) {
     return Stack(
@@ -246,8 +252,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
                   side: BorderSide(color: borderColor, width: borderWidth),
                 ),
               ),
-              padding: WidgetStateProperty.all(
-                EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+              padding: WidgetStateProperty.all(padding
               ),
               elevation: WidgetStateProperty.all(buttonElevation),
               overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -307,7 +312,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
   double _measureMinWidth({
     required BuildContext context,
     required TextStyle textStyle,
-    required double horizontalPadding,
+    required EdgeInsets padding,
   }) {
     final textPainter = TextPainter(
       text: TextSpan(text: widget.titleText, style: textStyle),
@@ -318,7 +323,7 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     final prefixWidth = widget.prefix != null ? 24.0 : 0.0;
     final suffixWidth = widget.suffix != null ? 24.0 : 0.0;
 
-    return textPainter.width + prefixWidth + suffixWidth + horizontalPadding * 2;
+    return textPainter.width + prefixWidth + suffixWidth + padding.left + padding.right;
   }
 }
 
