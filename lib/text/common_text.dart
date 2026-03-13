@@ -169,10 +169,7 @@ class CommonText extends StatelessWidget {
           formattedData,
           textAlign: textAlign,
           textDirection: textDirection ?? TextDirection.ltr,
-          style: effectiveTextStyle,
-          maxLines: maxLines,
-          overflow: effectiveOverflow,
-          softWrap: softWrap ?? true,
+          style: effectiveTextStyle,  
         );
       }
 
