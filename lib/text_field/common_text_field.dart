@@ -44,6 +44,7 @@ class CommonTextField extends StatefulWidget {
     this.borderType = BorderType.outline,
     this.suffixBuilder,
     this.prefixBuilder,
+    this.fontSize,
   });
 
   final double borderWidth;
@@ -74,6 +75,7 @@ class CommonTextField extends StatefulWidget {
   final TextAlign textAlign;
   final PasswordObscureIcon? passwordObscureIcon;
   final TextStyle? hintStyle;
+  final double? fontSize;
 
   final String? Function(String? value)? validation;
   final BorderType borderType;
@@ -271,7 +273,13 @@ class _CommonTextFieldState extends State<CommonTextField> {
             }
             return widget.showValidationMessage ? error : (error != null ? '' : null);
           },
-      style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
+      style: _getStyle(
+        fontWeight: FontWeight.w500,
+        fontSize:
+            widget.fontSize ??
+            CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ??
+            16.sp,
+      ),
       decoration: InputDecoration(
       
         filled: true,
@@ -284,7 +292,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
         hintStyle:
             widget.hintStyle ??
             _getStyle(
-              fontSize: CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
+              fontSize:
+                  widget.fontSize ??
+                  CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ??
+                  16.sp,
           fontStyle:
               CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ?? FontStyle.italic,
           textColor: hintColor(),
