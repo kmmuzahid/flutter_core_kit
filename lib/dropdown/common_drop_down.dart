@@ -26,6 +26,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.hintStyle,
     this.borderType = BorderType.outline,
     this.borderWidth = 1.2,
+    this.suffixIcon,
   });
 
   final String hint;
@@ -47,6 +48,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final TextStyle? hintStyle;
   final BorderType borderType;
   final double borderWidth;
+  final Widget? suffixIcon;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -159,7 +161,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
                   fontStyle: widget.fontStyle,
                 ),
           ),
-          icon: const Icon(Icons.arrow_drop_down),
+          icon: widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
           dropdownColor: widget.backgroundColor ?? CoreKit.instance.surfaceBG,
           isExpanded: true,
           items: _items.map((item) {
