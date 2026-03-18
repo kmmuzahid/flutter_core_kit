@@ -173,7 +173,10 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     final contrastColor = resolveTextColorFromDecoration(finalDecoration);
     final leadingButton = _buildLeadingButton(config, contrastColor);
 
-    
+    bool isCenter =
+        config.titleAlignment == Alignment.center ||
+        config.leadingAlignment == Alignment.bottomCenter ||
+        config.actionAlignment == Alignment.topCenter;
 
     // Use Material for elevation and to ensure ink splashes from buttons are visible.
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -188,40 +191,73 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           bottom: false,
           child: SizedBox(
             height: preferredSize.height,
-            child: Row( 
-            children: [
-              // --- Leading Widget ---
-              if (!hideBack)
-                Align(
-                  alignment: config.leadingAlignment ?? Alignment.centerLeft,
-                  child: leadingButton,
-                ),
+            child: isCenter
+                ? _appbarStackBased(config, leadingButton, contrastColor)
+                : _appbarRowBased(config, leadingButton, contrastColor),
+          ),
+        ),
+      ),
+    );
+  }
 
-                if (config.titleSpacing > 0) SizedBox(width: config.titleSpacing.w),
+  Widget _appbarStackBased(AppbarConfig config, Widget leadingButton, Color contrastColor) {
+    return Stack(
+      children: [
+        // --- Leading Widget ---
+        if (!hideBack)
+          Align(alignment: config.leadingAlignment ?? Alignment.centerLeft, child: leadingButton),
 
-              // --- Title Widget ---
-                Expanded(
-                  child: Align(
-                    alignment: config.titleAlignment ?? Alignment.center,
-                  child: _titleBuilder(config, contrastColor),
-               
-                  ),
-                ),
+        // --- Title Widget ---
+        Align(
+          alignment: config.titleAlignment ?? Alignment.center,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: config.titleSpacing > 0 ? config.titleSpacing.w : 0,
+            ),
+            child: _titleBuilder(config, contrastColor),
+          ),
+        ),
 
-              // --- Action Widgets ---
-              if (config.actions?.isNotEmpty == true)
-                Align(
-                  alignment: config.actionAlignment ?? Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
-                  ),
-                ),
-            ],
+        // --- Action Widgets ---
+        if (config.actions?.isNotEmpty == true)
+          Align(
+            alignment: config.actionAlignment ?? Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
             ),
           ),
-        )
-      ),
+      ],
+    );
+  }
+
+  Row _appbarRowBased(AppbarConfig config, Widget leadingButton, Color contrastColor) {
+    return Row(
+      children: [
+        // --- Leading Widget ---
+        if (!hideBack)
+          Align(alignment: config.leadingAlignment ?? Alignment.centerLeft, child: leadingButton),
+
+        if (config.titleSpacing > 0) SizedBox(width: config.titleSpacing.w),
+
+        // --- Title Widget ---
+        Expanded(
+          child: Align(
+            alignment: config.titleAlignment ?? Alignment.center,
+            child: _titleBuilder(config, contrastColor),
+          ),
+        ),
+
+        // --- Action Widgets ---
+        if (config.actions?.isNotEmpty == true)
+          Align(
+            alignment: config.actionAlignment ?? Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
+            ),
+          ),
+      ],
     );
   }
 
@@ -264,13 +300,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // // / Calculate contrast color based on background brightness
-  // Color _getContrastColor(Color backgroundColor) {
-  //   // Calculate relative luminance
-  //   final luminance = backgroundColor.computeLuminance();
-  //   // A threshold of 0.5 is standard for distinguishing light from dark.
-  //   return luminance > 0.5 ? Colors.black : Colors.white;
-  // }
 
   Color resolveTextColorFromDecoration(Decoration? decoration) {
     if (decoration == null) {
