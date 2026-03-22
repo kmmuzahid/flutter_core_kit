@@ -1,20 +1,16 @@
-import 'package:analyzer/dart/analysis/results.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/error/error.dart';
+import 'package:analyzer/error/error.dart' hide LintCode;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:path/path.dart' as p;
 
-/// Entry point for custom_lint
 PluginBase createPlugin() => _ProtectedLintPlugin();
 
 class _ProtectedLintPlugin extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) => [
-        _ProtectedLintRule(),
-      ];
+    _ProtectedLintRule(),
+  ];
 }
 
 class _ProtectedLintRule extends DartLintRule {
@@ -22,8 +18,10 @@ class _ProtectedLintRule extends DartLintRule {
 
   static const _code = LintCode(
     name: 'protected_lint',
-    problemMessage: '{0} is annotated @Protected(depth: {1}) but is accessed from {2} folder level(s) away.',
-    correctionMessage: 'Only access {0} within {1} folder level(s) of its definition at "{3}".',
+    problemMessage:
+        '{0} is annotated @Protected(depth: {1}) but is accessed from {2} folder level(s) away.',
+    correctionMessage:
+        'Only access {0} within {1} folder level(s) of its definition at "{3}".',
     errorSeverity: ErrorSeverity.ERROR,
   );
 
@@ -34,7 +32,8 @@ class _ProtectedLintRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addSimpleIdentifier((node) {
-      final element = node.staticElement;
+      final dynamic n = node;
+      final element = n.staticElement;
       if (element is ClassElement) {
         _check(resolver, reporter, element, node.offset, node.length);
       }
@@ -48,12 +47,23 @@ class _ProtectedLintRule extends DartLintRule {
     });
 
     context.registry.addImportDirective((node) {
-      final libraryElement = node.element?.importedLibrary;
+      final dynamic d = node;
+      final libraryElement = d.element?.importedLibrary;
       if (libraryElement == null) return;
 
-      final classes = libraryElement.exportNamespace.definedNames.values.whereType<ClassElement>();
+      // Using dynamic to bypass resolution issues with Namespace.definedNames in some analyzer versions
+      final dynamic namespace = libraryElement.exportNamespace;
+      final Iterable<dynamic> definedNames = namespace.definedNames.values;
+      final classes = definedNames.whereType<ClassElement>();
       for (final element in classes) {
-        _check(resolver, reporter, element, node.offset, node.length, isImport: true);
+        _check(
+          resolver,
+          reporter,
+          element,
+          node.offset,
+          node.length,
+          isImport: true,
+        );
       }
     });
   }
@@ -81,7 +91,8 @@ class _ProtectedLintRule extends DartLintRule {
     }
     if (classFile == null) {
       try {
-        classFile = e.firstFragment?.libraryFragment?.source?.fullName as String?;
+        classFile =
+            e.firstFragment?.libraryFragment?.source?.fullName as String?;
       } catch (_) {}
     }
     if (classFile == null) {
@@ -105,8 +116,20 @@ class _ProtectedLintRule extends DartLintRule {
     }
 
     for (final meta in annots) {
-      final sourceStr = meta.toSource();
-      if (sourceStr.startsWith('@Protected')) {
+      if (meta is! ElementAnnotation) continue;
+
+      final element = meta.element;
+      final name =
+          element?.enclosingElement?.name ??
+          element?.enclosingElement?.enclosingElement?.name;
+
+      if (name == 'Protected') {
+        protectedAnnotation = meta;
+        break;
+      }
+
+      // Fallback for some analyzer versions
+      if (meta.toSource().startsWith('@Protected')) {
         protectedAnnotation = meta;
         break;
       }
@@ -122,30 +145,33 @@ class _ProtectedLintRule extends DartLintRule {
     final folderDiff = _folderDepth(classFolder, usageFolder);
 
     if (folderDiff > depth) {
+      final dynamic r = reporter;
       if (isImport) {
-        reporter.reportErrorForOffset(
-          LintCode(
-            name: 'protected_import_lint',
-            problemMessage: 'Importing {0} is illegal. It is annotated @Protected(depth: {1}) but accessed {2} folder level(s) away.',
-            errorSeverity: ErrorSeverity.ERROR,
-          ),
-          offset,
-          length,
-          [element.name, depth, folderDiff],
+        final code = LintCode(
+          name: 'protected_import_lint',
+          problemMessage:
+              'Importing {0} is illegal. It is annotated @Protected(depth: {1}) but accessed {2} folder level(s) away.',
+          errorSeverity: ErrorSeverity.ERROR,
         );
+        r.reportErrorForOffset(code, offset, length, [
+          element.name ?? '',
+          depth,
+          folderDiff,
+        ]);
       } else {
-        reporter.reportErrorForOffset(
-          _code,
-          offset,
-          length,
-          [element.name, depth, folderDiff, classFolder],
-        );
+        r.reportErrorForOffset(_code, offset, length, [
+          element.name ?? '',
+          depth,
+          folderDiff,
+          classFolder,
+        ]);
       }
     }
   }
 
   int _folderDepth(String classFolder, String usageFolder) {
-    if (p.equals(classFolder, usageFolder) || p.isWithin(classFolder, usageFolder)) {
+    if (p.equals(classFolder, usageFolder) ||
+        p.isWithin(classFolder, usageFolder)) {
       return 1;
     }
     int diff = 1;
@@ -153,7 +179,8 @@ class _ProtectedLintRule extends DartLintRule {
     while (ancestor != p.dirname(ancestor)) {
       ancestor = p.dirname(ancestor);
       diff++;
-      if (p.equals(ancestor, usageFolder) || p.isWithin(ancestor, usageFolder)) {
+      if (p.equals(ancestor, usageFolder) ||
+          p.isWithin(ancestor, usageFolder)) {
         return diff;
       }
     }

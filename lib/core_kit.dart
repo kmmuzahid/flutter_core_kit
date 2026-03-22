@@ -7,7 +7,6 @@ library;
 
 //annotations
 export 'package:core_kit/annotations/protected.dart';
-export 'package:core_kit/annotations/protected_lint.dart';
 
 // app_bar
 export 'package:core_kit/app_bar/common_app_bar.dart';
@@ -82,5 +81,3 @@ export 'package:dio/dio.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:image_picker/image_picker.dart';
 export 'package:permission_handler/permission_handler.dart';
- 
-
