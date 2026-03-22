@@ -4,26 +4,37 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
 class CoreScreenUtils {
   CoreScreenUtils._();
 
-  static late Size deviceSize;
-  static late double _designWidth;
-  static late double _designHeight;
+  static Size? _deviceSize;
+  static double? _designWidth;
+  static double? _designHeight;
 
   static void init(BuildContext context, VoidCallback onComplete) {
-    deviceSize = MediaQuery.of(context).size;
-    _designWidth = CoreKit.instance.designSize.width;
-    _designHeight = CoreKit.instance.designSize.height;
+    _deviceSize = MediaQuery.of(context).size;
+    _designWidth = coreKitInstance.designSize.width;
+    _designHeight = coreKitInstance.designSize.height;
     onComplete();
   }
 
   static double _scale() {
-    return deviceSize.width / _designWidth < deviceSize.height / _designHeight
-        ? deviceSize.width / _designWidth
-        : deviceSize.height / _designHeight;
+    final width = _designWidth;
+    final height = _designHeight;
+    final device = _deviceSize;
+    if (width == null ||
+        height == null ||
+        device == null ||
+        width == 0 ||
+        height == 0) {
+      return 1.0;
+    }
+    return device.width / width < device.height / height
+        ? device.width / width
+        : device.height / height;
   }
 
   static double width({required num value}) => value * _scale();

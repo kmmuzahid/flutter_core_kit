@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -54,7 +54,7 @@ class _CommonDraggableBottomSheetState extends State<CommonDraggableBottomSheet>
         height: 4.h,
         width: 30.w,
         decoration: BoxDecoration(
-          color: CoreKit.instance.primaryColor,
+          color: coreKitInstance.primaryColor,
           borderRadius: BorderRadius.circular(4.r),
         ),
       ),
@@ -73,7 +73,7 @@ class _CommonDraggableBottomSheetState extends State<CommonDraggableBottomSheet>
         return AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           decoration: BoxDecoration(
-            color: CoreKit.instance.surfaceBG,
+            color: coreKitInstance.surfaceBG,
             borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
             boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
           ),

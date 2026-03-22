@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -36,7 +37,6 @@ class CommonImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     try {
       if (src.isEmpty) return placeholder();
 
@@ -59,20 +59,20 @@ class CommonImage extends StatelessWidget {
     }
   }
 
-Widget placeholder() {
+  Widget placeholder() {
     return ClipRRect(
       borderRadius: getBorderRadius(),
       child: SizedBox(
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
-        child: Container(color: CoreKit.instance.theme.colorScheme.outline),
+        child: Container(color: coreKitInstance.theme.colorScheme.outline),
       ),
     );
   }
- 
 
-Widget getImage() { 
-    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) && src.startsWith('assets/')) {
+  Widget getImage() {
+    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) &&
+        src.startsWith('assets/')) {
       return _buildSvgImage();
     }
 
@@ -90,10 +90,11 @@ Widget getImage() {
         filePrefixes.any((prefix) => src.startsWith(prefix)) ||
         File(src).existsSync()) {
       return src.startsWith('assets/') ? _buildPngImage() : _buildFileImage();
-  }
- 
+    }
+
     return _buildNetworkImage();
   }
+
   Widget _buildErrorWidget() {
     if (defaultImage == null) {
       return const SizedBox();
@@ -105,8 +106,8 @@ Widget getImage() {
     final path = src.startsWith('http')
         ? src
         : src.startsWith('/')
-        ? '${CoreKit.instance.imageBaseUrl}$src'
-        : '${CoreKit.instance.imageBaseUrl}/$src';
+        ? '${coreKitInstance.imageBaseUrl}$src'
+        : '${coreKitInstance.imageBaseUrl}/$src';
     return ClipRRect(
       borderRadius: getBorderRadius(),
       child: CachedNetworkImage(
@@ -115,7 +116,7 @@ Widget getImage() {
         imageUrl: path,
         fit: fill,
         imageBuilder: (context, imageProvider) => Container(
-          decoration: BoxDecoration( 
+          decoration: BoxDecoration(
             image: DecorationImage(image: imageProvider, fit: fill),
           ),
         ),
@@ -134,12 +135,14 @@ Widget getImage() {
     );
   }
 
-  Widget _buildSvgImage() { 
+  Widget _buildSvgImage() {
     return ClipRRect(
       borderRadius: getBorderRadius(),
       child: SvgPicture.asset(
         src,
-        colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
+        colorFilter: imageColor != null
+            ? ColorFilter.mode(imageColor!, BlendMode.srcIn)
+            : null,
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
         fit: fill,

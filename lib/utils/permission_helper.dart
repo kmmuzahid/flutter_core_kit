@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -55,13 +56,18 @@ class PermissionHelper {
   }
 
   static Future<dynamic> _dialog(Permission permission) {
-    final errorColor = CoreKit.instance.permissionHandlerColors.errorColor;
-    final actionColor = CoreKit.instance.permissionHandlerColors.actionColor;
-    final normalColor = CoreKit.instance.permissionHandlerColors.normalColor;
-    final fontFamily = CoreKit.instance.fontFamily;
+    final errorColor = coreKitInstance.permissionHandlerColors.errorColor;
+    final actionColor = coreKitInstance.permissionHandlerColors.actionColor;
+    final normalColor = coreKitInstance.permissionHandlerColors.normalColor;
+    final fontFamily = coreKitInstance.fontFamily;
+
+    final navigatorState = coreKitInstance.navigatorKey.currentState;
+    if (navigatorState == null) {
+      return Future.value(null);
+    }
 
     return showDialog(
-      context: CoreKit.instance.navigatorKey.currentState!.context,
+      context: navigatorState.context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -69,7 +75,7 @@ class PermissionHelper {
             Icon(Icons.warning_amber_rounded, color: errorColor),
             const SizedBox(width: 8),
             Text(
-              CoreKit.instance.permissionHelperConfig.permissionDenied,
+              coreKitInstance.permissionHelperConfig.permissionDenied,
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontWeight: FontWeight.bold,
@@ -85,11 +91,15 @@ class PermissionHelper {
           children: [
             RichText(
               text: TextSpan(
-                style: TextStyle(fontSize: 15, color: Colors.black87, fontFamily: fontFamily),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87,
+                  fontFamily: fontFamily,
+                ),
                 children: [
                   TextSpan(
                     text:
-                        '❌ ${_getPermissionName(permission)} ${CoreKit.instance.permissionHelperConfig.permissionIsPermanentlyDenied}\n\n',
+                        '❌ ${_getPermissionName(permission)} ${coreKitInstance.permissionHelperConfig.permissionIsPermanentlyDenied}\n\n',
                     style: TextStyle(
                       fontFamily: fontFamily,
                       color: errorColor,
@@ -97,11 +107,15 @@ class PermissionHelper {
                     ),
                   ),
                   TextSpan(
-                    text: '✅ ${CoreKit.instance.permissionHelperConfig.toFixThisPleaseGoTo} ',
-                    style: TextStyle(fontFamily: fontFamily, color: normalColor),
+                    text:
+                        '✅ ${coreKitInstance.permissionHelperConfig.toFixThisPleaseGoTo} ',
+                    style: TextStyle(
+                      fontFamily: fontFamily,
+                      color: normalColor,
+                    ),
                   ),
                   TextSpan(
-                    text: CoreKit.instance.permissionHelperConfig.openSettings,
+                    text: coreKitInstance.permissionHelperConfig.openSettings,
                     style: TextStyle(
                       fontFamily: fontFamily,
                       color: actionColor,
@@ -111,8 +125,11 @@ class PermissionHelper {
                   ),
                   TextSpan(
                     text:
-                        ' ${CoreKit.instance.permissionHelperConfig.andAllowThePermissionManually}',
-                    style: TextStyle(fontFamily: fontFamily, color: normalColor),
+                        ' ${coreKitInstance.permissionHelperConfig.andAllowThePermissionManually}',
+                    style: TextStyle(
+                      fontFamily: fontFamily,
+                      color: normalColor,
+                    ),
                   ),
                 ],
               ),
@@ -123,11 +140,11 @@ class PermissionHelper {
           TextButton.icon(
             onPressed: () {
               openAppSettings();
-              CoreKit.instance.appbarConfig.getBack?.call();
+              coreKitInstance.appbarConfig.getBack?.call();
             },
             icon: Icon(Icons.settings, color: actionColor),
             label: Text(
-              CoreKit.instance.permissionHelperConfig.openSettings,
+              coreKitInstance.permissionHelperConfig.openSettings,
               style: TextStyle(
                 fontFamily: fontFamily,
                 color: actionColor,
@@ -136,9 +153,9 @@ class PermissionHelper {
             ),
           ),
           TextButton(
-            onPressed: CoreKit.instance.appbarConfig.getBack,
+            onPressed: coreKitInstance.appbarConfig.getBack,
             child: Text(
-              CoreKit.instance.permissionHelperConfig.cancel,
+              coreKitInstance.permissionHelperConfig.cancel,
               style: TextStyle(fontFamily: fontFamily, color: Colors.grey[700]),
             ),
           ),

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/network/response_state.dart' show ResponseState;
 import 'package:core_kit/utils/extension.dart';
-import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -13,9 +12,9 @@ import 'request_input.dart';
 class DioRequestBuilder {
   DioRequestBuilder._();
   static final instance = DioRequestBuilder._();
-  late TokenProvider _tokenProvider;
+  TokenProvider? _tokenProvider;
+  Dio? _dio;
 
-  late Dio _dio;
   void init({required TokenProvider tokenProvider, required Dio dio}) {
     _tokenProvider = tokenProvider;
     _dio = dio;
@@ -29,18 +28,23 @@ class DioRequestBuilder {
     required int retryCount,
     required int maxRetry,
   }) async {
+    final tokenProvider = _tokenProvider;
+    final dio = _dio;
+    if (tokenProvider == null || dio == null) {
+      throw StateError('DioRequestBuilder not initialized. Call init() first.');
+    }
+
     final requestOptions = await _buildOptions(
       input: input,
-      accessToken: await _tokenProvider.accessToken(),
+      accessToken: await tokenProvider.accessToken(),
       retryCount: retryCount,
       maxRetry: maxRetry,
     );
 
-    dio.Response response;
-    response = await _dio.request(
+    Response response;
+    response = await dio.request(
       requestOptions.path,
       data: requestOptions.data,
-      // queryParameters: requestOptions.queryParameters,
       options: requestOptions.options,
       cancelToken: cancelToken,
       onSendProgress: input.onSendProgress,
@@ -51,13 +55,16 @@ class DioRequestBuilder {
     //   DioUtils.log(_config, response.data.toString(), tag: input.endpoint);
     // }
 
-    final parsed = response.data['data'] != null ? responseBuilder(response.data['data']) : null;
+    final parsed = response.data['data'] != null
+        ? responseBuilder(response.data['data'])
+        : null;
 
     final message = response.data is Map && response.data['message'] != null
         ? response.data['message'].toString()
         : response.statusMessage;
 
-    if (showMessage && (response.statusCode == 200 || response.statusCode == 201)) {
+    if (showMessage &&
+        (response.statusCode == 200 || response.statusCode == 201)) {
       DioUtils.showMessage(message ?? '', isError: false);
     }
 
@@ -88,7 +95,8 @@ class DioRequestBuilder {
       }
     }
     if (input.queryParams?.isNotEmpty ?? false) {
-      url = "$url?${input.queryParams!.entries.map((e) => "${e.key}=${e.value}").join("&")}";
+      url =
+          "$url?${input.queryParams!.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }
 
     final headers = {
@@ -105,10 +113,11 @@ class DioRequestBuilder {
     final hasJson = input.jsonBody != null;
     final hasList = input.listBody != null;
 
-    final needsMultipart = hasFiles || hasFields || (hasFiles && (hasJson || hasList));
+    final needsMultipart =
+        hasFiles || hasFields || (hasFiles && (hasJson || hasList));
 
     if (needsMultipart) {
-      dio.FormData formData = dio.FormData();
+      FormData formData = FormData();
       final Map<String, dynamic> form = {};
 
       if (input.formFields != null) {
@@ -146,9 +155,9 @@ class DioRequestBuilder {
             // }
           }
         }
-      } 
+      }
       contentType = 'multipart/form-data';
-      formData = dio.FormData.fromMap(form);
+      formData = FormData.fromMap(form);
       body = formData;
     } else if (hasJson) {
       body = input.jsonBody;
@@ -160,8 +169,8 @@ class DioRequestBuilder {
 
     return _RequestOptionsData(
       path: url,
-      data: body, 
-      options: dio.Options(
+      data: body,
+      options: Options(
         extra: {'retryCount': retryCount, 'maxRetry': maxRetry},
         method: input.method.name,
         headers: headers,
@@ -174,11 +183,11 @@ class DioRequestBuilder {
 class _RequestOptionsData {
   _RequestOptionsData({
     required this.path,
-    required this.data, 
+    required this.data,
     required this.options,
   });
 
   final String path;
-  final dynamic data; 
-  final dio.Options options;
+  final dynamic data;
+  final Options options;
 }

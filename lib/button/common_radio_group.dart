@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
 /// A theme-aware radio group that accepts a Map of options where
@@ -129,8 +129,8 @@ class _RadioItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = selected
-        ? selectedColor ?? CoreKit.instance.primaryColor
-        : unSelectedColor ?? CoreKit.instance.secondaryColor;
+        ? selectedColor ?? coreKitInstance.primaryColor
+        : unSelectedColor ?? coreKitInstance.secondaryColor;
 
     return GestureDetector(
       onTap: onTap,
@@ -190,7 +190,7 @@ class CommonRadioFormField extends FormField<String> {
                    padding: const EdgeInsets.only(top: 4.0),
                    child: Text(
                      state.errorText ?? '',
-                     style: CoreKit.instance.defaultTextStyle?.copyWith(color: Colors.red),
+                     style: coreKitInstance.defaultTextStyle?.copyWith(color: Colors.red),
                    ),
                  ),
              ],

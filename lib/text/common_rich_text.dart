@@ -40,13 +40,15 @@ class CommonRichText extends StatelessWidget {
           final rContent = richTextContent[index];
 
           if (rContent is CommonSimpleRichTextContent) {
-            final style = rContent.style?.copyWith(fontFamily: CoreKit.instance.fontFamily);
+            final style = rContent.style?.copyWith(
+              fontFamily: coreKitInstance.fontFamily,
+            );
             return TextSpan(
               text: rContent.text,
               style:
                   style ??
-                  CoreKit.instance.defaultTextStyle?.copyWith(
-                    fontFamily: CoreKit.instance.fontFamily,
+                  coreKitInstance.defaultTextStyle?.copyWith(
+                    fontFamily: coreKitInstance.fontFamily,
                   ),
               recognizer: rContent.ontap == null
                   ? null

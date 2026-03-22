@@ -1,6 +1,4 @@
-
-
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
 import '../text/common_text.dart';
@@ -51,7 +49,8 @@ class CommonButton extends StatefulWidget {
   State<CommonButton> createState() => _CommonButtonState();
 }
 
-class _CommonButtonState extends State<CommonButton> with SingleTickerProviderStateMixin {
+class _CommonButtonState extends State<CommonButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -62,10 +61,9 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _animation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.linear));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.linear),
+    );
 
     if (widget.isLoading) {
       _animationController.repeat();
@@ -90,46 +88,58 @@ class _CommonButtonState extends State<CommonButton> with SingleTickerProviderSt
     _animationController.dispose();
     super.dispose();
   }
-EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
+
+  EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
     return padding.resolve(Directionality.of(context));
   }
+
   @override
   Widget build(BuildContext context) {
-    
     final elevatedButtonTheme = Theme.of(context).elevatedButtonTheme;
 
     // Extract theme values
     final themeShape = elevatedButtonTheme.style?.shape?.resolve({});
-    final resolvedShape = themeShape is RoundedRectangleBorder ? themeShape : null;
-    final themeBorderRadius = resolvedShape?.borderRadius.resolve(TextDirection.ltr).topLeft.x;
+    final resolvedShape = themeShape is RoundedRectangleBorder
+        ? themeShape
+        : null;
+    final themeBorderRadius = resolvedShape?.borderRadius
+        .resolve(TextDirection.ltr)
+        .topLeft
+        .x;
     final themeBorderWidth = resolvedShape?.side.width;
     final themeBorderColor = resolvedShape?.side.color;
     final themeMinSize = elevatedButtonTheme.style?.minimumSize?.resolve({});
     final themePadding = elevatedButtonTheme.style?.padding?.resolve({});
-    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({});
+    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor
+        ?.resolve({});
     final titleColor = elevatedButtonTheme.style?.textStyle?.resolve({})?.color;
-    final themeDisabledBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({
-      WidgetState.disabled,
-    });
-    final themeDisabledForegroundColor = elevatedButtonTheme.style?.foregroundColor?.resolve({
-      WidgetState.disabled,
-    });
+    final themeDisabledBackgroundColor = elevatedButtonTheme
+        .style
+        ?.backgroundColor
+        ?.resolve({WidgetState.disabled});
+    final themeDisabledForegroundColor = elevatedButtonTheme
+        .style
+        ?.foregroundColor
+        ?.resolve({WidgetState.disabled});
     final themeElevation = elevatedButtonTheme.style?.elevation?.resolve({});
     final themeTextStyle = elevatedButtonTheme.style?.textStyle?.resolve({});
 
     // Resolve final values: widget param > theme > default
     final borderRadius = widget.buttonRadius?.r ?? themeBorderRadius ?? 8.0;
     final borderWidth = widget.borderWidth?.w ?? themeBorderWidth ?? 1.5;
-    final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
+    final borderColor =
+        widget.borderColor ?? themeBorderColor ?? Colors.transparent;
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
 
-    
-
     final backgroundColor =
-        widget.buttonColor ?? themeBackgroundColor ?? CoreKit.instance.primaryColor;
-    final foregroundColor = widget.titleColor ?? titleColor ?? CoreKit.instance.onPrimaryColor;
+        widget.buttonColor ??
+        themeBackgroundColor ??
+        coreKitInstance.primaryColor;
+    final foregroundColor =
+        widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
     final loaderColor =
-        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ?? CoreKit.instance.secondaryColor;
+        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ??
+        coreKitInstance.secondaryColor;
     final disabledBackgroundColor =
         widget.buttonColor ?? themeDisabledBackgroundColor ?? backgroundColor;
     final disabledForegroundColor =
@@ -146,12 +156,17 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool hasBoundedWidth = constraints.maxWidth.isFinite;
-        final double maxAvailableWidth = hasBoundedWidth ? constraints.maxWidth : 0;
+        final double maxAvailableWidth = hasBoundedWidth
+            ? constraints.maxWidth
+            : 0;
 
         final textStyle = (themeTextStyle ?? const TextStyle()).copyWith(
-          fontFamily: CoreKit.instance.fontFamily,
+          fontFamily: coreKitInstance.fontFamily,
           fontSize: fontSize(elevatedButtonTheme),
-          fontWeight: widget.titleWeight ?? themeTextStyle?.fontWeight ?? FontWeight.w600,
+          fontWeight:
+              widget.titleWeight ??
+              themeTextStyle?.fontWeight ??
+              FontWeight.w600,
         );
 
         final double minRequiredWidth = _measureMinWidth(
@@ -172,7 +187,10 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
         // CASE 2: explicit width provided
         else if (!requestedWidth.isNaN) {
           if (hasBoundedWidth) {
-            calculatedWidth = requestedWidth.clamp(minRequiredWidth, maxAvailableWidth);
+            calculatedWidth = requestedWidth.clamp(
+              minRequiredWidth,
+              maxAvailableWidth,
+            );
           } else {
             calculatedWidth = requestedWidth;
           }
@@ -180,7 +198,10 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
         // CASE 3: auto size
         else {
           if (hasBoundedWidth) {
-            calculatedWidth = minRequiredWidth.clamp(themeMinWidth, maxAvailableWidth);
+            calculatedWidth = minRequiredWidth.clamp(
+              themeMinWidth,
+              maxAvailableWidth,
+            );
           } else {
             calculatedWidth = minRequiredWidth;
           }
@@ -201,12 +222,11 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
             loaderColor: loaderColor,
             borderWidth: borderWidth,
             buttonElevation: buttonElevation,
-            padding: padding
+            padding: padding,
           ),
         );
       },
     );
-
   }
 
   double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
@@ -226,7 +246,7 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
     required double borderWidth,
     required double buttonElevation,
     required EdgeInsets padding,
-    required ElevatedButtonThemeData elevatedButtonThemeData
+    required ElevatedButtonThemeData elevatedButtonThemeData,
   }) {
     return Stack(
       children: [
@@ -239,7 +259,7 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
                     ? disabledBackgroundColor
                     : backgroundColor,
               ),
-             
+
               foregroundColor: WidgetStateProperty.resolveWith(
                 (states) => states.contains(WidgetState.disabled)
                     ? disabledForegroundColor
@@ -252,8 +272,7 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
                   side: BorderSide(color: borderColor, width: borderWidth),
                 ),
               ),
-              padding: WidgetStateProperty.all(padding
-              ),
+              padding: WidgetStateProperty.all(padding),
               elevation: WidgetStateProperty.all(buttonElevation),
               overlayColor: WidgetStateProperty.all(Colors.transparent),
               splashFactory: NoSplash.splashFactory,
@@ -263,20 +282,23 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
                     decoration: BoxDecoration(
                       color: widget.buttonColor,
                       borderRadius: BorderRadius.circular(borderRadius),
-                      border: Border.all(color: borderColor, width: borderWidth),
+                      border: Border.all(
+                        color: borderColor,
+                        width: borderWidth,
+                      ),
                     ),
                     child: child,
                   );
                 }
-              
-                return CoreKit.instance.theme.elevatedButtonTheme.style?.backgroundBuilder?.call(
-                      context,
-                      state,
-                      child,
-                    ) ??
+
+                return coreKitInstance
+                        .theme
+                        .elevatedButtonTheme
+                        .style
+                        ?.backgroundBuilder
+                        ?.call(context, state, child) ??
                     child ??
                     SizedBox.shrink();
-                
               },
             ),
             child: CommonText(
@@ -299,7 +321,11 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
                 child: AnimatedBuilder(
                   animation: _animation,
                   builder: (_, __) => CustomPaint(
-                    painter: _BorderLoaderPainter(_animation.value, loaderColor, borderRadius),
+                    painter: _BorderLoaderPainter(
+                      _animation.value,
+                      loaderColor,
+                      borderRadius,
+                    ),
                   ),
                 ),
               ),
@@ -323,7 +349,11 @@ EdgeInsets toEdgeInsets(BuildContext context, EdgeInsetsGeometry padding) {
     final prefixWidth = widget.prefix != null ? 24.0 : 0.0;
     final suffixWidth = widget.suffix != null ? 24.0 : 0.0;
 
-    return textPainter.width + prefixWidth + suffixWidth + padding.left + padding.right;
+    return textPainter.width +
+        prefixWidth +
+        suffixWidth +
+        padding.left +
+        padding.right;
   }
 }
 
@@ -336,7 +366,8 @@ class _BorderLoaderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    final path = Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
 
     final paint = Paint()
       ..color = color

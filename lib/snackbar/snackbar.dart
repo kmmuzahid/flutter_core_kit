@@ -10,12 +10,17 @@ enum SnackBarType { success, error, warning, info }
 
 OverlayEntry? _currentSnackBarEntry;
 
-void showSnackBar(String text, {required SnackBarType type, Duration? customDuration}) {
-  final overlayState = CoreKit.instance.navigatorKey.currentState?.overlay;
+void showSnackBar(
+  String text, {
+  required SnackBarType type,
+  Duration? customDuration,
+}) {
+  final overlayState = coreKitInstance.navigatorKey.currentState?.overlay;
   if (overlayState == null) return;
 
   final int calculatedMs = 2000 + (text.length * 25);
-  final Duration displayDuration = customDuration ?? Duration(milliseconds: calculatedMs);
+  final Duration displayDuration =
+      customDuration ?? Duration(milliseconds: calculatedMs);
 
   _currentSnackBarEntry?.remove();
   _currentSnackBarEntry = null;
@@ -48,7 +53,7 @@ class _ThemeWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(data: CoreKit.instance.theme, child: child);
+    return Theme(data: coreKitInstance.theme, child: child);
   }
 }
 
@@ -69,7 +74,8 @@ class _SnackBarOverlay extends StatefulWidget {
   State<_SnackBarOverlay> createState() => _SnackBarOverlayState();
 }
 
-class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerProviderStateMixin {
+class _SnackBarOverlayState extends State<_SnackBarOverlay>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _slideAnimation;
   bool _isDismissing = false;
@@ -78,7 +84,10 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
 
     // Exact same animation as original
     _slideAnimation = Tween<Offset>(
@@ -120,7 +129,10 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
           final theme = Theme.of(themeContext);
           final colorScheme = theme.colorScheme;
           final snackBarTheme = theme.snackBarTheme;
-          final (accentColor, iconData) = _getSemanticColors(widget.type, colorScheme);
+          final (accentColor, iconData) = _getSemanticColors(
+            widget.type,
+            colorScheme,
+          );
 
           return Material(
             color: Colors.transparent,
@@ -137,10 +149,12 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
                   onDismissed: (_) => _dismiss(),
                   child: Container(
                     padding: EdgeInsets.zero,
-                    margin: snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
+                    margin:
+                        snackBarTheme.insetPadding ?? const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: snackBarTheme.backgroundColor ?? colorScheme.surface,
+                      color:
+                          snackBarTheme.backgroundColor ?? colorScheme.surface,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2),
@@ -153,7 +167,10 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
                     child: Container(
                       padding:
                           snackBarTheme.insetPadding ??
-                          const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                          const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 10,
+                          ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border(
@@ -173,7 +190,9 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
                               style:
                                   snackBarTheme.contentTextStyle ??
                                   TextStyle(
-                                    color: colorScheme.onSurface.withOpacity(0.85),
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.85,
+                                    ),
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
                                   ),
@@ -194,7 +213,10 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay> with SingleTickerPro
 }
 
 /// Extracts semantic colors strictly from the App's ColorScheme
-(Color, IconData) _getSemanticColors(SnackBarType type, ColorScheme colorScheme) {
+(Color, IconData) _getSemanticColors(
+  SnackBarType type,
+  ColorScheme colorScheme,
+) {
   switch (type) {
     case SnackBarType.success:
       return (const Color(0xFF10B981), Icons.check_circle_outline_rounded);

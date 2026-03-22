@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +7,7 @@ class CoreUtils {
   static late Size deviceSize;
 
   static RepaintBoundary divider() => RepaintBoundary(
-    child: Divider(color: CoreKit.instance.outlineColor, thickness: 1.w),
+    child: Divider(color: coreKitInstance.outlineColor, thickness: 1.w),
   );
 
   static DateTime? parseDate(String? dateString) {

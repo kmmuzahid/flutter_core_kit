@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -42,7 +42,9 @@ class CommonShare {
   }) async {
     try {
       // Download the image
-      final response = await http.get(Uri.parse('${CoreKit.instance.imageBaseUrl}$imageUrl'));
+      final response = await http.get(
+        Uri.parse('${coreKitInstance.imageBaseUrl}$imageUrl'),
+      );
       if (response.statusCode != 200) {
         return;
       }

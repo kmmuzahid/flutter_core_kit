@@ -1,6 +1,6 @@
 import 'package:core_kit/button/common_button.dart';
 import 'package:core_kit/form/custom_form.dart';
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ Future commonDialog({
     context: context,
     barrierDismissible: isDismissible,
     builder: (dialogContext) => Dialog(
-      backgroundColor: CoreKit.instance.surfaceBG,
+      backgroundColor: coreKitInstance.surfaceBG,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
       child: Padding(
@@ -41,17 +41,34 @@ Future CommonDialogWithActions({
     context: context,
     barrierDismissible: isDismissible,
     builder: (dialogContext) => Dialog(
-      backgroundColor: CoreKit.instance.surfaceBG,
+      backgroundColor: coreKitInstance.surfaceBG,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: validationRequired
             ? CustomForm(
-                builder: (context, formKey) =>
-                    _body(title, subTitle, content, onConfirm, onCancel, formKey, action, cancel),
+                builder: (context, formKey) => _body(
+                  title,
+                  subTitle,
+                  content,
+                  onConfirm,
+                  onCancel,
+                  formKey,
+                  action,
+                  cancel,
+                ),
               )
-            : _body(title, subTitle, content, onConfirm, onCancel, null, action, cancel),
+            : _body(
+                title,
+                subTitle,
+                content,
+                onConfirm,
+                onCancel,
+                null,
+                action,
+                cancel,
+              ),
       ),
     ),
   );
@@ -74,7 +91,7 @@ Column _body(
         top: 20,
         text: title,
         fontWeight: FontWeight.w600,
-        textColor: CoreKit.instance.primaryColor,
+        textColor: coreKitInstance.primaryColor,
         fontSize: 24,
       ),
       if (subTitle != null)
@@ -98,21 +115,21 @@ Column _body(
                 if (formKey.currentState?.validate() ?? false) {
                   formKey.currentState?.save();
                   onConfirm.call();
-                  CoreKit.instance.appbarConfig.getBack?.call();
+                  coreKitInstance.appbarConfig.getBack?.call();
                 }
               } else {
                 onConfirm.call();
-                CoreKit.instance.appbarConfig.getBack?.call();
+                coreKitInstance.appbarConfig.getBack?.call();
               }
             },
           ),
           20.width,
           CommonButton(
-            buttonColor: CoreKit.instance.outlineColor,
+            buttonColor: coreKitInstance.outlineColor,
             titleText: cancel,
             onTap: () {
               onCancel?.call();
-              CoreKit.instance.appbarConfig.getBack?.call();
+              coreKitInstance.appbarConfig.getBack?.call();
             },
           ),
         ],

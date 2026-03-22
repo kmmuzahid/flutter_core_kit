@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +39,7 @@ class CommonTextField extends StatefulWidget {
     this.showValidationMessage = true,
     this.textAlign = TextAlign.left,
     this.passwordObscureIcon,
-    this.maxWords, 
+    this.maxWords,
     this.hintStyle,
     this.borderType = BorderType.outline,
     this.suffixBuilder,
@@ -79,8 +79,10 @@ class CommonTextField extends StatefulWidget {
 
   final String? Function(String? value)? validation;
   final BorderType borderType;
-  final Widget? Function(TextEditingController controller, FocusNode focusNode)? suffixBuilder;
-  final Widget? Function(TextEditingController controller, FocusNode focusNode)? prefixBuilder;
+  final Widget? Function(TextEditingController controller, FocusNode focusNode)?
+  suffixBuilder;
+  final Widget? Function(TextEditingController controller, FocusNode focusNode)?
+  prefixBuilder;
 
   @override
   State<CommonTextField> createState() => _CommonTextFieldState();
@@ -95,17 +97,18 @@ class _CommonTextFieldState extends State<CommonTextField> {
   late ThemeData theme;
 
   Widget? _getPrefix() {
-    return widget.prefixBuilder?.call(_controller, _focusNode) ?? widget.prefixIcon;
+    return widget.prefixBuilder?.call(_controller, _focusNode) ??
+        widget.prefixIcon;
   }
 
   Widget? getSuffix() {
-    return widget.suffixBuilder?.call(_controller, _focusNode) ?? widget.suffixIcon;
+    return widget.suffixBuilder?.call(_controller, _focusNode) ??
+        widget.suffixIcon;
   }
 
   @override
   void initState() {
     super.initState();
-    theme = Theme.of(CoreKit.instance.navigatorKey.currentContext!);
     _obscureText =
         widget.validationType == ValidationType.validatePassword ||
         widget.validationType == ValidationType.validateConfirmPassword;
@@ -115,7 +118,6 @@ class _CommonTextFieldState extends State<CommonTextField> {
     if (widget.initialText != null) {
       _controller.text = widget.initialText ?? '';
     }
-    
 
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
@@ -123,7 +125,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
       }
       setState(() {});
     });
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    theme = Theme.of(context);
   }
 
   @override
@@ -140,7 +147,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
   }
 
   Color _iconColor() {
-    return _focusNode.hasFocus ? CoreKit.instance.primaryColor : hintColor();
+    return _focusNode.hasFocus ? coreKitInstance.primaryColor : hintColor();
   }
 
   void _onSave(String? value) {
@@ -149,7 +156,8 @@ class _CommonTextFieldState extends State<CommonTextField> {
         widget.originalPassword != null,
         'Original Password cannot be null for Confirm password field',
       );
-    if (widget.onSaved != null) widget.onSaved!(value?.trim() ?? '', _controller);
+    if (widget.onSaved != null)
+      widget.onSaved!(value?.trim() ?? '', _controller);
   }
 
   String _cleanText(String text) {
@@ -168,7 +176,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
     FontStyle? fontStyle,
   }) {
     return TextStyle(
-      fontFamily: CoreKit.instance.fontFamily,
+      fontFamily: coreKitInstance.fontFamily,
       fontWeight: fontWeight,
       fontSize: fontSize,
       color: textColor,
@@ -192,7 +200,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
                       (widget.maxLength ?? 0) > 0
                           ? '$lengthCount/${widget.maxLength}'
                           : '$wordCount/${widget.maxWords}',
-                      style: _getStyle(fontSize: 12.sp, textColor: CoreKit.instance.outlineColor),
+                      style: _getStyle(
+                        fontSize: 12.sp,
+                        textColor: coreKitInstance.outlineColor,
+                      ),
                     ),
                   ),
               ],
@@ -202,8 +213,8 @@ class _CommonTextFieldState extends State<CommonTextField> {
   }
 
   Color hintColor() {
-    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
-        CoreKit.instance.outlineColor;
+    return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
+        coreKitInstance.outlineColor;
   }
 
   TextFormField _buildTextField() {
@@ -217,7 +228,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
       onTapUpOutside: (event) {
         _onSave(_controller.text);
       },
-      
+
       readOnly: widget.isReadOnly,
       onChanged: widget.onChanged,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -237,19 +248,27 @@ class _CommonTextFieldState extends State<CommonTextField> {
                 setState(() => lengthCount = length);
                 return newValue.copyWith(
                   text: newValue.text,
-                  selection: TextSelection.collapsed(offset: newValue.text.length),
+                  selection: TextSelection.collapsed(
+                    offset: newValue.text.length,
+                  ),
                 );
               }
               return oldValue;
             }
 
             if (widget.maxWords != null) {
-              final words = cleanedText.split(' ').where((w) => w.isNotEmpty).length;
-              if (words <= widget.maxWords! || newValue.text.length < oldValue.text.length) {
+              final words = cleanedText
+                  .split(' ')
+                  .where((w) => w.isNotEmpty)
+                  .length;
+              if (words <= widget.maxWords! ||
+                  newValue.text.length < oldValue.text.length) {
                 setState(() => wordCount = words);
                 return newValue.copyWith(
                   text: newValue.text,
-                  selection: TextSelection.collapsed(offset: newValue.text.length),
+                  selection: TextSelection.collapsed(
+                    offset: newValue.text.length,
+                  ),
                 );
               }
             }
@@ -268,20 +287,23 @@ class _CommonTextFieldState extends State<CommonTextField> {
               newValue,
               originalPassword: widget.originalPassword?.call(),
             );
-            if (widget.maxWords != null && newValue.isNotEmpty && wordCount > widget.maxWords!) {
+            if (widget.maxWords != null &&
+                newValue.isNotEmpty &&
+                wordCount > widget.maxWords!) {
               error = 'Maximum ${widget.maxWords} words allowed';
             }
-            return widget.showValidationMessage ? error : (error != null ? '' : null);
+            return widget.showValidationMessage
+                ? error
+                : (error != null ? '' : null);
           },
       style: _getStyle(
         fontWeight: FontWeight.w500,
         fontSize:
             widget.fontSize ??
-            CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ??
+            coreKitInstance.theme.inputDecorationTheme.hintStyle?.fontSize ??
             16.sp,
       ),
       decoration: InputDecoration(
-      
         filled: true,
         counterText: '',
         errorMaxLines: widget.showValidationMessage ? 2 : 1,
@@ -294,11 +316,20 @@ class _CommonTextFieldState extends State<CommonTextField> {
             _getStyle(
               fontSize:
                   widget.fontSize ??
-                  CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ??
+                  coreKitInstance
+                      .theme
+                      .inputDecorationTheme
+                      .hintStyle
+                      ?.fontSize ??
                   16.sp,
-          fontStyle:
-              CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ?? FontStyle.italic,
-          textColor: hintColor(),
+              fontStyle:
+                  coreKitInstance
+                      .theme
+                      .inputDecorationTheme
+                      .hintStyle
+                      ?.fontStyle ??
+                  FontStyle.italic,
+              textColor: hintColor(),
             ),
         //prefix
         prefixIconConstraints: BoxConstraints(
@@ -309,15 +340,20 @@ class _CommonTextFieldState extends State<CommonTextField> {
         prefixIcon: widget.prefixText?.isNotEmpty == true
             ? Padding(
                 padding: const EdgeInsets.only(left: 10, right: 5),
-                child: CommonText(text: widget.prefixText!, textColor: _iconColor()),
+                child: CommonText(
+                  text: widget.prefixText!,
+                  textColor: _iconColor(),
+                ),
               )
             : Padding(
-                padding: EdgeInsets.only(left: 10.w, right: widget.paddingHorizontal),
+                padding: EdgeInsets.only(
+                  left: 10.w,
+                  right: widget.paddingHorizontal,
+                ),
                 child: _getPrefix(),
               ),
-      
+
         //sufix
-     
         suffixIconConstraints: BoxConstraints(
           maxWidth:
               (widget.suffixIcon == null && widget.suffixBuilder == null) &&
@@ -333,7 +369,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
             : widget.validationType == ValidationType.validatePassword
             ? (_buildPasswordSuffixIcon())
             : Padding(
-                padding: EdgeInsets.only(right: 10, left: widget.paddingHorizontal),
+                padding: EdgeInsets.only(
+                  right: 10,
+                  left: widget.paddingHorizontal,
+                ),
                 child: getSuffix(),
               ),
 
@@ -342,21 +381,27 @@ class _CommonTextFieldState extends State<CommonTextField> {
         focusedBorder: _buildBorder(
           color: widget.isReadOnly
               ? (widget.borderColor ??
-                    theme.inputDecorationTheme.disabledBorder?.borderSide.color ??
-                    CoreKit.instance.outlineColor)
+                    theme
+                        .inputDecorationTheme
+                        .disabledBorder
+                        ?.borderSide
+                        .color ??
+                    coreKitInstance.outlineColor)
               : theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
-                    CoreKit.instance.primaryColor,
+                    coreKitInstance.primaryColor,
           width: widget.borderWidth.w,
         ),
         enabledBorder: _buildBorder(
           color:
               widget.borderColor ??
               theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
-              CoreKit.instance.outlineColor,
+              coreKitInstance.outlineColor,
           width: widget.borderWidth.w,
         ),
         errorBorder: _buildBorder(
-          color: theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red,
+          color:
+              theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+              Colors.red,
           width: widget.borderWidth.w,
         ),
         contentPadding: EdgeInsets.symmetric(
@@ -373,22 +418,31 @@ class _CommonTextFieldState extends State<CommonTextField> {
     if (widget.borderType == BorderType.underline) {
       return UnderlineInputBorder(
         borderRadius: widget.borderRadius == null
-            ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
-                  ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
+            ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline ==
+                      true
+                  ? (coreKitInstance.theme.inputDecorationTheme.border
+                            as OutlineInputBorder)
                         .borderRadius
                   : BorderRadius.circular(12)
             : BorderRadius.circular(widget.borderRadius?.r ?? 0),
-        borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+        borderSide: BorderSide(
+          color: color,
+          width: width ?? widget.borderWidth.w,
+        ),
       );
     }
     return OutlineInputBorder(
       borderRadius: widget.borderRadius == null
-          ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
-                ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
+          ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline == true
+                ? (coreKitInstance.theme.inputDecorationTheme.border
+                          as OutlineInputBorder)
                       .borderRadius
                 : BorderRadius.circular(12)
           : BorderRadius.circular(widget.borderRadius?.r ?? 0),
-      borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+      borderSide: BorderSide(
+        color: color,
+        width: width ?? widget.borderWidth.w,
+      ),
     );
   }
 
@@ -397,10 +451,13 @@ class _CommonTextFieldState extends State<CommonTextField> {
       onTap: _togglePasswordVisibility,
       child: Padding(
         padding:
-            widget.passwordObscureIcon?.padding ?? CoreKit.instance.passWordObscureIcon.padding,
+            widget.passwordObscureIcon?.padding ??
+            coreKitInstance.passWordObscureIcon.padding,
         child: _obscureText
-            ? widget.passwordObscureIcon?.hide ?? CoreKit.instance.passWordObscureIcon.hide
-            : widget.passwordObscureIcon?.show ?? CoreKit.instance.passWordObscureIcon.show,
+            ? widget.passwordObscureIcon?.hide ??
+                  coreKitInstance.passWordObscureIcon.hide
+            : widget.passwordObscureIcon?.show ??
+                  coreKitInstance.passWordObscureIcon.show,
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -46,13 +46,13 @@ class PermissionHandlerHelper {
   }
 
   Future<dynamic> _dialog() {
-    final errorColor = CoreKit.instance.permissionHandlerColors.errorColor;
-    final actionColor = CoreKit.instance.permissionHandlerColors.actionColor;
-    final normalColor = CoreKit.instance.permissionHandlerColors.normalColor;
-    final fontFamily = CoreKit.instance.fontFamily;
+    final errorColor = coreKitInstance.permissionHandlerColors.errorColor;
+    final actionColor = coreKitInstance.permissionHandlerColors.actionColor;
+    final normalColor = coreKitInstance.permissionHandlerColors.normalColor;
+    final fontFamily = coreKitInstance.fontFamily;
 
     return showDialog(
-      context: CoreKit.instance.navigatorKey.currentState!.context,
+      context: coreKitInstance.navigatorKey.currentState!.context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -76,7 +76,11 @@ class PermissionHandlerHelper {
           children: [
             RichText(
               text: TextSpan(
-                style: TextStyle(fontSize: 15, color: Colors.black87, fontFamily: fontFamily),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87,
+                  fontFamily: fontFamily,
+                ),
                 children: [
                   TextSpan(
                     text:
@@ -89,7 +93,10 @@ class PermissionHandlerHelper {
                   ),
                   TextSpan(
                     text: '✅ To fix this, please go to ',
-                    style: TextStyle(fontFamily: fontFamily, color: normalColor),
+                    style: TextStyle(
+                      fontFamily: fontFamily,
+                      color: normalColor,
+                    ),
                   ),
                   TextSpan(
                     text: 'App Settings',
@@ -102,7 +109,10 @@ class PermissionHandlerHelper {
                   ),
                   TextSpan(
                     text: ' and allow the permission manually.',
-                    style: TextStyle(fontFamily: fontFamily, color: normalColor),
+                    style: TextStyle(
+                      fontFamily: fontFamily,
+                      color: normalColor,
+                    ),
                   ),
                 ],
               ),
@@ -113,7 +123,7 @@ class PermissionHandlerHelper {
           TextButton.icon(
             onPressed: () {
               openAppSettings();
-              CoreKit.instance.appbarConfig.getBack?.call();
+              coreKitInstance.appbarConfig.getBack?.call();
             },
             icon: Icon(Icons.settings, color: actionColor),
             label: Text(
@@ -126,7 +136,7 @@ class PermissionHandlerHelper {
             ),
           ),
           TextButton(
-            onPressed: CoreKit.instance.appbarConfig.getBack,
+            onPressed: coreKitInstance.appbarConfig.getBack,
             child: Text(
               'Cancel',
               style: TextStyle(fontFamily: fontFamily, color: Colors.grey[700]),

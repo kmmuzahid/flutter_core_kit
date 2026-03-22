@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart' show CoreKit;
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -82,15 +82,22 @@ class CommonText extends StatelessWidget {
         : _withoutBorder(context);
   }
 
-  EdgeInsets _edgeInsetsBuilder() =>
-      EdgeInsets.only(left: left.w, right: right.w, top: top.h, bottom: bottom.h);
+  EdgeInsets _edgeInsetsBuilder() => EdgeInsets.only(
+    left: left.w,
+    right: right.w,
+    top: top.h,
+    bottom: bottom.h,
+  );
 
   Widget _withBorder(BuildContext context) => Container(
     padding: _edgeInsetsBuilder(),
     margin: EdgeInsets.all(5.w),
     decoration: BoxDecoration(
-      color: backgroundColor ?? CoreKit.instance.backgroundColor,
-      border: Border.all(color: borderColor ?? Theme.of(context).dividerColor, width: 1.2.w),
+      color: backgroundColor ?? coreKitInstance.backgroundColor,
+      border: Border.all(
+        color: borderColor ?? Theme.of(context).dividerColor,
+        width: 1.2.w,
+      ),
       borderRadius: BorderRadius.circular(borderRadious?.r ?? 4.r),
     ),
     child: _textField(context),
@@ -124,11 +131,11 @@ class CommonText extends StatelessWidget {
     final formattedData = _formatNumbersInText(text);
     final isHtml = _isHtml(text);
     if (isHtml) {
-        return Html(
-          data: formattedData,
-          style: {
+      return Html(
+        data: formattedData,
+        style: {
           'body': Style(
-            fontFamily: CoreKit.instance.fontFamily,
+            fontFamily: coreKitInstance.fontFamily,
             // margin: Margins.zero,
             // padding: HtmlPaddings.zero,
             // textOverflow: effectiveOverflow,
@@ -138,7 +145,7 @@ class CommonText extends StatelessWidget {
             fontWeight: fontWeight,
           ),
           'p': Style(
-            fontFamily: CoreKit.instance.fontFamily,
+            fontFamily: coreKitInstance.fontFamily,
             // margin: Margins.zero,
             // padding: HtmlPaddings.zero,
             // textAlign: textAlign,
@@ -147,7 +154,7 @@ class CommonText extends StatelessWidget {
             fontWeight: fontWeight,
           ),
           'h1,h2,h3,h4,h5,h6': Style(
-            fontFamily: CoreKit.instance.fontFamily,
+            fontFamily: coreKitInstance.fontFamily,
             // margin: Margins.zero,
             // padding: HtmlPaddings.zero,
             // textAlign: textAlign,
@@ -155,13 +162,12 @@ class CommonText extends StatelessWidget {
             color: textColor,
             fontWeight: fontWeight,
           ),
-          },
-        );
-      }
+        },
+      );
+    }
 
     Widget buildText() {
       // For HTML content
-     
 
       // For description text - no resizing
       if (isDescription) {
@@ -169,7 +175,7 @@ class CommonText extends StatelessWidget {
           formattedData,
           textAlign: textAlign,
           textDirection: textDirection ?? TextDirection.ltr,
-          style: effectiveTextStyle,  
+          style: effectiveTextStyle,
         );
       }
 
@@ -208,7 +214,8 @@ class CommonText extends StatelessWidget {
                 softWrap: softWrap ?? true,
                 textDirection: textDirection ?? TextDirection.ltr,
                 minFontSize: minFontSize,
-                maxFontSize: maxAutoFontSize ?? effectiveTextStyle.fontSize ?? 24.0,
+                maxFontSize:
+                    maxAutoFontSize ?? effectiveTextStyle.fontSize ?? 24.0,
                 availableWidth: constraints.maxWidth,
               );
             },
@@ -283,7 +290,7 @@ class CommonText extends StatelessWidget {
     TextStyle baseStyle = style ?? const TextStyle();
 
     baseStyle = baseStyle.copyWith(
-      fontFamily: CoreKit.instance.fontFamily,
+      fontFamily: coreKitInstance.fontFamily,
       fontSize: effectiveFontSize,
       fontWeight: fontWeight ?? baseStyle.fontWeight ?? FontWeight.w400,
       color: textColor ?? baseStyle.color,

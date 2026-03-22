@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
 class CommonTabBar extends StatefulWidget {
@@ -43,8 +43,8 @@ class _CommonTabBarState extends State<CommonTabBar> {
   @override
   void initState() {
     _selectedIndex = widget.initialIndex;
-    primaryColor = widget.color ?? CoreKit.instance.primaryColor;
-    secondaryColor = widget.color ?? CoreKit.instance.primaryColor.withAlpha(30);
+    primaryColor = widget.color ?? coreKitInstance.primaryColor;
+    secondaryColor = widget.color ?? coreKitInstance.primaryColor.withAlpha(30);
     super.initState();
   }
 

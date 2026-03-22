@@ -15,7 +15,7 @@ class CommonPopupMenu extends StatefulWidget {
     this.triggerIcon = Icons.more_vert,
     this.onPrimaryColor,
     this.primaryColor,
-    this.menuTextStyle
+    this.menuTextStyle,
   }) : assert(
          icons == null || icons.length == items.length,
          'If icons are provided, they must match the length of items',
@@ -46,9 +46,14 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
   }
 
   void _showPopupMenu(BuildContext context, GlobalKey key) async {
-    final RenderBox button = key.currentContext!.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset position = button.localToGlobal(Offset.zero, ancestor: overlay);
+    final RenderBox button =
+        key.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final Offset position = button.localToGlobal(
+      Offset.zero,
+      ancestor: overlay,
+    );
 
     final selected = await showMenu<String>(
       context: context,
@@ -58,9 +63,9 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
         position.dx + button.size.width,
         position.dy,
       ),
-      color: widget.primaryColor ?? CoreKit.instance.primaryColor,
+      color: widget.primaryColor ?? coreKitInstance.primaryColor,
       elevation: 1,
-      shadowColor: CoreKit.instance.outlineColor,
+      shadowColor: coreKitInstance.outlineColor,
       items: List.generate(widget.items.length, (index) {
         return PopupMenuItem<String>(
           value: widget.items[index],
@@ -70,7 +75,7 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
               if (widget.icons != null) SizedBox(width: 8.w),
               Text(
                 widget.items[index],
-                style: widget.menuTextStyle ?? CoreKit.instance.defaultTextStyle,
+                style: widget.menuTextStyle ?? coreKitInstance.defaultTextStyle,
               ),
             ],
           ),
@@ -108,7 +113,9 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
                 children: [
                   Text(
                     selectedText ?? '',
-                    style: widget.textStyle ?? Theme.of(context).textTheme.bodyMedium,
+                    style:
+                        widget.textStyle ??
+                        Theme.of(context).textTheme.bodyMedium,
                   ),
                   SizedBox(width: 8.w),
                   const Icon(Icons.arrow_drop_down),

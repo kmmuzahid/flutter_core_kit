@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
@@ -83,7 +83,8 @@ class CommonMultilineTextField extends StatefulWidget {
   final String? Function(String? value)? validation;
 
   @override
-  State<CommonMultilineTextField> createState() => _CommonMultilineTextFieldState();
+  State<CommonMultilineTextField> createState() =>
+      _CommonMultilineTextFieldState();
 }
 
 class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
@@ -147,7 +148,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   }
 
   Color _iconColor() {
-    return _focusNode.hasFocus ? CoreKit.instance.primaryColor : CoreKit.instance.outlineColor;
+    return _focusNode.hasFocus
+        ? coreKitInstance.primaryColor
+        : coreKitInstance.outlineColor;
   }
 
   void _onSave(String? value) {
@@ -166,7 +169,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
       child: Padding(
         padding: EdgeInsetsDirectional.only(end: 10.w),
         child: Icon(
-          _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+          _obscureText
+              ? Icons.visibility_off_outlined
+              : Icons.visibility_outlined,
           size: 20.sp,
         ),
       ),
@@ -181,7 +186,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     FontStyle? fontStyle,
   }) {
     return TextStyle(
-      fontFamily: CoreKit.instance.fontFamily,
+      fontFamily: coreKitInstance.fontFamily,
       fontWeight: fontWeight,
       fontSize: fontSize,
       color: textColor,
@@ -191,14 +196,17 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   }
 
   Color hintColor() {
-    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
-        CoreKit.instance.outlineColor;
+    return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
+        coreKitInstance.outlineColor;
   }
 
   OutlineInputBorder _buildBorder({required Color color, double? width}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(widget.borderRadius.r),
-      borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+      borderSide: BorderSide(
+        color: color,
+        width: width ?? widget.borderWidth.w,
+      ),
     );
   }
 
@@ -227,7 +235,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               textAlignVertical: TextAlignVertical.top,
               readOnly: widget.isReadOnly,
               maxLines: null,
-              
+
               scrollPhysics: const BouncingScrollPhysics(),
               inputFormatters: [
                 ...InputHelper.getInputFormatters(widget.validationType),
@@ -245,24 +253,32 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                         // Return the cleaned text
                         return TextEditingValue(
                           text: newValue.text,
-                          selection: TextSelection.collapsed(offset: newValue.text.length),
+                          selection: TextSelection.collapsed(
+                            offset: newValue.text.length,
+                          ),
                         );
                       }
                       return oldValue;
                     }
 
                     // Count words by splitting on whitespace and filtering out empty strings
-                    final words = cleanedText.split(' ').where((word) => word.isNotEmpty).length;
+                    final words = cleanedText
+                        .split(' ')
+                        .where((word) => word.isNotEmpty)
+                        .length;
 
                     // Allow the change if word count is within limit or if text is being deleted
-                    if (words <= widget.maxWords! || newValue.text.length < oldValue.text.length) {
+                    if (words <= widget.maxWords! ||
+                        newValue.text.length < oldValue.text.length) {
                       setState(() {
                         wordCount = words;
                       });
                       // Return the cleaned text
                       return TextEditingValue(
                         text: newValue.text,
-                        selection: TextSelection.collapsed(offset: newValue.text.length),
+                        selection: TextSelection.collapsed(
+                          offset: newValue.text.length,
+                        ),
                       );
                     }
                     return oldValue;
@@ -296,8 +312,10 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     );
 
                     if (newValue.isNotEmpty) {
-                      if (widget.minLength > 0 && newValue.length < widget.minLength) {
-                        error = 'Minimum ${widget.minLength} characters required';
+                      if (widget.minLength > 0 &&
+                          newValue.length < widget.minLength) {
+                        error =
+                            'Minimum ${widget.minLength} characters required';
                       }
 
                       final wordCount = newValue.split(' ').length;
@@ -312,7 +330,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                         }
                       }
                     }
- 
+
                     // setState(() {
                     if (error == null || error == '') {
                       _isErrorMessageShown = false;
@@ -322,7 +340,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     // });
 
                     // Return the error to show the error border, but return null for the message if showValidationMessage is false
-                    return widget.showValidationMessage ? error : (error != null ? '' : null);
+                    return widget.showValidationMessage
+                        ? error
+                        : (error != null ? '' : null);
                   },
 
               style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
@@ -331,8 +351,6 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               decoration: InputDecoration(
                 filled: true,
                 counterText: '',
-                
-                 
 
                 // errorMaxLines: 1,
                 errorStyle: _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
@@ -341,9 +359,18 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     widget.hintStyle ??
                     _getStyle(
                       fontSize:
-                          CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
+                          coreKitInstance
+                              .theme
+                              .inputDecorationTheme
+                              .hintStyle
+                              ?.fontSize ??
+                          16.sp,
                       fontStyle:
-                          CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
+                          coreKitInstance
+                              .theme
+                              .inputDecorationTheme
+                              .hintStyle
+                              ?.fontStyle ??
                           FontStyle.italic,
                       textColor: hintColor(),
                     ),
@@ -355,10 +382,16 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                               left: 10,
                               right: 5,
                             ), // add some right padding to allow hint space
-                            child: CommonText(text: widget.prefixText!, textColor: _iconColor()),
+                            child: CommonText(
+                              text: widget.prefixText!,
+                              textColor: _iconColor(),
+                            ),
                           )
                         : Padding(
-                            padding: EdgeInsets.only(left: 10.w, right: widget.paddingHorizontal),
+                            padding: EdgeInsets.only(
+                              left: 10.w,
+                              right: widget.paddingHorizontal,
+                            ),
                             child: widget.prefixIcon,
                           ),
                   ],
@@ -366,25 +399,34 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 suffixIconConstraints: BoxConstraints(
                   maxWidth:
                       widget.suffixIcon == null &&
-                          widget.validationType != ValidationType.validatePassword
+                          widget.validationType !=
+                              ValidationType.validatePassword
                       ? widget.paddingHorizontal
                       : double.infinity,
                 ),
 
                 prefixIconConstraints: BoxConstraints(
-                  maxWidth: widget.prefixIcon == null ? widget.paddingHorizontal : double.infinity,
+                  maxWidth: widget.prefixIcon == null
+                      ? widget.paddingHorizontal
+                      : double.infinity,
                 ),
                 suffixIcon: widget.showActionButton
                     ? GestureDetector(
                         onTap: () {
                           _onSave(_controller.text.trim());
                         },
-                        child: widget.actionButtonIcon ?? const Icon(Icons.search),
+                        child:
+                            widget.actionButtonIcon ?? const Icon(Icons.search),
                       )
                     : widget.validationType == ValidationType.validatePassword
-                    ? (_obscureText ? _buildPasswordSuffixIcon() : _buildPasswordSuffixIcon())
+                    ? (_obscureText
+                          ? _buildPasswordSuffixIcon()
+                          : _buildPasswordSuffixIcon())
                     : Padding(
-                        padding: EdgeInsets.only(right: 10, left: widget.paddingHorizontal),
+                        padding: EdgeInsets.only(
+                          right: 10,
+                          left: widget.paddingHorizontal,
+                        ),
                         child: widget.suffixIcon,
                       ),
                 prefixIconColor: _iconColor(),
@@ -392,17 +434,23 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
 
                 focusedBorder: _buildBorder(
                   color: widget.isReadOnly
-                      ? (widget.borderColor ?? CoreKit.instance.outlineColor)
-                      : CoreKit.instance.primaryColor,
+                      ? (widget.borderColor ?? coreKitInstance.outlineColor)
+                      : coreKitInstance.primaryColor,
                   width: widget.borderWidth.w,
                 ),
                 enabledBorder: _buildBorder(
-                  color: widget.borderColor ?? CoreKit.instance.outlineColor,
+                  color: widget.borderColor ?? coreKitInstance.outlineColor,
                   width: widget.borderWidth.w,
                 ),
-                errorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
-                focusedErrorBorder: _buildBorder(color: Colors.red, width: widget.borderWidth.w),
-                
+                errorBorder: _buildBorder(
+                  color: Colors.red,
+                  width: widget.borderWidth.w,
+                ),
+                focusedErrorBorder: _buildBorder(
+                  color: Colors.red,
+                  width: widget.borderWidth.w,
+                ),
+
                 contentPadding: EdgeInsets.only(
                   left: widget.paddingHorizontal.w,
                   right: widget.paddingHorizontal.w,
@@ -414,7 +462,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               ),
             ),
           ),
-          
+
           Row(
             children: [
               if (((widget.minLength != lengthCount && widget.minLength > 0) ||
@@ -434,21 +482,45 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   Widget _maximumHintBuilder() {
     return (widget.maxLength ?? 0) > 0
         ? (widget.multilineLimitHintBuilder?.maximumHint != null
-              ? widget.multilineLimitHintBuilder!.maximumHint(lengthCount, widget.maxLength!)
-              : Text('$lengthCount/${widget.maxLength}', style: widget.counterTextStyle))
+              ? widget.multilineLimitHintBuilder!.maximumHint(
+                  lengthCount,
+                  widget.maxLength!,
+                )
+              : Text(
+                  '$lengthCount/${widget.maxLength}',
+                  style: widget.counterTextStyle,
+                ))
         : (widget.multilineLimitHintBuilder?.maximumHint != null
-              ? widget.multilineLimitHintBuilder!.maximumHint(wordCount, widget.maxWords!)
-              : Text('$wordCount/${widget.maxWords}', style: widget.counterTextStyle));
+              ? widget.multilineLimitHintBuilder!.maximumHint(
+                  wordCount,
+                  widget.maxWords!,
+                )
+              : Text(
+                  '$wordCount/${widget.maxWords}',
+                  style: widget.counterTextStyle,
+                ));
   }
 
   Widget _minimumHintBuilder() {
     return (widget.minLength > 0)
         ? (widget.multilineLimitHintBuilder?.minimumHint != null
-              ? widget.multilineLimitHintBuilder!.minimumHint(lengthCount, widget.minLength)
-              : Text('$lengthCount/${widget.minLength}', style: widget.counterTextStyle))
+              ? widget.multilineLimitHintBuilder!.minimumHint(
+                  lengthCount,
+                  widget.minLength,
+                )
+              : Text(
+                  '$lengthCount/${widget.minLength}',
+                  style: widget.counterTextStyle,
+                ))
         : (widget.multilineLimitHintBuilder?.minimumHint != null
-              ? widget.multilineLimitHintBuilder!.minimumHint(wordCount, widget.minWords)
-              : Text('$wordCount/${widget.minWords}', style: widget.counterTextStyle));
+              ? widget.multilineLimitHintBuilder!.minimumHint(
+                  wordCount,
+                  widget.minWords,
+                )
+              : Text(
+                  '$wordCount/${widget.minWords}',
+                  style: widget.counterTextStyle,
+                ));
   }
 }
 
@@ -456,5 +528,8 @@ class MultilineHintLimitBuilder {
   final Widget Function(int currentLength, int limit) minimumHint;
   final Widget Function(int currentLength, int limit) maximumHint;
 
-  MultilineHintLimitBuilder({required this.minimumHint, required this.maximumHint});
+  MultilineHintLimitBuilder({
+    required this.minimumHint,
+    required this.maximumHint,
+  });
 }

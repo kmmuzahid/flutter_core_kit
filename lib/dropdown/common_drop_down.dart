@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/text_field/common_text_field.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
@@ -54,19 +54,23 @@ class CommonDropDown<T> extends StatefulWidget {
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
 }
 
-class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTickerProviderStateMixin {
+class _CommonDropDownState<T> extends State<CommonDropDown<T>>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   T? _selectedItem;
-  String? fontFamily = CoreKit.instance.fontFamily;
+  String? fontFamily = coreKitInstance.fontFamily;
   late ThemeData theme;
   late List<T> _items;
 
   @override
   void initState() {
-    theme = Theme.of(CoreKit.instance.navigatorKey.currentContext!);
+    theme = Theme.of(coreKitInstance.navigatorKey.currentContext!);
     super.initState();
     _items = widget.items;
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
 
     _selectedItem = _getInitialSelection();
 
@@ -84,7 +88,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
       if (widget.initalValue is MapEntry) {
         return _items.firstWhere(
           (item) =>
-              item is MapEntry && (item as MapEntry).key == (widget.initalValue as MapEntry).key,
+              item is MapEntry &&
+              (item as MapEntry).key == (widget.initalValue as MapEntry).key,
           orElse: () => _items.isNotEmpty ? _items.first : widget.initalValue!,
         );
       } else {
@@ -106,21 +111,25 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
 
   TextStyle _getTextStyle(BuildContext context) {
     return widget.textStyle?.copyWith(fontFamily: fontFamily) ??
-        TextStyle(fontFamily: fontFamily, fontSize: 16.sp, color: CoreKit.instance.outlineColor);
+        TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 16.sp,
+          color: coreKitInstance.outlineColor,
+        );
   }
 
-  
   Color hintColor() {
-    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
-        CoreKit.instance.outlineColor;
+    return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
+        coreKitInstance.outlineColor;
   }
 
   @override
   Widget build(BuildContext context) {
     final borderColor = widget.isLoading
-        ? CoreKit.instance.primaryColor
-        : (widget.borderColor ?? theme.inputDecorationTheme.border?.borderSide.color) ??
-              CoreKit.instance.outlineColor;
+        ? coreKitInstance.primaryColor
+        : (widget.borderColor ??
+                  theme.inputDecorationTheme.border?.borderSide.color) ??
+              coreKitInstance.outlineColor;
 
     return Stack(
       alignment: Alignment.center,
@@ -139,12 +148,14 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
           onSaved: widget.onChanged,
           validator: (value) {
             if (widget.isRequired &&
-                (value == null || !_items.any((item) => _itemsEqual(item, value)))) {
+                (value == null ||
+                    !_items.any((item) => _itemsEqual(item, value)))) {
               return '${widget.hint} is required';
             }
             return null;
           },
-          initialValue: (widget.enableInitalSelection || widget.initalValue != null)
+          initialValue:
+              (widget.enableInitalSelection || widget.initalValue != null)
               ? _selectedItem
               : null,
           decoration: _buildInputDecoration(context, borderColor),
@@ -152,17 +163,20 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
             text: widget.hint,
             style:
                 widget.hintStyle ??
-                _getTextStyle(context,
-                  
-                ).copyWith(
+                _getTextStyle(context).copyWith(
                   color: hintColor(),
                   fontSize:
-                      CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
+                      coreKitInstance
+                          .theme
+                          .inputDecorationTheme
+                          .hintStyle
+                          ?.fontSize ??
+                      16.sp,
                   fontStyle: widget.fontStyle,
                 ),
           ),
           icon: widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
-          dropdownColor: widget.backgroundColor ?? CoreKit.instance.surfaceBG,
+          dropdownColor: widget.backgroundColor ?? coreKitInstance.surfaceBG,
           isExpanded: true,
           items: _items.map((item) {
             final name = widget.nameBuilder(item);
@@ -170,7 +184,10 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
               value: item,
               child: name is Widget
                   ? name
-                  : CommonText(text: name.toString(), style: _getTextStyle(context)),
+                  : CommonText(
+                      text: name.toString(),
+                      style: _getTextStyle(context),
+                    ),
             );
           }).toList(),
           onChanged: (T? newValue) {
@@ -210,26 +227,37 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
     if (widget.borderType == BorderType.underline) {
       return UnderlineInputBorder(
         borderRadius: _borderRadious(),
-        borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+        borderSide: BorderSide(
+          color: color,
+          width: width ?? widget.borderWidth.w,
+        ),
       );
     }
     return OutlineInputBorder(
       borderRadius: _borderRadious(),
-      borderSide: BorderSide(color: color, width: width ?? widget.borderWidth.w),
+      borderSide: BorderSide(
+        color: color,
+        width: width ?? widget.borderWidth.w,
+      ),
     );
   }
 
   BorderRadius _borderRadious() {
     return widget.borderRadius == null
-        ? CoreKit.instance.theme.inputDecorationTheme.border?.isOutline == true
-              ? (CoreKit.instance.theme.inputDecorationTheme.border as OutlineInputBorder)
+        ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline == true
+              ? (coreKitInstance.theme.inputDecorationTheme.border
+                        as OutlineInputBorder)
                     .borderRadius
               : BorderRadius.circular(12)
         : BorderRadius.circular(widget.borderRadius?.r ?? 0);
   }
-  
-  InputDecoration _buildInputDecoration(BuildContext context, Color borderColor) {
-    final backgroundColor = widget.backgroundColor ?? theme.inputDecorationTheme.fillColor;
+
+  InputDecoration _buildInputDecoration(
+    BuildContext context,
+    Color borderColor,
+  ) {
+    final backgroundColor =
+        widget.backgroundColor ?? theme.inputDecorationTheme.fillColor;
     return InputDecoration(
       isDense: true,
       filled: backgroundColor != null,
@@ -242,7 +270,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>> with SingleTicker
           : null,
       prefixIconConstraints: const BoxConstraints(),
       contentPadding:
-          widget.contentPadding ?? EdgeInsets.only(left: 10.w, right: 2.w, top: 14.w, bottom: 14.w),
+          widget.contentPadding ??
+          EdgeInsets.only(left: 10.w, right: 2.w, top: 14.w, bottom: 14.w),
       border: _buildBorder(color: borderColor),
       enabledBorder: _buildBorder(color: borderColor),
       focusedBorder: _buildBorder(color: borderColor),

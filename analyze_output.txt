@@ -1,0 +1,303 @@
+Analyzing flutter_core_kit...
+An error occurred while executing an analyzer plugin: Failed to compile "C:\Users\kmmuz\AppData\Local\.dartServer\.plugin_manager\ffd64b0c5c8201e99f517e44d975a2c1\analyzer_plugin\bin\plugin.dart" to an AOT snapshot.
+  pluginFolder = C:\Users\kmmuz\AppData\Local\.dartServer\.plugin_manager\ffd64b0c5c8201e99f517e44d975a2c1\analyzer_plugin
+  exitCode = 255
+  stdout = 
+  stderr = Package(s) [objective_c] require the native assets feature to be enabled. Enable native assets with `--enable-experiment=native-assets`.
+
+
+#0      PluginManager._compileAsAot (package:analysis_server/src/plugin/plugin_manager.dart:731)
+#1      PluginManager._computeFiles (package:analysis_server/src/plugin/plugin_manager.dart:781)
+#2      PluginManager.filesFor (package:analysis_server/src/plugin/plugin_manager.dart:529)
+#3      PluginManager.addPluginToContextRoot (package:analysis_server/src/plugin/plugin_manager.dart:379)
+#4      PluginWatcher._addLegacyPlugins (package:analysis_server/src/plugin/plugin_watcher.dart:99)
+#5      PluginWatcher.addedDriver (package:analysis_server/src/plugin/plugin_watcher.dart:49)
+#6      AnalysisDriverScheduler.add (package:analyzer/src/dart/analysis/driver.dart:2523)
+#7      new AnalysisDriver (package:analyzer/src/dart/analysis/driver.dart:345)
+#8      ContextBuilderImpl.createContext (package:analyzer/src/dart/analysis/context_builder.dart:157)
+#9      new AnalysisContextCollectionImpl (package:analyzer/src/dart/analysis/analysis_context_collection.dart:102)
+#10     ContextManagerImpl._createAnalysisContexts.performContextRebuildGuarded.performContextRebuild (package:analysis_server/src/context_manager.dart:586)
+<asynchronous suspension>
+#11     ContextManagerImpl._createAnalysisContexts.performContextRebuildGuarded (package:analysis_server/src/context_manager.dart:733)
+<asynchronous suspension>
+#12     _CancellingTaskQueue.queue.<anonymous closure> (package:analysis_server/src/context_manager.dart:1038)
+<asynchronous suspension>
+#13     ContextManagerImpl.setRoots (package:analysis_server/src/context_manager.dart:377)
+<asynchronous suspension>
+#14     LegacyAnalysisServer.setAnalysisRoots (package:analysis_server/src/legacy_analysis_server.dart:895)
+<asynchronous suspension>
+#15     AnalysisSetAnalysisRootsHandler.handle (package:analysis_server/src/handler/legacy/analysis_set_analysis_roots.dart:56)
+<asynchronous suspension>
+#16     LegacyAnalysisServer.handleRequest.<anonymous closure>.<anonymous closure> (package:analysis_server/src/legacy_analysis_server.dart:642)
+<asynchronous suspension>
+#17     OperationPerformanceImpl.runAsync (package:analyzer/src/util/performance/operation_performance.dart:169)
+<asynchronous suspension>
+#18     LegacyAnalysisServer.handleRequest.<anonymous closure> (package:analysis_server/src/legacy_analysis_server.dart:622)
+<asynchronous suspension>
+
+An error occurred while executing an analyzer plugin: Failed to compile "C:\Users\kmmuz\AppData\Local\.dartServer\.plugin_manager\0fb37e7e3cf3e54dad89ac9111d0da5d\analyzer_plugin\bin\plugin.dart" to an AOT snapshot.
+  pluginFolder = C:\Users\kmmuz\AppData\Local\.dartServer\.plugin_manager\0fb37e7e3cf3e54dad89ac9111d0da5d\analyzer_plugin
+  exitCode = 255
+  stdout = 
+  stderr = Package(s) [objective_c] require the native assets feature to be enabled. Enable native assets with `--enable-experiment=native-assets`.
+
+
+#0      PluginManager._compileAsAot (package:analysis_server/src/plugin/plugin_manager.dart:731)
+#1      PluginManager._computeFiles (package:analysis_server/src/plugin/plugin_manager.dart:781)
+#2      PluginManager.filesFor (package:analysis_server/src/plugin/plugin_manager.dart:529)
+#3      PluginManager.addPluginToContextRoot (package:analysis_server/src/plugin/plugin_manager.dart:379)
+#4      PluginWatcher._addLegacyPlugins (package:analysis_server/src/plugin/plugin_watcher.dart:99)
+#5      PluginWatcher.addedDriver (package:analysis_server/src/plugin/plugin_watcher.dart:49)
+#6      AnalysisDriverScheduler.add (package:analyzer/src/dart/analysis/driver.dart:2523)
+#7      new AnalysisDriver (package:analyzer/src/dart/analysis/driver.dart:345)
+#8      ContextBuilderImpl.createContext (package:analyzer/src/dart/analysis/context_builder.dart:157)
+#9      new AnalysisContextCollectionImpl (package:analyzer/src/dart/analysis/analysis_context_collection.dart:102)
+#10     ContextManagerImpl._createAnalysisContexts.performContextRebuildGuarded.performContextRebuild (package:analysis_server/src/context_manager.dart:586)
+<asynchronous suspension>
+#11     ContextManagerImpl._createAnalysisContexts.performContextRebuildGuarded (package:analysis_server/src/context_manager.dart:733)
+<asynchronous suspension>
+#12     _CancellingTaskQueue.queue.<anonymous closure> (package:analysis_server/src/context_manager.dart:1038)
+<asynchronous suspension>
+#13     ContextManagerImpl.setRoots (package:analysis_server/src/context_manager.dart:377)
+<asynchronous suspension>
+#14     LegacyAnalysisServer.setAnalysisRoots (package:analysis_server/src/legacy_analysis_server.dart:895)
+<asynchronous suspension>
+#15     AnalysisSetAnalysisRootsHandler.handle (package:analysis_server/src/handler/legacy/analysis_set_analysis_roots.dart:56)
+<asynchronous suspension>
+#16     LegacyAnalysisServer.handleRequest.<anonymous closure>.<anonymous closure> (package:analysis_server/src/legacy_analysis_server.dart:642)
+<asynchronous suspension>
+#17     OperationPerformanceImpl.runAsync (package:analyzer/src/util/performance/operation_performance.dart:169)
+<asynchronous suspension>
+#18     LegacyAnalysisServer.handleRequest.<anonymous closure> (package:analysis_server/src/legacy_analysis_server.dart:622)
+<asynchronous suspension>
+
+
+  error - lib\app_bar\common_app_bar.dart:126:33 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\app_bar\common_app_bar.dart:133:33 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\bottomsheet\common_draggable_bottom_sheet.dart:57:18 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\bottomsheet\common_draggable_bottom_sheet.dart:76:20 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_button.dart:129:55 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_button.dart:130:64 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_button.dart:132:68 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_button.dart:152:23 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_button.dart:272:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_radio_group.dart:132:28 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_radio_group.dart:133:30 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\button\common_radio_group.dart:193:29 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\commonTabBar\common_tab_bar.dart:46:36 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\commonTabBar\common_tab_bar.dart:47:38 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:17:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:44:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:77:20 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:101:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:105:17 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:111:26 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dialoge\common_dialog.dart:115:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:60:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:66:22 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:109:67 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:114:12 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:115:9 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:121:11 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:123:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:160:23 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:165:52 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:224:11 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\dropdown\common_drop_down.dart:225:18 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\image\common_image.dart:68:33 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\image\common_image.dart:108:14 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\image\common_image.dart:109:14 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\initializer.dart:400:9 - Undefined class 'RebuildFactor'. Try changing the name to the name of an existing class, or creating a class with the name 'RebuildFactor'. - undefined_class
+  error - lib\initializer.dart:413:40 - Class 'CoreKit' can't define static member 'navigatorKey' and have instance member 'CoreKit.navigatorKey' with the same name. Try renaming the member to a name that doesn't conflict. - conflicting_static_and_instance
+  error - lib\initializer.dart:443:26 - Undefined name 'RebuildFactor'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\initializer.dart:470:26 - Undefined name 'RebuildFactor'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\initializer.dart:538:9 - The named parameter 'navigatorKey' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'navigatorKey'. - undefined_named_parameter
+  error - lib\network\dio_request_builder.dart:45:5 - The prefix 'dio' can't be used here because it's shadowed by a local declaration. Try renaming either the prefix or the local declaration. - prefix_shadowed_by_local_declaration
+  error - lib\pop_up\common_alert.dart:40:16 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\pop_up\common_alert.dart:42:35 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\pop_up\common_alert.dart:53:22 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\pop_up\common_alert.dart:63:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\pop_up\common_popup_menu.dart:61:37 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\pop_up\common_popup_menu.dart:63:20 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\pop_up\common_popup_menu.dart:73:48 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\snackbar\snackbar.dart:14:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\snackbar\snackbar.dart:51:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_rich_text.dart:43:64 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_rich_text.dart:48:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_rich_text.dart:49:33 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_text.dart:92:33 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_text.dart:131:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_text.dart:141:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_text.dart:150:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text\common_text.dart:286:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:150:34 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:150:58 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:184:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:194:12 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:195:9 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:344:27 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:346:27 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:395:48 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:396:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_multiline_text_field.dart:400:48 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:81:45 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:122:57 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:141:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:143:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:162:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:172:12 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_phone_number_text_filed.dart:173:9 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:146:34 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:174:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:198:68 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:208:12 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:209:9 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:283:13 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:300:19 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:303:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:349:21 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:351:21 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:358:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:379:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:380:22 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:389:13 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:390:20 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:403:52 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:405:51 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\text_field\common_text_field.dart:406:51 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\app_utils.dart:10:27 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\common_share.dart:45:52 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\core_screen_utils.dart:18:20 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\core_screen_utils.dart:19:21 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\extension.dart:10:36 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:49:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:50:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:51:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:52:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:55:16 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:116:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_handler_helper.dart:129:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:58:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:59:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:60:25 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:61:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:63:28 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:77:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:97:64 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:105:32 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:109:27 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:119:29 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:131:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:135:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:144:24 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\utils\permission_helper.dart:146:15 - Undefined name 'coreKitInstance'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+warning - lib\core_kit_internal.dart:9:32 - The library 'package:core_kit/initializer.dart' doesn't export a member with the shown name 'coreKitInstanceSingleton'. Try removing the name from the list of shown members. - undefined_shown_name
+warning - lib\core_kit_internal.dart:9:51 - The library 'package:core_kit/initializer.dart' doesn't export a member with the shown name 'coreKitInstance'. Try removing the name from the list of shown members. - undefined_shown_name
+warning - lib\initializer.dart:66:17 - The declaration 'init' isn't referenced. Try removing the declaration of 'init'. - unused_element
+warning - lib\initializer.dart:107:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\snackbar\snackbar.dart:206:5 - This default clause is covered by the previous cases. Try removing the default clause, or restructuring the preceding patterns. - unreachable_switch_default
+warning - lib\subfolder\subfolder2\test_usage_deep.dart:4:9 - The value of the local variable 'x' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\test_usage_up.dart:4:9 - The value of the local variable 'x' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\text\common_text.dart:102:17 - The declaration '_convertAlignment' isn't referenced. Try removing the declaration of '_convertAlignment'. - unused_element
+warning - lib\text\common_text.dart:343:11 - The value of the local variable 'baseFontSize' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\text_field\common_date_input_text_field.dart:2:8 - Unused import: 'package:core_kit/text_field/input_formatters/input_helper.dart'. Try removing the import directive. - unused_import
+warning - lib\text_field\common_date_input_text_field.dart:95:11 - The value of the local variable 'now' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\text_field\common_multiline_text_field.dart:95:8 - The value of the field '_isErrorMessageShown' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\text_field\input_formatters\phone_input_formater.dart:9:9 - The value of the local variable 'selectionIndex' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\utils\extension.dart:220:11 - The value of the local variable 'localizations' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\utils\test_usage.dart:4:9 - The value of the local variable 'x' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - tools\custom_lint\test_import.dart:1:8 - Unused import: 'package:custom_lint_builder/custom_lint_builder.dart'. Try removing the import directive. - unused_import
+   info - lib\annotations\plugin\plugin.dart:3:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:4:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:5:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:6:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:7:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:8:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:9:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:10:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:11:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:15:3 - Parameter 'resourceProvider' could be a super parameter. Trying converting 'resourceProvider' to a super parameter. - use_super_parameters
+   info - lib\annotations\plugin\protected_plugin.dart:3:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\protected_plugin.dart:4:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\button\common_button.dart:301:32 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
+   info - lib\button\muiltiple_selector.dart:30:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\button\radio_group_form_field.dart:26:26 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\button\radio_group_form_field.dart:27:26 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\city_state\state_data.dart:1:1 - Dangling library doc comment. Add a 'library' directive after the library comment. - dangling_library_doc_comments
+   info - lib\core_kit_internal.dart:3:9 - Library names are not necessary. Remove the library name. - unnecessary_library_name
+   info - lib\dialoge\common_dialog.dart:28:8 - The variable name 'CommonDialogWithActions' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - non_constant_identifier_names
+   info - lib\dialoge\common_dialog.dart:50:15 - 'CustomForm' is deprecated and shouldn't be used. Use FormBuilder instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use_from_same_package
+   info - lib\dropdown\common_drop_down.dart:194:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
+   info - lib\form\custom_form.dart:15:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\form\custom_form.dart:18:38 - 'CustomForm' is deprecated and shouldn't be used. Use FormBuilder instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use_from_same_package
+   info - lib\image\image_picker\common_image_picker.dart:33:37 - 'PermissionHandlerHelper' is deprecated and shouldn't be used. Use PermissionHelper instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use_from_same_package
+   info - lib\initializer.dart:131:46 - '_LegacyInitWrapperState' is deprecated and shouldn't be used. Use CoreKit or CoreKit.router instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use_from_same_package
+   info - lib\initializer.dart:530:11 - Use a function declaration rather than a variable assignment to bind a function to a name. Try rewriting the closure assignment as a function declaration. - prefer_function_declarations_over_variables
+   info - lib\network\dio_interceptor.dart:14:8 - The imported package 'http' isn't a dependency of the importing package. Try adding a dependency for 'http' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\network\dio_service.dart:10:8 - The import of 'package:dio/dio.dart' is unnecessary because all of the used elements are also provided by the import of 'package:core_kit/core_kit.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\network\request_input.dart:6:22 - The constant name 'GET' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:27 - The constant name 'POST' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:33 - The constant name 'PUT' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:38 - The constant name 'DELETE' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:46 - The constant name 'PATCH' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\response_state.dart:32:25 - Unnecessary 'this.' qualifier. Try removing 'this.'. - unnecessary_this
+   info - lib\network\response_state.dart:35:35 - Unnecessary 'this.' qualifier. Try removing 'this.'. - unnecessary_this
+   info - lib\snackbar\snackbar.dart:146:47 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\snackbar\snackbar.dart:176:66 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:47:24 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:47:42 - 'opacity' is deprecated and shouldn't be used. Use .a. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:146:24 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:146:42 - 'opacity' is deprecated and shouldn't be used. Use .a. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text\common_text.dart:115:34 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text\common_text.dart:276:23 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\common_multiline_text_field.dart:124:38 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\common_multiline_text_field.dart:126:34 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\common_multiline_text_field.dart:138:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\text_field\common_multiline_text_field.dart:155:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\text_field\common_text_field.dart:151:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\text_field\common_text_field.dart:160:38 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\common_text_field.dart:161:34 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\date_input_formatter.dart:12:46 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:19:44 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:54:31 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:64:13 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:71:13 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:83:45 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:94:13 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:266:23 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:278:22 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:289:23 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:311:24 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:323:24 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:335:27 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:372:22 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:398:23 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:410:29 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:448:19 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:478:19 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:490:19 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:502:23 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:514:22 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:526:27 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\input_helper.dart:538:21 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\phone_input_formater.dart:7:45 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text_field\input_formatters\phone_input_formater.dart:12:9 - Use 'isNotEmpty' instead of 'length' to test whether the collection is empty. Try rewriting the expression to use 'isNotEmpty'. - prefer_is_empty
+   info - lib\utils\common_share.dart:5:8 - The imported package 'http' isn't a dependency of the importing package. Try adding a dependency for 'http' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\utils\common_share.dart:6:8 - The imported package 'path_provider' isn't a dependency of the importing package. Try adding a dependency for 'path_provider' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\utils\common_share.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\utils\common_share.dart:65:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\utils\core_screen_utils.dart:47:11 - The extension name 'responsive' isn't an UpperCamelCase identifier. Try changing the name to follow the UpperCamelCase style. - camel_case_extensions
+   info - lib\utils\core_screen_utils.dart:57:11 - The extension name 'responsiveDouble' isn't an UpperCamelCase identifier. Try changing the name to follow the UpperCamelCase style. - camel_case_extensions
+   info - lib\utils\extension.dart:6:8 - The imported package 'http_parser' isn't a dependency of the importing package. Try adding a dependency for 'http_parser' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\utils\extension.dart:39:41 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\utils\extension.dart:227:22 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\utils\extension.dart:235:22 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\utils\extension.dart:299:20 - 'RegExp' is deprecated and shouldn't be used. This class will become 'final' in a future release. 'Pattern' may be a more appropriate interface to implement. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - tools\custom_lint\lib\core_kit_lints.dart:17:3 - Constructors in '@immutable' classes should be declared as 'const'. Try adding 'const' to the constructor declaration. - prefer_const_constructors_in_immutables
+   info - tools\custom_lint\lib\core_kit_lints.dart:25:20 - 'ErrorSeverity' is deprecated and shouldn't be used. Use 'DiagnosticSeverity' instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - tools\custom_lint\lib\core_kit_lints.dart:31:5 - 'ErrorReporter' is deprecated and shouldn't be used. Use 'DiagnosticReporter' instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - tools\custom_lint\lib\core_kit_lints.dart:73:5 - 'ErrorReporter' is deprecated and shouldn't be used. Use 'DiagnosticReporter' instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - tools\custom_lint\lib\core_kit_lints.dart:154:26 - 'ErrorSeverity' is deprecated and shouldn't be used. Use 'DiagnosticSeverity' instead. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - tools\custom_lint\test_import.dart:3:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+
+227 issues found.

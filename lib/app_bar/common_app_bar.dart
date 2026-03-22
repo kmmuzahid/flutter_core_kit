@@ -3,7 +3,7 @@
  * @Date: 2026-01-05 11:21:15
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/core_kit.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 class AppbarConfig {
@@ -123,14 +123,14 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(
-    (appbarConfig?.height?.h ?? CoreKit.instance.appbarConfig.height?.h) ?? kToolbarHeight.h,
+    (appbarConfig?.height?.h ?? coreKitInstance.appbarConfig.height?.h) ?? kToolbarHeight.h,
   );
 
   @override
   Widget build(BuildContext context) { 
     // Merge local config with the global one from CoreKit.
     // Properties defined in `appbarConfig` will override the global ones.
-    final AppbarConfig config = CoreKit.instance.appbarConfig.copyWith(
+    final AppbarConfig config = coreKitInstance.appbarConfig.copyWith(
       onBack: appbarConfig?.onBack,
       backIcon: appbarConfig?.backIcon,
       backButton: appbarConfig?.backButton,

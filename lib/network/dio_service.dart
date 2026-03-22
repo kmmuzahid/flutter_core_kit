@@ -51,8 +51,13 @@ class TokenProvider {
 
 class DioService {
   DioService._(this._dio, this._config);
-  static late DioService instance;
+  static DioService? _instance;
   static bool _isInitialized = false;
+
+  static DioService get instance {
+    assert(_instance != null, 'DioService not initialized. Call DioService.init() first.');
+    return _instance!;
+  }
 
   final Dio _dio;
   final DioServiceConfig _config;
@@ -86,7 +91,7 @@ class DioService {
     //request builder initialized
     DioRequestBuilder.instance.init(tokenProvider: tokenProvider, dio: dioInstance);
     //instance created for DioService
-    DioService.instance = instance;
+    DioService._instance = instance;
     //logging
     DioUtils.log(config, 'DioService has been created', tag: 'dio');
     return instance;

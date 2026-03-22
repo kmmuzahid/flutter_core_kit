@@ -4,7 +4,7 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/button/common_button.dart';
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
 class CommonAlert {
@@ -37,9 +37,9 @@ class CommonAlert {
 
   Future<dynamic> _alertBuilder() {
     return showDialog(
-      context: CoreKit.instance.navigatorKey.currentContext!,
+      context: coreKitInstance.navigatorKey.currentContext!,
       builder: (c) => AlertDialog(
-        title: Text(title, style: CoreKit.instance.defaultTextStyle),
+        title: Text(title, style: coreKitInstance.defaultTextStyle),
         actionsAlignment: MainAxisAlignment.center,
         content: content,
         actions: [
@@ -50,7 +50,7 @@ class CommonAlert {
               buttonHeight: 35,
               buttonColor: cancelButtonColor ?? Colors.red,
               titleColor: cancelTitleColor ?? Colors.white,
-              onTap: CoreKit.instance.appbarConfig.getBack,
+              onTap: coreKitInstance.appbarConfig.getBack,
             ),
           if (disableActionButton == false)
             IntrinsicWidth(
@@ -60,7 +60,7 @@ class CommonAlert {
                 buttonColor: actionButtonColor ?? Colors.green,
                 titleColor: actionTitleColor ?? Colors.white,
                 onTap: () {
-                  CoreKit.instance.appbarConfig.getBack?.call();
+                  coreKitInstance.appbarConfig.getBack?.call();
                   onTap();
                 },
               ),

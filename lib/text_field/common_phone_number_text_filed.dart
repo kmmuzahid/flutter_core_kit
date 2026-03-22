@@ -3,7 +3,7 @@
  * @Date: 2026-01-05 16:03:11
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
@@ -69,21 +69,23 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
 
     return IntlPhoneField(
       initialCountryCode: initalCountryCode,
-      
-      
+
       controller: controller,
       readOnly: isReadOnly,
       textInputAction: textInputAction,
       textAlign: textAlign,
       validator: (value) => showValidationMessage
-          ? InputHelper.validate(ValidationType.validatePhone, value?.completeNumberWithPlus ?? '')
+          ? InputHelper.validate(
+              ValidationType.validatePhone,
+              value?.completeNumberWithPlus ?? '',
+            )
           : null,
-      style: (theme.textTheme.bodyMedium ?? CoreKit.instance.defaultTextStyle)?.copyWith(
-        fontWeight: FontWeight.bold,
-        fontSize: 16.sp,
-      ),
+      style: (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
+          ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
       keyboardType: InputHelper.getKeyboardType(ValidationType.validatePhone),
-      inputFormatters: InputHelper.getInputFormatters(ValidationType.validatePhone),
+      inputFormatters: InputHelper.getInputFormatters(
+        ValidationType.validatePhone,
+      ),
 
       // --- Decoration Section ---
       decoration: InputDecoration(
@@ -100,27 +102,40 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
 
         border: OutlineInputBorder(
           borderRadius: effectiveBorderRadius,
-          borderSide: BorderSide(color: effectiveBorderColor, width: borderWidth),
+          borderSide: BorderSide(
+            color: effectiveBorderColor,
+            width: borderWidth,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: effectiveBorderRadius,
-          borderSide: BorderSide(color: effectiveBorderColor, width: borderWidth),
+          borderSide: BorderSide(
+            color: effectiveBorderColor,
+            width: borderWidth,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: effectiveBorderRadius,
-          borderSide: BorderSide(color: theme.primaryColor, width: borderWidth + 0.4),
+          borderSide: BorderSide(
+            color: theme.primaryColor,
+            width: borderWidth + 0.4,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: effectiveBorderRadius,
-          borderSide: BorderSide(color: theme.colorScheme.error, width: borderWidth),
+          borderSide: BorderSide(
+            color: theme.colorScheme.error,
+            width: borderWidth,
+          ),
         ),
       ),
 
       // --- Dropdown/Flag Section ---
       flagsButtonPadding: const EdgeInsets.only(left: 12, right: 8),
       dropdownIconPosition: IconPosition.trailing,
-      dropdownTextStyle: (theme.textTheme.bodyMedium ?? CoreKit.instance.defaultTextStyle)
-          ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
+      dropdownTextStyle:
+          (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
+              ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
 
       // Ensures the vertical line between flag and text is clean
       showCountryFlag: true,
@@ -131,23 +146,34 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
       pickerDialogStyle:
           pickerDialogStyle ??
           PickerDialogStyle(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        searchFieldInputDecoration: InputDecoration(
-          hintText: hint,
+            backgroundColor: theme.scaffoldBackgroundColor,
+            searchFieldInputDecoration: InputDecoration(
+              hintText: hint,
               hintStyle:
                   hintStyle ??
                   _getStyle(
                     fontSize:
-                        CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontSize ?? 16.sp,
+                        coreKitInstance
+                            .theme
+                            .inputDecorationTheme
+                            .hintStyle
+                            ?.fontSize ??
+                        16.sp,
                     fontStyle:
-                        CoreKit.instance.theme.inputDecorationTheme.hintStyle?.fontStyle ??
+                        coreKitInstance
+                            .theme
+                            .inputDecorationTheme
+                            .hintStyle
+                            ?.fontStyle ??
                         FontStyle.italic,
                     textColor: hintColor(),
                   ),
-          suffixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      ),
+              suffixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
     );
   }
 
@@ -159,7 +185,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
     FontStyle? fontStyle,
   }) {
     return TextStyle(
-      fontFamily: CoreKit.instance.fontFamily,
+      fontFamily: coreKitInstance.fontFamily,
       fontWeight: fontWeight,
       fontSize: fontSize,
       color: textColor,
@@ -169,9 +195,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
   }
 
   Color hintColor() {
-    return CoreKit.instance.theme.inputDecorationTheme.hintStyle?.color ??
-        CoreKit.instance.outlineColor;
+    return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
+        coreKitInstance.outlineColor;
   }
-
-  
 }

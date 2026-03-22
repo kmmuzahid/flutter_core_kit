@@ -1,4 +1,4 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:dio/dio.dart' as dio;
@@ -7,7 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-ThemeData get getTheme => Theme.of(CoreKit.instance.navigatorKey.currentContext!);
+ThemeData get getTheme => Theme.of(coreKitInstance.navigatorKey.currentContext!);
 
 extension FormStateX on GlobalKey<FormState> {
   bool validateAndSave() {
