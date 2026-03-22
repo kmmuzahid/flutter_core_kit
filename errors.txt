@@ -1,0 +1,81 @@
+Analyzing flutter_core_kit...
+
+  error - lib\annotations\plugin\plugin.dart:8:7 - Missing concrete implementation of 'ServerPlugin.analyzeFile'. Try implementing the missing method, or make the class abstract. - non_abstract_class_inherits_abstract_member
+  error - lib\annotations\plugin\plugin.dart:9:48 - The named parameter 'resourceProvider' is required, but there's no corresponding argument. Try adding the required argument. - missing_required_argument
+  error - lib\annotations\plugin\plugin.dart:9:54 - Too many positional arguments: 0 expected, but 1 found. Try removing the extra positional arguments, or specifying the name for named arguments. - extra_positional_arguments_could_be_named
+  error - lib\annotations\plugin\plugin.dart:21:10 - The name 'HoverInformation' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'HoverInformation'. - non_type_as_type_argument
+  error - lib\annotations\plugin\plugin.dart:21:40 - Undefined class 'HoverParams'. Try changing the name to the name of an existing class, or creating a class with the name 'HoverParams'. - undefined_class
+  error - lib\annotations\plugin\plugin.dart:25:12 - The method 'HoverInformation' isn't defined for the type 'ProtectedAnalyzerPlugin'. Try correcting the name to the name of an existing method, or defining a method named 'HoverInformation'. - undefined_method
+  error - lib\annotations\plugin\plugin.dart:40:10 - The name 'Assist' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'Assist'. - non_type_as_type_argument
+  error - lib\annotations\plugin\plugin.dart:40:29 - Undefined class 'AssistContext'. Try changing the name to the name of an existing class, or creating a class with the name 'AssistContext'. - undefined_class
+  error - lib\annotations\plugin\plugin.dart:42:12 - The method 'Assist' isn't defined for the type 'ProtectedAnalyzerPlugin'. Try correcting the name to the name of an existing method, or defining a method named 'Assist'. - undefined_method
+  error - lib\annotations\protected_lint.dart:20:40 - The argument type '_ProtectedVisitor' can't be assigned to the parameter type 'AstVisitor<dynamic>'.  - argument_type_not_assignable
+  error - lib\annotations\protected_lint.dart:24:33 - Classes can only extend other classes. Try specifying a different superclass, or removing the extends clause. - extends_non_class
+  error - lib\annotations\protected_lint.dart:37:21 - The returned type 'Null' isn't returnable from a 'ElementAnnotation' function, as required by the closure's context. - return_of_invalid_type_from_closure
+  error - lib\annotations\protected_lint.dart:53:11 - The argument type 'Token' can't be assigned to the parameter type 'AstNode?'.  - argument_type_not_assignable
+  error - lib\core_kit.dart:9:8 - Target of URI doesn't exist: 'lib/annotations/protected.dart'. Try creating the file referenced by the URI, or try using a URI for a file that does exist. - uri_does_not_exist
+  error - lib\core_kit.dart:10:8 - Target of URI doesn't exist: 'lib/annotations/protected_lint.dart'. Try creating the file referenced by the URI, or try using a URI for a file that does exist. - uri_does_not_exist
+warning - lib\annotations\plugin\plugin.dart:21:28 - The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation. - override_on_non_overriding_member
+warning - lib\annotations\plugin\plugin.dart:40:18 - The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation. - override_on_non_overriding_member
+warning - lib\annotations\protected_lint.dart:31:8 - The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation. - override_on_non_overriding_member
+warning - lib\annotations\protected_lint.dart:40:20 - The operand can't be 'null', so the condition is always 'false'. Try removing the condition, an enclosing condition, or the whole conditional statement. - unnecessary_null_comparison
+warning - lib\annotations\protected_lint.dart:40:29 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
+warning - lib\annotations\protected_lint.dart:60:11 - The value of the local variable 'hoverText' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\initializer.dart:123:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\snackbar\snackbar.dart:206:5 - This default clause is covered by the previous cases. Try removing the default clause, or restructuring the preceding patterns. - unreachable_switch_default
+warning - lib\text\common_text.dart:102:17 - The declaration '_convertAlignment' isn't referenced. Try removing the declaration of '_convertAlignment'. - unused_element
+warning - lib\text\common_text.dart:343:11 - The value of the local variable 'baseFontSize' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\text_field\common_date_input_text_field.dart:2:8 - Unused import: 'package:core_kit/text_field/input_formatters/input_helper.dart'. Try removing the import directive. - unused_import
+warning - lib\text_field\common_date_input_text_field.dart:95:11 - The value of the local variable 'now' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\text_field\common_multiline_text_field.dart:95:8 - The value of the field '_isErrorMessageShown' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\text_field\input_formatters\phone_input_formater.dart:9:9 - The value of the local variable 'selectionIndex' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\utils\extension.dart:220:11 - The value of the local variable 'localizations' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\annotations\plugin\plugin.dart:4:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:5:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:6:8 - The imported package 'path' isn't a dependency of the importing package. Try adding a dependency for 'path' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:9:3 - Parameter 'sendPort' could be a super parameter. Trying converting 'sendPort' to a super parameter. - use_super_parameters
+   info - lib\annotations\protected_lint.dart:2:8 - Import of a library in the 'lib/src' directory of another package. Try importing a public library that exports this library, or removing the import. - implementation_imports
+   info - lib\annotations\protected_lint.dart:2:8 - The imported package 'linter' isn't a dependency of the importing package. Try adding a dependency for 'linter' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:3:8 - Import of a library in the 'lib/src' directory of another package. Try importing a public library that exports this library, or removing the import. - implementation_imports
+   info - lib\annotations\protected_lint.dart:3:8 - The imported package 'linter' isn't a dependency of the importing package. Try adding a dependency for 'linter' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:4:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:5:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:6:8 - The imported package 'path' isn't a dependency of the importing package. Try adding a dependency for 'path' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\button\common_button.dart:301:32 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
+   info - lib\button\muiltiple_selector.dart:30:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\button\radio_group_form_field.dart:26:26 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\button\radio_group_form_field.dart:27:26 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\city_state\state_data.dart:1:1 - Dangling library doc comment. Add a 'library' directive after the library comment. - dangling_library_doc_comments
+   info - lib\dialoge\common_dialog.dart:28:8 - The variable name 'CommonDialogWithActions' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - non_constant_identifier_names
+   info - lib\dropdown\common_drop_down.dart:194:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
+   info - lib\form\custom_form.dart:15:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\network\dio_interceptor.dart:14:8 - The imported package 'http' isn't a dependency of the importing package. Try adding a dependency for 'http' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\network\dio_service.dart:10:8 - The import of 'package:dio/dio.dart' is unnecessary because all of the used elements are also provided by the import of 'package:core_kit/core_kit.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\network\request_input.dart:6:22 - The constant name 'GET' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:27 - The constant name 'POST' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:33 - The constant name 'PUT' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:38 - The constant name 'DELETE' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\request_input.dart:6:46 - The constant name 'PATCH' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style. - constant_identifier_names
+   info - lib\network\response_state.dart:32:25 - Unnecessary 'this.' qualifier. Try removing 'this.'. - unnecessary_this
+   info - lib\network\response_state.dart:35:35 - Unnecessary 'this.' qualifier. Try removing 'this.'. - unnecessary_this
+   info - lib\snackbar\snackbar.dart:146:47 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\snackbar\snackbar.dart:176:66 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:47:24 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:47:42 - 'opacity' is deprecated and shouldn't be used. Use .a. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:146:24 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\spotlight\core_spotlight.dart:146:42 - 'opacity' is deprecated and shouldn't be used. Use .a. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\text\common_text.dart:252:9 - Use the null-aware marker '?' rather than a null check via an 'if'. Try using '?'. - use_null_aware_elements
+   info - lib\text\common_text.dart:256:9 - Use the null-aware marker '?' rather than a null check via an 'if'. Try using '?'. - use_null_aware_elements
+   info - lib\text_field\common_multiline_text_field.dart:138:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\text_field\common_multiline_text_field.dart:155:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\text_field\common_text_field.dart:148:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\text_field\input_formatters\phone_input_formater.dart:12:9 - Use 'isNotEmpty' instead of 'length' to test whether the collection is empty. Try rewriting the expression to use 'isNotEmpty'. - prefer_is_empty
+   info - lib\utils\common_share.dart:5:8 - The imported package 'http' isn't a dependency of the importing package. Try adding a dependency for 'http' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\utils\common_share.dart:6:8 - The imported package 'path_provider' isn't a dependency of the importing package. Try adding a dependency for 'path_provider' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\utils\common_share.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\utils\common_share.dart:65:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\utils\core_screen_utils.dart:41:11 - The extension name 'responsive' isn't an UpperCamelCase identifier. Try changing the name to follow the UpperCamelCase style. - camel_case_extensions
+   info - lib\utils\core_screen_utils.dart:51:11 - The extension name 'responsiveDouble' isn't an UpperCamelCase identifier. Try changing the name to follow the UpperCamelCase style. - camel_case_extensions
+   info - lib\utils\extension.dart:6:8 - The imported package 'http_parser' isn't a dependency of the importing package. Try adding a dependency for 'http_parser' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+
+77 issues found.

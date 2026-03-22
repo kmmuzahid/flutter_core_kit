@@ -1,0 +1,18 @@
+Analyzing plugin.dart, protected_plugin.dart, protected_lint.dart, core_kit.dart...
+
+warning - lib\annotations\protected_lint.dart:48:11 - The value of the local variable 'allowedFolders' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\annotations\plugin\plugin.dart:3:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:4:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:5:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:6:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:9:3 - Parameter 'resourceProvider' could be a super parameter. Trying converting 'resourceProvider' to a super parameter. - use_super_parameters
+   info - lib\annotations\plugin\protected_plugin.dart:3:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\protected_plugin.dart:4:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:2:8 - Import of a library in the 'lib/src' directory of another package. Try importing a public library that exports this library, or removing the import. - implementation_imports
+   info - lib\annotations\protected_lint.dart:2:8 - The imported package 'linter' isn't a dependency of the importing package. Try adding a dependency for 'linter' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:3:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:4:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:5:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:6:8 - The imported package 'path' isn't a dependency of the importing package. Try adding a dependency for 'path' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+
+14 issues found.

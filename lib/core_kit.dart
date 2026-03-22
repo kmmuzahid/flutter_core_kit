@@ -5,6 +5,10 @@
  */
 library;
 
+//annotations
+export 'package:core_kit/annotations/protected.dart';
+export 'package:core_kit/annotations/protected_lint.dart';
+
 // app_bar
 export 'package:core_kit/app_bar/common_app_bar.dart';
 // bottomsheet

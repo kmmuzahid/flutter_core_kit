@@ -1,0 +1,13 @@
+name: core_kit_lints
+description: Lint rules for core_kit.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: '>=3.10.4 <4.0.0'
+
+dependencies:
+  analyzer: any
+  custom_lint_builder: any
+  custom_lint: any
+  path: any

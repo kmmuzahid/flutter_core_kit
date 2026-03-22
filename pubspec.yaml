@@ -4,7 +4,7 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: ^3.10.4
+  sdk: ^3.10.4 
   flutter: ">=1.17.0"
 
 dependencies:
@@ -24,6 +24,7 @@ dependencies:
   intl_phone_field_v2:
   # another_flushbar:
   share_plus:
+  path: ^1.9.1
   
 
 dev_dependencies:

@@ -1,0 +1,29 @@
+Analyzing plugin.dart, protected_lint.dart...
+
+  error - lib\annotations\plugin\plugin.dart:8:7 - Missing concrete implementation of 'ServerPlugin.analyzeFile'. Try implementing the missing method, or make the class abstract. - non_abstract_class_inherits_abstract_member
+  error - lib\annotations\plugin\plugin.dart:9:48 - The named parameter 'resourceProvider' is required, but there's no corresponding argument. Try adding the required argument. - missing_required_argument
+  error - lib\annotations\plugin\plugin.dart:9:54 - Too many positional arguments: 0 expected, but 1 found. Try removing the extra positional arguments, or specifying the name for named arguments. - extra_positional_arguments_could_be_named
+  error - lib\annotations\plugin\plugin.dart:21:10 - The name 'HoverInformation' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'HoverInformation'. - non_type_as_type_argument
+  error - lib\annotations\plugin\plugin.dart:21:40 - Undefined class 'HoverParams'. Try changing the name to the name of an existing class, or creating a class with the name 'HoverParams'. - undefined_class
+  error - lib\annotations\plugin\plugin.dart:25:12 - The method 'HoverInformation' isn't defined for the type 'ProtectedAnalyzerPlugin'. Try correcting the name to the name of an existing method, or defining a method named 'HoverInformation'. - undefined_method
+  error - lib\annotations\plugin\plugin.dart:40:10 - The name 'Assist' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'Assist'. - non_type_as_type_argument
+  error - lib\annotations\plugin\plugin.dart:40:29 - Undefined class 'AssistContext'. Try changing the name to the name of an existing class, or creating a class with the name 'AssistContext'. - undefined_class
+  error - lib\annotations\plugin\plugin.dart:42:12 - The method 'Assist' isn't defined for the type 'ProtectedAnalyzerPlugin'. Try correcting the name to the name of an existing method, or defining a method named 'Assist'. - undefined_method
+warning - lib\annotations\plugin\plugin.dart:21:28 - The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation. - override_on_non_overriding_member
+warning - lib\annotations\plugin\plugin.dart:40:18 - The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation. - override_on_non_overriding_member
+warning - lib\annotations\protected_lint.dart:3:8 - Unused import: 'package:linter/src/rules.dart'. Try removing the import directive. - unused_import
+warning - lib\annotations\protected_lint.dart:65:11 - The value of the local variable 'hoverText' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\annotations\plugin\plugin.dart:4:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:5:8 - The imported package 'analyzer_plugin' isn't a dependency of the importing package. Try adding a dependency for 'analyzer_plugin' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:6:8 - The imported package 'path' isn't a dependency of the importing package. Try adding a dependency for 'path' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\plugin\plugin.dart:9:3 - Parameter 'sendPort' could be a super parameter. Trying converting 'sendPort' to a super parameter. - use_super_parameters
+   info - lib\annotations\protected_lint.dart:2:8 - Import of a library in the 'lib/src' directory of another package. Try importing a public library that exports this library, or removing the import. - implementation_imports
+   info - lib\annotations\protected_lint.dart:2:8 - The imported package 'linter' isn't a dependency of the importing package. Try adding a dependency for 'linter' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:3:8 - Import of a library in the 'lib/src' directory of another package. Try importing a public library that exports this library, or removing the import. - implementation_imports
+   info - lib\annotations\protected_lint.dart:3:8 - The imported package 'linter' isn't a dependency of the importing package. Try adding a dependency for 'linter' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:4:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:5:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:6:8 - The imported package 'analyzer' isn't a dependency of the importing package. Try adding a dependency for 'analyzer' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+   info - lib\annotations\protected_lint.dart:7:8 - The imported package 'path' isn't a dependency of the importing package. Try adding a dependency for 'path' in the 'pubspec.yaml' file. - depend_on_referenced_packages
+
+25 issues found.
