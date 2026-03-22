@@ -16,7 +16,9 @@ class InputHelper {
 
       case ValidationType.validateEmail:
         return [
-          FilteringTextInputFormatter.deny(RegExp(r'\s')), // Deny spaces for email
+          FilteringTextInputFormatter.deny(
+            RegExp(r'\s'),
+          ), // Deny spaces for email
         ];
 
       case ValidationType.validatePhone:
@@ -80,7 +82,9 @@ class InputHelper {
 
       case ValidationType.validateTime:
         return [
-          FilteringTextInputFormatter.allow(RegExp(r'[0-9:]')), // Allow numbers and colon
+          FilteringTextInputFormatter.allow(
+            RegExp(r'[0-9:]'),
+          ), // Allow numbers and colon
         ];
 
       case ValidationType.validateIP:
@@ -91,7 +95,9 @@ class InputHelper {
       case ValidationType.validateFullName:
         return [
           FilteringTextInputFormatter.allow(
-            RegExp(r"[a-zA-Z'\- ]"), // Allow letters, apostrophes, hyphens, and spaces
+            RegExp(
+              r"[a-zA-Z'\- ]",
+            ), // Allow letters, apostrophes, hyphens, and spaces
           ),
         ];
       case ValidationType.validateNID:
@@ -273,7 +279,6 @@ class InputHelper {
     return null; // Return null if year is valid
   }
 
-
   static String? _validateNID(String? value) {
     final nidRegex = RegExp(r'^\d{12}$'); // Assuming NID is exactly 12 digits
     if (value == null || value.isEmpty) {
@@ -308,7 +313,9 @@ class InputHelper {
     if (value == null || value.isEmpty) {
       return CoreKitString.requiredField;
     }
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     if (!emailRegex.hasMatch(value)) {
       return CoreKitString.invalidEmail;
     }
@@ -354,7 +361,10 @@ class InputHelper {
   }
 
   // Confirm password validation
-  static String? _validateConfirmPassword(String? value, String? originalPassword) {
+  static String? _validateConfirmPassword(
+    String? value,
+    String? originalPassword,
+  ) {
     if (value == null || value.isEmpty) {
       return CoreKitString.requiredField;
     }
@@ -441,7 +451,11 @@ class InputHelper {
   }
 
   // Custom regex pattern validation
-  static String? _validateCustomPattern(String? value, String pattern, String errorMessage) {
+  static String? _validateCustomPattern(
+    String? value,
+    String pattern,
+    String errorMessage,
+  ) {
     if (value == null || value.isEmpty) {
       return CoreKitString.requiredField;
     }
@@ -453,7 +467,11 @@ class InputHelper {
   }
 
   // Date range validation
-  static String? _validateDateRange(String? value, DateTime startDate, DateTime endDate) {
+  static String? _validateDateRange(
+    String? value,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     if (value == null || value.isEmpty) {
       return CoreKitString.requiredField;
     }
@@ -461,7 +479,10 @@ class InputHelper {
       final date = DateFormat('yyyy-MM-dd').parseStrict(value);
       if (date.isBefore(startDate) || date.isAfter(endDate)) {
         return CoreKitString.invalidDateRange(endDate, startDate)
-            .replaceAll('{startDate}', DateFormat('yyyy-MM-dd').format(startDate))
+            .replaceAll(
+              '{startDate}',
+              DateFormat('yyyy-MM-dd').format(startDate),
+            )
             .replaceAll('{endDate}', DateFormat('yyyy-MM-dd').format(endDate));
       }
     } catch (e) {

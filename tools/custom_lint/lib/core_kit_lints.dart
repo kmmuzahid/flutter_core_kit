@@ -14,7 +14,7 @@ class _ProtectedLintPlugin extends PluginBase {
 }
 
 class _ProtectedLintRule extends DartLintRule {
-  _ProtectedLintRule() : super(code: _code);
+  const _ProtectedLintRule() : super(code: _code);
 
   static const _code = LintCode(
     name: 'protected_lint',

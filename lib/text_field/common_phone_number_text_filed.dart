@@ -5,13 +5,10 @@
  */
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field_v2/country_picker_dialog.dart';
 import 'package:intl_phone_field_v2/intl_phone_field.dart';
 import 'package:intl_phone_field_v2/phone_number.dart';
-
-import 'validation_type.dart';
 
 class CommonPhoneNumberTextFiled extends StatelessWidget {
   const CommonPhoneNumberTextFiled({

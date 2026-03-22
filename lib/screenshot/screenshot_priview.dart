@@ -39,30 +39,29 @@ class ScreenshotPreview {
     final overlay = Overlay.of(buildContext);
 
     _overlayEntry = OverlayEntry(
-      builder:
-          (_) => Positioned(
-            bottom: bottom,
-            left: left,
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: borderColor, width: borderWidth),
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  boxShadow: [boxShadow],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(borderRadius - 2),
-                  child: Image.file(
-                    File(imagePath),
-                    width: width,
-                    height: height,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+      builder: (_) => Positioned(
+        bottom: bottom,
+        left: left,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: borderColor, width: borderWidth),
+              borderRadius: BorderRadius.circular(borderRadius),
+              boxShadow: [boxShadow],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(borderRadius - 2),
+              child: Image.file(
+                File(imagePath),
+                width: width,
+                height: height,
+                fit: BoxFit.cover,
               ),
             ),
           ),
+        ),
+      ),
     );
 
     overlay.insert(_overlayEntry!);

@@ -46,7 +46,8 @@ class _MultipleSelectorState extends State<MultipleSelector> {
   @override
   void didUpdateWidget(MultipleSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.items != widget.items || oldWidget.selectedItems != widget.selectedItems) {
+    if (oldWidget.items != widget.items ||
+        oldWidget.selectedItems != widget.selectedItems) {
       setState(() {
         _selectedItems = List.from(widget.selectedItems);
         _filterItems();
@@ -57,7 +58,9 @@ class _MultipleSelectorState extends State<MultipleSelector> {
   void _filterItems() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredItems = widget.items.where((item) => item.toLowerCase().contains(query)).toList();
+      _filteredItems = widget.items
+          .where((item) => item.toLowerCase().contains(query))
+          .toList();
     });
   }
 
@@ -92,13 +95,18 @@ class _MultipleSelectorState extends State<MultipleSelector> {
           ),
         if (widget.showSearch)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
               ),
             ),

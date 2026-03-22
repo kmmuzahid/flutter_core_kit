@@ -83,14 +83,22 @@ class DashedBorderPainter extends CustomPainter {
     // Right border
     double startY = 0;
     while (startY < size.height) {
-      canvas.drawLine(Offset(size.width, startY), Offset(size.width, startY + dashWidth), paint);
+      canvas.drawLine(
+        Offset(size.width, startY),
+        Offset(size.width, startY + dashWidth),
+        paint,
+      );
       startY += dashWidth + dashSpace;
     }
 
     // Bottom border
     startX = size.width;
     while (startX > 0) {
-      canvas.drawLine(Offset(startX, size.height), Offset(startX - dashWidth, size.height), paint);
+      canvas.drawLine(
+        Offset(startX, size.height),
+        Offset(startX - dashWidth, size.height),
+        paint,
+      );
       startX -= dashWidth + dashSpace;
     }
 

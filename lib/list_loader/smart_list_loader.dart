@@ -23,7 +23,7 @@ class SmartListLoader extends StatefulWidget {
     this.onColapsAppbar,
     this.limit = 10,
     super.key,
-    this.initalLoader
+    this.initalLoader,
   });
 
   final int itemCount;
@@ -79,9 +79,14 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     _checkScrollability();
 
     final pos = _scrollController.position;
-    final isAtEdge = widget.isReverse ? pos.pixels <= 100 : pos.pixels >= pos.maxScrollExtent - 200;
+    final isAtEdge = widget.isReverse
+        ? pos.pixels <= 100
+        : pos.pixels >= pos.maxScrollExtent - 200;
 
-    if (isAtEdge && widget.onLoadMore != null && !widget.isLoading && !widget.isLoadDone) {
+    if (isAtEdge &&
+        widget.onLoadMore != null &&
+        !widget.isLoading &&
+        !widget.isLoadDone) {
       _debounce.run(() {
         if (mounted) {
           widget.onLoadMore!(getNextPage());
@@ -104,8 +109,10 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   }
 
   void _updateHeights() {
-    final appBarBox = _appBarKey.currentContext?.findRenderObject() as RenderBox?;
-    final stickyBox = _stickyKey.currentContext?.findRenderObject() as RenderBox?;
+    final appBarBox =
+        _appBarKey.currentContext?.findRenderObject() as RenderBox?;
+    final stickyBox =
+        _stickyKey.currentContext?.findRenderObject() as RenderBox?;
 
     setState(() {
       _appBarHeight = appBarBox?.size.height ?? 0.0;
@@ -135,8 +142,10 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         _appBarHeight > 0 &&
         (_scrollController.hasClients
             ? (widget.isReverse
-                  ? (_scrollController.position.pixels < 5 || !_isContentScrollable)
-                  : (_scrollController.offset < _appBarHeight || !_isContentScrollable))
+                  ? (_scrollController.position.pixels < 5 ||
+                        !_isContentScrollable)
+                  : (_scrollController.offset < _appBarHeight ||
+                        !_isContentScrollable))
             : true);
 
     // Show collapsed appbar when:
@@ -144,7 +153,8 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     // - OR when main appbar is hidden
     final bool showCollapsedAppBar =
         widget.onColapsAppbar != null &&
-        ((isAppBarCollapsed && _isContentScrollable) || (!showMainAppBar && _isContentScrollable));
+        ((isAppBarCollapsed && _isContentScrollable) ||
+            (!showMainAppBar && _isContentScrollable));
 
     final appBarWidgets = [
       if (showMainAppBar)
@@ -170,23 +180,25 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         ),
     ];
 
-    final listSliver = widget.initalLoader != null && widget.isLoading && widget.itemCount == 0
+    final listSliver =
+        widget.initalLoader != null && widget.isLoading && widget.itemCount == 0
         ? SliverToBoxAdapter(child: widget.initalLoader!)
         : SliverPadding(
-      padding: widget.padding ?? EdgeInsets.zero,
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          if (!widget.isReverse && index == widget.itemCount || widget.isReverse && index == 0) {
-            return _buildFooter();
-          }
-          final actualIndex = widget.isReverse ? index - 1 : index;
-          if (actualIndex >= 0 && actualIndex < widget.itemCount) {
-            return widget.itemBuilder(context, actualIndex);
-          }
-          return null;
-        }, childCount: widget.itemCount + 1),
-      ),
-    );
+            padding: widget.padding ?? EdgeInsets.zero,
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                if (!widget.isReverse && index == widget.itemCount ||
+                    widget.isReverse && index == 0) {
+                  return _buildFooter();
+                }
+                final actualIndex = widget.isReverse ? index - 1 : index;
+                if (actualIndex >= 0 && actualIndex < widget.itemCount) {
+                  return widget.itemBuilder(context, actualIndex);
+                }
+                return null;
+              }, childCount: widget.itemCount + 1),
+            ),
+          );
 
     return Scaffold(
       body: Stack(
@@ -196,8 +208,14 @@ class _SmartListLoaderState extends State<SmartListLoader> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(key: _appBarKey, child: widget.appbar ?? const SizedBox()),
-                Container(key: _stickyKey, child: widget.onColapsAppbar ?? const SizedBox()),
+                Container(
+                  key: _appBarKey,
+                  child: widget.appbar ?? const SizedBox(),
+                ),
+                Container(
+                  key: _stickyKey,
+                  child: widget.onColapsAppbar ?? const SizedBox(),
+                ),
               ],
             ),
           ),
@@ -235,7 +253,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     return CustomScrollView(
       controller: _scrollController,
       reverse: widget.isReverse,
-      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       slivers: [
         if (widget.isReverse) listSliver else ...appBarWidgets,
         if (widget.isReverse) ...appBarWidgets.reversed else listSliver,
@@ -263,7 +283,11 @@ class _SmartListLoaderState extends State<SmartListLoader> {
 }
 
 class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _StickyHeaderDelegate({required this.height, required this.child, required this.visible});
+  _StickyHeaderDelegate({
+    required this.height,
+    required this.child,
+    required this.visible,
+  });
   final double height;
   final Widget child;
   final bool visible;
@@ -274,7 +298,11 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => visible ? height : 0.0;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return visible ? child : const SizedBox.shrink();
   }
 

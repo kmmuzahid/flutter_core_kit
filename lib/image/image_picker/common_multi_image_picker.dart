@@ -41,10 +41,12 @@ class _CommonMultiImagePickerField extends StatefulWidget {
   final bool isFullScreenEnabled;
 
   @override
-  State<_CommonMultiImagePickerField> createState() => _CommonMultiImagePickerFieldState();
+  State<_CommonMultiImagePickerField> createState() =>
+      _CommonMultiImagePickerFieldState();
 }
 
-class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerField> {
+class _CommonMultiImagePickerFieldState
+    extends State<_CommonMultiImagePickerField> {
   final ImagePicker _picker = ImagePicker();
   List<XFile> _images = [];
 
@@ -62,8 +64,6 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
       var files = (await _picker.pickMultiImage(limit: widget.limit));
       if (files.isEmpty) return;
 
-   
-
       final existingNames = _images.map((img) => p.basename(img.path)).toSet();
       final newFiles = files.where((file) {
         final name = p.basename(file.path);
@@ -71,14 +71,14 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
       }).toList();
 
       if (newFiles.isNotEmpty) {
-          _images.addAll(newFiles);
+        _images.addAll(newFiles);
         setState(() {
           if (widget.limit != null) {
             if (_images.length > widget.limit!) {
               _images = _images.take(widget.limit!).toList();
             }
           }
-      
+
           widget.field.didChange(_images);
         });
       }
@@ -102,13 +102,15 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
     });
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         border: Border.all(
-          color: widget.field.hasError ? Theme.of(context).colorScheme.error : Colors.grey.shade300,
+          color: widget.field.hasError
+              ? Theme.of(context).colorScheme.error
+              : Colors.grey.shade300,
         ),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -144,7 +146,11 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
                       ],
                     ),
                     child: const Center(
-                      child: Icon(Icons.add_a_photo_outlined, size: 26, color: Colors.grey),
+                      child: Icon(
+                        Icons.add_a_photo_outlined,
+                        size: 26,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 );
@@ -185,8 +191,15 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
                       onTap: () => _removeImage(index),
                       child: Container(
                         padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        child: const Icon(Icons.close, size: 18, color: Colors.white),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          size: 18,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -199,7 +212,10 @@ class _CommonMultiImagePickerFieldState extends State<_CommonMultiImagePickerFie
               padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: Text(
                 widget.field.errorText ?? '',
-                style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 12,
+                ),
               ),
             ),
         ],

@@ -18,22 +18,24 @@ class RadioGroupFormField<T> extends FormField<T> {
              children: [
                Flex(
                  direction: direction,
-                 children:
-                     options.map((T option) {
-                       return RadioListTile<T>(
-                         title: Text(labelBuilder(option)),
-                         value: option,
-                         groupValue: state.value,
-                         onChanged: (val) => state.didChange(val),
-                       );
-                     }).toList(),
+                 children: options.map((T option) {
+                   return RadioListTile<T>(
+                     title: Text(labelBuilder(option)),
+                     value: option,
+                     groupValue: state.value,
+                     onChanged: (val) => state.didChange(val),
+                   );
+                 }).toList(),
                ),
                if (state.hasError)
                  Padding(
                    padding: const EdgeInsets.only(left: 16.0),
                    child: Text(
                      state.errorText ?? '',
-                     style: TextStyle(color: Theme.of(state.context).colorScheme.error, fontSize: 12),
+                     style: TextStyle(
+                       color: Theme.of(state.context).colorScheme.error,
+                       fontSize: 12,
+                     ),
                    ),
                  ),
              ],

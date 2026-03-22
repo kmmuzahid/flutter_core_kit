@@ -1,7 +1,4 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/text/common_text.dart';
-import 'package:core_kit/text_field/common_text_field.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
 class CommonDropDown<T> extends StatefulWidget {
@@ -208,7 +205,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
           Positioned.fill(
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (_, __) {
+              builder: (_, _) {
                 return CustomPaint(
                   painter: _BorderLoaderPainter(
                     _controller.value,

@@ -1,5 +1,4 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -256,11 +255,11 @@ class CommonText extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (preffix != null) preffix!,
+        ?preffix,
         if (preffix != null) 10.width,
         Flexible(child: buildText()),
         if (suffix != null) 10.width,
-        if (suffix != null) suffix!,
+        ?suffix,
       ],
     );
   }

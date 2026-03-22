@@ -100,7 +100,10 @@ class _CommonRadioGroupState extends State<CommonRadioGroup> {
           ? SingleChildScrollView(scrollDirection: Axis.horizontal, child: row)
           : row;
     } else {
-      content = Column(crossAxisAlignment: CrossAxisAlignment.start, children: children);
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      );
     }
 
     return Padding(padding: widget.padding ?? EdgeInsets.zero, child: content);
@@ -138,14 +141,17 @@ class _RadioItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+            selected
+                ? Icons.radio_button_checked
+                : Icons.radio_button_unchecked,
             size: iconSize,
             color: color,
           ),
           const SizedBox(width: 6),
           Text(
             label,
-            style: (textStyle ?? Theme.of(context).textTheme.bodyMedium)?.copyWith(color: color),
+            style: (textStyle ?? Theme.of(context).textTheme.bodyMedium)
+                ?.copyWith(color: color),
           ),
         ],
       ),
@@ -190,7 +196,9 @@ class CommonRadioFormField extends FormField<String> {
                    padding: const EdgeInsets.only(top: 4.0),
                    child: Text(
                      state.errorText ?? '',
-                     style: coreKitInstance.defaultTextStyle?.copyWith(color: Colors.red),
+                     style: coreKitInstance.defaultTextStyle?.copyWith(
+                       color: Colors.red,
+                     ),
                    ),
                  ),
              ],

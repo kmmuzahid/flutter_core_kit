@@ -30,7 +30,9 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
   XFile? _selectedImages;
 
   Future<void> _pickImage(FormFieldState<XFile> fieldState) async {
-    final permissionHandlerHelper = PermissionHandlerHelper(permission: Permission.photos);
+    final permissionHandlerHelper = PermissionHandlerHelper(
+      permission: Permission.photos,
+    );
     final status = await permissionHandlerHelper.getStatus();
     if (!status) return;
     final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
@@ -67,11 +69,15 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
                     height: widget.height.h,
                     decoration: BoxDecoration(
                       border: Border.all(color: borderColor, width: 1.5),
-                      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerLowest,
                     ),
                     child: _selectedImages != null || widget.src != null
                         ? CommonImage(
-                            src: _selectedImages != null ? _selectedImages!.path : widget.src!,
+                            src: _selectedImages != null
+                                ? _selectedImages!.path
+                                : widget.src!,
                             fill: BoxFit.cover,
                           )
                         : Icon(

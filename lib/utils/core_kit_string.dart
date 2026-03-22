@@ -22,7 +22,8 @@ class CoreKitString {
   static const String invalidEmail = 'Please enter a valid email address';
 
   // ===== Phone =====
-  static const String invalidPhone = 'Please enter a valid phone number (xxx-xxx-xxxx)';
+  static const String invalidPhone =
+      'Please enter a valid phone number (xxx-xxx-xxxx)';
 
   // ===== Password =====
   static const String invalidPassword =
@@ -39,15 +40,18 @@ class CoreKitString {
   static const String invalidNumber = 'Please enter a valid number';
 
   // ===== Credit Card =====
-  static const String invalidCreditCard = 'Please enter a valid 16-digit credit card number';
+  static const String invalidCreditCard =
+      'Please enter a valid 16-digit credit card number';
 
   // ===== Postal Code =====
   static const String invalidPostalCode = 'Please enter a valid postal code';
 
   // ===== Length =====
-  static String minLengthError(int minLength) => 'Minimum length is $minLength characters';
+  static String minLengthError(int minLength) =>
+      'Minimum length is $minLength characters';
 
-  static String maxLengthError(int maxLength) => 'Maximum length is $maxLength characters';
+  static String maxLengthError(int maxLength) =>
+      'Maximum length is $maxLength characters';
 
   // ===== Date Range =====
   static String invalidDateRange(DateTime startDate, DateTime endDate) {
@@ -56,7 +60,8 @@ class CoreKitString {
   }
 
   // ===== Alpha Numeric =====
-  static const String alphaNumericError = 'Only letters and numbers are allowed';
+  static const String alphaNumericError =
+      'Only letters and numbers are allowed';
 
   // ===== Username =====
   static const String usernameError =
@@ -69,7 +74,8 @@ class CoreKitString {
   static const String invalidOTP = 'OTP must be a 6-digit number';
 
   // ===== Currency =====
-  static const String invalidCurrency = 'Please enter a valid amount (up to 2 decimal places)';
+  static const String invalidCurrency =
+      'Please enter a valid amount (up to 2 decimal places)';
 
   // ===== IP Address =====
   static const String invalidIP = 'Please enter a valid IP address';

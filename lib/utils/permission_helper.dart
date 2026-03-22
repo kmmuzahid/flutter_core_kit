@@ -1,10 +1,7 @@
 import 'dart:io';
 
-import 'package:core_kit/initializer.dart';
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/utils/app_log.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 /// A helper class for handling permission requests.
 class PermissionHelper {

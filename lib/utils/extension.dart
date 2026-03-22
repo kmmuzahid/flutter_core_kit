@@ -1,13 +1,11 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/utils/app_log.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-ThemeData get getTheme => Theme.of(coreKitInstance.navigatorKey.currentContext!);
+ThemeData get getTheme =>
+    Theme.of(coreKitInstance.navigatorKey.currentContext!);
 
 extension FormStateX on GlobalKey<FormState> {
   bool validateAndSave() {
@@ -28,7 +26,11 @@ extension StringCasingExtension on String {
   String capitalizeEachWord() {
     if (isEmpty) return this;
     return split(' ')
-        .map((word) => word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1).toLowerCase())
+        .map(
+          (word) => word.isEmpty
+              ? ''
+              : word[0].toUpperCase() + word.substring(1).toLowerCase(),
+        )
         .join(' ');
   }
 }
@@ -36,7 +38,10 @@ extension StringCasingExtension on String {
 extension EnumDisplayName on Enum {
   String get displayName {
     final raw = name;
-    final spaced = raw.replaceAllMapped(RegExp(r'([A-Z])'), (match) => '${match.group(0)}');
+    final spaced = raw.replaceAllMapped(
+      RegExp(r'([A-Z])'),
+      (match) => '${match.group(0)}',
+    );
 
     return spaced[0].toUpperCase() + spaced.substring(1);
   }
@@ -112,12 +117,17 @@ extension AsyncTryCatch on Function() {
 }
 
 extension WidgetPaddingX on Widget {
-  Widget paddingAll(double padding) => Padding(padding: EdgeInsets.all(padding), child: this);
+  Widget paddingAll(double padding) =>
+      Padding(padding: EdgeInsets.all(padding), child: this);
 
-  Widget paddingSymmetric({double horizontal = 0.0, double vertical = 0.0}) => Padding(
-    padding: EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical),
-    child: this,
-  );
+  Widget paddingSymmetric({double horizontal = 0.0, double vertical = 0.0}) =>
+      Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontal,
+          vertical: vertical,
+        ),
+        child: this,
+      );
 
   Widget paddingOnly({
     double left = 0.0,
@@ -125,7 +135,12 @@ extension WidgetPaddingX on Widget {
     double right = 0.0,
     double bottom = 0.0,
   }) => Padding(
-    padding: EdgeInsets.only(top: top.w, left: left.w, right: right.w, bottom: bottom.w),
+    padding: EdgeInsets.only(
+      top: top.w,
+      left: left.w,
+      right: right.w,
+      bottom: bottom.w,
+    ),
     child: this,
   );
 
@@ -134,12 +149,17 @@ extension WidgetPaddingX on Widget {
 
 /// Add margin property to widget
 extension WidgetMarginX on Widget {
-  Widget marginAll(double margin) => Container(margin: EdgeInsets.all(margin), child: this);
+  Widget marginAll(double margin) =>
+      Container(margin: EdgeInsets.all(margin), child: this);
 
-  Widget marginSymmetric({double horizontal = 0.0, double vertical = 0.0}) => Container(
-    margin: EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical),
-    child: this,
-  );
+  Widget marginSymmetric({double horizontal = 0.0, double vertical = 0.0}) =>
+      Container(
+        margin: EdgeInsets.symmetric(
+          horizontal: horizontal,
+          vertical: vertical,
+        ),
+        child: this,
+      );
 
   Widget marginOnly({
     double left = 0.0,
@@ -147,7 +167,12 @@ extension WidgetMarginX on Widget {
     double right = 0.0,
     double bottom = 0.0,
   }) => Container(
-    margin: EdgeInsets.only(top: top.w, left: left.w, right: right.w, bottom: bottom.w),
+    margin: EdgeInsets.only(
+      top: top.w,
+      left: left.w,
+      right: right.w,
+      bottom: bottom.w,
+    ),
     child: this,
   );
 
@@ -229,7 +254,10 @@ extension TimeOfDayParser on String {
       if (match == null) {
         throw FormatException('Invalid 24-hour time format: $trimmed');
       }
-      return TimeOfDay(hour: int.parse(match.group(1)!), minute: int.parse(match.group(2)!));
+      return TimeOfDay(
+        hour: int.parse(match.group(1)!),
+        minute: int.parse(match.group(2)!),
+      );
     } else {
       // 12-hour format: "2:30 PM", "11:45 AM", etc.
       final regExp = RegExp(r'^(\d{1,2}):(\d{2})\s?([AaPp][Mm])$');
@@ -290,13 +318,19 @@ extension StringToTimeOfDay on String {
   TimeOfDay toTimeOfDay24() {
     final parts = trim().split(':');
     if (parts.length < 2) throw FormatException('Invalid time format: $this');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1].substring(0, 2)));
+    return TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1].substring(0, 2)),
+    );
   }
 
   /// "2:30 PM", "02:30pm", "2:30PM" → TimeOfDay (12-hour format)
   TimeOfDay toTimeOfDay12() {
     final cleaned = trim().replaceAll(' ', '');
-    final regExp = RegExp(r'^(\d{1,2}):(\d{2})(AM|PM|am|pm)$', caseSensitive: false);
+    final regExp = RegExp(
+      r'^(\d{1,2}):(\d{2})(AM|PM|am|pm)$',
+      caseSensitive: false,
+    );
     final match = regExp.firstMatch(cleaned);
     if (match == null) {
       throw FormatException('Invalid 12-hour time format: $this');

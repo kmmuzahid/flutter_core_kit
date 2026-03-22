@@ -1,5 +1,4 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
 class CommonDraggableBottomSheet extends StatefulWidget {
@@ -19,17 +18,20 @@ class CommonDraggableBottomSheet extends StatefulWidget {
   final double maxChildSize;
 
   @override
-  State<CommonDraggableBottomSheet> createState() => _CommonDraggableBottomSheetState();
+  State<CommonDraggableBottomSheet> createState() =>
+      _CommonDraggableBottomSheetState();
 }
 
-class _CommonDraggableBottomSheetState extends State<CommonDraggableBottomSheet> {
+class _CommonDraggableBottomSheetState
+    extends State<CommonDraggableBottomSheet> {
   late DraggableScrollableController _draggableController;
   double _currentSize = 0.15;
 
   @override
   void initState() {
     super.initState();
-    _draggableController = DraggableScrollableController()..addListener(_onSizeChange);
+    _draggableController = DraggableScrollableController()
+      ..addListener(_onSizeChange);
   }
 
   void _onSizeChange() {
@@ -75,7 +77,9 @@ class _CommonDraggableBottomSheetState extends State<CommonDraggableBottomSheet>
           decoration: BoxDecoration(
             color: coreKitInstance.surfaceBG,
             borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+            boxShadow: const [
+              BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1),
+            ],
           ),
           child: Column(
             children: [

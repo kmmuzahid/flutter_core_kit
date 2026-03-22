@@ -39,7 +39,8 @@ class CommonRatingBar extends StatelessWidget {
           spacing: spacing,
           children: List.generate(maxRating, (index) {
             final full = index + 1;
-            final isHalf = allowHalf && (rating >= index + 0.5 && rating < full);
+            final isHalf =
+                allowHalf && (rating >= index + 0.5 && rating < full);
             final icon = rating >= full
                 ? Icons.star
                 : isHalf
@@ -49,7 +50,9 @@ class CommonRatingBar extends StatelessWidget {
             return GestureDetector(
               onTap: onRatingChanged == null
                   ? null
-                  : () => onRatingChanged!(allowHalf ? index + 1.0 : full.toDouble()),
+                  : () => onRatingChanged!(
+                      allowHalf ? index + 1.0 : full.toDouble(),
+                    ),
               child: Icon(icon, color: color, size: size.w),
             );
           }),
@@ -58,7 +61,9 @@ class CommonRatingBar extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             '($totalCount)',
-            style: textStyle ?? TextStyle(fontSize: (size * 0.7).sp, color: Colors.grey[700]),
+            style:
+                textStyle ??
+                TextStyle(fontSize: (size * 0.7).sp, color: Colors.grey[700]),
           ),
         ],
       ],

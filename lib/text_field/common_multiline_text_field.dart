@@ -1,11 +1,7 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'validation_type.dart';
 
 class CommonMultilineTextField extends StatefulWidget {
   const CommonMultilineTextField({
@@ -154,11 +150,12 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   }
 
   void _onSave(String? value) {
-    if (widget.validationType == ValidationType.validateConfirmPassword)
+    if (widget.validationType == ValidationType.validateConfirmPassword) {
       assert(
         widget.originalPassword == null,
         'Orginal Password can not be null for Confirm password filed',
       );
+    }
     if (widget.onSaved == null) return;
     widget.onSaved!(value?.trim() ?? '', _controller);
   }

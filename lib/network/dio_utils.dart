@@ -9,8 +9,12 @@ import 'package:core_kit/utils/app_log.dart';
 import 'dio_service.dart';
 
 class DioUtils {
-  
-  static void log(DioServiceConfig config, String message, {String? tag, bool isError = false}) {
+  static void log(
+    DioServiceConfig config,
+    String message, {
+    String? tag,
+    bool isError = false,
+  }) {
     if (!config.enableDebugLogs) return;
 
     if (isError) {
@@ -27,5 +31,4 @@ class DioUtils {
       showSnackBar(message, type: SnackBarType.success);
     }
   }
-
 }

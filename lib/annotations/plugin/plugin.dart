@@ -5,15 +5,13 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
 import 'package:path/path.dart' as p;
 
 class ProtectedAnalyzerPlugin extends ServerPlugin {
-  ProtectedAnalyzerPlugin({required ResourceProvider resourceProvider})
-      : super(resourceProvider: resourceProvider);
+  ProtectedAnalyzerPlugin({required super.resourceProvider});
 
   @override
   String get name => 'protected_plugin';
@@ -40,16 +38,14 @@ class ProtectedAnalyzerPlugin extends ServerPlugin {
     if (collector.errors.isEmpty) return;
 
     channel.sendNotification(
-      AnalysisErrorsParams(
-        path,
-        collector.errors,
-      ).toNotification(),
+      AnalysisErrorsParams(path, collector.errors).toNotification(),
     );
   }
 
   @override
   Future<EditGetAssistsResult> handleEditGetAssists(
-      EditGetAssistsParams parameters) async {
+    EditGetAssistsParams parameters,
+  ) async {
     return EditGetAssistsResult(const <PrioritizedSourceChange>[]);
   }
 }
@@ -88,8 +84,9 @@ class _ProtectedUsageCollector extends RecursiveAstVisitor<void> {
     // Look for @Protected annotation
     ElementAnnotation? protectedAnnotation;
     for (final meta in element.metadata) {
-      final annotationName = meta.element?.enclosingElement?.name
-          ?? meta.element?.enclosingElement?.enclosingElement?.name;
+      final annotationName =
+          meta.element?.enclosingElement?.name ??
+          meta.element?.enclosingElement?.enclosingElement?.name;
       if (annotationName == 'Protected') {
         protectedAnnotation = meta;
         break;
@@ -115,21 +112,22 @@ class _ProtectedUsageCollector extends RecursiveAstVisitor<void> {
         result.lineInfo.getLocation(offset).lineNumber,
         result.lineInfo.getLocation(offset).columnNumber,
         endLine: result.lineInfo.getLocation(offset + length).lineNumber,
-        endColumn:
-            result.lineInfo.getLocation(offset + length).columnNumber,
+        endColumn: result.lineInfo.getLocation(offset + length).columnNumber,
       );
 
-      errors.add(AnalysisError(
-        AnalysisErrorSeverity.WARNING,
-        AnalysisErrorType.LINT,
-        location,
-        '${element.name} is @Protected(depth: $depth) '
-        'but accessed $folderDiff folder level(s) away.',
-        'protected_lint',
-        correction:
-            'Only use ${element.name} within $depth folder level(s) of its definition.',
-        hasFix: false,
-      ));
+      errors.add(
+        AnalysisError(
+          AnalysisErrorSeverity.WARNING,
+          AnalysisErrorType.LINT,
+          location,
+          '${element.name} is @Protected(depth: $depth) '
+              'but accessed $folderDiff folder level(s) away.',
+          'protected_lint',
+          correction:
+              'Only use ${element.name} within $depth folder level(s) of its definition.',
+          hasFix: false,
+        ),
+      );
     }
   }
 

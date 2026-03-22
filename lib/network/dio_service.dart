@@ -7,7 +7,6 @@ import 'package:core_kit/core_kit.dart';
 import 'package:core_kit/network/dio_interceptor.dart';
 import 'package:core_kit/network/dio_request_builder.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:dio/dio.dart';
 
 import 'dio_utils.dart';
 import 'request_input.dart';
@@ -27,6 +26,7 @@ class DioServiceConfig {
 
   DioServiceConfig({
     required this.baseUrl,
+
     ///Refresh token endpoint must be post method
     required this.refreshTokenEndpoint,
     this.connectTimeout = const Duration(seconds: 15),
@@ -40,12 +40,12 @@ class DioServiceConfig {
 class TokenProvider {
   Future<String>? Function() accessToken;
   Future<String>? Function() refreshToken;
-  Future<void> Function(dynamic data) updateTokens; 
+  Future<void> Function(dynamic data) updateTokens;
 
   TokenProvider({
     required this.accessToken,
     required this.refreshToken,
-    required this.updateTokens, 
+    required this.updateTokens,
   });
 }
 
@@ -55,13 +55,15 @@ class DioService {
   static bool _isInitialized = false;
 
   static DioService get instance {
-    assert(_instance != null, 'DioService not initialized. Call DioService.init() first.');
+    assert(
+      _instance != null,
+      'DioService not initialized. Call DioService.init() first.',
+    );
     return _instance!;
   }
 
   final Dio _dio;
   final DioServiceConfig _config;
-  
 
   /// Create and initialize DioService
   static Future<DioService> init({
@@ -89,17 +91,16 @@ class DioService {
       tokenProvider: tokenProvider,
     ).intercept();
     //request builder initialized
-    DioRequestBuilder.instance.init(tokenProvider: tokenProvider, dio: dioInstance);
+    DioRequestBuilder.instance.init(
+      tokenProvider: tokenProvider,
+      dio: dioInstance,
+    );
     //instance created for DioService
     DioService._instance = instance;
     //logging
     DioUtils.log(config, 'DioService has been created', tag: 'dio');
     return instance;
   }
-
-
-
-
 
   Future<ResponseState<T?>> request<T>({
     required RequestInput input,
@@ -134,7 +135,11 @@ class DioService {
       );
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
-        DioUtils.log(_config, 'Request cancelled: ${e.message}', tag: input.endpoint);
+        DioUtils.log(
+          _config,
+          'Request cancelled: ${e.message}',
+          tag: input.endpoint,
+        );
         if (showMessage) {
           DioUtils.showMessage(e.message ?? '', isError: true);
         }
@@ -157,7 +162,7 @@ class DioService {
             retryCount: retryCount + 1,
             maxRetry: maxRetry,
             showMessage: showMessage,
-            
+
             isRetry: true,
           );
         }
@@ -169,7 +174,8 @@ class DioService {
               ? responseBuilder(e.response?.data['data'])
               : null;
           final bool isSuccess = e.response?.data['success'] ?? false;
-          final message = e.response!.data is Map && e.response!.data['message'] != null
+          final message =
+              e.response!.data is Map && e.response!.data['message'] != null
               ? e.response!.data['message'].toString()
               : e.response!.statusMessage;
           if (showMessage) {
@@ -216,7 +222,12 @@ class DioService {
       // }
 
       final err = _parseError(e);
-      DioUtils.log(_config, 'Request failed: $err', tag: input.endpoint, isError: true);
+      DioUtils.log(
+        _config,
+        'Request failed: $err',
+        tag: input.endpoint,
+        isError: true,
+      );
       return ResponseState(
         data: null,
         message: e.message,
@@ -226,7 +237,12 @@ class DioService {
       );
     } catch (e) {
       final err = e.toString();
-      DioUtils.log(_config, 'Unknown error occurred: $err', tag: input.endpoint, isError: true);
+      DioUtils.log(
+        _config,
+        'Unknown error occurred: $err',
+        tag: input.endpoint,
+        isError: true,
+      );
       return ResponseState(
         data: null,
         isSuccess: false,
@@ -236,9 +252,6 @@ class DioService {
       );
     }
   }
-
-
-
 
   bool _shouldRetry(DioException e) =>
       e.type == DioExceptionType.connectionTimeout ||
@@ -260,4 +273,3 @@ class DioService {
     return e.message ?? 'An unknown error occurred.';
   }
 }
-

@@ -106,7 +106,8 @@ class DioInterceptor extends Interceptor {
         headers: {'refreshtoken': refreshToken},
       );
 
-      if (response.body.isNotEmpty && (response.statusCode == 200 || response.statusCode == 201)) {
+      if (response.body.isNotEmpty &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
         final data = jsonDecode(response.body);
 
         await _tokenProvider.updateTokens(data['data']);
@@ -122,7 +123,9 @@ class DioInterceptor extends Interceptor {
           tag: 'Auth',
           isError: true,
         );
-        throw Exception('Refresh token failed with status: ${response.statusCode}');
+        throw Exception(
+          'Refresh token failed with status: ${response.statusCode}',
+        );
       }
     } on DioException catch (e) {
       DioUtils.log(
@@ -133,12 +136,19 @@ class DioInterceptor extends Interceptor {
       );
       throw Exception('Refresh token failed: ${e.message}');
     } catch (e) {
-      DioUtils.log(_config, 'Error during token refresh: $e', tag: 'Auth', isError: true);
+      DioUtils.log(
+        _config,
+        'Error during token refresh: $e',
+        tag: 'Auth',
+        isError: true,
+      );
       throw Exception('Refresh token failed: $e');
     }
   }
 
-  Future<Response<dynamic>> _retryAfterRefresh(RequestOptions requestOptions) async {
+  Future<Response<dynamic>> _retryAfterRefresh(
+    RequestOptions requestOptions,
+  ) async {
     await _injectToken(requestOptions);
 
     final options = Options(
@@ -205,14 +215,18 @@ class DioInterceptor extends Interceptor {
           handler.next(response);
         },
         onError: (DioException error, handler) async {
-          final requestId = error.requestOptions.extra['requestId'] as int? ?? 0;
+          final requestId =
+              error.requestOptions.extra['requestId'] as int? ?? 0;
           final statusCode = error.response?.statusCode;
           final path = error.requestOptions.path;
-          final retryCount = error.requestOptions.extra['retryCount'] as int? ?? 0;
+          final retryCount =
+              error.requestOptions.extra['retryCount'] as int? ?? 0;
           final maxRetry = error.requestOptions.extra['maxRetry'] as int? ?? 1;
 
-          AppLogger.debug('Retry count: $retryCount, Max retry: $maxRetry', tag: 'DioInterceptor');
- 
+          AppLogger.debug(
+            'Retry count: $retryCount, Max retry: $maxRetry',
+            tag: 'DioInterceptor',
+          );
 
           if (retryCount == maxRetry &&
               !_isServerOff &&
@@ -225,7 +239,7 @@ class DioInterceptor extends Interceptor {
               'Server is currently unavailable. Please try again later.',
               isError: true,
             );
-            
+
             _isServerOff = true;
           }
 
@@ -283,7 +297,9 @@ class DioInterceptor extends Interceptor {
               }
             } else {
               final responseCompleter = Completer<dio.Response>();
-              _queue.add(_QueuedRequest(error.requestOptions, responseCompleter));
+              _queue.add(
+                _QueuedRequest(error.requestOptions, responseCompleter),
+              );
               return responseCompleter.future.then(handler.resolve).catchError((
                 Object err,
                 StackTrace stackTrace,
@@ -302,7 +318,8 @@ class DioInterceptor extends Interceptor {
                 }
               });
             }
-          } else if (statusCode == 401 && path == _config.refreshTokenEndpoint) {
+          } else if (statusCode == 401 &&
+              path == _config.refreshTokenEndpoint) {
             DioUtils.log(
               _config,
               '401 received from refresh token endpoint. Logging out.',

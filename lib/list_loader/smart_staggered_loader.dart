@@ -7,7 +7,7 @@ library;
 
 import 'package:core_kit/utils/debouncer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart'; 
+import 'package:flutter/scheduler.dart';
 
 class SmartStaggeredLoader extends StatefulWidget {
   const SmartStaggeredLoader({
@@ -67,14 +67,14 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   double _currentOffset = 0.0;
   final Debouncer _debounce = Debouncer(milliseconds: 500);
   bool _isContentScrollable = false;
- 
+
   int getNextPage() {
     return ((widget.itemCount + widget.limit - 1) ~/ widget.limit) + 1;
   }
 
   @override
   void initState() {
-    super.initState(); 
+    super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -123,8 +123,10 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   }
 
   void _updateHeights() {
-    final appBarBox = _appBarKey.currentContext?.findRenderObject() as RenderBox?;
-    final stickyBox = _stickyKey.currentContext?.findRenderObject() as RenderBox?;
+    final appBarBox =
+        _appBarKey.currentContext?.findRenderObject() as RenderBox?;
+    final stickyBox =
+        _stickyKey.currentContext?.findRenderObject() as RenderBox?;
 
     setState(() {
       _appBarHeight = appBarBox?.size.height ?? 0.0;
@@ -141,20 +143,24 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   @override
   Widget build(BuildContext context) {
     final isAppBarCollapsed =
-        _scrollController.hasClients && _currentOffset >= _appBarHeight && _isContentScrollable;
+        _scrollController.hasClients &&
+        _currentOffset >= _appBarHeight &&
+        _isContentScrollable;
 
     // Show main appbar when at top or content is not scrollable
     final bool showMainAppBar =
         widget.appbar != null &&
         _appBarHeight > 0 &&
         (_scrollController.hasClients
-            ? (_scrollController.offset < _appBarHeight || !_isContentScrollable)
+            ? (_scrollController.offset < _appBarHeight ||
+                  !_isContentScrollable)
             : true);
 
     // Show collapsed appbar when content is scrollable and scrolled past threshold
     final bool showCollapsedAppBar =
         widget.onColapsAppbar != null &&
-        ((isAppBarCollapsed && _isContentScrollable) || (!showMainAppBar && _isContentScrollable));
+        ((isAppBarCollapsed && _isContentScrollable) ||
+            (!showMainAppBar && _isContentScrollable));
 
     return Scaffold(
       body: Stack(
@@ -163,8 +169,14 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(key: _appBarKey, child: widget.appbar ?? const SizedBox()),
-                Container(key: _stickyKey, child: widget.onColapsAppbar ?? const SizedBox()),
+                Container(
+                  key: _appBarKey,
+                  child: widget.appbar ?? const SizedBox(),
+                ),
+                Container(
+                  key: _stickyKey,
+                  child: widget.onColapsAppbar ?? const SizedBox(),
+                ),
               ],
             ),
           ),
@@ -191,7 +203,8 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
     return CustomScrollView(
       controller: _scrollController,
       physics:
-          widget.physics ?? const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          widget.physics ??
+          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       slivers: [
         if (showMainAppBar)
           SliverAppBar(
@@ -216,7 +229,8 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
             ),
           ),
 
-        if (widget.topWidget != null) SliverToBoxAdapter(child: widget.topWidget),
+        if (widget.topWidget != null)
+          SliverToBoxAdapter(child: widget.topWidget),
 
         SliverPadding(
           padding: widget.padding ?? EdgeInsets.zero,
@@ -230,7 +244,9 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
                     childAspectRatio: widget.aspectRatio,
                     maxCrossAxisExtent: widget.maxCrossAxisExtent,
                     mainAxisSpacing: widget.mainAxisSpacing,
-                    crossAxisSpacing: widget.isSeperated ? 0 : widget.crossAxisSpacing,
+                    crossAxisSpacing: widget.isSeperated
+                        ? 0
+                        : widget.crossAxisSpacing,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final child = widget.itemBuilder(context, index);
@@ -277,14 +293,22 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
       width: width,
     );
 
-    final spacing = widget.crossAxisSpacing <= 0 ? 0 : widget.crossAxisSpacing / 2;
+    final spacing = widget.crossAxisSpacing <= 0
+        ? 0
+        : widget.crossAxisSpacing / 2;
 
     return Container(
       padding: EdgeInsets.only(
-        left: (gridChildPosition.isLastInRow || gridChildPosition.isMiddleInRow ? spacing : 0)
-            .toDouble(),
-        right: (gridChildPosition.isFirstInRow || gridChildPosition.isMiddleInRow ? spacing : 0)
-            .toDouble(),
+        left:
+            (gridChildPosition.isLastInRow || gridChildPosition.isMiddleInRow
+                    ? spacing
+                    : 0)
+                .toDouble(),
+        right:
+            (gridChildPosition.isFirstInRow || gridChildPosition.isMiddleInRow
+                    ? spacing
+                    : 0)
+                .toDouble(),
       ),
       decoration: BoxDecoration(
         border: Border(
@@ -309,7 +333,8 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
     final positionInRow = index % childrenInRow;
 
     final isFirstInRow = positionInRow == 0;
-    final isLastInRow = positionInRow == childrenInRow - 1 || index == totalChildren - 1;
+    final isLastInRow =
+        positionInRow == childrenInRow - 1 || index == totalChildren - 1;
     final isMiddleInRow = !isFirstInRow && !isLastInRow;
     final isItInLastRow = currentRow == totalRows - 1;
 
@@ -324,8 +349,11 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 }
 
 class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-
-  _StickyHeaderDelegate({required this.height, required this.child, required this.visible});
+  _StickyHeaderDelegate({
+    required this.height,
+    required this.child,
+    required this.visible,
+  });
   final double height;
   final Widget child;
   final bool visible;
@@ -336,7 +364,11 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => visible ? height : 0.0;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return visible ? child : const SizedBox.shrink();
   }
 

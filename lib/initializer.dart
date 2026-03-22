@@ -106,7 +106,6 @@ class PermissionHadlerColors {
 
 class _LegacyInitWrapper extends StatefulWidget {
   const _LegacyInitWrapper({
-    super.key,
     required this.child,
     required this.dioServiceConfig,
     required this.tokenProvider,

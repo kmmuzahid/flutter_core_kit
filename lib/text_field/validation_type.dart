@@ -27,5 +27,5 @@ enum ValidationType {
   validateFullName,
   validateNID,
   notRequired,
-  validateYear
+  validateYear,
 }

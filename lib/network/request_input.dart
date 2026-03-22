@@ -6,10 +6,9 @@ import 'package:dio/dio.dart';
 enum RequestMethod { GET, POST, PUT, DELETE, PATCH }
 
 class RequestInput {
-
   RequestInput({
     required this.endpoint,
-    required this.method, 
+    required this.method,
     this.pathParams,
     this.queryParams,
     this.headers,
@@ -21,9 +20,9 @@ class RequestInput {
     this.onReceiveProgress,
     this.requiresToken = true,
     this.cancelToken,
-    this.listBody
+    this.listBody,
   });
-  final String endpoint; 
+  final String endpoint;
   final RequestMethod method;
   final List<String>? pathParams;
   final Map<String, dynamic>? queryParams;
@@ -31,7 +30,7 @@ class RequestInput {
   final Map<String, dynamic>? formFields;
   final Map<String, dynamic>? jsonBody;
   final List<Map<String, dynamic>>? listBody;
-  final Map<String, dynamic>? files; 
+  final Map<String, dynamic>? files;
   final Duration? timeout;
   final Function(int, int)? onSendProgress;
   final Function(int, int)? onReceiveProgress;
@@ -55,5 +54,4 @@ class RequestInput {
   }
 
   String toJson() => json.encode(toMap());
-
 }

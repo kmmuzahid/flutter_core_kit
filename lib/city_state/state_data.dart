@@ -1,4 +1,5 @@
 ///list of states of each country
+library;
 
 class StateDialogs {
   static List<String> stateItems = [];
@@ -640,7 +641,11 @@ class Canada {
 }
 
 class CaymanIslands {
-  static List<String> states = <String>['Grand Cayman', 'Cayman Brac', 'Little Cayman'];
+  static List<String> states = <String>[
+    'Grand Cayman',
+    'Cayman Brac',
+    'Little Cayman',
+  ];
 }
 
 class CentralAfrica {
@@ -865,7 +870,13 @@ class Cuba {
 }
 
 class Cyprus {
-  static List<String> states = <String>["Nicosia", "Famagusta", "Larnaca", "Limassol", "Paphos"];
+  static List<String> states = <String>[
+    "Nicosia",
+    "Famagusta",
+    "Larnaca",
+    "Limassol",
+    "Paphos",
+  ];
 }
 
 class CzechRepublic {
@@ -1093,7 +1104,12 @@ class Ethiopia {
 }
 
 class Fiji {
-  static List<String> states = <String>["Central", "Eastern", "Northern", "Western"];
+  static List<String> states = <String>[
+    "Central",
+    "Eastern",
+    "Northern",
+    "Western",
+  ];
 }
 
 class France {
@@ -1545,7 +1561,10 @@ class Haiti {
 }
 
 class Herzegovina {
-  static List<String> states = <String>['Bosnia and Herzegovina	', 'Republika Srpska	'];
+  static List<String> states = <String>[
+    'Bosnia and Herzegovina	',
+    'Republika Srpska	',
+  ];
 }
 
 class Iceland {
@@ -1696,7 +1715,14 @@ class Ireland {
 }
 
 class Isle {
-  static List<String> states = <String>["Ayre", "Garff", "Glenfaba", "Michael", "Middle", "Rushen"];
+  static List<String> states = <String>[
+    "Ayre",
+    "Garff",
+    "Glenfaba",
+    "Michael",
+    "Middle",
+    "Rushen",
+  ];
 }
 
 class Israel {
@@ -2156,7 +2182,11 @@ class Lithuania {
 }
 
 class Luxembourg {
-  static List<String> states = <String>['Diekirch', 'Grevenmacher', 'Luxembourg'];
+  static List<String> states = <String>[
+    'Diekirch',
+    'Grevenmacher',
+    'Luxembourg',
+  ];
 }
 
 class Macao {
@@ -2203,7 +2233,11 @@ class Madagascar {
 }
 
 class Malawi {
-  static List<String> states = <String>["Northern Region", "Central Region", "Southern Region"];
+  static List<String> states = <String>[
+    "Northern Region",
+    "Central Region",
+    "Southern Region",
+  ];
 }
 
 class Malaysia {
@@ -3208,7 +3242,11 @@ class Rwanda {
 }
 
 class Helena {
-  static List<String> states = <String>['Ascension	', 'Saint Helena	', 'Tristan da Cunha	'];
+  static List<String> states = <String>[
+    'Ascension	',
+    'Saint Helena	',
+    'Tristan da Cunha	',
+  ];
 }
 
 class Kitts {
@@ -3678,7 +3716,12 @@ class Suriname {
 }
 
 class Swaziland {
-  static List<String> states = <String>["Hhohho", "Lubombo", "Manzini", "Shiselweni"];
+  static List<String> states = <String>[
+    "Hhohho",
+    "Lubombo",
+    "Manzini",
+    "Shiselweni",
+  ];
 }
 
 class Sweden {
@@ -3899,7 +3942,11 @@ class Tanzania {
 }
 
 class Tokelau {
-  static List<String> states = <String>["Atafu Atoll", "Nukunonu Atoll", "Fakaofo Atoll"];
+  static List<String> states = <String>[
+    "Atafu Atoll",
+    "Nukunonu Atoll",
+    "Fakaofo Atoll",
+  ];
 }
 
 class Tonga {
@@ -4125,7 +4172,13 @@ class Turkeys {
 }
 
 class Turkmenistan {
-  static List<String> states = <String>["Ahal", "Balkan", "Dashoguz", "Lebap", "Mary"];
+  static List<String> states = <String>[
+    "Ahal",
+    "Balkan",
+    "Dashoguz",
+    "Lebap",
+    "Mary",
+  ];
 }
 
 class Turks {
@@ -4295,7 +4348,12 @@ class Ukraine {
 }
 
 class Uk {
-  static List<String> states = <String>["England", "Scotland", "Wales", "Northern Ireland"];
+  static List<String> states = <String>[
+    "England",
+    "Scotland",
+    "Wales",
+    "Northern Ireland",
+  ];
 }
 
 class Uruguay {
@@ -4396,7 +4454,14 @@ class US {
 }
 
 class Vanuatu {
-  static List<String> states = <String>["Malampa", "Penama", "Sanma", "Shefa", "Tafea", "Torba"];
+  static List<String> states = <String>[
+    "Malampa",
+    "Penama",
+    "Sanma",
+    "Shefa",
+    "Tafea",
+    "Torba",
+  ];
 }
 
 class Venezuela {

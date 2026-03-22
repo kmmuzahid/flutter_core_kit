@@ -6,6 +6,7 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 class AppbarConfig {
   /// ()=> Get.back() or Navigator.pop(context) etc
   final Function()? onBack;
@@ -123,11 +124,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(
-    (appbarConfig?.height?.h ?? coreKitInstance.appbarConfig.height?.h) ?? kToolbarHeight.h,
+    (appbarConfig?.height?.h ?? coreKitInstance.appbarConfig.height?.h) ??
+        kToolbarHeight.h,
   );
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     // Merge local config with the global one from CoreKit.
     // Properties defined in `appbarConfig` will override the global ones.
     final AppbarConfig config = coreKitInstance.appbarConfig.copyWith(
@@ -145,7 +147,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       actionAlignment: appbarConfig?.actionAlignment,
       titleSpacing: appbarConfig?.titleSpacing,
       leadingPadding: appbarConfig?.leadingPadding,
-      titleBuilder: appbarConfig?.titleBuilder
+      titleBuilder: appbarConfig?.titleBuilder,
     );
 
     // Determine the background color for calculating text/icon contrast.
@@ -156,7 +158,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     //     Theme.of(context).appBarTheme.backgroundColor ??
     //     Theme.of(context).scaffoldBackgroundColor;
 
-
     final backgroundColor =
         config.backgroundColor ??
         Theme.of(context).appBarTheme.backgroundColor ??
@@ -165,10 +166,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     // Determine the final decoration for the app bar container.
     // A provided `decoration` takes precedence over `backgroundColor`.
     final Decoration finalDecoration =
-        config.decoration?.call() ??
-        BoxDecoration(
-          color: backgroundColor,
-        );
+        config.decoration?.call() ?? BoxDecoration(color: backgroundColor);
 
     final contrastColor = resolveTextColorFromDecoration(finalDecoration);
     final leadingButton = _buildLeadingButton(config, contrastColor);
@@ -182,7 +180,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: contrastColor == Colors.white ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: contrastColor == Colors.white
+            ? Brightness.light
+            : Brightness.dark,
       ),
       child: Container(
         decoration: finalDecoration,
@@ -200,12 +200,19 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _appbarStackBased(AppbarConfig config, Widget leadingButton, Color contrastColor) {
+  Widget _appbarStackBased(
+    AppbarConfig config,
+    Widget leadingButton,
+    Color contrastColor,
+  ) {
     return Stack(
       children: [
         // --- Leading Widget ---
         if (!hideBack)
-          Align(alignment: config.leadingAlignment ?? Alignment.centerLeft, child: leadingButton),
+          Align(
+            alignment: config.leadingAlignment ?? Alignment.centerLeft,
+            child: leadingButton,
+          ),
 
         // --- Title Widget ---
         Align(
@@ -224,19 +231,29 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
             alignment: config.actionAlignment ?? Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: config.actions!,
+              ),
             ),
           ),
       ],
     );
   }
 
-  Row _appbarRowBased(AppbarConfig config, Widget leadingButton, Color contrastColor) {
+  Row _appbarRowBased(
+    AppbarConfig config,
+    Widget leadingButton,
+    Color contrastColor,
+  ) {
     return Row(
       children: [
         // --- Leading Widget ---
         if (!hideBack)
-          Align(alignment: config.leadingAlignment ?? Alignment.centerLeft, child: leadingButton),
+          Align(
+            alignment: config.leadingAlignment ?? Alignment.centerLeft,
+            child: leadingButton,
+          ),
 
         if (config.titleSpacing > 0) SizedBox(width: config.titleSpacing.w),
 
@@ -254,7 +271,10 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
             alignment: config.actionAlignment ?? Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Row(mainAxisSize: MainAxisSize.min, children: config.actions!),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: config.actions!,
+              ),
             ),
           ),
       ],
@@ -293,13 +313,13 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         }
       },
       child: Container(
-        color: Colors.transparent, // For better hit-testing on transparent areas
+        color:
+            Colors.transparent, // For better hit-testing on transparent areas
         padding: config.leadingPadding,
         child: buttonContent,
       ),
     );
   }
-
 
   Color resolveTextColorFromDecoration(Decoration? decoration) {
     if (decoration == null) {
@@ -338,7 +358,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 
-Color _textFromGradient(Gradient gradient) {
+  Color _textFromGradient(Gradient gradient) {
     double luminance = 0;
 
     for (final color in gradient.colors) {

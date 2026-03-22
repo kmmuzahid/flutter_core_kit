@@ -2,7 +2,10 @@ import 'package:flutter/services.dart';
 
 class DateFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     // If the new value is empty or shorter than old value (backspace/delete)
     if (newValue.text.isEmpty || newValue.text.length < oldValue.text.length) {
       return newValue;
@@ -10,7 +13,7 @@ class DateFormatter extends TextInputFormatter {
 
     // Remove all non-digit characters
     String digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     // If no digits, return empty
     if (digits.isEmpty) return const TextEditingValue();
 
@@ -23,7 +26,7 @@ class DateFormatter extends TextInputFormatter {
         selection: TextSelection.collapsed(offset: digits.length),
       );
     }
-    
+
     // We have at least 4 digits (year)
     String year = digits.substring(0, 4);
     formatted = year;
@@ -72,7 +75,7 @@ class DateFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
-  
+
   int _getDaysInMonth(int month, int year) {
     if (month == 2) {
       // February

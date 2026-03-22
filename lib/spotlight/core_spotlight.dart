@@ -12,7 +12,12 @@ class CoreSpotlight extends StatelessWidget {
   final double radius;
   final Color color;
 
-  const CoreSpotlight({super.key, required this.center, required this.radius, required this.color});
+  const CoreSpotlight({
+    super.key,
+    required this.center,
+    required this.radius,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +33,11 @@ class _SpotlightPainter extends CustomPainter {
   final double radius;
   final Color color;
 
-  _SpotlightPainter({required this.center, required this.radius, required this.color});
+  _SpotlightPainter({
+    required this.center,
+    required this.radius,
+    required this.color,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -48,7 +57,13 @@ class _SpotlightPainter extends CustomPainter {
       stops.add(t);
     }
 
-    final gradient = ui.Gradient.radial(center, radius, colors, stops, TileMode.clamp);
+    final gradient = ui.Gradient.radial(
+      center,
+      radius,
+      colors,
+      stops,
+      TileMode.clamp,
+    );
 
     final paint = Paint()
       ..shader = gradient
@@ -147,7 +162,13 @@ class _SpotlightAdvancedPainter extends CustomPainter {
       stops.add(t);
     }
 
-    final gradient = ui.Gradient.radial(center, radius, colors, stops, TileMode.clamp);
+    final gradient = ui.Gradient.radial(
+      center,
+      radius,
+      colors,
+      stops,
+      TileMode.clamp,
+    );
 
     final paint = Paint()
       ..shader = gradient

@@ -24,7 +24,7 @@ class CommonCityDropDown extends StatelessWidget {
     this.isLoading = false,
     this.borderRadius = 8,
     this.enableInitalSelection = false,
-    this.contentPadding,  
+    this.contentPadding,
   });
   final String selectedState;
   final String selectedCountry;
@@ -39,14 +39,16 @@ class CommonCityDropDown extends StatelessWidget {
   final bool isRequired;
   final bool isLoading;
   final double borderRadius;
-  final bool enableInitalSelection;  
+  final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
   @override
   Widget build(BuildContext context) {
-    final city = getTheCities(
-      country: selectedCountry,
-      state: selectedState,
-    ).map((e) => MapEntry(e, e)).toList()..sort((a, b) => a.key.compareTo(b.key));
+    final city =
+        getTheCities(
+            country: selectedCountry,
+            state: selectedState,
+          ).map((e) => MapEntry(e, e)).toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
     return CommonDropDown<MapEntry<String, String>>(
       hint: hint,
       prefix: prefix,
@@ -59,7 +61,9 @@ class CommonCityDropDown extends StatelessWidget {
       borderColor: borderColor,
       initalValue: initalCity != null
           ? city.firstWhere(
-              (element) => element.key.trim().toLowerCase() == initalCity!.trim().toLowerCase(),
+              (element) =>
+                  element.key.trim().toLowerCase() ==
+                  initalCity!.trim().toLowerCase(),
               orElse: () => city.first,
             )
           : null,
@@ -82,7 +86,8 @@ class CommonCityDropDown extends StatelessWidget {
     List<Map<String, dynamic>>? selectedCountryData;
 
     for (final countryData in allStatesWithCities) {
-      if (countryData is Map<String, dynamic> && countryData.containsKey(country)) {
+      if (countryData is Map<String, dynamic> &&
+          countryData.containsKey(country)) {
         selectedCountryData = countryData[country];
         break;
       }

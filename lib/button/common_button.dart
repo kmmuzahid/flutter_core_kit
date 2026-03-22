@@ -1,9 +1,6 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
-import '../text/common_text.dart';
-import '../utils/core_screen_utils.dart';
-
 class CommonButton extends StatefulWidget {
   const CommonButton({
     required this.titleText,
@@ -320,7 +317,7 @@ class _CommonButtonState extends State<CommonButton>
               child: IgnorePointer(
                 child: AnimatedBuilder(
                   animation: _animation,
-                  builder: (_, __) => CustomPaint(
+                  builder: (_, _) => CustomPaint(
                     painter: _BorderLoaderPainter(
                       _animation.value,
                       loaderColor,

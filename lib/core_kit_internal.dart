@@ -1,6 +1,6 @@
 /// Internal library exports - for use within core_kit package only.
 /// Do not import this in external code.
-library core_kit_internal;
+library;
 
 // Re-export core_kit public API
 export 'core_kit.dart';

@@ -29,10 +29,10 @@ class ResponseState<T> {
     return ResponseState<T>(
       data: data ?? this.data,
       isRequesting: isRequesting ?? this.isRequesting,
-      message: error ?? this.message,
+      message: error ?? message,
       cancelToken: cancelToken ?? this.cancelToken,
       isSuccess: isSuccess ?? this.isSuccess,
-      statusCode: responseCode ?? this.statusCode,
+      statusCode: responseCode ?? statusCode,
     );
   }
 }

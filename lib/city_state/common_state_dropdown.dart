@@ -39,12 +39,13 @@ class CommonStateDropdown extends StatelessWidget {
   final TextStyle? textStyle;
   final bool isLoading;
   final double borderRadius;
-  final bool enableInitalSelection;  
+  final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
   @override
   Widget build(BuildContext context) {
-    final state = getStates(country: countryName).map((e) => MapEntry(e, e)).toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
+    final state =
+        getStates(country: countryName).map((e) => MapEntry(e, e)).toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
 
     return CommonDropDown<MapEntry<String, String>>(
       key: const Key('Location_united_states'),
@@ -53,13 +54,13 @@ class CommonStateDropdown extends StatelessWidget {
       contentPadding: contentPadding,
       borderRadius: borderRadius,
       isLoading: isLoading,
-      backgroundColor: backgroundColor, 
+      backgroundColor: backgroundColor,
       fontStyle: fontStyle,
       items: state,
       textStyle: textStyle,
       borderColor: borderColor,
       initalValue: initialValue,
-      enableInitalSelection: enableInitalSelection, 
+      enableInitalSelection: enableInitalSelection,
       isRequired: isRequired,
       onChanged: onChanged,
       nameBuilder: (states) {
@@ -75,7 +76,8 @@ class CommonStateDropdown extends StatelessWidget {
     List<Map<String, dynamic>>? selectedCountryData;
 
     for (final countryData in allStatesWithCities) {
-      if (countryData is Map<String, dynamic> && countryData.containsKey(country)) {
+      if (countryData is Map<String, dynamic> &&
+          countryData.containsKey(country)) {
         selectedCountryData = countryData[country];
         break;
       }
@@ -84,7 +86,7 @@ class CommonStateDropdown extends StatelessWidget {
     final List<String> stateList = [];
 
     if (selectedCountryData != null) {
-      for (final stateData in selectedCountryData) { 
+      for (final stateData in selectedCountryData) {
         stateList.addAll(stateData.entries.map((e) => e.key).toList());
       }
     }

@@ -14,7 +14,12 @@ class FormBuilder<T> extends StatefulWidget {
     super.key,
   });
 
-  final Widget Function(BuildContext context, GlobalKey<FormState> formKey, T entity) builder;
+  final Widget Function(
+    BuildContext context,
+    GlobalKey<FormState> formKey,
+    T entity,
+  )
+  builder;
 
   final T entity;
   final ScrollPhysics? scrollPhysics;
@@ -37,7 +42,10 @@ class _FormBuilderState<T> extends State<FormBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final form = Form(key: _formKey, child: widget.builder(context, _formKey, entity));
+    final form = Form(
+      key: _formKey,
+      child: widget.builder(context, _formKey, entity),
+    );
     if (widget.scrollPhysics is NeverScrollableScrollPhysics) {
       return form;
     }

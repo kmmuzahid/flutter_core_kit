@@ -59,12 +59,15 @@ class _CommonTabBarState extends State<CommonTabBar> {
                 final isSelected = _selectedIndex == tabIndex;
 
                 final defaultSelectedStyle = BoxDecoration(
-                  color: secondaryColor, // Replace with AppColors.primaryColor if needed
+                  color:
+                      secondaryColor, // Replace with AppColors.primaryColor if needed
                   borderRadius: BorderRadius.circular(8),
                 );
 
                 final defaultUnselectedStyle = BoxDecoration(
-                  border: Border.all(color: secondaryColor), // Replace with AppColors.primaryColor
+                  border: Border.all(
+                    color: secondaryColor,
+                  ), // Replace with AppColors.primaryColor
                   borderRadius: BorderRadius.circular(8),
                 );
 
@@ -74,7 +77,9 @@ class _CommonTabBarState extends State<CommonTabBar> {
                 );
 
                 final defaultUnselectedTextStyle = TextStyle(
-                  color: _selectedIndex == tabIndex ? secondaryColor : primaryColor,
+                  color: _selectedIndex == tabIndex
+                      ? secondaryColor
+                      : primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: _selectedIndex == tabIndex ? 14 : 12,
                 );
@@ -101,8 +106,10 @@ class _CommonTabBarState extends State<CommonTabBar> {
                       child: Text(
                         widget.tabs[tabIndex],
                         style: isSelected
-                            ? (widget.selectedTextStyle ?? defaultSelectedTextStyle)
-                            : (widget.unselectedTextStyle ?? defaultUnselectedTextStyle),
+                            ? (widget.selectedTextStyle ??
+                                  defaultSelectedTextStyle)
+                            : (widget.unselectedTextStyle ??
+                                  defaultUnselectedTextStyle),
                       ),
                     ),
                   ),
@@ -112,7 +119,9 @@ class _CommonTabBarState extends State<CommonTabBar> {
           },
         ),
         const SizedBox(height: 16),
-        widget.isExpanded ? Expanded(child: _tabViewContent()) : _tabViewContent(),
+        widget.isExpanded
+            ? Expanded(child: _tabViewContent())
+            : _tabViewContent(),
       ],
     );
   }

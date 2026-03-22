@@ -1,5 +1,4 @@
 import 'package:core_kit/text_field/common_text_field.dart';
-import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +54,8 @@ class CommonDateInputTextField extends StatefulWidget {
   final bool? isValidationRequired;
 
   @override
-  State<CommonDateInputTextField> createState() => _CommonDateInputTextFieldState();
+  State<CommonDateInputTextField> createState() =>
+      _CommonDateInputTextFieldState();
 }
 
 class _CommonDateInputTextFieldState extends State<CommonDateInputTextField> {
