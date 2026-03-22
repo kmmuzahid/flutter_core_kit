@@ -19,9 +19,9 @@ class _ProtectedLintRule extends DartLintRule {
   static const _code = LintCode(
     name: 'protected_lint',
     problemMessage:
-        '{0} is annotated @Protected(depth: {1}) but is accessed from {2} folder level(s) away.',
+        '🔒 {0} is @Protected(depth: {1}) but accessed from {2} folders away.',
     correctionMessage:
-        'Only access {0} within {1} folder level(s) of its definition at "{3}".',
+        'Please only use {0} within {1} folder levels of its definition at "{3}".',
     errorSeverity: ErrorSeverity.ERROR,
   );
 
@@ -150,7 +150,7 @@ class _ProtectedLintRule extends DartLintRule {
         final code = LintCode(
           name: 'protected_import_lint',
           problemMessage:
-              'Importing {0} is illegal. It is annotated @Protected(depth: {1}) but accessed {2} folder level(s) away.',
+              '🚫 Import of {0} is illegal. It is @Protected(depth: {1}) but accessed {2} folder(s) away.',
           errorSeverity: ErrorSeverity.ERROR,
         );
         r.reportErrorForOffset(code, offset, length, [
