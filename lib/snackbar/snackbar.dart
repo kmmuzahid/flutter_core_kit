@@ -225,7 +225,6 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
     case SnackBarType.warning:
       return (colorScheme.tertiary, Icons.info_outline_rounded);
     case SnackBarType.info:
-    default:
       return (colorScheme.primary, Icons.info_outline_rounded);
   }
 }

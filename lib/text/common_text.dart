@@ -105,18 +105,6 @@ class CommonText extends StatelessWidget {
   Widget _withoutBorder(BuildContext context) =>
       Padding(padding: _edgeInsetsBuilder(), child: _textField(context));
 
-  WrapAlignment _convertAlignment() {
-    switch (alignment) {
-      case MainAxisAlignment.center:
-        return WrapAlignment.center;
-      case MainAxisAlignment.end:
-        return WrapAlignment.end;
-      case MainAxisAlignment.start:
-      default:
-        return WrapAlignment.start;
-    }
-  }
-
   String _formatNumbersInText(String text) {
     return text.replaceAllMapped(RegExp(r'\d+\.\d+'), (match) {
       final number = double.tryParse(match.group(0) ?? '0') ?? 0;
@@ -346,7 +334,6 @@ class _AdaptiveText extends StatelessWidget {
     }
 
     double fontSize = maxFontSize;
-    final baseFontSize = style.fontSize ?? 14.0;
 
     // Binary search for optimal font size
     double low = minFontSize;

@@ -89,7 +89,6 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   late bool _obscureText;
   int wordCount = 0;
   int lengthCount = 0;
-  bool _isErrorMessageShown = false;
 
   // bool get _hasController => widget.controller != null;
 
@@ -327,14 +326,6 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                         }
                       }
                     }
-
-                    // setState(() {
-                    if (error == null || error == '') {
-                      _isErrorMessageShown = false;
-                    } else {
-                      _isErrorMessageShown = true;
-                    }
-                    // });
 
                     // Return the error to show the error border, but return null for the message if showValidationMessage is false
                     return widget.showValidationMessage

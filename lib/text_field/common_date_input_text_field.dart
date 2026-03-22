@@ -92,7 +92,6 @@ class _CommonDateInputTextFieldState extends State<CommonDateInputTextField> {
   }
 
   Future<void> _openDatePicker(BuildContext context) async {
-    final now = DateTime.now();
     final firstDate = _calculateMinDate();
     final lastDate = _calculateMaxDate();
     final initialDate = _calculateInitialDate();

@@ -242,7 +242,6 @@ extension TimeOfDayParser on String {
       throw FormatException('Time string is empty');
     }
 
-    final localizations = MaterialLocalizations.of(context);
     final is24HourFormat = MediaQuery.of(context).alwaysUse24HourFormat;
 
     final trimmed = trim();
