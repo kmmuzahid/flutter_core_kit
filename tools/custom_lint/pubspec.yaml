@@ -7,7 +7,7 @@ environment:
   sdk: '>=3.10.4 <4.0.0'
 
 dependencies:
-  analyzer: any
-  custom_lint_builder: any
-  custom_lint: any
+  analyzer: ^6.0.0
+  custom_lint: ^2.1.0
+  custom_lint_builder: ^2.1.0
   path: any
