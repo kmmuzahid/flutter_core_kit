@@ -8,6 +8,7 @@ import 'package:core_kit/app_bar/common_app_bar.dart';
 import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/permission_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Library-private accessor for internal use within the core_kit package.
@@ -31,8 +32,7 @@ class PasswordObscureIcon {
 class coreKitInstanceSingleton {
   coreKitInstanceSingleton._();
 
-  static final coreKitInstanceSingleton _instance = coreKitInstanceSingleton
-      ._();
+  static final coreKitInstanceSingleton _instance = coreKitInstanceSingleton._();
   static coreKitInstanceSingleton get instance => _instance;
 
   late GlobalKey<NavigatorState> navigatorKey;
@@ -103,6 +103,10 @@ class PermissionHadlerColors {
     required this.normalColor,
   });
 }
+
+// ============================================================
+// Legacy wrapper — kept intact, do not modify
+// ============================================================
 
 class _LegacyInitWrapper extends StatefulWidget {
   const _LegacyInitWrapper({
@@ -183,10 +187,18 @@ class _LegacyInitWrapperState extends State<_LegacyInitWrapper> {
   }
 }
 
+// ============================================================
+// CoreKitConfig — abstract config with context injection
+// ============================================================
+
 /// Abstract class that defines required configuration for CoreKit.
 ///
 /// Implement this class to provide all required configurations for CoreKit.
 /// Use [CoreKitConfigDefaults] mixin to get default values for optional properties.
+///
+/// Context-aware getters (appbarConfig, permissionHandlerColors, etc.)
+/// can safely use [context] — it is injected by CoreKit before any
+/// getter is called.
 ///
 /// Example:
 /// ```dart
@@ -195,63 +207,93 @@ class _LegacyInitWrapperState extends State<_LegacyInitWrapper> {
 ///   String get imageBaseUrl => 'https://api.example.com/images/';
 ///
 ///   @override
-///   DioServiceConfig get dioConfig => DioServiceConfig(
-///     baseUrl: 'https://api.example.com',
-///     refreshTokenEndpoint: '/auth/refresh',
-///   );
+///   DioServiceConfig get dioConfig => DioServiceConfig(...);
 ///
 ///   @override
 ///   TokenProvider get tokenProvider => TokenProvider(...);
+///
+///   @override
+///   AppbarConfig? get appbarConfig => AppbarConfig(
+///     backgroundColor: context.colors.surface,
+///     titleStyle: TextStyle(color: context.colors.onSurface),
+///   );
+///
+///   @override
+///   PermissionHadlerColors? get permissionHandlerColors =>
+///     PermissionHadlerColors(
+///       errorColor: context.colors.error,
+///       actionColor: context.colors.primary,
+///       normalColor: context.colors.onSurface,
+///     );
 /// }
 /// ```
 abstract class CoreKitConfig {
-  /// Base URL for images.
+  BuildContext? _context;
+
+  /// The BuildContext injected by CoreKit after MaterialApp is built.
   ///
-  /// Used by [CommonImage] to build full image URLs from relative paths.
-  /// Should end with a trailing slash.
+  /// Safe to use inside any getter — CoreKit guarantees this is set
+  /// before appbarConfig, permissionHandlerColors, passwordObscureIcon,
+  /// and permissionHelperConfig are ever read.
+  ///
+  /// Do NOT use this inside imageBaseUrl, dioConfig, tokenProvider,
+  /// or designSize — those are read before context is available.
+  @protected
+  BuildContext get context {
+    assert(
+      _context != null,
+      '\n\ncoreKitInstance context is not available yet.\n'
+      'Only use `context` inside these getters:\n'
+      '  - appbarConfig\n'
+      '  - permissionHandlerColors\n'
+      '  - passwordObscureIcon\n'
+      '  - permissionHelperConfig\n'
+      'Do NOT use `context` in imageBaseUrl, dioConfig, tokenProvider, or designSize.\n',
+    );
+    return _context!;
+  }
+
+  /// Called internally by CoreKit once a valid BuildContext is available.
+  /// Do not call this manually.
+  @internal
+  void attachContext(BuildContext ctx) => _context = ctx;
+
+  // ── Pure values — context not available, do not use context here ──
+
+  /// Base URL for images.
+  /// Used by CommonImage to build full image URLs from relative paths.
   String get imageBaseUrl;
 
   /// Dio service configuration for network requests.
-  ///
-  /// Defines base URL, timeouts, and token refresh endpoint.
   DioServiceConfig get dioConfig;
 
   /// Token provider for authentication handling.
-  ///
-  /// Provides access token, refresh token, and token update logic.
   TokenProvider get tokenProvider;
 
-  /// Optional app bar configuration.
-  ///
-  /// Default: null (uses [AppbarConfig] defaults)
-  AppbarConfig? get appbarConfig;
-
-  /// Optional permission helper strings for localization.
-  ///
-  /// Default: null (uses English defaults)
-  PermissionHelperConfig? get permissionHelperConfig;
-
-  /// Optional permission handler colors for theming.
-  ///
-  /// Default: null (uses red/green/black defaults)
-  PermissionHadlerColors? get permissionHandlerColors;
-
-  /// Optional password obscure icon configuration.
-  ///
-  /// Default: null (uses standard visibility icons)
-  PasswordObscureIcon? get passwordObscureIcon;
-
   /// Design size for responsive scaling.
-  ///
-  /// Used by [CoreScreenUtils] to calculate responsive dimensions.
   /// Default: Size(428, 926) - iPhone 14 Pro Max dimensions
   Size get designSize;
+
+  // ── Context-aware — context is safe to use in these getters ──
+
+  /// Optional app bar configuration.
+  /// context is available here — use context.colors, context.theme, etc.
+  AppbarConfig? get appbarConfig => null;
+
+  /// Optional permission helper strings for localization.
+  /// context is available here.
+  PermissionHelperConfig? get permissionHelperConfig => null;
+
+  /// Optional permission handler colors for theming.
+  /// context is available here — use context.colors, context.theme, etc.
+  PermissionHadlerColors? get permissionHandlerColors => null;
+
+  /// Optional password obscure icon configuration.
+  /// context is available here — use context.colors, context.theme, etc.
+  PasswordObscureIcon? get passwordObscureIcon => null;
 }
 
 /// Mixin to provide default values for optional [CoreKitConfig] properties.
-///
-/// Implement this mixin with [CoreKitConfig] to avoid implementing
-/// all optional properties.
 ///
 /// Example:
 /// ```dart
@@ -260,26 +302,101 @@ abstract class CoreKitConfig {
 /// }
 /// ```
 mixin CoreKitConfigDefaults implements CoreKitConfig {
-  /// Returns null - uses [AppbarConfig] defaults
   @override
   AppbarConfig? get appbarConfig => null;
 
-  /// Returns null - uses English defaults
   @override
   PermissionHelperConfig? get permissionHelperConfig => null;
 
-  /// Returns null - uses red/green/black defaults
   @override
   PermissionHadlerColors? get permissionHandlerColors => null;
 
-  /// Returns null - uses standard visibility icons
   @override
   PasswordObscureIcon? get passwordObscureIcon => null;
 
-  /// Returns Size(428, 926) - iPhone 14 Pro Max dimensions
   @override
   Size get designSize => const Size(428, 926);
 }
+
+// ============================================================
+// _CoreKitInitWrapper
+//
+// Lives inside MaterialApp builder: — context is always valid here.
+// Injects context into config, then reads all context-aware getters.
+// Holds child hostage until ready, then releases — identical to legacy.
+// ============================================================
+
+class _CoreKitInitWrapper extends StatefulWidget {
+  const _CoreKitInitWrapper({required this.config, required this.child});
+
+  final CoreKitConfig config;
+  final Widget? child;
+
+  @override
+  State<_CoreKitInitWrapper> createState() => _CoreKitInitWrapperState();
+}
+
+class _CoreKitInitWrapperState extends State<_CoreKitInitWrapper> {
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Warm up CoreScreenUtils on dependency changes — same as legacy
+    CoreScreenUtils.init(context, () {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      CoreScreenUtils.init(context, () {
+        final instance = coreKitInstance;
+        final config = widget.config;
+
+        // ✅ Inject context first — all context-aware getters are now safe
+        config.attachContext(context);
+
+        // Now read context-aware getters safely
+        if (config.permissionHelperConfig != null) {
+          instance.permissionHelperConfig = config.permissionHelperConfig!;
+        }
+        if (config.permissionHandlerColors != null) {
+          instance.permissionHandlerColors = config.permissionHandlerColors!;
+        }
+        if (config.passwordObscureIcon != null) {
+          instance.passWordObscureIcon = config.passwordObscureIcon!;
+        }
+
+        instance.appbarConfig = config.appbarConfig ?? AppbarConfig();
+        if (instance.appbarConfig.onBack == null) {
+          instance.appbarConfig = instance.appbarConfig.copyWith(
+            onBack: () => instance.navigatorKey.currentState?.pop(),
+          );
+        }
+
+        DioService.init(config: config.dioConfig, tokenProvider: config.tokenProvider);
+
+        // Release child — identical to legacy setState pattern
+        setState(() => _initialized = true);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ✅ Identical to legacy _SetChild:
+    // child always stays in the tree (theme extensions available)
+    // but navigation is blocked until _initialized
+    return _initialized
+        ? widget.child ?? const SizedBox.shrink()
+        : Scaffold(body: widget.child ?? const SizedBox.shrink());
+  }
+}
+
+// ============================================================
+// CoreKit — main widget
+// ============================================================
 
 /// CoreKit - Main application wrapper widget.
 ///
@@ -290,16 +407,11 @@ mixin CoreKitConfigDefaults implements CoreKitConfig {
 /// - Permission handling
 /// - Theme and navigation
 ///
-/// The [config] parameter is required and should implement [CoreKitConfig].
-/// Use [CoreKitConfigDefaults] mixin for optional properties.
-///
-/// If [navigatorKey] is not provided, one will be created automatically.
-/// Access the navigator key anywhere via [CoreKit.navigatorKey].
-///
 /// Example using standard routing:
 /// ```dart
 /// CoreKit(
 ///   config: MyAppConfig(),
+///   navigatorKey: myNavigatorKey,
 ///   home: HomeScreen(),
 ///   theme: ThemeData(...),
 /// )
@@ -309,7 +421,8 @@ mixin CoreKitConfigDefaults implements CoreKitConfig {
 /// ```dart
 /// CoreKit.router(
 ///   config: MyAppConfig(),
-///   routerConfig: appRouter.config(),
+///   navigatorKey: goRouter.routerDelegate.navigatorKey,
+///   routerConfig: goRouter,
 ///   theme: ThemeData(...),
 /// )
 /// ```
@@ -317,98 +430,45 @@ class CoreKit extends StatefulWidget {
   /// Required configuration implementing [CoreKitConfig].
   final CoreKitConfig config;
 
-  /// Application theme.
+  /// Navigator key — must be the same key used by your router.
+  /// For GoRouter: pass `goRouter.routerDelegate.navigatorKey`
+  /// For standard routing: create a GlobalKey and pass it here.
+  final GlobalKey<NavigatorState> navigatorKey;
+
   final ThemeData? theme;
-
-  /// Dark theme for dark mode support.
   final ThemeData? darkTheme;
-
-  /// Theme mode (system, light, or dark).
   final ThemeMode? themeMode;
-
-  /// Application title shown in task switcher.
   final String title;
-
-  /// Restoration scope ID for state restoration.
   final String? restorationScopeId;
-
-  /// Default locale for the application.
   final Locale? locale;
-
-  /// Localization delegates for translations.
   final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
-
-  /// Callback for resolving list of locales.
   final LocaleListResolutionCallback? localeListResolutionCallback;
-
-  /// Callback for resolving a single locale.
   final LocaleResolutionCallback? localeResolutionCallback;
-
-  /// List of supported locales.
   final Iterable<Locale> supportedLocales;
-
-  /// Show performance overlay (debug only).
   final bool showPerformanceOverlay;
-
-  /// Checkerboard offscreen layers (debug only).
   final bool checkerboardOffscreenLayers;
-
-  /// Checkerboard raster cache images (debug only).
   final bool checkerboardRasterCacheImages;
-
-  /// Show semantics debugger (debug only).
   final bool showSemanticsDebugger;
-
-  /// Show debug banner.
   final bool debugShowCheckedModeBanner;
-
-  /// Keyboard shortcuts map.
   final Map<ShortcutActivator, Intent>? shortcuts;
-
-  /// Actions map.
   final Map<Type, Action<Intent>>? actions;
-
-  /// Show material grid (debug only).
   final bool debugShowMaterialGrid;
-
-  /// Home widget (for standard routing, not used with .router).
   final Widget? home;
-
-  /// Routes map (for standard routing, not used with .router).
   final Map<String, WidgetBuilder> routes;
-
-  /// Initial route (for standard routing, not used with .router).
   final String? initialRoute;
-
-  /// Route generator callback (for standard routing, not used with .router).
   final RouteFactory? onGenerateRoute;
-
-  /// Unknown route handler (for standard routing, not used with .router).
   final RouteFactory? onUnknownRoute;
-
-  /// Navigator observers (for standard routing, not used with .router).
   final List<NavigatorObserver> navigatorObservers;
-
-  /// Router configuration (required for .router constructor).
   final RouterConfig<Object>? routerConfig;
-
-  /// Ensure screen size is initialized.
   final bool ensureScreenSize;
-
-  /// Access the navigator key created by CoreKit.
-  ///
-  /// Available immediately after CoreKit widget is initialized.
-  /// Use this for navigation from anywhere in the app:
-  /// ```dart
-  /// CoreKit.navigatorKey.currentState?.push(...)
-  /// CoreKit.navigatorKey.currentContext  // for theme access
-  /// ```
-  static GlobalKey<NavigatorState> get navigatorKey =>
-      coreKitInstance.navigatorKey;
+  final ScrollBehavior? scrollBehavior;
+  final Duration themeAnimationDuration;
+  final Curve themeAnimationCurve;
 
   const CoreKit({
     super.key,
     required this.config,
+    required this.navigatorKey,
     this.ensureScreenSize = true,
     this.theme,
     this.darkTheme,
@@ -425,6 +485,8 @@ class CoreKit extends StatefulWidget {
     this.checkerboardRasterCacheImages = false,
     this.showSemanticsDebugger = false,
     this.debugShowCheckedModeBanner = true,
+    this.themeAnimationDuration = const Duration(milliseconds: 300),
+    this.themeAnimationCurve = Curves.easeInOut,
     this.shortcuts,
     this.actions,
     this.debugShowMaterialGrid = false,
@@ -434,19 +496,24 @@ class CoreKit extends StatefulWidget {
     this.onGenerateRoute,
     this.onUnknownRoute,
     this.navigatorObservers = const <NavigatorObserver>[],
+    this.scrollBehavior,
   }) : routerConfig = null;
 
   const CoreKit.router({
     super.key,
     required this.config,
     required this.routerConfig,
+    required this.navigatorKey,
     this.ensureScreenSize = true,
     this.theme,
     this.darkTheme,
     this.themeMode,
     this.title = '',
     this.restorationScopeId,
+    this.scrollBehavior,
     this.locale,
+    this.themeAnimationDuration = const Duration(milliseconds: 300),
+    this.themeAnimationCurve = Curves.easeInOut,
     this.localizationsDelegates,
     this.localeListResolutionCallback,
     this.localeResolutionCallback,
@@ -467,82 +534,35 @@ class CoreKit extends StatefulWidget {
        navigatorObservers = const <NavigatorObserver>[];
 
   @override
-  State<CoreKit> createState() => coreKitInstanceState();
+  State<CoreKit> createState() => _CoreKitState();
 }
 
-// ignore: camel_case_types
-class coreKitInstanceState extends State<CoreKit> {
-  bool _initialized = false;
-  late final GlobalKey<NavigatorState> _navigatorKey;
-
+class _CoreKitState extends State<CoreKit> {
   @override
   void initState() {
     super.initState();
-    _navigatorKey = GlobalKey<NavigatorState>();
+    // Assign all context-free config immediately — safe in initState.
+    // Context-dependent config (appbarConfig, permissionHandlerColors,
+    // passwordObscureIcon, permissionHelperConfig) is handled inside
+    // _CoreKitInitWrapper after context is injected via attachContext.
     final instance = coreKitInstance;
     final config = widget.config;
-    instance.navigatorKey = _navigatorKey;
+
+    instance.navigatorKey = widget.navigatorKey;
     instance.imageBaseUrl = config.imageBaseUrl;
     instance.designSize = config.designSize;
     instance.dioServiceConfig = config.dioConfig;
     instance.tokenProvider = config.tokenProvider;
-    if (config.permissionHelperConfig != null) {
-      instance.permissionHelperConfig = config.permissionHelperConfig!;
-    }
-    if (config.permissionHandlerColors != null) {
-      instance.permissionHandlerColors = config.permissionHandlerColors!;
-    }
-    if (config.passwordObscureIcon != null) {
-      instance.passWordObscureIcon = config.passwordObscureIcon!;
-    }
-    instance.appbarConfig = config.appbarConfig ?? AppbarConfig();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _initializeWithContext(context);
-  }
-
-  void _initializeWithContext(BuildContext context) {
-    if (_initialized) return;
-    CoreScreenUtils.init(context, () {
-      final instance = coreKitInstance;
-      final config = widget.config;
-      if (instance.appbarConfig.onBack == null) {
-        instance.appbarConfig = instance.appbarConfig.copyWith(
-          onBack: () => instance.navigatorKey.currentState?.pop(),
-        );
-      }
-      DioService.init(
-        config: config.dioConfig,
-        tokenProvider: config.tokenProvider,
-      );
-      setState(() => _initialized = true);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_initialized) {
-      // Show a loading screen or splash while initializing
-      return MaterialApp(
-        navigatorKey: _navigatorKey,
-        theme: widget.theme,
-        darkTheme: widget.darkTheme,
-        themeMode: widget.themeMode,
-        title: widget.title,
-        home: Scaffold(
-          backgroundColor:
-              widget.theme?.scaffoldBackgroundColor ?? Colors.white,
-          body: const Center(child: CircularProgressIndicator()),
-        ),
-      );
-    }
-
     if (widget.routerConfig != null) {
       return MaterialApp.router(
         key: widget.key,
+        scrollBehavior: widget.scrollBehavior,
+        themeAnimationDuration: widget.themeAnimationDuration,
+        themeAnimationCurve: widget.themeAnimationCurve,
         theme: widget.theme,
         darkTheme: widget.darkTheme,
         themeMode: widget.themeMode,
@@ -561,14 +581,18 @@ class coreKitInstanceState extends State<CoreKit> {
         shortcuts: widget.shortcuts,
         actions: widget.actions,
         debugShowMaterialGrid: widget.debugShowMaterialGrid,
-        routerConfig: widget.routerConfig!,
+        routerConfig: widget.routerConfig,
+        builder: (context, child) => _CoreKitInitWrapper(config: widget.config, child: child),
       );
     }
 
     return MaterialApp(
       key: widget.key,
-      navigatorKey: _navigatorKey,
+      scrollBehavior: widget.scrollBehavior,
+      navigatorKey: widget.navigatorKey,
       theme: widget.theme,
+      themeAnimationDuration: widget.themeAnimationDuration,
+      themeAnimationCurve: widget.themeAnimationCurve,
       darkTheme: widget.darkTheme,
       themeMode: widget.themeMode,
       title: widget.title,
@@ -592,6 +616,7 @@ class coreKitInstanceState extends State<CoreKit> {
       onGenerateRoute: widget.onGenerateRoute,
       onUnknownRoute: widget.onUnknownRoute,
       navigatorObservers: widget.navigatorObservers,
+      builder: (context, child) => _CoreKitInitWrapper(config: widget.config, child: child),
     );
   }
 }

@@ -14,6 +14,8 @@ class CoreScreenUtils {
   static double? _designWidth;
   static double? _designHeight;
 
+  static Size get deviceSize => _deviceSize ?? coreKitInstance.designSize;
+
   static void init(BuildContext context, VoidCallback onComplete) {
     _deviceSize = MediaQuery.of(context).size;
     _designWidth = coreKitInstance.designSize.width;
