@@ -38,6 +38,7 @@ class CommonText extends StatelessWidget {
     this.height,
     this.textScaleFactor = .9,
     this.preventScaling = false,
+    this.gradient,
   });
 
   final double left;
@@ -73,6 +74,7 @@ class CommonText extends StatelessWidget {
   final double? height;
   final double textScaleFactor;
   final bool preventScaling;
+  final Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
@@ -169,25 +171,14 @@ class CommonText extends StatelessWidget {
       // For multiline text
       if (maxLines != null && maxLines! > 1) {
         if (preventScaling) {
-          return ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return const LinearGradient(
-                colors: [Colors.black, Colors.transparent],
-                stops: [0.8, 1.0],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.dstIn,
-            child: Text(
-              formattedData,
-              maxLines: maxLines,
-              overflow: effectiveOverflow,
-              textAlign: textAlign,
-              softWrap: softWrap ?? true,
-              textDirection: textDirection ?? TextDirection.ltr,
-              style: effectiveTextStyle,
-            ),
+          return Text(
+            formattedData,
+            maxLines: maxLines,
+            overflow: effectiveOverflow,
+            textAlign: textAlign,
+            softWrap: softWrap ?? true,
+            textDirection: textDirection ?? TextDirection.ltr,
+            style: effectiveTextStyle,
           );
         } else {
           return LayoutBuilder(
@@ -245,7 +236,16 @@ class CommonText extends StatelessWidget {
       children: [
         ?preffix,
         if (preffix != null) 10.width,
-        Flexible(child: buildText()),
+        Flexible(
+          child: gradient != null
+              ? ShaderMask(
+                  shaderCallback: (bounds) =>
+                      gradient!.createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+                  blendMode: BlendMode.dstIn,
+                  child: buildText(),
+                )
+              : buildText(),
+        ),
         if (suffix != null) 10.width,
         ?suffix,
       ],

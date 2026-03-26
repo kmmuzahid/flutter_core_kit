@@ -73,35 +73,21 @@ extension responsiveDouble on double {
 }
 
 // ---------------------------------------------------------------------------
-// Aspect ratio extension – Size
+// Aspect ratio extensions
 // ---------------------------------------------------------------------------
 
-extension AspectRatioRecord on (num width, num height) {
-  double get ar => Size($1.toDouble(), $2.toDouble()).ar;
-}
-
-extension WidgetAspectRatio on Widget {
-  Widget toAr(num width, num height) => AspectRatio(aspectRatio: (width, height).ar, child: this);
-}
-
 extension AspectRatioExtension on Size {
-  /// Returns the aspect ratio of this [Size] treated as Figma widget
-  /// dimensions, scaled to fit the actual device screen.
+  /// Wraps a placeholder in a width-constrained [AspectRatio] using this
+  /// [Size] as the Figma widget dimensions.
   ///
-  /// The design frame dimensions come from [CoreScreenUtils.init] — no extra
-  /// arguments needed.
+  /// Prefer using [WidgetAspectRatio.toAr] on a real widget, or the record
+  /// extension `(207, 232).ar` directly inside [AspectRatio.aspectRatio].
   ///
-  /// Falls back to the raw Figma ratio (width / height) if called before
-  /// [CoreScreenUtils.init].
-  ///
-  /// Usage:
+  /// Raw ratio (no SizedBox) — useful when you only need the double:
   /// ```dart
-  /// AspectRatio(
-  ///   aspectRatio: Size(358, 200).ar,
-  ///   child: MyCard(),
-  /// )
+  /// AspectRatio(aspectRatio: Size(207, 232).arValue, child: MyCard())
   /// ```
-  double get ar {
+  double get arValue {
     assert(height != 0, 'Size.height must not be zero');
 
     final designW = CoreScreenUtils._designWidth;
@@ -117,9 +103,31 @@ extension AspectRatioExtension on Size {
       return width / height;
     }
 
-    final scaledWidth = width * (device.width / designW);
-    final scaledHeight = height * (device.height / designH);
+    final scale = device.width / designW < device.height / designH
+        ? device.width / designW
+        : device.height / designH;
 
-    return scaledWidth / scaledHeight;
+    return (width * scale) / (height * scale);
   }
+}
+
+extension AspectRatioRecord on (num width, num height) {
+  /// Raw aspect ratio double — use inside [AspectRatio.aspectRatio].
+  /// ```dart
+  /// AspectRatio(aspectRatio: (207, 232).arValue, child: MyCard())
+  /// ```
+  double get arValue => Size($1.toDouble(), $2.toDouble()).arValue;
+}
+
+extension WidgetAspectRatio on Widget {
+  /// Constrains the widget to a responsive width and derives its height
+  /// automatically via [AspectRatio] — no [SizedBox] needed at the call site.
+  ///
+  /// ```dart
+  /// MyCard().toAr(207, 232)
+  /// ```
+  Widget toAr(num width, num height) => SizedBox(
+    width: width.toDouble().w,
+    child: AspectRatio(aspectRatio: (width, height).arValue, child: this),
+  );
 }

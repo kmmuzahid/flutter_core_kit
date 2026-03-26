@@ -90,80 +90,79 @@ class _CommonButtonState extends State<CommonButton>
     return padding.resolve(Directionality.of(context));
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final elevatedButtonTheme = Theme.of(context).elevatedButtonTheme;
 
     // Extract theme values
     final themeShape = elevatedButtonTheme.style?.shape?.resolve({});
-    final resolvedShape = themeShape is RoundedRectangleBorder
-        ? themeShape
-        : null;
-    final themeBorderRadius = resolvedShape?.borderRadius
-        .resolve(TextDirection.ltr)
-        .topLeft
-        .x;
+    final resolvedShape = themeShape is RoundedRectangleBorder ? themeShape : null;
+
+    final themeBorderRadius = resolvedShape?.borderRadius.resolve(TextDirection.ltr).topLeft.x;
+
     final themeBorderWidth = resolvedShape?.side.width;
     final themeBorderColor = resolvedShape?.side.color;
+
     final themeMinSize = elevatedButtonTheme.style?.minimumSize?.resolve({});
     final themePadding = elevatedButtonTheme.style?.padding?.resolve({});
-    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor
-        ?.resolve({});
+
+    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({});
+
     final titleColor = elevatedButtonTheme.style?.textStyle?.resolve({})?.color;
-    final themeDisabledBackgroundColor = elevatedButtonTheme
-        .style
-        ?.backgroundColor
-        ?.resolve({WidgetState.disabled});
-    final themeDisabledForegroundColor = elevatedButtonTheme
-        .style
-        ?.foregroundColor
-        ?.resolve({WidgetState.disabled});
+
+    final themeDisabledBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({
+      WidgetState.disabled,
+    });
+
+    final themeDisabledForegroundColor = elevatedButtonTheme.style?.foregroundColor?.resolve({
+      WidgetState.disabled,
+    });
+
     final themeElevation = elevatedButtonTheme.style?.elevation?.resolve({});
+
     final themeTextStyle = elevatedButtonTheme.style?.textStyle?.resolve({});
 
-    // Resolve final values: widget param > theme > default
+    // Resolve final values
     final borderRadius = widget.buttonRadius?.r ?? themeBorderRadius ?? 8.0;
+
     final borderWidth = widget.borderWidth?.w ?? themeBorderWidth ?? 1.5;
-    final borderColor =
-        widget.borderColor ?? themeBorderColor ?? Colors.transparent;
+
+    final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
+
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
 
     final backgroundColor =
-        widget.buttonColor ??
-        themeBackgroundColor ??
-        coreKitInstance.primaryColor;
+        widget.buttonColor ?? themeBackgroundColor ?? coreKitInstance.primaryColor;
+
     final foregroundColor =
-        widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
+      widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
+
     final loaderColor =
-        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ??
-        coreKitInstance.secondaryColor;
+        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ?? coreKitInstance.secondaryColor;
+
     final disabledBackgroundColor =
         widget.buttonColor ?? themeDisabledBackgroundColor ?? backgroundColor;
+
     final disabledForegroundColor =
         widget.titleColor ?? themeDisabledForegroundColor ?? foregroundColor;
+
     final buttonElevation = widget.elevation ?? themeElevation ?? 2.0;
 
     final padding = toEdgeInsets(
       context,
-      widget.padding ??
-          themePadding ??
-          const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      widget.padding ?? themePadding ??
+        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
     );
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool hasBoundedWidth = constraints.maxWidth.isFinite;
-        final double maxAvailableWidth = hasBoundedWidth
-            ? constraints.maxWidth
-            : 0;
+        final double maxAvailableWidth = hasBoundedWidth ? constraints.maxWidth : 0;
 
         final textStyle = (themeTextStyle ?? const TextStyle()).copyWith(
           fontFamily: coreKitInstance.fontFamily,
           fontSize: fontSize(elevatedButtonTheme),
-          fontWeight:
-              widget.titleWeight ??
-              themeTextStyle?.fontWeight ??
-              FontWeight.w600,
+          fontWeight: widget.titleWeight ?? themeTextStyle?.fontWeight ?? FontWeight.w600,
         );
 
         final double minRequiredWidth = _measureMinWidth(
@@ -172,40 +171,51 @@ class _CommonButtonState extends State<CommonButton>
           padding: padding,
         );
 
-        final double themeMinWidth = themeMinSize?.width ?? 88.0;
+        // FIX START
+        final double? themeMinWidthRaw = themeMinSize?.width;
+        final bool isThemeFullWidth = themeMinWidthRaw == double.infinity;
+
+        final double themeMinWidth = isThemeFullWidth ? 0 : (themeMinWidthRaw ?? 88.0);
+        // FIX END
+
         final double requestedWidth = widget.buttonWidth ?? double.nan;
 
         double? calculatedWidth;
 
-        // CASE 1: buttonWidth == double.infinity
+        // CASE 1: buttonWidth == infinity
         if (requestedWidth == double.infinity) {
           calculatedWidth = hasBoundedWidth ? maxAvailableWidth : null;
         }
-        // CASE 2: explicit width provided
+
+        // CASE 2: explicit width
         else if (!requestedWidth.isNaN) {
-          if (hasBoundedWidth) {
-            calculatedWidth = requestedWidth.clamp(
-              minRequiredWidth,
-              maxAvailableWidth,
-            );
+          if (requestedWidth == double.infinity) {
+            calculatedWidth = hasBoundedWidth ? maxAvailableWidth : null;
+          } else if (hasBoundedWidth) {
+            calculatedWidth = requestedWidth.clamp(minRequiredWidth, maxAvailableWidth);
           } else {
             calculatedWidth = requestedWidth;
           }
         }
-        // CASE 3: auto size
+
+        // CASE 3: auto
         else {
           if (hasBoundedWidth) {
+            if (isThemeFullWidth) {
+              calculatedWidth = maxAvailableWidth;
+            } else {
             calculatedWidth = minRequiredWidth.clamp(
               themeMinWidth,
               maxAvailableWidth,
             );
+            }
           } else {
-            calculatedWidth = minRequiredWidth;
+            calculatedWidth = isThemeFullWidth ? null : minRequiredWidth;
           }
         }
 
         return SizedBox(
-          width: calculatedWidth, // may be null — this is correct
+          width: calculatedWidth,
           height: minHeight,
           child: _buildButton(
             textStyle: textStyle,
@@ -226,7 +236,7 @@ class _CommonButtonState extends State<CommonButton>
     );
   }
 
-  double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
+double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
     final themeTextStyle = elevatedButtonTheme.style?.textStyle?.resolve({});
     return widget.titleSize?.sp ?? themeTextStyle?.fontSize?.sp ?? 16.sp;
   }
