@@ -102,6 +102,10 @@ abstract class CoreKitConfig {
   PermissionHelperConfig? get permissionHelperConfig => null;
   PermissionHadlerColors? get permissionHandlerColors => null;
   PasswordObscureIcon? get passwordObscureIcon => null;
+  /// New: UI shown before CoreKit is ready
+  Widget? get preInitChild => null;
+
+
 }
 
 mixin CoreKitConfigDefaults implements CoreKitConfig {
@@ -115,6 +119,8 @@ mixin CoreKitConfigDefaults implements CoreKitConfig {
   PasswordObscureIcon? get passwordObscureIcon => null;
   @override
   Size get designSize => const Size(428, 926);
+  @override
+  Widget? get preInitChild => Container();
 }
 
 // ============================================================
@@ -180,7 +186,7 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
   @override
   Widget build(BuildContext context) {
     if (!_dioInitialized) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: widget.config.preInitChild ?? Container());
     }
     return widget.child;
   }
