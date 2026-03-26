@@ -289,7 +289,10 @@ double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
                 if (widget.buttonColor != null || widget.gradient != null) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: widget.buttonColor,
+                      // Use null for color when gradient is provided,
+                      // since BoxDecoration does not allow both simultaneously.
+                      color: widget.gradient != null ? null : widget.buttonColor,
+                      gradient: widget.gradient,
                       borderRadius: BorderRadius.circular(borderRadius),
                       border: Border.all(
                         color: borderColor,
