@@ -80,6 +80,10 @@ extension AspectRatioRecord on (num width, num height) {
   double get ar => Size($1.toDouble(), $2.toDouble()).ar;
 }
 
+extension WidgetAspectRatio on Widget {
+  Widget toAr(num width, num height) => AspectRatio(aspectRatio: (width, height).ar, child: this);
+}
+
 extension AspectRatioExtension on Size {
   /// Returns the aspect ratio of this [Size] treated as Figma widget
   /// dimensions, scaled to fit the actual device screen.

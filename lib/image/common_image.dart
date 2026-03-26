@@ -40,7 +40,7 @@ class CommonImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (enableAspectRatio && width != null && height != null && width! > 0 && height! > 0) {
-      return AspectRatio(aspectRatio: (width ?? 0, height ?? 0).ar, child: _genralChild());
+      return _genralChild().toAr(width!, height!);
     }
     return _genralChild();
   }
