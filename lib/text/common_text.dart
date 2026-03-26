@@ -241,7 +241,7 @@ class CommonText extends StatelessWidget {
               ? ShaderMask(
                   shaderCallback: (bounds) =>
                       gradient!.createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-                  blendMode: BlendMode.dstIn,
+                  blendMode: BlendMode.srcIn,
                   child: buildText(),
                 )
               : buildText(),

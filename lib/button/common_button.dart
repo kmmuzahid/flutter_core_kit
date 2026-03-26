@@ -22,6 +22,7 @@ class CommonButton extends StatefulWidget {
     this.elevation,
     this.gradient,
     this.padding,
+    this.titleGradient,
   });
   final VoidCallback? onTap;
   final String titleText;
@@ -40,6 +41,7 @@ class CommonButton extends StatefulWidget {
   final MainAxisAlignment alignment;
   final double? elevation;
   final Gradient? gradient;
+  final Gradient? titleGradient;
   final EdgeInsetsGeometry? padding;
 
   @override
@@ -312,6 +314,7 @@ double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
               text: widget.titleText,
               preffix: widget.prefix,
               suffix: widget.suffix,
+              gradient: widget.titleGradient,
               maxLines: 1,
               overflow: TextOverflow.visible,
               fontSize: fontSize(elevatedButtonThemeData),
