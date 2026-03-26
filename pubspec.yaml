@@ -4,8 +4,7 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: ^3.10.4 
-  flutter: ">=1.17.0"
+  sdk: ^3.11.1
 
 dependencies:
   flutter:
@@ -24,7 +23,7 @@ dependencies:
   intl_phone_field_v2:
   # another_flushbar:
   share_plus:
-  path: ^1.9.1
+  path:
   
 
   analyzer: any
@@ -34,7 +33,10 @@ dependencies:
   http_parser: any
 dev_dependencies:
   flutter_test:
-    sdk: flutter  
+    sdk: flutter
+  custom_lint:
+  core_kit_lints:
+    path: tools/custom_lint  
 
 flutter:
   uses-material-design: true

@@ -19,6 +19,7 @@ class CommonImage extends StatelessWidget {
     this.enableGrayscale = false,
     super.key,
     this.borderRadiusCustom,
+    this.enableAspectRatio = false,
   });
   final String src;
   final String? defaultImage;
@@ -30,6 +31,7 @@ class CommonImage extends StatelessWidget {
   final bool enableGrayscale;
   final BoxFit fill;
   final BorderRadius? borderRadiusCustom;
+  final bool enableAspectRatio;
 
   BorderRadius getBorderRadius() {
     return borderRadiusCustom ?? BorderRadius.circular(borderRadius.r);
@@ -37,11 +39,18 @@ class CommonImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (enableAspectRatio && width != null && height != null && width! > 0 && height! > 0) {
+      return AspectRatio(aspectRatio: (width ?? 0, height ?? 0).ar, child: _genralChild());
+    }
+    return _genralChild();
+  }
+
+  Widget _genralChild() {
     try {
       if (src.isEmpty) return placeholder();
-
+    
       if (!enableGrayscale) return getImage();
-
+    
       return ColorFiltered(
         colorFilter: const ColorFilter.matrix(<double>[
           0.2126, 0.7152, 0.0722, 0, 0, // red

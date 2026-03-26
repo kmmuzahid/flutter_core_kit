@@ -32,8 +32,7 @@ class _ProtectedLintRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addSimpleIdentifier((node) {
-      final dynamic n = node;
-      final element = n.staticElement;
+      final element = node.staticElement;
       if (element is ClassElement) {
         _check(resolver, reporter, element, node.offset, node.length);
       }
@@ -47,14 +46,13 @@ class _ProtectedLintRule extends DartLintRule {
     });
 
     context.registry.addImportDirective((node) {
-      final dynamic d = node;
-      final libraryElement = d.element?.importedLibrary;
+      final libraryElement = node.element?.importedLibrary;
       if (libraryElement == null) return;
 
-      // Using dynamic to bypass resolution issues with Namespace.definedNames in some analyzer versions
-      final dynamic namespace = libraryElement.exportNamespace;
-      final Iterable<dynamic> definedNames = namespace.definedNames.values;
-      final classes = definedNames.whereType<ClassElement>();
+      // Get all exported classes from the imported library
+      final classes = libraryElement.exportNamespace.definedNames.values
+          .whereType<ClassElement>();
+      
       for (final element in classes) {
         _check(
           resolver,
@@ -78,29 +76,8 @@ class _ProtectedLintRule extends DartLintRule {
   }) {
     final usageFile = resolver.path;
 
-    // Resiliently get the class file path
-    final dynamic e = element;
-    String? classFile;
-    try {
-      classFile = e.source?.fullName as String?;
-    } catch (_) {}
-    if (classFile == null) {
-      try {
-        classFile = e.librarySource?.fullName as String?;
-      } catch (_) {}
-    }
-    if (classFile == null) {
-      try {
-        classFile =
-            e.firstFragment?.libraryFragment?.source?.fullName as String?;
-      } catch (_) {}
-    }
-    if (classFile == null) {
-      try {
-        classFile = e.library?.source?.fullName as String?;
-      } catch (_) {}
-    }
-
+    // Get the class file path
+    String? classFile = element.source?.fullName;
     if (classFile == null) return;
 
     // Skip usages in the same file
@@ -108,19 +85,10 @@ class _ProtectedLintRule extends DartLintRule {
 
     // Look for @Protected annotation
     ElementAnnotation? protectedAnnotation;
-    dynamic annots;
-    try {
-      annots = (element.metadata as dynamic).annotations;
-    } catch (_) {
-      annots = element.metadata;
-    }
-
-    for (final meta in annots) {
-      if (meta is! ElementAnnotation) continue;
-
+    
+    for (final meta in element.metadata) {
       final element = meta.element;
-      final name =
-          element?.enclosingElement?.name ??
+      final name = element?.enclosingElement?.name ??
           element?.enclosingElement?.enclosingElement?.name;
 
       if (name == 'Protected') {
@@ -145,7 +113,6 @@ class _ProtectedLintRule extends DartLintRule {
     final folderDiff = _folderDepth(classFolder, usageFolder);
 
     if (folderDiff > depth) {
-      final dynamic r = reporter;
       if (isImport) {
         final code = LintCode(
           name: 'protected_import_lint',
@@ -153,13 +120,13 @@ class _ProtectedLintRule extends DartLintRule {
               '🚫 Import of {0} is illegal. It is @Protected(depth: {1}) but accessed {2} folder(s) away.',
           errorSeverity: ErrorSeverity.ERROR,
         );
-        r.reportErrorForOffset(code, offset, length, [
+        reporter.reportErrorForOffset(code, offset, length, [
           element.name ?? '',
           depth,
           folderDiff,
         ]);
       } else {
-        r.reportErrorForOffset(_code, offset, length, [
+        reporter.reportErrorForOffset(_code, offset, length, [
           element.name ?? '',
           depth,
           folderDiff,

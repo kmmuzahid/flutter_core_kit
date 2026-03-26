@@ -4,10 +4,10 @@ version: 0.0.1
 publish_to: none
 
 environment:
-  sdk: '>=3.10.4 <4.0.0'
+  sdk: '>=3.9.0 <4.0.0'
 
 dependencies:
-  analyzer: ^6.0.0
-  custom_lint: ^2.1.0
-  custom_lint_builder: ^2.1.0
+  analyzer:  
+  custom_lint:  
+  custom_lint_builder:  
   path: any
