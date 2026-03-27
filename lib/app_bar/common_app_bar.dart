@@ -45,6 +45,8 @@ class AppbarConfig {
 
   final EdgeInsets leadingPadding;
 
+  final EdgeInsets actionsPadding;
+
   final Widget Function(String title)? titleBuilder;
 
   AppbarConfig({
@@ -62,7 +64,8 @@ class AppbarConfig {
     this.actionAlignment,
     this.titleSpacing = 0,
     this.titleBuilder,
-    this.leadingPadding = const EdgeInsets.symmetric(horizontal: 16.0),
+    this.leadingPadding = const EdgeInsets.only(left: 16.0, right: 8.0),
+    this.actionsPadding = const EdgeInsets.only(right: 16.0, left: 8.0),
   });
 
   AppbarConfig copyWith({
@@ -81,6 +84,7 @@ class AppbarConfig {
     double? titleSpacing,
     EdgeInsets? leadingPadding,
     Widget Function(String title)? titleBuilder,
+    EdgeInsets? actionsPadding,
   }) {
     return AppbarConfig(
       onBack: onBack ?? this.onBack,
@@ -98,6 +102,7 @@ class AppbarConfig {
       titleSpacing: titleSpacing ?? this.titleSpacing,
       leadingPadding: leadingPadding ?? this.leadingPadding,
       titleBuilder: titleBuilder ?? this.titleBuilder,
+      actionsPadding: actionsPadding ?? this.actionsPadding,
     );
   }
 }
@@ -135,6 +140,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     final AppbarConfig config = coreKitInstance.appbarConfig.copyWith(
       onBack: appbarConfig?.onBack,
       backIcon: appbarConfig?.backIcon,
+      actionsPadding: appbarConfig?.actionsPadding,
       backButton: appbarConfig?.backButton,
       decoration: appbarConfig?.decoration,
       backgroundColor: appbarConfig?.backgroundColor,
@@ -230,7 +236,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           Align(
             alignment: config.actionAlignment ?? Alignment.centerRight,
             child: Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: config.actionsPadding,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: config.actions!,
@@ -270,7 +276,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           Align(
             alignment: config.actionAlignment ?? Alignment.centerRight,
             child: Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: config.actionsPadding,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: config.actions!,
