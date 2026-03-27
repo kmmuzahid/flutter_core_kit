@@ -102,10 +102,9 @@ abstract class CoreKitConfig {
   PermissionHelperConfig? get permissionHelperConfig => null;
   PermissionHadlerColors? get permissionHandlerColors => null;
   PasswordObscureIcon? get passwordObscureIcon => null;
+
   /// New: UI shown before CoreKit is ready
   Widget? get preInitChild => null;
-
-
 }
 
 mixin CoreKitConfigDefaults implements CoreKitConfig {
@@ -225,6 +224,7 @@ class CoreKit extends StatefulWidget {
   final ScrollBehavior? scrollBehavior;
   final Duration themeAnimationDuration;
   final Curve themeAnimationCurve;
+  final Widget Function(Widget Function(Widget? child))? appBuilder;
 
   const CoreKit({
     super.key,
@@ -258,7 +258,43 @@ class CoreKit extends StatefulWidget {
     this.onUnknownRoute,
     this.navigatorObservers = const <NavigatorObserver>[],
     this.scrollBehavior,
+    this.appBuilder,
   }) : routerConfig = null;
+
+  const CoreKit.builder({
+    super.key,
+    required this.config,
+    required this.navigatorKey,
+    this.ensureScreenSize = true,
+    this.appBuilder,
+  }) : routerConfig = null,
+       theme = null,
+       darkTheme = null,
+       themeMode = null,
+       title = '',
+       restorationScopeId = null,
+       locale = null,
+       localizationsDelegates = null,
+       localeListResolutionCallback = null,
+       localeResolutionCallback = null,
+       supportedLocales = const <Locale>[Locale('en', 'US')],
+       showPerformanceOverlay = false,
+       checkerboardOffscreenLayers = false,
+       checkerboardRasterCacheImages = false,
+       showSemanticsDebugger = false,
+       debugShowCheckedModeBanner = true,
+       themeAnimationDuration = const Duration(milliseconds: 300),
+       themeAnimationCurve = Curves.easeInOut,
+       shortcuts = null,
+       actions = null,
+       debugShowMaterialGrid = false,
+       home = null,
+       routes = const <String, WidgetBuilder>{},
+       initialRoute = null,
+       onGenerateRoute = null,
+       onUnknownRoute = null,
+       navigatorObservers = const <NavigatorObserver>[],
+       scrollBehavior = null;
 
   const CoreKit.router({
     super.key,
@@ -292,6 +328,7 @@ class CoreKit extends StatefulWidget {
        initialRoute = null,
        onGenerateRoute = null,
        onUnknownRoute = null,
+       appBuilder = null,
        navigatorObservers = const <NavigatorObserver>[];
 
   @override
@@ -314,6 +351,9 @@ class _CoreKitState extends State<CoreKit> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.appBuilder != null) {
+      return widget.appBuilder!.call(_buildRouteGate);
+    }
     if (widget.routerConfig != null) {
       return MaterialApp.router(
         key: widget.key,
@@ -339,8 +379,7 @@ class _CoreKitState extends State<CoreKit> {
         shortcuts: widget.shortcuts,
         actions: widget.actions,
         debugShowMaterialGrid: widget.debugShowMaterialGrid,
-        builder: (context, child) =>
-            CoreKitRouterGate(config: widget.config, child: child ?? const SizedBox.shrink()),
+        builder: (context, child) => _buildRouteGate(child),
       );
     }
 
@@ -374,8 +413,10 @@ class _CoreKitState extends State<CoreKit> {
       onGenerateRoute: widget.onGenerateRoute,
       onUnknownRoute: widget.onUnknownRoute,
       navigatorObservers: widget.navigatorObservers,
-      builder: (context, child) =>
-          CoreKitRouterGate(config: widget.config, child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => _buildRouteGate(child),
     );
   }
+
+  Widget _buildRouteGate(Widget? child) =>
+      CoreKitRouterGate(config: widget.config, child: child ?? const SizedBox.shrink());
 }
