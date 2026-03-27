@@ -224,7 +224,7 @@ class CoreKit extends StatefulWidget {
   final ScrollBehavior? scrollBehavior;
   final Duration themeAnimationDuration;
   final Curve themeAnimationCurve;
-  final Widget Function(Widget Function(Widget? child))? appBuilder;
+  final Widget Function(Widget Function(Widget? child))? app;
 
   const CoreKit({
     super.key,
@@ -258,7 +258,7 @@ class CoreKit extends StatefulWidget {
     this.onUnknownRoute,
     this.navigatorObservers = const <NavigatorObserver>[],
     this.scrollBehavior,
-    this.appBuilder,
+    this.app,
   }) : routerConfig = null;
 
   const CoreKit.builder({
@@ -266,7 +266,7 @@ class CoreKit extends StatefulWidget {
     required this.config,
     required this.navigatorKey,
     this.ensureScreenSize = true,
-    this.appBuilder,
+    this.app,
   }) : routerConfig = null,
        theme = null,
        darkTheme = null,
@@ -328,7 +328,7 @@ class CoreKit extends StatefulWidget {
        initialRoute = null,
        onGenerateRoute = null,
        onUnknownRoute = null,
-       appBuilder = null,
+       app = null,
        navigatorObservers = const <NavigatorObserver>[];
 
   @override
@@ -351,8 +351,8 @@ class _CoreKitState extends State<CoreKit> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.appBuilder != null) {
-      return widget.appBuilder!.call(_buildRouteGate);
+    if (widget.app != null) {
+      return widget.app!.call(_buildRouteGate);
     }
     if (widget.routerConfig != null) {
       return MaterialApp.router(
