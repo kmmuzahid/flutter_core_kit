@@ -257,16 +257,16 @@ class CoreKit extends StatefulWidget {
     this.onGenerateRoute,
     this.onUnknownRoute,
     this.navigatorObservers = const <NavigatorObserver>[],
-    this.scrollBehavior,
-    this.app,
-  }) : routerConfig = null;
+    this.scrollBehavior, 
+  }) : routerConfig = null,
+       app = null;
 
   const CoreKit.builder({
     super.key,
     required this.config,
     required this.navigatorKey,
+    required this.app,
     this.ensureScreenSize = true,
-    this.app,
   }) : routerConfig = null,
        theme = null,
        darkTheme = null,
