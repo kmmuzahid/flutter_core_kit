@@ -11,7 +11,7 @@ coreKitInstanceSingleton get coreKitInstance => coreKitInstanceSingleton.instanc
 
 typedef NavigationBack = void Function();
 
-typedef CorkitInitBuilder = Function(BuildContext, Widget?);
+typedef CorkitInitBuilder = Widget Function(BuildContext context, Widget? child);
 
 class PasswordObscureIcon {
   final Widget show;
