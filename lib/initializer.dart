@@ -226,7 +226,7 @@ class CoreKit extends StatefulWidget {
   final ScrollBehavior? scrollBehavior;
   final Duration themeAnimationDuration;
   final Curve themeAnimationCurve;
-  final Widget Function(CorkitInitBuilder appBuilderChild)? app;
+  final Widget Function(CorkitInitBuilder builder)? app;
 
   const CoreKit({
     super.key,
@@ -381,7 +381,7 @@ class _CoreKitState extends State<CoreKit> {
         shortcuts: widget.shortcuts,
         actions: widget.actions,
         debugShowMaterialGrid: widget.debugShowMaterialGrid,
-        builder: (context, child) => _buildRouteGate(child),
+        builder: (context, child) => _buildRouteGate(context, child),
       );
     }
 
@@ -415,10 +415,10 @@ class _CoreKitState extends State<CoreKit> {
       onGenerateRoute: widget.onGenerateRoute,
       onUnknownRoute: widget.onUnknownRoute,
       navigatorObservers: widget.navigatorObservers,
-      builder: (context, child) => _buildRouteGate(child),
+      builder: (context, child) => _buildRouteGate(context, child),
     );
   }
 
-  Widget _buildRouteGate(Widget? child) =>
+  Widget _buildRouteGate(BuildContext context, Widget? child) =>
       CoreKitRouterGate(config: widget.config, child: child ?? const SizedBox.shrink());
 }
