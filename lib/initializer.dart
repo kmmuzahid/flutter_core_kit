@@ -11,6 +11,8 @@ coreKitInstanceSingleton get coreKitInstance => coreKitInstanceSingleton.instanc
 
 typedef NavigationBack = void Function();
 
+typedef CorkitInitBuilder = Widget Function(Widget? child);
+
 class PasswordObscureIcon {
   final Widget show;
   final Widget hide;
@@ -224,7 +226,7 @@ class CoreKit extends StatefulWidget {
   final ScrollBehavior? scrollBehavior;
   final Duration themeAnimationDuration;
   final Curve themeAnimationCurve;
-  final Widget Function(Widget Function(Widget? child))? app;
+  final Widget Function(CorkitInitBuilder appBuilderChild)? app;
 
   const CoreKit({
     super.key,
