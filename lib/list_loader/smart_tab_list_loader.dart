@@ -123,6 +123,10 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
   late Map<T, ScrollController> _scrollControllers;
   int _currentIndex = 0;
 
+  Key _getKey(T tab) {
+    return ValueKey('${tab.hashCode}_${widget.gridConfig.hashCode}${widget.padding.hashCode}');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -140,6 +144,9 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
   @override
   void didUpdateWidget(covariant SmartTabListLoader<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.gridConfig != widget.gridConfig) {
+      _update();
+    }
 
     if (oldWidget.value != widget.value) {
       _switchToValueTab(fade: true);
@@ -156,6 +163,10 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
         for (var tab in widget.tabs) tab.tab: _scrollControllers[tab.tab] ?? ScrollController(),
       };
     }
+  }
+
+  void _update() {
+    if (mounted) setState(() {});
   }
 
   void _switchToValueTab({bool fade = true}) {
@@ -209,103 +220,119 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             child: widget.gridConfig == null
-                ? SmartListLoader(
-                    key: ValueKey(cfg.tab),
-                    scrollController: scrollController,
-                    itemCount: cfg.itemCount,
-                    itemBuilder: (context, idx) {
-                      return widget.itemBuilder(
-                        SmartTabContext<T>(
-                          tab: cfg.tab,
-                          index: idx,
-                          itemCount: cfg.itemCount,
-                          isLoading: cfg.isLoading,
-                          isLoadDone: cfg.isLoadDone,
-                        ),
-                        idx,
-                      );
-                    },
-                    onLoadMore: (page) {
-                      widget.onLoadMore?.call(
-                        SmartTabContext<T>(
-                          tab: cfg.tab,
-                          index: index,
-                          itemCount: cfg.itemCount,
-                          isLoading: cfg.isLoading,
-                          isLoadDone: cfg.isLoadDone,
-                        ),
-                        page,
-                      );
-                    },
-                    onRefresh: () {
-                      widget.onRefresh?.call(
-                        SmartTabContext<T>(
-                          tab: cfg.tab,
-                          index: index,
-                          itemCount: cfg.itemCount,
-                          isLoading: cfg.isLoading,
-                          isLoadDone: cfg.isLoadDone,
-                        ),
-                      );
-                    },
-                    isLoading: cfg.isLoading,
-                    isLoadDone: cfg.isLoadDone,
-                    padding: widget.padding,
-                    appbar: widget.appbar,
-                    onColapsAppbar: widget.onColapsAppbar,
-                    limit: widget.limit,
-                  )
-                : SmartStaggeredLoader(
-                    key: ValueKey(cfg.tab),
-              scrollController: scrollController,
-                    gridConfig: widget.gridConfig,
-              itemCount: cfg.itemCount,
-              itemBuilder: (context, idx) {
-                return widget.itemBuilder(
-                  SmartTabContext<T>(
-                    tab: cfg.tab,
-                    index: idx,
-                    itemCount: cfg.itemCount,
-                    isLoading: cfg.isLoading,
-                    isLoadDone: cfg.isLoadDone,
-                  ),
-                  idx,
-                );
-              },
-              onLoadMore: (page) {
-                widget.onLoadMore?.call(
-                  SmartTabContext<T>(
-                    tab: cfg.tab,
-                    index: index,
-                    itemCount: cfg.itemCount,
-                    isLoading: cfg.isLoading,
-                    isLoadDone: cfg.isLoadDone,
-                  ),
-                  page,
-                );
-              },
-              onRefresh: () {
-                widget.onRefresh?.call(
-                  SmartTabContext<T>(
-                    tab: cfg.tab,
-                    index: index,
-                    itemCount: cfg.itemCount,
-                    isLoading: cfg.isLoading,
-                    isLoadDone: cfg.isLoadDone,
-                  ),
-                );
-              },
-              isLoading: cfg.isLoading,
-              isLoadDone: cfg.isLoadDone,
-              padding: widget.padding,
-              appbar: widget.appbar,
-              onColapsAppbar: widget.onColapsAppbar,
-              limit: widget.limit,
-
-            ),
+                ? _routeList(cfg, scrollController, index)
+                : _routeGrid(cfg, scrollController, index),
           ),
         );
       }),
+    );
+  }
+
+  SmartListLoader _routeList(
+    SmartTabConfig<dynamic> cfg,
+    ScrollController scrollController,
+    int index,
+  ) {
+    return SmartListLoader(
+      key: _getKey(cfg.tab),
+      scrollController: scrollController,
+      itemCount: cfg.itemCount,
+      itemBuilder: (context, idx) {
+        return widget.itemBuilder(
+          SmartTabContext<T>(
+            tab: cfg.tab,
+            index: idx,
+            itemCount: cfg.itemCount,
+            isLoading: cfg.isLoading,
+            isLoadDone: cfg.isLoadDone,
+          ),
+          idx,
+        );
+      },
+      onLoadMore: (page) {
+        widget.onLoadMore?.call(
+          SmartTabContext<T>(
+            tab: cfg.tab,
+            index: index,
+            itemCount: cfg.itemCount,
+            isLoading: cfg.isLoading,
+            isLoadDone: cfg.isLoadDone,
+          ),
+          page,
+        );
+      },
+      onRefresh: () {
+        widget.onRefresh?.call(
+          SmartTabContext<T>(
+            tab: cfg.tab,
+            index: index,
+            itemCount: cfg.itemCount,
+            isLoading: cfg.isLoading,
+            isLoadDone: cfg.isLoadDone,
+          ),
+        );
+      },
+      isLoading: cfg.isLoading,
+      isLoadDone: cfg.isLoadDone,
+      padding: widget.padding,
+      appbar: widget.appbar,
+      onColapsAppbar: widget.onColapsAppbar,
+      limit: widget.limit,
+    );
+  }
+
+  SmartStaggeredLoader _routeGrid(
+    SmartTabConfig<dynamic> cfg,
+    ScrollController scrollController,
+    int index,
+  ) {
+    return SmartStaggeredLoader(
+      key: _getKey(cfg.tab),
+      scrollController: scrollController,
+      gridConfig: widget.gridConfig,
+      itemCount: cfg.itemCount,
+      itemBuilder: (context, idx) {
+        return widget.itemBuilder(
+          SmartTabContext<T>(
+            tab: cfg.tab,
+            index: idx,
+            itemCount: cfg.itemCount,
+            isLoading: cfg.isLoading,
+            isLoadDone: cfg.isLoadDone,
+          ),
+          idx,
+        );
+      },
+      onLoadMore: (page) {
+        widget.onLoadMore?.call(
+          SmartTabContext<T>(
+            tab: cfg.tab,
+            index: index,
+            itemCount: cfg.itemCount,
+            isLoading: cfg.isLoading,
+            isLoadDone: cfg.isLoadDone,
+          ),
+          page,
+        );
+      },
+      onRefresh: () {
+        widget.onRefresh?.call(
+          SmartTabContext<T>(
+            tab: cfg.tab,
+            index: index,
+            itemCount: cfg.itemCount,
+            isLoading: cfg.isLoading,
+            isLoadDone: cfg.isLoadDone,
+          ),
+        );
+      },
+      isLoading: cfg.isLoading,
+      isLoadDone: cfg.isLoadDone,
+      padding: widget.padding,
+      appbar: widget.appbar,
+      onColapsAppbar: widget.onColapsAppbar,
+      limit: widget.limit,
+
     );
   }
 }

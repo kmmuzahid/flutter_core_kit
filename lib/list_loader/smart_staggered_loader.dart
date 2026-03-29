@@ -25,6 +25,30 @@ class GridConfig {
     this.aspectRatio = 1,
     this.itemInRow = 0,
   });
+  
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is GridConfig &&
+        other.maxCrossAxisExtent == maxCrossAxisExtent &&
+        other.mainAxisSpacing == mainAxisSpacing &&
+        other.crossAxisSpacing == crossAxisSpacing &&
+        other.enableMassionary == enableMassionary &&
+        other.aspectRatio == aspectRatio &&
+        other.itemInRow == itemInRow;
+  }
+
+  @override
+  int get hashCode {
+    return maxCrossAxisExtent.hashCode ^
+        mainAxisSpacing.hashCode ^
+        crossAxisSpacing.hashCode ^
+        enableMassionary.hashCode ^
+        aspectRatio.hashCode ^
+        itemInRow.hashCode;
+  }
+
 }
 
 class SmartStaggeredLoader extends StatefulWidget {
