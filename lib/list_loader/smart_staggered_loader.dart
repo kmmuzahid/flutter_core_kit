@@ -31,6 +31,7 @@ class SmartStaggeredLoader extends StatefulWidget {
     this.onColapsAppbar,
     this.isSeperated = false,
     this.limit = 20,
+    this.scrollController,
   });
 
   final int itemCount;
@@ -52,6 +53,7 @@ class SmartStaggeredLoader extends StatefulWidget {
   final Widget? onColapsAppbar;
   final bool isSeperated;
   final int limit;
+  final ScrollController? scrollController;
 
   @override
   State<SmartStaggeredLoader> createState() => _SmartStaggeredLoaderState();
@@ -75,7 +77,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    _scrollController = widget.scrollController ?? ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _updateHeights();
@@ -136,7 +138,9 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    if (widget.scrollController == null) {
+      _scrollController.dispose();
+    }
     super.dispose();
   }
 

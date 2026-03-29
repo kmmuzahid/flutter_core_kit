@@ -24,6 +24,7 @@ class SmartListLoader extends StatefulWidget {
     this.limit = 10,
     super.key,
     this.initalLoader,
+    this.scrollController,
   });
 
   final int itemCount;
@@ -38,6 +39,7 @@ class SmartListLoader extends StatefulWidget {
   final Widget? onColapsAppbar;
   final int limit;
   final Widget? initalLoader;
+  final ScrollController? scrollController;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -61,7 +63,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    _scrollController = widget.scrollController ?? ScrollController();
     _scrollController.addListener(_scrollListener);
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _updateHeights();
@@ -122,7 +124,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    if (widget.scrollController == null) {
+      _scrollController.dispose();
+    }
     super.dispose();
   }
 
