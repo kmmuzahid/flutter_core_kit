@@ -250,6 +250,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
                   gridDelegate: gridConfig.itemInRow > 0
                       ? SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: gridConfig.itemInRow,
+                          childAspectRatio: gridConfig.aspectRatio,
                           mainAxisSpacing: gridConfig.mainAxisSpacing,
                           crossAxisSpacing: widget.isSeperated ? 0 : gridConfig.crossAxisSpacing,
                         )
