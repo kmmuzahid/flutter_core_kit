@@ -7,6 +7,8 @@ import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+
+ 
 class SmartTabContext<T> {
   const SmartTabContext({
     required this.tab,
@@ -55,8 +57,9 @@ class SmartTabConfig<T> {
   final Widget? initalLoader;
 }
 
+// ignore: must_be_immutable
 class SmartTabListLoader<T> extends StatefulWidget {
-  const SmartTabListLoader({
+  SmartTabListLoader({
     required this.tabs,
     required this.itemBuilder,
     this.onTabControllerReady,
@@ -69,13 +72,16 @@ class SmartTabListLoader<T> extends StatefulWidget {
     this.onColapsAppbar,
     this.limit = 10,
     required this.value,
+    this.gridConfig,
     super.key,
   }) : assert(tabs.length > 0, 'tabs must not be empty');
 
   final T value;
 
+  final GridConfig? gridConfig;
+
   /// One config entry per tab — data/state only.
-  final List<SmartTabConfig<T>> tabs;
+  List<SmartTabConfig<T>> tabs;
 
   /// Builds each list item. Receives full tab context + the item index.
   final Widget Function(SmartTabContext<T> ctx, int itemIndex) itemBuilder;
@@ -202,9 +208,57 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
             opacity: _currentIndex == index ? 1 : 0,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: SmartListLoader(
-              key: ValueKey(cfg.tab),
+            child: widget.gridConfig == null
+                ? SmartListLoader(
+                    key: ValueKey(cfg.tab),
+                    scrollController: scrollController,
+                    itemCount: cfg.itemCount,
+                    itemBuilder: (context, idx) {
+                      return widget.itemBuilder(
+                        SmartTabContext<T>(
+                          tab: cfg.tab,
+                          index: idx,
+                          itemCount: cfg.itemCount,
+                          isLoading: cfg.isLoading,
+                          isLoadDone: cfg.isLoadDone,
+                        ),
+                        idx,
+                      );
+                    },
+                    onLoadMore: (page) {
+                      widget.onLoadMore?.call(
+                        SmartTabContext<T>(
+                          tab: cfg.tab,
+                          index: index,
+                          itemCount: cfg.itemCount,
+                          isLoading: cfg.isLoading,
+                          isLoadDone: cfg.isLoadDone,
+                        ),
+                        page,
+                      );
+                    },
+                    onRefresh: () {
+                      widget.onRefresh?.call(
+                        SmartTabContext<T>(
+                          tab: cfg.tab,
+                          index: index,
+                          itemCount: cfg.itemCount,
+                          isLoading: cfg.isLoading,
+                          isLoadDone: cfg.isLoadDone,
+                        ),
+                      );
+                    },
+                    isLoading: cfg.isLoading,
+                    isLoadDone: cfg.isLoadDone,
+                    padding: widget.padding,
+                    appbar: widget.appbar,
+                    onColapsAppbar: widget.onColapsAppbar,
+                    limit: widget.limit,
+                  )
+                : SmartStaggeredLoader(
+                    key: ValueKey(cfg.tab),
               scrollController: scrollController,
+                    gridConfig: widget.gridConfig,
               itemCount: cfg.itemCount,
               itemBuilder: (context, idx) {
                 return widget.itemBuilder(
@@ -247,6 +301,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
               appbar: widget.appbar,
               onColapsAppbar: widget.onColapsAppbar,
               limit: widget.limit,
+
             ),
           ),
         );
