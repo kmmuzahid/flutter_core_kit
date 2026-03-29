@@ -73,7 +73,8 @@ class _SmartListLoaderState extends State<SmartListLoader> {
 
   void _scrollListener() {
     if (!_scrollController.hasClients) return;
-
+   
+    if (mounted)
     setState(() {
       _currentOffset = _scrollController.offset;
     });
@@ -103,7 +104,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final pos = _scrollController.position;
     final isScrollable = pos.maxScrollExtent > 0;
 
-    if (_isContentScrollable != isScrollable) {
+    if (_isContentScrollable != isScrollable && mounted) {
       setState(() {
         _isContentScrollable = isScrollable;
       });
@@ -116,6 +117,8 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final stickyBox =
         _stickyKey.currentContext?.findRenderObject() as RenderBox?;
 
+
+    if (mounted)
     setState(() {
       _appBarHeight = appBarBox?.size.height ?? 0.0;
       _stickyHeight = stickyBox?.size.height ?? 0.0;
@@ -124,7 +127,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    if (widget.scrollController == null) {
+      _scrollController.dispose();
+    }
     super.dispose();
   }
 

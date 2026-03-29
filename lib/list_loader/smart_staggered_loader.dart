@@ -88,9 +88,11 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   void _scrollListener() {
     if (!_scrollController.hasClients) return;
 
-    setState(() {
-      _currentOffset = _scrollController.offset;
-    });
+    if (mounted) {
+      setState(() {
+        _currentOffset = _scrollController.offset;
+      });
+    }
 
     _checkScrollability();
 
@@ -117,7 +119,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
     final pos = _scrollController.position;
     final isScrollable = pos.maxScrollExtent > 0;
 
-    if (_isContentScrollable != isScrollable) {
+    if (_isContentScrollable != isScrollable && mounted) {
       setState(() {
         _isContentScrollable = isScrollable;
       });
@@ -130,15 +132,19 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
     final stickyBox =
         _stickyKey.currentContext?.findRenderObject() as RenderBox?;
 
-    setState(() {
-      _appBarHeight = appBarBox?.size.height ?? 0.0;
-      _stickyHeight = stickyBox?.size.height ?? 0.0;
-    });
+    if (mounted) {
+      setState(() {
+        _appBarHeight = appBarBox?.size.height ?? 0.0;
+        _stickyHeight = stickyBox?.size.height ?? 0.0;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    if (widget.scrollController == null) {
+      _scrollController.dispose();
+    }
     super.dispose();
   }
 
