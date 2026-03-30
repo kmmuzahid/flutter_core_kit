@@ -25,6 +25,7 @@ class SmartListLoader extends StatefulWidget {
     super.key,
     this.initalLoader,
     this.scrollController,
+    this.emptyWidget,
   });
 
   final int itemCount;
@@ -40,6 +41,7 @@ class SmartListLoader extends StatefulWidget {
   final int limit;
   final Widget? initalLoader;
   final ScrollController? scrollController;
+  final Widget? emptyWidget;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -228,14 +230,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
           ),
 
           if (widget.itemCount == 0 && !widget.isLoading)
-            Center(
-              child: Image.asset(
-                'assets/images/empty_icon.png', // path inside the library
-                package: 'core_kit', // the library name as in pubspec.yaml
-                width: 100,
-                height: 100,
-              ),
-            ),
+            _empty(),
 
           // Only show RefreshIndicator if onRefresh is provided
           widget.onRefresh != null
@@ -254,6 +249,18 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         ],
       ),
     );
+  }
+
+  Widget _empty() {
+    return widget.emptyWidget ??
+        Center(
+          child: Image.asset(
+            'assets/images/empty_icon.png', // path inside the library
+            package: 'core_kit', // the library name as in pubspec.yaml
+            width: 100,
+            height: 100,
+          ),
+        );
   }
 
   Widget _buildScrollView(List<Widget> appBarWidgets, Widget listSliver) {

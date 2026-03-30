@@ -5,7 +5,6 @@ library;
 
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 
  
@@ -46,15 +45,16 @@ class SmartTabConfig<T> {
     this.isLoading = false,
     this.isLoadDone = false,
     this.initalLoader,
+    this.emptyWidget,
   });
-
-  /// The tab identifier.
+ 
   final T tab;
 
   final int itemCount;
   final bool isLoading;
   final bool isLoadDone;
   final Widget? initalLoader;
+  final Widget? emptyWidget;
 }
 
 // ignore: must_be_immutable
@@ -73,10 +73,13 @@ class SmartTabListLoader<T> extends StatefulWidget {
     this.limit = 10,
     required this.value,
     this.gridConfig,
+    this.emptyWidget,
     super.key,
   }) : assert(tabs.length > 0, 'tabs must not be empty');
 
   final T value;
+
+  final Widget? emptyWidget;
 
   final GridConfig? gridConfig;
 
@@ -118,8 +121,7 @@ class SmartTabListLoader<T> extends StatefulWidget {
 }
 
 class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
+    with TickerProviderStateMixin { 
   late Map<T, ScrollController> _scrollControllers;
   int _currentIndex = 0;
 
@@ -130,15 +132,11 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: widget.tabs.length, vsync: this);
-    _tabController.addListener(_onTabChanged);
+  
 
     _scrollControllers = {for (var tab in widget.tabs) tab.tab: ScrollController()};
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      widget.onTabControllerReady?.call(_tabController);
-      _switchToValueTab(fade: false); // initial tab, no fade
-    });
+   
   }
 
   @override
@@ -153,11 +151,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
     }
 
     if (oldWidget.tabs.length != widget.tabs.length) {
-      _tabController.removeListener(_onTabChanged);
-      _tabController.dispose();
-      _tabController = TabController(length: widget.tabs.length, vsync: this);
-      _tabController.addListener(_onTabChanged);
-      widget.onTabControllerReady?.call(_tabController);
+ 
 
       _scrollControllers = {
         for (var tab in widget.tabs) tab.tab: _scrollControllers[tab.tab] ?? ScrollController(),
@@ -174,33 +168,14 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
     if (index != -1 && index != _currentIndex) {
       setState(() {
         _currentIndex = index;
-      });
-      _tabController.index = index;
+      }); 
     }
   }
 
-  void _onTabChanged() {
-    if (!_tabController.indexIsChanging) return;
-    setState(() {
-      _currentIndex = _tabController.index;
-    });
-
-    final cfg = widget.tabs[_currentIndex];
-    widget.onPageChange?.call(
-      SmartTabContext<T>(
-        tab: cfg.tab,
-        index: _currentIndex,
-        itemCount: cfg.itemCount,
-        isLoading: cfg.isLoading,
-        isLoadDone: cfg.isLoadDone,
-      ),
-    );
-  }
-
+ 
   @override
   void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
+ 
     _scrollControllers.values.forEach((c) => c.dispose());
     super.dispose();
   }
@@ -236,6 +211,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
     return SmartListLoader(
       key: _getKey(cfg.tab),
       scrollController: scrollController,
+      emptyWidget: cfg.emptyWidget ?? widget.emptyWidget,
       itemCount: cfg.itemCount,
       itemBuilder: (context, idx) {
         return widget.itemBuilder(
@@ -288,6 +264,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
   ) {
     return SmartStaggeredLoader(
       key: _getKey(cfg.tab),
+      emptyWidget: cfg.emptyWidget ?? widget.emptyWidget,
       scrollController: scrollController,
       gridConfig: widget.gridConfig,
       itemCount: cfg.itemCount,

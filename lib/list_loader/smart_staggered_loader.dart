@@ -70,6 +70,7 @@ class SmartStaggeredLoader extends StatefulWidget {
     this.limit = 20,
     this.scrollController,
     this.isSeperated = false,
+    this.emptyWidget,
   });
 
   final int itemCount;
@@ -86,6 +87,7 @@ class SmartStaggeredLoader extends StatefulWidget {
   final Widget? onColapsAppbar;
   final int limit;
   final ScrollController? scrollController;
+  final Widget? emptyWidget;
 
   final bool isSeperated;
   final GridConfig? gridConfig;
@@ -266,9 +268,9 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
         SliverPadding(
           padding: widget.padding ?? EdgeInsets.zero,
           sliver: widget.itemCount == 0 && !widget.isLoading
-              ? const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(child: Text('No data found')),
+              ? SliverToBoxAdapter(
+                  // hasScrollBody: false,
+                  child: _empty(),
                 )
               : SliverGrid(
                   gridDelegate: gridConfig.itemInRow > 0
@@ -319,6 +321,18 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
       );
     }
     return const SizedBox.shrink();
+  }
+
+  Widget _empty() {
+    return widget.emptyWidget ??
+        Center(
+          child: Image.asset(
+            'assets/images/empty_icon.png', // path inside the library
+            package: 'core_kit', // the library name as in pubspec.yaml
+            width: 100,
+            height: 100,
+          ),
+        );
   }
 
   Widget _seprated(int index, Widget child, double width) {
