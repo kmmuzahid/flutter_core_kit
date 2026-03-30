@@ -10,6 +10,7 @@ class CommonImagePicker extends StatefulWidget {
     this.pickerIcon = Icons.image,
     this.onSaved,
     this.validator,
+    this.pickerIconWidget,
     this.src,
   });
 
@@ -17,6 +18,7 @@ class CommonImagePicker extends StatefulWidget {
   final double height;
   final double borderRadius;
   final IconData pickerIcon;
+  final Widget? pickerIconWidget;
   final void Function(XFile?)? onSaved;
   final FormFieldValidator<XFile>? validator;
   final String? src;
@@ -80,11 +82,12 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
                                 : widget.src!,
                             fill: BoxFit.cover,
                           )
-                        : Icon(
-                            widget.pickerIcon,
-                            size: widget.width / 1.8,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                        : widget.pickerIconWidget ??
+                              Icon(
+                                widget.pickerIcon,
+                                size: widget.width / 1.8,
+                                color: Theme.of(context).primaryColor,
+                              ),
                   ),
                 ),
                 _buildCameraIcon(() => _pickImage(fieldState), isCircular),

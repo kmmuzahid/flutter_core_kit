@@ -41,6 +41,7 @@ class CommonTextField extends StatefulWidget {
     this.suffixBuilder,
     this.prefixBuilder,
     this.fontSize,
+    this.textStyle,
   });
 
   final double borderWidth;
@@ -72,6 +73,7 @@ class CommonTextField extends StatefulWidget {
   final PasswordObscureIcon? passwordObscureIcon;
   final TextStyle? hintStyle;
   final double? fontSize;
+  final TextStyle? textStyle;
 
   final String? Function(String? value)? validation;
   final BorderType borderType;
@@ -173,7 +175,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
     double? height,
     FontStyle? fontStyle,
   }) {
-    return TextStyle(
+    return (widget.textStyle ?? TextStyle()).copyWith(
       fontFamily: coreKitInstance.fontFamily,
       fontWeight: fontWeight,
       fontSize: fontSize,
