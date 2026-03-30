@@ -126,7 +126,9 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
   int _currentIndex = 0;
 
   Key _getKey(T tab) {
-    return ValueKey('${tab.hashCode}_${widget.gridConfig.hashCode}${widget.padding.hashCode}');
+    return ValueKey(
+      '${tab.hashCode}_${widget.gridConfig.hashCode}${widget.padding.hashCode}${widget.appbar.runtimeType}${widget.onColapsAppbar.runtimeType}',
+    );
   }
 
   @override
