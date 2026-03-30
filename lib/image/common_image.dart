@@ -20,6 +20,9 @@ class CommonImage extends StatelessWidget {
     super.key,
     this.borderRadiusCustom,
     this.enableAspectRatio = false,
+    this.borderWidth = 0,
+    this.borderOffset = 0,
+    this.borderColor = Colors.black12,
   });
   final String src;
   final String? defaultImage;
@@ -32,13 +35,46 @@ class CommonImage extends StatelessWidget {
   final BoxFit fill;
   final BorderRadius? borderRadiusCustom;
   final bool enableAspectRatio;
+  final double borderWidth;
+  final Color borderColor;
+  final double borderOffset;
 
   BorderRadius getBorderRadius() {
     return borderRadiusCustom ?? BorderRadius.circular(borderRadius.r);
   }
 
+  BorderRadius getOuterBorderRadius() {
+    double totalAddition = borderOffset + borderWidth;
+
+    if (borderRadiusCustom != null) {
+      return BorderRadius.only(
+        topLeft: borderRadiusCustom!.topLeft + Radius.circular(totalAddition),
+        topRight: borderRadiusCustom!.topRight + Radius.circular(totalAddition),
+        bottomLeft: borderRadiusCustom!.bottomLeft + Radius.circular(totalAddition),
+        bottomRight: borderRadiusCustom!.bottomRight + Radius.circular(totalAddition),
+      );
+    }
+
+    // Fallback to the standard radius + the added space
+    return BorderRadius.circular(borderRadius.r + totalAddition);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (borderWidth > 0) {
+      return Container(
+        padding: EdgeInsets.all(borderOffset),
+        decoration: BoxDecoration(
+          border: Border.all(color: borderColor, width: borderWidth),
+          borderRadius: getOuterBorderRadius(),
+        ),
+        child: _finalImage(),
+      );
+    }
+    return _finalImage();
+  }
+
+  Widget _finalImage() {
     if (enableAspectRatio && width != null && height != null && width! > 0 && height! > 0) {
       return _genralChild().toAr(width!, height!);
     }
@@ -48,9 +84,9 @@ class CommonImage extends StatelessWidget {
   Widget _genralChild() {
     try {
       if (src.isEmpty) return placeholder();
-    
+
       if (!enableGrayscale) return getImage();
-    
+
       return ColorFiltered(
         colorFilter: const ColorFilter.matrix(<double>[
           0.2126, 0.7152, 0.0722, 0, 0, // red
@@ -61,10 +97,7 @@ class CommonImage extends StatelessWidget {
         child: getImage(),
       );
     } catch (e) {
-      return ClipRRect(
-        borderRadius: getBorderRadius(),
-        child: _buildErrorWidget(),
-      );
+      return ClipRRect(borderRadius: getBorderRadius(), child: _buildErrorWidget());
     }
   }
 
@@ -80,8 +113,7 @@ class CommonImage extends StatelessWidget {
   }
 
   Widget getImage() {
-    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) &&
-        src.startsWith('assets/')) {
+    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) && src.startsWith('assets/')) {
       return _buildSvgImage();
     }
 
@@ -130,10 +162,7 @@ class CommonImage extends StatelessWidget {
           ),
         ),
         progressIndicatorBuilder: (context, url, downloadProgress) {
-          return Skeletonizer(
-            enabled: (downloadProgress.progress ?? 0) < 1,
-            child: placeholder(),
-          );
+          return Skeletonizer(enabled: (downloadProgress.progress ?? 0) < 1, child: placeholder());
         },
         errorWidget: (context, url, error) {
           AppLogger.error(error.toString(), tag: 'Common Image');
@@ -149,9 +178,7 @@ class CommonImage extends StatelessWidget {
       borderRadius: getBorderRadius(),
       child: SvgPicture.asset(
         src,
-        colorFilter: imageColor != null
-            ? ColorFilter.mode(imageColor!, BlendMode.srcIn)
-            : null,
+        colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
         fit: fill,
