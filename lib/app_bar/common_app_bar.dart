@@ -293,7 +293,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         CommonText(
           text: title ?? '',
           fontWeight: FontWeight.w600,
-          fontSize: 18.sp,
+          fontSize:
+              coreKitInstanceSingleton.instance.theme.appBarTheme.titleTextStyle?.fontSize ?? 18,
           textColor: config.titleColor?.call() ?? contrastColor,
         );
   }
