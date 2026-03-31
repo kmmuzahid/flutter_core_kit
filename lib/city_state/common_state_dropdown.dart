@@ -83,7 +83,7 @@ class CommonStateDropdown extends StatelessWidget {
       }
     }
 
-    final List<String> stateList = [];
+    final stateList = <String>[];
 
     if (selectedCountryData != null) {
       for (final stateData in selectedCountryData) {

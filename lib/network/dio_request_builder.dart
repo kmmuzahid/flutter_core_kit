@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/dio_utils.dart';
+import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/network/response_state.dart' show ResponseState;
 import 'package:core_kit/utils/extension.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'dio_utils.dart';
-import 'request_input.dart';
 
 class DioRequestBuilder {
   DioRequestBuilder._();
@@ -22,6 +21,7 @@ class DioRequestBuilder {
 
   Future<ResponseState<T?>> build<T>({
     required RequestInput input,
+    // ignore: avoid_annotating_with_dynamic
     required T? Function(dynamic data) responseBuilder,
     required CancelToken cancelToken,
     required bool showMessage,
@@ -84,9 +84,9 @@ class DioRequestBuilder {
     required int retryCount,
     required int maxRetry,
   }) async {
-    String url = input.endpoint;
+    var url = input.endpoint;
     if (input.pathParams?.isNotEmpty ?? false) {
-      for (int i = 0; i < input.pathParams!.length; i++) {
+      for (var i = 0; i < input.pathParams!.length; i++) {
         if (i == 0 && url.endsWith('/')) {
           url = "$url${input.pathParams![i]}";
         } else {
@@ -106,7 +106,7 @@ class DioRequestBuilder {
     };
 
     dynamic body;
-    String contentType = 'application/json';
+    var contentType = 'application/json';
 
     final hasFiles = input.files != null && input.files!.isNotEmpty;
     final hasFields = input.formFields != null;
@@ -117,8 +117,8 @@ class DioRequestBuilder {
         hasFiles || hasFields || (hasFiles && (hasJson || hasList));
 
     if (needsMultipart) {
-      FormData formData = FormData();
-      final Map<String, dynamic> form = {};
+      var formData = FormData();
+      final form = <String, dynamic>{};
 
       if (input.formFields != null) {
         form.addAll(input.formFields!);

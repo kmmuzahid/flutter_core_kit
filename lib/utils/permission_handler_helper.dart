@@ -9,7 +9,7 @@ class PermissionHandlerHelper {
   final Permission permission;
 
   Future<bool> getStatus() async {
-    bool currentStatus = false;
+    var currentStatus = false;
 
     if ((permission == Permission.photos || permission == Permission.storage) &&
         Platform.isAndroid) {

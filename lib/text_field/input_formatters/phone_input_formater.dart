@@ -8,7 +8,7 @@ class PhoneNumberFormatter extends TextInputFormatter {
   ) {
     // Remove everything except digits
     final digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    String newText = '';
+    var newText = '';
 
     // Format as xxx-xxx-xxxx
     if (digits.isNotEmpty) {

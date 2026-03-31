@@ -113,7 +113,7 @@ class DashedBorderPainter extends CustomPainter {
   void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
     final dashPath = Path();
     for (final metric in path.computeMetrics()) {
-      double distance = 0.0;
+      var distance = 0.0;
       while (distance < metric.length) {
         final start = metric.getTangentForOffset(distance)!.position;
         distance += dashWidth;

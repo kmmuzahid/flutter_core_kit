@@ -272,9 +272,9 @@ class CommonText extends StatelessWidget {
   }
 
   TextStyle getStyle() {
-    final double effectiveFontSize = fontSize ?? style?.fontSize ?? 12.0;
+    final effectiveFontSize = fontSize ?? style?.fontSize ?? 12.0;
 
-    TextStyle baseStyle = style ?? const TextStyle();
+    var baseStyle = style ?? const TextStyle();
 
     baseStyle = baseStyle.copyWith(
       fontFamily: coreKitInstance.fontFamily,
@@ -286,7 +286,7 @@ class CommonText extends StatelessWidget {
       decorationColor: decorationColor ?? baseStyle.decorationColor,
     );
 
-    final double? fontHeight = textHeight != null
+    final fontHeight = textHeight != null
         ? (textHeight! / effectiveFontSize)
         : baseStyle.height;
 
@@ -333,11 +333,12 @@ class _AdaptiveText extends StatelessWidget {
       );
     }
 
-    double fontSize = maxFontSize;
+    var fontSize = maxFontSize;
 
     // Binary search for optimal font size
-    double low = minFontSize;
-    double high = maxFontSize;
+    var low = minFontSize;
+    var high = maxFontSize;
+    
 
     while (high - low > 0.5) {
       final mid = (low + high) / 2;

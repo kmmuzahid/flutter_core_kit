@@ -8,12 +8,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-
-import 'dio_utils.dart';
 
 class DioInterceptor extends Interceptor {
   final Dio _dio;

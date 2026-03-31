@@ -96,7 +96,7 @@ class CommonCityDropDown extends StatelessWidget {
     if (selectedCountryData != null) {
       for (final stateData in selectedCountryData) {
         for (final stateEntry in stateData.entries) {
-          final String stateName = stateEntry.key;
+          final stateName = stateEntry.key;
           if (stateName.trim().toLowerCase() == state.trim().toLowerCase()) {
             return stateEntry.value;
           }

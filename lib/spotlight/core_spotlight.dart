@@ -47,13 +47,13 @@ class _SpotlightPainter extends CustomPainter {
 
     const steps = 30; // More steps = smoother spotlight
 
-    for (int i = 0; i <= steps; i++) {
+    for (var i = 0; i <= steps; i++) {
       final t = i / steps;
 
       // Exponential falloff for smooth spotlight effect
       final falloff = _calculateFalloff(t);
 
-      colors.add(color.withOpacity(color.opacity * falloff));
+      colors.add(color.withValues(alpha: color.a * falloff));
       stops.add(t);
     }
 
@@ -85,10 +85,10 @@ class _SpotlightPainter extends CustomPainter {
     if (x > 0) return 1.0;
 
     // Using exp approximation for smooth falloff
-    double result = 1.0 + x;
-    double term = x;
+    var result = 1.0 + x;
+    var term = x;
 
-    for (int i = 2; i < 8; i++) {
+    for (var i = 2; i < 8; i++) {
       term *= x / i;
       result += term;
     }
@@ -152,13 +152,13 @@ class _SpotlightAdvancedPainter extends CustomPainter {
     final colors = <Color>[];
     final stops = <double>[];
 
-    for (int i = 0; i <= gradientSteps; i++) {
+    for (var i = 0; i <= gradientSteps; i++) {
       final t = i / gradientSteps;
 
       // Match shader's exponential falloff: exp(-d * d * 6.0)
       final falloff = _exponentialFalloff(t);
 
-      colors.add(color.withOpacity(color.opacity * falloff));
+      colors.add(color.withValues(alpha: color.a * falloff));
       stops.add(t);
     }
 
@@ -188,10 +188,10 @@ class _SpotlightAdvancedPainter extends CustomPainter {
     if (x > 10) return 1.0;
 
     // Taylor series approximation (good enough for visuals)
-    double result = 1.0;
-    double term = 1.0;
+    var result = 1.0;
+    var term = 1.0;
 
-    for (int i = 1; i < 10; i++) {
+    for (var i = 1; i < 10; i++) {
       term *= x / i;
       result += term;
     }

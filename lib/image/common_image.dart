@@ -44,7 +44,7 @@ class CommonImage extends StatelessWidget {
   }
 
   BorderRadius getOuterBorderRadius() {
-    double totalAddition = borderOffset + borderWidth;
+    final totalAddition = borderOffset + borderWidth;
 
     if (borderRadiusCustom != null) {
       return BorderRadius.only(

@@ -18,9 +18,9 @@ class CoreUtils {
 
   static DateTime subtractYears(DateTime date, int yearsToSubtract) {
     // Handle edge case for leap year (Feb 29 to non-leap year)
-    final int newYear = date.year - yearsToSubtract;
-    final int newMonth = date.month;
-    final int newDay = date.day;
+    final newYear = date.year - yearsToSubtract;
+    final newMonth = date.month;
+    final newDay = date.day;
 
     // Check if the resulting date would be invalid (e.g., Feb 29 to non-leap year)
     // Dart automatically corrects this to Feb 28 if the new year is not a leap year
@@ -88,7 +88,7 @@ class CoreUtils {
 
   static String formatDateToShortMonth(DateTime dateTime) {
     final localDate = dateTime.toLocal();
-    const List<String> monthAbbr = [
+    const monthAbbr = <String>[
       'Jan',
       'Feb',
       'Mar',
@@ -103,9 +103,9 @@ class CoreUtils {
       'Dec',
     ];
 
-    final String day = localDate.day.toString().padLeft(2, '0');
-    final String month = monthAbbr[localDate.month - 1];
-    final String year = localDate.year.toString();
+    final day = localDate.day.toString().padLeft(2, '0');
+    final month = monthAbbr[localDate.month - 1];
+    final year = localDate.year.toString();
 
     return '$day $month $year';
   }
@@ -116,7 +116,7 @@ class CoreUtils {
   }
 
   static String formatDouble(double value) {
-    final double rounded = double.parse(value.toStringAsFixed(1));
+    final rounded = double.parse(value.toStringAsFixed(1));
     if (rounded == rounded.toInt()) {
       return rounded.toInt().toString();
     } else {

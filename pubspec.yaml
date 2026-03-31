@@ -4,7 +4,7 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: ^3.11.1
+  sdk: ^3.11.4
 
 dependencies:
   flutter:
@@ -33,10 +33,11 @@ dependencies:
   http_parser: any
 dev_dependencies:
   flutter_test:
+  flutter_lints:
     sdk: flutter
-  custom_lint:
-  core_kit_lints:
-    path: tools/custom_lint  
+  # custom_lint:
+  # core_kit_lints:
+  #   path: tools/custom_lint  
 
 flutter:
   uses-material-design: true

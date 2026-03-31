@@ -45,12 +45,12 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
     selectedText = widget.initialText ?? widget.items.first;
   }
 
-  void _showPopupMenu(BuildContext context, GlobalKey key) async {
-    final RenderBox button =
+  Future<void> _showPopupMenu(BuildContext context, GlobalKey key) async {
+    final button =
         key.currentContext!.findRenderObject() as RenderBox;
-    final RenderBox overlay =
+    final overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset position = button.localToGlobal(
+    final position = button.localToGlobal(
       Offset.zero,
       ancestor: overlay,
     );

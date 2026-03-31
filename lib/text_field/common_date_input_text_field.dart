@@ -1,8 +1,7 @@
 import 'package:core_kit/text_field/common_text_field.dart';
+import 'package:core_kit/text_field/validation_type.dart';
 import 'package:core_kit/utils/app_utils.dart';
 import 'package:flutter/material.dart';
-
-import 'validation_type.dart';
 
 class CommonDateInputTextField extends StatefulWidget {
   CommonDateInputTextField({
@@ -101,7 +100,7 @@ class _CommonDateInputTextFieldState extends State<CommonDateInputTextField> {
         ? firstDate
         : (initialDate.isAfter(lastDate) ? lastDate : initialDate);
 
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: clampedInitialDate,
       firstDate: firstDate,

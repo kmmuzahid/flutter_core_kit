@@ -6,10 +6,9 @@ import 'dart:async';
 import 'package:core_kit/core_kit.dart';
 import 'package:core_kit/network/dio_interceptor.dart';
 import 'package:core_kit/network/dio_request_builder.dart';
+import 'package:core_kit/network/dio_utils.dart';
+import 'package:core_kit/network/request_input.dart';
 import 'package:dio/dio.dart' as dio;
-
-import 'dio_utils.dart';
-import 'request_input.dart';
 
 // Callback for request state changes
 typedef OnRequestStateChange<T> = void Function(ResponseState<T> state);

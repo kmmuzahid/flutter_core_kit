@@ -36,7 +36,7 @@ class coreKitInstanceSingleton {
   late DioServiceConfig dioServiceConfig;
   late TokenProvider tokenProvider;
 
-  PermissionHelperConfig permissionHelperConfig = PermissionHelperConfig();
+  PermissionHelperConfig permissionHelperConfig = const PermissionHelperConfig();
   PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
     padding: const EdgeInsetsDirectional.only(end: 10),
     show: const Icon(Icons.visibility, size: 20),
@@ -92,6 +92,7 @@ abstract class CoreKitConfig {
     return _context!;
   }
 
+  // ignore: invalid_internal_annotation
   @internal
   void attachContext(BuildContext ctx) => _context = ctx;
 

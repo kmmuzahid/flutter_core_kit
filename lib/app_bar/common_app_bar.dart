@@ -137,7 +137,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     // Merge local config with the global one from CoreKit.
     // Properties defined in `appbarConfig` will override the global ones.
-    final AppbarConfig config = coreKitInstance.appbarConfig.copyWith(
+    final config = coreKitInstance.appbarConfig.copyWith(
       onBack: appbarConfig?.onBack,
       backIcon: appbarConfig?.backIcon,
       actionsPadding: appbarConfig?.actionsPadding,
@@ -177,7 +177,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     final contrastColor = resolveTextColorFromDecoration(finalDecoration);
     final leadingButton = _buildLeadingButton(config, contrastColor);
 
-    bool isCenter =
+    final isCenter =
         config.titleAlignment == Alignment.center ||
         config.leadingAlignment == Alignment.bottomCenter ||
         config.actionAlignment == Alignment.topCenter;
@@ -301,7 +301,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildLeadingButton(AppbarConfig config, Color contrastColor) {
     if (hideBack) return const SizedBox.shrink();
 
-    final Widget buttonContent =
+    final buttonContent =
         leading ?? // 1. Use widget provided to CommonAppBar
         config.backButton ?? // 2. Use widget from AppbarConfig
         Icon(

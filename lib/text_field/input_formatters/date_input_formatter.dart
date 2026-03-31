@@ -12,12 +12,12 @@ class DateFormatter extends TextInputFormatter {
     }
 
     // Remove all non-digit characters
-    String digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    var digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
 
     // If no digits, return empty
     if (digits.isEmpty) return const TextEditingValue();
 
-    String formatted = '';
+    var formatted = '';
 
     // Handle year (first 4 digits)
     if (digits.length <= 4) {
@@ -28,17 +28,17 @@ class DateFormatter extends TextInputFormatter {
     }
 
     // We have at least 4 digits (year)
-    String year = digits.substring(0, 4);
+    final year = digits.substring(0, 4);
     formatted = year;
     digits = digits.substring(4);
 
     // Handle month (next 1-2 digits)
     if (digits.isNotEmpty) {
       // If we have more than 2 digits, take first 2 for month
-      String monthStr = digits.length > 2 ? digits.substring(0, 2) : digits;
+      final monthStr = digits.length > 2 ? digits.substring(0, 2) : digits;
 
       // Parse month, default to 1 if invalid
-      int month = int.tryParse(monthStr) ?? 1;
+      var month = int.tryParse(monthStr) ?? 1;
 
       // If we have 2 digits, validate month
       if (monthStr.length == 2) {
@@ -51,9 +51,9 @@ class DateFormatter extends TextInputFormatter {
 
         // Handle day if we have digits left
         if (digits.isNotEmpty) {
-          int maxDay = _getDaysInMonth(month, int.parse(year));
-          String dayStr = digits.length > 2 ? digits.substring(0, 2) : digits;
-          int day = int.tryParse(dayStr) ?? 1;
+          final maxDay = _getDaysInMonth(month, int.parse(year));
+          final dayStr = digits.length > 2 ? digits.substring(0, 2) : digits;
+          var day = int.tryParse(dayStr) ?? 1;
 
           if (dayStr.length == 2) {
             if (day < 1) day = 1;

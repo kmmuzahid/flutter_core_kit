@@ -158,8 +158,8 @@ class _CommonButtonState extends State<CommonButton>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bool hasBoundedWidth = constraints.maxWidth.isFinite;
-        final double maxAvailableWidth = hasBoundedWidth ? constraints.maxWidth : 0;
+        final hasBoundedWidth = constraints.maxWidth.isFinite;
+        final maxAvailableWidth = hasBoundedWidth ? constraints.maxWidth : 0.0;
 
         final textStyle = (themeTextStyle ?? const TextStyle()).copyWith(
           fontFamily: coreKitInstance.fontFamily,
@@ -167,20 +167,20 @@ class _CommonButtonState extends State<CommonButton>
           fontWeight: widget.titleWeight ?? themeTextStyle?.fontWeight ?? FontWeight.w600,
         );
 
-        final double minRequiredWidth = _measureMinWidth(
+        final minRequiredWidth = _measureMinWidth(
           context: context,
           textStyle: textStyle,
           padding: padding,
         );
 
         // FIX START
-        final double? themeMinWidthRaw = themeMinSize?.width;
-        final bool isThemeFullWidth = themeMinWidthRaw == double.infinity;
+        final themeMinWidthRaw = themeMinSize?.width;
+        final isThemeFullWidth = themeMinWidthRaw == double.infinity;
 
-        final double themeMinWidth = isThemeFullWidth ? 0 : (themeMinWidthRaw ?? 88.0);
+        final themeMinWidth = isThemeFullWidth ? 0.0 : (themeMinWidthRaw ?? 88.0);
         // FIX END
 
-        final double requestedWidth = widget.buttonWidth ?? double.nan;
+        final requestedWidth = widget.buttonWidth ?? double.nan;
 
         double? calculatedWidth;
 
@@ -310,7 +310,7 @@ double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
                         ?.backgroundBuilder
                         ?.call(context, state, child) ??
                     child ??
-                    SizedBox.shrink();
+                    const SizedBox.shrink();
               },
             ),
             child: CommonText(
@@ -387,13 +387,13 @@ class _BorderLoaderPainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
-    final dashWidth = 50.0;
-    final dashSpace = 1.0;
-    final totalLength = (dashWidth + dashSpace);
+    const dashWidth = 50.0;
+    const dashSpace = 1.0;
+    const totalLength = (dashWidth + dashSpace);
     final pathMetrics = path.computeMetrics();
 
     for (final metric in pathMetrics) {
-      double distance = progress * metric.length;
+      var distance = progress * metric.length;
 
       while (distance < metric.length) {
         final segment = metric.extractPath(distance, distance + dashWidth);

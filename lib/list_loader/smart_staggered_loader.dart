@@ -191,7 +191,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
         _scrollController.hasClients && _currentOffset >= _appBarHeight && _isContentScrollable;
 
     // Show main appbar when at top or content is not scrollable
-    final bool showMainAppBar =
+    final showMainAppBar =
         widget.appbar != null &&
         _appBarHeight > 0 &&
         (_scrollController.hasClients
@@ -199,7 +199,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
             : true);
 
     // Show collapsed appbar when content is scrollable and scrolled past threshold
-    final bool showCollapsedAppBar =
+    final showCollapsedAppBar =
         widget.onColapsAppbar != null &&
         ((isAppBarCollapsed && _isContentScrollable) || (!showMainAppBar && _isContentScrollable));
 

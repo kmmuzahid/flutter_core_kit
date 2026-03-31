@@ -140,7 +140,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     // Show main appbar based on scroll position
     // In reverse: show when at bottom (pixels < 5 or not scrollable)
     // In normal: show when at top or not scrollable
-    final bool showMainAppBar =
+    final showMainAppBar =
         widget.appbar != null &&
         _appBarHeight > 0 &&
         (_scrollController.hasClients
@@ -152,7 +152,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     // Show collapsed appbar when:
     // - Content is scrollable AND we've scrolled away from the top/bottom
     // - OR when main appbar is hidden
-    final bool showCollapsedAppBar =
+    final showCollapsedAppBar =
         widget.onColapsAppbar != null &&
         ((isAppBarCollapsed && _isContentScrollable) || (!showMainAppBar && _isContentScrollable));
 

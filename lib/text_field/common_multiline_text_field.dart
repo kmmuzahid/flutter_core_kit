@@ -117,7 +117,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     if (text.trim().isEmpty) return text;
 
     // Remove HTML tags
-    String cleaned = text.replaceAll(RegExp(r'<[^>]*>'), '');
+    var cleaned = text.replaceAll(RegExp(r'<[^>]*>'), '');
     // Replace multiple spaces with a single space
     cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
     return cleaned;
@@ -241,7 +241,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     final cleanedText = _cleanText(newValue.text);
 
                     if (widget.maxLength != null) {
-                      final int length = cleanedText.length;
+                      final length = cleanedText.length;
                       if (length <= widget.maxLength!) {
                         setState(() {
                           lengthCount = length;
@@ -301,7 +301,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                   widget.validation ??
                   (value) {
                     final newValue = _cleanText(value?.trim() ?? '');
-                    String? error = InputHelper.validate(
+                    var error = InputHelper.validate(
                       widget.validationType,
                       newValue,
                       originalPassword: widget.originalPassword?.call(),

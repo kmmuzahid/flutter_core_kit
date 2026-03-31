@@ -88,9 +88,9 @@ extension TimeFormater on DateTime {
   String get dayName => DateFormat('E').format(this);
 
   String get checkTime {
-    final DateTime currentDateTime = DateTime.now();
+    final currentDateTime = DateTime.now();
 
-    final Duration difference = currentDateTime.difference(this);
+    final difference = currentDateTime.difference(this);
     if (difference.inDays == 0) {
       if (difference.inHours == 0) {
         return ('${difference.inMinutes} minutes ago');
@@ -202,7 +202,7 @@ extension ListXFileToMultipart on List<XFile> {
 
 String? _getMimeTypeFromXFile(XFile file) {
   // Get the file extension from the file path
-  String extension = file.path.split('.').last.toLowerCase();
+  final extension = file.path.split('.').last.toLowerCase();
 
   // Map the extension to MIME type
   switch (extension) {
@@ -239,7 +239,7 @@ extension TimeOfDayParser on String {
   /// Supports both 12-hour (e.g. "2:30 PM") and 24-hour (e.g. "14:30") formats
   TimeOfDay toTimeOfDay(BuildContext context) {
     if (isEmpty) {
-      throw FormatException('Time string is empty');
+      throw const FormatException('Time string is empty');
     }
 
     final is24HourFormat = MediaQuery.of(context).alwaysUse24HourFormat;
@@ -265,7 +265,7 @@ extension TimeOfDayParser on String {
         throw FormatException('Invalid 12-hour time format: $trimmed');
       }
 
-      int hour = int.parse(match.group(1)!);
+      var hour = int.parse(match.group(1)!);
       final minute = int.parse(match.group(2)!);
       final period = match.group(3)!.toUpperCase();
 
@@ -335,7 +335,7 @@ extension StringToTimeOfDay on String {
       throw FormatException('Invalid 12-hour time format: $this');
     }
 
-    int h = int.parse(match.group(1)!);
+    var h = int.parse(match.group(1)!);
     final m = int.parse(match.group(2)!);
     final period = match.group(3)!.toUpperCase();
 

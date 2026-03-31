@@ -32,12 +32,12 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
   XFile? _selectedImages;
 
   Future<void> _pickImage(FormFieldState<XFile> fieldState) async {
-    final permissionHandlerHelper = PermissionHandlerHelper(
+    const permissionHandlerHelper = PermissionHandlerHelper(
       permission: Permission.photos,
     );
     final status = await permissionHandlerHelper.getStatus();
     if (!status) return;
-    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
 
     if (picked != null) {
       setState(() {

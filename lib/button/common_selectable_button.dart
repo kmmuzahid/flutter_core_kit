@@ -15,7 +15,7 @@ class CommonSelectableButton extends FormField<String> {
        super(
          initialValue: initialValue ?? titles.first,
          builder: (FormFieldState<String> field) {
-           final _SelectableButtonsState state =
+           final state =
                field as _SelectableButtonsState;
 
            final onPrimary = Theme.of(state.context).colorScheme.onPrimary;

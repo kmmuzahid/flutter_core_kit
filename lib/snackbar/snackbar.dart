@@ -18,8 +18,8 @@ void showSnackBar(
   final overlayState = coreKitInstance.navigatorKey.currentState?.overlay;
   if (overlayState == null) return;
 
-  final int calculatedMs = 2000 + (text.length * 25);
-  final Duration displayDuration =
+  final calculatedMs = 2000 + (text.length * 25);
+  final displayDuration =
       customDuration ?? Duration(milliseconds: calculatedMs);
 
   _currentSnackBarEntry?.remove();
@@ -157,7 +157,7 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
                           snackBarTheme.backgroundColor ?? colorScheme.surface,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 10,
                           spreadRadius: 1,
                           offset: const Offset(0, 4),
@@ -190,8 +190,7 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
                               style:
                                   snackBarTheme.contentTextStyle ??
                                   TextStyle(
-                                    color: colorScheme.onSurface.withOpacity(
-                                      0.85,
+                                    color: colorScheme.onSurface.withValues(alpha: 0.85,
                                     ),
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,

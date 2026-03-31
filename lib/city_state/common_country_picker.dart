@@ -67,7 +67,7 @@ class CommonCountryPicker extends StatelessWidget {
   }
 
   List<String> getStates() {
-    List<String> stateList = [];
+    final stateList = <String>[];
 
     for (final countryData in allStatesWithCities) {
       if (countryData is Map<String, dynamic>) {

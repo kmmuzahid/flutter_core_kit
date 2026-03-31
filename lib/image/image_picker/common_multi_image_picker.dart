@@ -56,12 +56,12 @@ class _CommonMultiImagePickerFieldState
     _images = _images = List<XFile>.from(widget.field.value ?? []);
   }
 
-  void _pickImages() async {
+  Future<void> _pickImages() async {
     final status = await PermissionHelper.request(Permission.photos);
     if (!status) return;
 
     if (widget.isMulti) {
-      var files = (await _picker.pickMultiImage(limit: widget.limit));
+      final files = (await _picker.pickMultiImage(limit: widget.limit));
       if (files.isEmpty) return;
 
       final existingNames = _images.map((img) => p.basename(img.path)).toSet();
@@ -157,7 +157,7 @@ class _CommonMultiImagePickerFieldState
               }
 
               // Image item
-              final XFile file = _images[index];
+              final file = _images[index];
 
               return Stack(
                 clipBehavior: Clip.none,

@@ -295,7 +295,7 @@ class _BorderLoaderPainter extends CustomPainter {
     final rect = Offset.zero & size;
 
     // Get correct path for ANY InputBorder type
-    Path path = inputBorder.getInnerPath(rect);
+    var path = inputBorder.getInnerPath(rect);
 
     if (inputBorder is UnderlineInputBorder) {
       path = Path();
@@ -308,8 +308,8 @@ class _BorderLoaderPainter extends CustomPainter {
       ..strokeWidth = 2.w
       ..style = PaintingStyle.stroke;
 
-    const double dashWidthFactor = 0.02;
-    const double dashSpaceFactor = 0.08;
+    const dashWidthFactor = 0.02;
+    const dashSpaceFactor = 0.08;
 
     final pathMetrics = path.computeMetrics();
 
@@ -318,7 +318,7 @@ class _BorderLoaderPainter extends CustomPainter {
       final dashSpace = metric.length * dashSpaceFactor;
       final totalLength = dashWidth + dashSpace;
 
-      double distance = progress * metric.length;
+      var distance = progress * metric.length;
 
       while (distance < metric.length) {
         final segment = metric.extractPath(distance, distance + dashWidth);

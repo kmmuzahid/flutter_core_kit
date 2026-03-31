@@ -162,7 +162,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
 
   String _cleanText(String text) {
     if (text.trim().isEmpty) return text;
-    String cleaned = text.replaceAll(RegExp(r'<[^>]*>'), '');
+    var cleaned = text.replaceAll(RegExp(r'<[^>]*>'), '');
     cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
     return cleaned;
   }
@@ -175,7 +175,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
     double? height,
     FontStyle? fontStyle,
   }) {
-    return (widget.textStyle ?? TextStyle()).copyWith(
+    return (widget.textStyle ?? const TextStyle()).copyWith(
       fontFamily: coreKitInstance.fontFamily,
       fontWeight: fontWeight,
       fontSize: fontSize,
@@ -243,7 +243,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
             final cleanedText = _cleanText(newValue.text);
 
             if (widget.maxLength != null) {
-              final int length = cleanedText.length;
+              final length = cleanedText.length;
               if (length <= widget.maxLength!) {
                 setState(() => lengthCount = length);
                 return newValue.copyWith(
@@ -282,7 +282,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
           widget.validation ??
           (value) {
             final newValue = _cleanText(value?.trim() ?? '');
-            String? error = InputHelper.validate(
+            var error = InputHelper.validate(
               widget.validationType,
               newValue,
               originalPassword: widget.originalPassword?.call(),

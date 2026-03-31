@@ -18,7 +18,7 @@ class PermissionHelper {
   /// final status = await PermissionHelper.request(Permission.camera);
   /// ```
   static Future<bool> request(Permission permission) async {
-    bool currentStatus = false;
+    var currentStatus = false;
 
     if ((permission == Permission.photos || permission == Permission.storage) &&
         Platform.isAndroid) {
