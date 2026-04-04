@@ -119,11 +119,24 @@ class DioRequestBuilder {
       var formData = FormData();
       final form = <String, dynamic>{};
 
-      if (input.formFields != null) {
-        form.addAll(input.formFields!);
-        // _form.add(input.formFields!.entries.map((e) => MapEntry(e.key, e.value)))
-        // formData.fields.addAll(input.formFields!.entries.map((e) => MapEntry(e.key, e.value)));
-      }
+      input.formFields?.forEach((key, value) async {
+        if (value is Map) {
+          form[key] = jsonEncode(value);
+        } else if (value is XFile) {
+          final multipartFile = await value.toMultipart();
+          form[key] = multipartFile;
+        } else if (value is List<XFile>) {
+          final imageFileList = await Future.wait(
+            value.map((e) async {
+              return await e.toMultipart();
+            }).toList(),
+          );
+          form[key] = imageFileList;
+        } else {
+          form[key] = value;
+        }
+      });
+
       if (hasJsonBody) {
         form['data'] = jsonEncode(input.jsonBody);
         // formData.fields.add(MapEntry('data', jsonEncode(input.jsonBody)));
