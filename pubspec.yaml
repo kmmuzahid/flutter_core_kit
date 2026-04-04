@@ -24,7 +24,6 @@ dependencies:
   # another_flushbar:
   share_plus:
   path:
-  
 
   analyzer: any
   analyzer_plugin: any
@@ -32,16 +31,9 @@ dependencies:
   path_provider: any
   http_parser: any
 dev_dependencies:
-  flutter_test:
-  flutter_lints:
-    sdk: flutter
-  # custom_lint:
-  # core_kit_lints:
-  #   path: tools/custom_lint  
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
- 
-

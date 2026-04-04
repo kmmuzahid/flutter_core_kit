@@ -1,3 +1,5 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +14,7 @@ class CommonImagePicker extends StatefulWidget {
     this.validator,
     this.pickerIconWidget,
     this.src,
+    this.onChange,
   });
 
   final double width;
@@ -20,6 +23,7 @@ class CommonImagePicker extends StatefulWidget {
   final IconData pickerIcon;
   final Widget? pickerIconWidget;
   final void Function(XFile?)? onSaved;
+  final void Function(XFile?)? onChange;
   final FormFieldValidator<XFile>? validator;
   final String? src;
 
@@ -44,6 +48,7 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
         _selectedImages = picked; // Always replace
       });
       fieldState.didChange(_selectedImages);
+      widget.onChange?.call(_selectedImages);
     }
   }
 
