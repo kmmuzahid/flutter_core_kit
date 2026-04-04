@@ -108,13 +108,12 @@ class DioRequestBuilder {
     dynamic body;
     var contentType = 'application/json';
 
-    final hasFiles = input.files != null && input.files!.isNotEmpty;
-    final hasFields = input.formFields != null;
-    final hasJson = input.jsonBody != null;
-    final hasList = input.listBody != null;
+    final hasFiles = input.files?.isNotEmpty == true;
+    final hasFields = input.formFields?.isNotEmpty == true;
+    final hasJsonBody = input.jsonBody?.isNotEmpty == true;
+    final hasListBody = input.listBody?.isNotEmpty == true;
 
-    final needsMultipart =
-        hasFiles || hasFields || (hasFiles && (hasJson || hasList));
+    final needsMultipart = hasFiles || hasFields;
 
     if (needsMultipart) {
       var formData = FormData();
@@ -125,11 +124,11 @@ class DioRequestBuilder {
         // _form.add(input.formFields!.entries.map((e) => MapEntry(e.key, e.value)))
         // formData.fields.addAll(input.formFields!.entries.map((e) => MapEntry(e.key, e.value)));
       }
-      if (hasJson) {
+      if (hasJsonBody) {
         form['data'] = jsonEncode(input.jsonBody);
         // formData.fields.add(MapEntry('data', jsonEncode(input.jsonBody)));
       }
-      if (hasList) {
+      if (hasListBody) {
         form['data'] = jsonEncode(input.listBody);
         // formData.fields.add(MapEntry('data', jsonEncode(input.listBody)));
       }
@@ -159,10 +158,10 @@ class DioRequestBuilder {
       contentType = 'multipart/form-data';
       formData = FormData.fromMap(form);
       body = formData;
-    } else if (hasJson) {
+    } else if (hasJsonBody) {
       body = input.jsonBody;
       contentType = 'application/json';
-    } else if (hasList) {
+    } else if (hasListBody) {
       body = jsonEncode(input.listBody);
       contentType = 'application/json';
     }
