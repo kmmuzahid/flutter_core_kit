@@ -6,8 +6,6 @@ library;
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
-
- 
 class SmartTabContext<T> {
   const SmartTabContext({
     required this.tab,
@@ -47,7 +45,7 @@ class SmartTabConfig<T> {
     this.initalLoader,
     this.emptyWidget,
   });
- 
+
   final T tab;
 
   final int itemCount;
@@ -75,7 +73,7 @@ class SmartTabListLoader<T> extends StatefulWidget {
     this.gridConfig,
     this.emptyWidget,
     super.key,
-  }) : assert(tabs.length > 0, 'tabs must not be empty');
+  }) : assert(tabs.isNotEmpty, 'tabs must not be empty');
 
   final T value;
 
@@ -121,7 +119,7 @@ class SmartTabListLoader<T> extends StatefulWidget {
 }
 
 class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
-    with TickerProviderStateMixin { 
+    with TickerProviderStateMixin {
   late Map<T, ScrollController> _scrollControllers;
   int _currentIndex = 0;
 
@@ -134,11 +132,10 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
   @override
   void initState() {
     super.initState();
-  
 
-    _scrollControllers = {for (var tab in widget.tabs) tab.tab: ScrollController()};
-
-   
+    _scrollControllers = {
+      for (var tab in widget.tabs) tab.tab: ScrollController(),
+    };
   }
 
   @override
@@ -153,10 +150,9 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
     }
 
     if (oldWidget.tabs.length != widget.tabs.length) {
- 
-
       _scrollControllers = {
-        for (var tab in widget.tabs) tab.tab: _scrollControllers[tab.tab] ?? ScrollController(),
+        for (var tab in widget.tabs)
+          tab.tab: _scrollControllers[tab.tab] ?? ScrollController(),
       };
     }
   }
@@ -170,15 +166,15 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
     if (index != -1 && index != _currentIndex) {
       setState(() {
         _currentIndex = index;
-      }); 
+      });
     }
   }
 
- 
   @override
   void dispose() {
- 
-    _scrollControllers.values.forEach((c) => c.dispose());
+    for (var c in _scrollControllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -311,7 +307,6 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       appbar: widget.appbar,
       onColapsAppbar: widget.onColapsAppbar,
       limit: widget.limit,
-
     );
   }
 }
