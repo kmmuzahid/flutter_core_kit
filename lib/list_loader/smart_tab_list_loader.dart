@@ -194,9 +194,9 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
             opacity: _currentIndex == index ? 1 : 0,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: widget.gridConfig == null
-                ? _routeList(cfg, scrollController, index)
-                : _routeGrid(cfg, scrollController, index),
+            child: cfg.gridConfig != null || widget.gridConfig != null
+                ? _routeGrid(cfg, scrollController, index)
+                : _routeList(cfg, scrollController, index),
           ),
         );
       }),
