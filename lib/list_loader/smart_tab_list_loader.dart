@@ -42,6 +42,7 @@ class SmartTabConfig<T> {
     required this.itemCount,
     this.isLoading = false,
     this.isLoadDone = false,
+    this.gridConfig,
     this.initalLoader,
     this.emptyWidget,
   });
@@ -53,6 +54,7 @@ class SmartTabConfig<T> {
   final bool isLoadDone;
   final Widget? initalLoader;
   final Widget? emptyWidget;
+  final GridConfig? gridConfig;
 }
 
 // ignore: must_be_immutable
@@ -264,7 +266,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       key: _getKey(cfg.tab),
       emptyWidget: cfg.emptyWidget ?? widget.emptyWidget,
       scrollController: scrollController,
-      gridConfig: widget.gridConfig,
+      gridConfig: cfg.gridConfig ?? widget.gridConfig,
       itemCount: cfg.itemCount,
       itemBuilder: (context, idx) {
         return widget.itemBuilder(
