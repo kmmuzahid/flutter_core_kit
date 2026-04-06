@@ -171,6 +171,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final appBarWidgets = [
       if (showMainAppBar)
         SliverAppBar(
+          primary: false,
           floating: true,
           snap: true,
           elevation: 0,

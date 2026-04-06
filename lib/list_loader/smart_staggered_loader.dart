@@ -254,6 +254,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
       slivers: [
         if (showMainAppBar)
           SliverAppBar(
+            primary: false,
             floating: true,
             snap: true,
             elevation: 0,
