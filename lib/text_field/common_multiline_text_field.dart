@@ -228,6 +228,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
         children: [
           Expanded(
             child: TextFormField(
+              onTapOutside: (event) {
+                _focusNode.unfocus();
+              },
               textAlignVertical: TextAlignVertical.top,
               readOnly: widget.isReadOnly,
               maxLines: null,
