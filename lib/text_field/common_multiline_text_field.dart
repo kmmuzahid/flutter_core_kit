@@ -89,6 +89,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   late bool _obscureText;
   int wordCount = 0;
   int lengthCount = 0;
+  late ThemeData theme;
 
   // bool get _hasController => widget.controller != null;
 
@@ -110,6 +111,12 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     _focusNode.addListener(() {
       setState(() {}); // rebuild to reflect focus changes
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    theme = Theme.of(context);
   }
 
   // Add this helper method to clean the text
@@ -425,20 +432,32 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
 
                 focusedBorder: _buildBorder(
                   color: widget.isReadOnly
-                      ? (widget.borderColor ?? coreKitInstance.outlineColor)
-                      : coreKitInstance.primaryColor,
+                      ? (widget.borderColor ??
+                          theme.inputDecorationTheme.disabledBorder?.borderSide
+                              .color ??
+                          coreKitInstance.outlineColor)
+                      : theme.inputDecorationTheme.focusedBorder?.borderSide
+                              .color ??
+                          coreKitInstance.primaryColor,
                   width: widget.borderWidth.w,
                 ),
                 enabledBorder: _buildBorder(
-                  color: widget.borderColor ?? coreKitInstance.outlineColor,
+                  color: widget.borderColor ??
+                      theme.inputDecorationTheme.enabledBorder?.borderSide
+                          .color ??
+                      coreKitInstance.outlineColor,
                   width: widget.borderWidth.w,
                 ),
                 errorBorder: _buildBorder(
-                  color: Colors.red,
+                  color: theme.inputDecorationTheme.errorBorder?.borderSide
+                          .color ??
+                      Colors.red,
                   width: widget.borderWidth.w,
                 ),
                 focusedErrorBorder: _buildBorder(
-                  color: Colors.red,
+                  color: theme.inputDecorationTheme.errorBorder?.borderSide
+                          .color ??
+                      Colors.red,
                   width: widget.borderWidth.w,
                 ),
 
