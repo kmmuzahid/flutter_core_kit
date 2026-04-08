@@ -433,29 +433,47 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 focusedBorder: _buildBorder(
                   color: widget.isReadOnly
                       ? (widget.borderColor ??
-                          theme.inputDecorationTheme.disabledBorder?.borderSide
-                              .color ??
-                          coreKitInstance.outlineColor)
-                      : theme.inputDecorationTheme.focusedBorder?.borderSide
-                              .color ??
-                          coreKitInstance.primaryColor,
+                            theme
+                                .inputDecorationTheme
+                                .disabledBorder
+                                ?.borderSide
+                                .color ??
+                            coreKitInstance.outlineColor)
+                      : theme
+                                .inputDecorationTheme
+                                .focusedBorder
+                                ?.borderSide
+                                .color ??
+                            coreKitInstance.primaryColor,
                   width: widget.borderWidth.w,
                 ),
                 enabledBorder: _buildBorder(
-                  color: widget.borderColor ??
-                      theme.inputDecorationTheme.enabledBorder?.borderSide
+                  color:
+                      widget.borderColor ??
+                      theme
+                          .inputDecorationTheme
+                          .enabledBorder
+                          ?.borderSide
                           .color ??
                       coreKitInstance.outlineColor,
                   width: widget.borderWidth.w,
                 ),
                 errorBorder: _buildBorder(
-                  color: theme.inputDecorationTheme.errorBorder?.borderSide
+                  color:
+                      theme
+                          .inputDecorationTheme
+                          .errorBorder
+                          ?.borderSide
                           .color ??
                       Colors.red,
                   width: widget.borderWidth.w,
                 ),
                 focusedErrorBorder: _buildBorder(
-                  color: theme.inputDecorationTheme.errorBorder?.borderSide
+                  color:
+                      theme
+                          .inputDecorationTheme
+                          .errorBorder
+                          ?.borderSide
                           .color ??
                       Colors.red,
                   width: widget.borderWidth.w,
@@ -489,6 +507,12 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     );
   }
 
+  TextStyle _getCounterStyle() {
+    return widget.counterTextStyle ??
+        Theme.of(context).textTheme.bodySmall ??
+        TextStyle(fontSize: 12, color: Colors.grey.shade200);
+  }
+
   Widget _maximumHintBuilder() {
     return (widget.maxLength ?? 0) > 0
         ? (widget.multilineLimitHintBuilder?.maximumHint != null
@@ -498,7 +522,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 )
               : Text(
                   '$lengthCount/${widget.maxLength}',
-                  style: widget.counterTextStyle,
+                  style: _getCounterStyle(),
                 ))
         : (widget.multilineLimitHintBuilder?.maximumHint != null
               ? widget.multilineLimitHintBuilder!.maximumHint(
@@ -507,7 +531,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 )
               : Text(
                   '$wordCount/${widget.maxWords}',
-                  style: widget.counterTextStyle,
+                  style: _getCounterStyle(),
                 ));
   }
 
@@ -520,7 +544,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 )
               : Text(
                   '$lengthCount/${widget.minLength}',
-                  style: widget.counterTextStyle,
+                  style: _getCounterStyle(),
                 ))
         : (widget.multilineLimitHintBuilder?.minimumHint != null
               ? widget.multilineLimitHintBuilder!.minimumHint(
@@ -529,7 +553,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 )
               : Text(
                   '$wordCount/${widget.minWords}',
-                  style: widget.counterTextStyle,
+                  style: _getCounterStyle(),
                 ));
   }
 }
