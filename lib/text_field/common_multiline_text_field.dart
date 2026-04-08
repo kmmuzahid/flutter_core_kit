@@ -509,7 +509,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
 
   TextStyle _getCounterStyle() {
     return widget.counterTextStyle ??
-        Theme.of(context).textTheme.bodySmall ??
+        theme.textTheme.bodySmall?.copyWith(
+          color: theme.inputDecorationTheme.hintStyle?.color,
+        ) ??
         TextStyle(fontSize: 12, color: Colors.grey.shade200);
   }
 
