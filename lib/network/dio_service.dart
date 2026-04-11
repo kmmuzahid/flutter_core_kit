@@ -20,11 +20,18 @@ class DioServiceConfig {
   final Duration connectTimeout;
   final Duration receiveTimeout;
   final Function()? onLogout;
+  final String tokenHeaderKey;
+  final String refreshTokenHeaderKey;
+  final bool isBearerToken;
+
 
   final bool enableDebugLogs;
 
   DioServiceConfig({
     required this.baseUrl,
+    this.tokenHeaderKey = 'Authorization',
+    this.refreshTokenHeaderKey = 'refreshToken',
+    this.isBearerToken = true,
 
     ///Refresh token endpoint must be post method
     required this.refreshTokenEndpoint,

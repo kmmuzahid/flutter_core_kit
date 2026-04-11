@@ -49,7 +49,7 @@ class DioInterceptor extends Interceptor {
   Future<void> _injectToken(RequestOptions options) async {
     final accessToken = await _tokenProvider.accessToken();
     if (accessToken?.isNotEmpty == true) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
+      options.headers[_config.tokenHeaderKey] = '${_config.isBearerToken? 'Bearer ' : ''}$accessToken';
     }
   }
 
@@ -102,7 +102,7 @@ class DioInterceptor extends Interceptor {
     try {
       final response = await http.post(
         Uri.parse('${_config.baseUrl}${_config.refreshTokenEndpoint}'),
-        headers: {'refreshtoken': refreshToken},
+        headers: {_config.refreshTokenHeaderKey: refreshToken},
       );
 
       if (response.body.isNotEmpty &&
