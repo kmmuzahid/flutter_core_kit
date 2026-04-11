@@ -100,18 +100,18 @@ class DioInterceptor extends Interceptor {
       tag: 'POST::${_config.refreshTokenEndpoint}',
     );
     try {
-      final response = await http.post(
-        Uri.parse('${_config.baseUrl}${_config.refreshTokenEndpoint}'),
-        headers: {_config.refreshTokenHeaderKey: refreshToken},
-      );
+      
+     final response = await  _dio.request(_config.refreshTokenEndpoint,
+         options: Options(method: _config.refreshTokenRequestMethod.name, headers: {_config.refreshTokenHeaderKey: refreshToken}));
 
-      if (response.body.isNotEmpty &&
+
+      if (response.data.isNotEmpty &&
           (response.statusCode == 200 || response.statusCode == 201)) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.data);
 
         await _tokenProvider.updateTokens(data['data']);
       } else if (response.statusCode == 401) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.data);
         DioUtils.showMessage(data['message'] ?? '', isError: true);
         _config.onLogout?.call();
         return;

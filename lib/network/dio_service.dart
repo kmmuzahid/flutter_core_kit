@@ -23,6 +23,7 @@ class DioServiceConfig {
   final String tokenHeaderKey;
   final String refreshTokenHeaderKey;
   final bool isBearerToken;
+  final RequestMethod refreshTokenRequestMethod;
 
 
   final bool enableDebugLogs;
@@ -32,6 +33,7 @@ class DioServiceConfig {
     this.tokenHeaderKey = 'Authorization',
     this.refreshTokenHeaderKey = 'refreshToken',
     this.isBearerToken = true,
+    this.refreshTokenRequestMethod =  RequestMethod.POST,
 
     ///Refresh token endpoint must be post method
     required this.refreshTokenEndpoint,
