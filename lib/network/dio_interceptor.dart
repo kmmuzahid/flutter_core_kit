@@ -107,11 +107,11 @@ class DioInterceptor extends Interceptor {
 
       if (response.data.isNotEmpty &&
           (response.statusCode == 200 || response.statusCode == 201)) {
-        final data = jsonDecode(response.data);
+        final data = response.data;
 
         await _tokenProvider.updateTokens(data['data']);
       } else if (response.statusCode == 401) {
-        final data = jsonDecode(response.data);
+        final data =  response.data;
         DioUtils.showMessage(data['message'] ?? '', isError: true);
         _config.onLogout?.call();
         return;
