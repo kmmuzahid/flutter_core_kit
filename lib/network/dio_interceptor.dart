@@ -96,7 +96,7 @@ class DioInterceptor extends Interceptor {
     }
     DioUtils.log(
       _config,
-      '🚀 Headers: {\'refreshtoken\': $refreshToken}\n',
+      '🚀 Headers: {\'${_config.refreshTokenHeaderKey}\': $refreshToken}\n',
       tag: 'POST::${_config.refreshTokenEndpoint}',
     );
     try {
