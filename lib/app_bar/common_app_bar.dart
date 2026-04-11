@@ -189,6 +189,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         statusBarIconBrightness: contrastColor == Colors.white
             ? Brightness.light
             : Brightness.dark,
+        statusBarBrightness: contrastColor == Colors.white
+            ? Brightness.dark   // iOS: dark background = dark brightness = white text
+            : Brightness.light, // iOS: light background = light brightness = black text
       ),
       child: Container(
         decoration: finalDecoration,
