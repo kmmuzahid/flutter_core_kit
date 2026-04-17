@@ -23,6 +23,7 @@ class CommonButton extends StatefulWidget {
     this.gradient,
     this.padding,
     this.titleGradient,
+    this.titleSpacing = 10,
   });
   final VoidCallback? onTap;
   final String titleText;
@@ -43,6 +44,7 @@ class CommonButton extends StatefulWidget {
   final Gradient? gradient;
   final Gradient? titleGradient;
   final EdgeInsetsGeometry? padding;
+  final double titleSpacing;
 
   @override
   State<CommonButton> createState() => _CommonButtonState();
@@ -315,6 +317,7 @@ double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
             ),
             child: CommonText(
               text: widget.titleText,
+              textSpacing: widget.titleSpacing,
               preffix: widget.prefix,
               suffix: widget.suffix,
               gradient: widget.titleGradient,

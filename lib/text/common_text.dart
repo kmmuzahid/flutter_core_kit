@@ -36,6 +36,7 @@ class CommonText extends StatelessWidget {
     this.decoration,
     this.textDirection,
     this.height,
+    this.textSpacing = 10,
     this.textScaleFactor = .9,
     this.preventScaling = false,
     this.gradient,
@@ -75,6 +76,7 @@ class CommonText extends StatelessWidget {
   final double textScaleFactor;
   final bool preventScaling;
   final Gradient? gradient;
+  final double textSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +237,7 @@ class CommonText extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ?preffix,
-        if (preffix != null) 10.width,
+        if (preffix != null) textSpacing.width,
         Flexible(
           child: gradient != null
               ? ShaderMask(
@@ -246,7 +248,7 @@ class CommonText extends StatelessWidget {
                 )
               : buildText(),
         ),
-        if (suffix != null) 10.width,
+        if (suffix != null) textSpacing.width,
         ?suffix,
       ],
     );
