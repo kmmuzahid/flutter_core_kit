@@ -11,7 +11,6 @@ class CommonMultilineTextField extends StatefulWidget {
     this.labelText,
     this.prefixIcon,
     this.controller,
-    this.textInputAction = TextInputAction.next,
     this.prefixText,
     this.paddingHorizontal = 16,
     this.paddingVertical = 14,
@@ -58,7 +57,6 @@ class CommonMultilineTextField extends StatefulWidget {
   final double borderRadius;
   final VoidCallback? onTap;
   final TextEditingController? controller;
-  final TextInputAction textInputAction;
   final bool showActionButton;
   final Widget? actionButtonIcon;
   final ValidationType validationType;
@@ -290,7 +288,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     return oldValue;
                   }),
               ],
-              keyboardType: InputHelper.getKeyboardType(widget.validationType),
+              keyboardType:  .multiline,
               textAlign: widget.textAlign,
               controller: _controller,
               focusNode: _focusNode,
@@ -298,7 +296,6 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               obscureText: _obscureText,
               onChanged: widget.onChanged,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              textInputAction: widget.textInputAction,
               onSaved: (v) {
                 _onSave(v?.trim() ?? '');
               },
