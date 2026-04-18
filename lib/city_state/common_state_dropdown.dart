@@ -24,6 +24,7 @@ class CommonStateDropdown extends StatelessWidget {
     this.borderRadius = 8,
     this.enableInitalSelection = false,
     this.contentPadding,
+    this.suffixIcon,
   });
 
   final String countryName;
@@ -41,6 +42,7 @@ class CommonStateDropdown extends StatelessWidget {
   final double borderRadius;
   final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
+  final Widget? suffixIcon;
   @override
   Widget build(BuildContext context) {
     final state =
@@ -51,6 +53,7 @@ class CommonStateDropdown extends StatelessWidget {
       key: const Key('Location_united_states'),
       hint: hint,
       prefix: prefix,
+      suffixIcon: suffixIcon,
       contentPadding: contentPadding,
       borderRadius: borderRadius,
       isLoading: isLoading,
