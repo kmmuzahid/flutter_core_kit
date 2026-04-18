@@ -25,6 +25,7 @@ class CommonCityDropDown extends StatelessWidget {
     this.borderRadius = 8,
     this.enableInitalSelection = false,
     this.contentPadding,
+    this.suffixIcon,
   });
   final String selectedState;
   final String selectedCountry;
@@ -41,6 +42,7 @@ class CommonCityDropDown extends StatelessWidget {
   final double borderRadius;
   final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
+  final Widget? suffixIcon;
   @override
   Widget build(BuildContext context) {
     final city =
@@ -52,6 +54,7 @@ class CommonCityDropDown extends StatelessWidget {
     return CommonDropDown<MapEntry<String, String>>(
       hint: hint,
       prefix: prefix,
+      suffixIcon: suffixIcon,
       fontStyle: fontStyle,
       contentPadding: contentPadding,
       items: city,

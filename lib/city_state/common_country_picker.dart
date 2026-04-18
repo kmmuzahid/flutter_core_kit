@@ -23,6 +23,7 @@ class CommonCountryPicker extends StatelessWidget {
     this.borderRadius = 8,
     this.enableInitalSelection = false,
     this.contentPadding,
+    this.suffixIcon,
   });
 
   final Widget? prefix;
@@ -39,6 +40,7 @@ class CommonCountryPicker extends StatelessWidget {
   final double borderRadius;
   final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
+  final Widget? suffixIcon;
   @override
   Widget build(BuildContext context) {
     final state = getStates().map((e) => MapEntry(e, e)).toList()
@@ -48,6 +50,7 @@ class CommonCountryPicker extends StatelessWidget {
       key: const Key('Country_picker'),
       hint: hint,
       prefix: prefix,
+      suffixIcon: suffixIcon,
       contentPadding: contentPadding,
       borderRadius: borderRadius,
       isLoading: isLoading,
