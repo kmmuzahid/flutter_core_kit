@@ -45,6 +45,8 @@ class SmartTabConfig<T> {
     this.gridConfig,
     this.initalLoader,
     this.emptyWidget,
+    this.subAppBar,
+    this.subOnColapsAppbar,
   });
 
   final T tab;
@@ -55,6 +57,8 @@ class SmartTabConfig<T> {
   final Widget? initalLoader;
   final Widget? emptyWidget;
   final GridConfig? gridConfig;
+  final Widget? subAppBar;
+  final Widget? subOnColapsAppbar;
 }
 
 // ignore: must_be_immutable
@@ -251,8 +255,8 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       isLoading: cfg.isLoading,
       isLoadDone: cfg.isLoadDone,
       padding: widget.padding,
-      appbar: widget.appbar,
-      onColapsAppbar: widget.onColapsAppbar,
+      appbar: _buildAppbar(cfg),
+      onColapsAppbar: _buildOncolupse(cfg),
       limit: widget.limit,
     );
   }
@@ -306,9 +310,31 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       isLoading: cfg.isLoading,
       isLoadDone: cfg.isLoadDone,
       padding: widget.padding,
-      appbar: widget.appbar,
-      onColapsAppbar: widget.onColapsAppbar,
+      appbar: _buildAppbar(cfg),
+      onColapsAppbar: _buildOncolupse(cfg),
       limit: widget.limit,
     );
+  }
+
+  Widget? _buildOncolupse(SmartTabConfig<dynamic> cfg) {
+    return cfg.subOnColapsAppbar == null
+        ? widget.onColapsAppbar
+        : widget.onColapsAppbar == null
+        ? cfg.subOnColapsAppbar
+        : Column(
+            mainAxisSize: .min,
+            children: [widget.onColapsAppbar!, cfg.subOnColapsAppbar!],
+          );
+  }
+
+  Widget? _buildAppbar(SmartTabConfig<dynamic> cfg) {
+    return cfg.subAppBar == null
+        ? widget.appbar
+        : widget.appbar == null
+        ? cfg.subAppBar
+        : Column(
+            mainAxisSize: .min,
+            children: [widget.appbar!, cfg.subAppBar!],
+          );
   }
 }
