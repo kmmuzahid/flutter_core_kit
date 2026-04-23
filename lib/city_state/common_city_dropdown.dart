@@ -3,7 +3,6 @@
  * @Date: 2026-01-05 12:53:28
  * @Email: km.muzahid@gmail.com
  */
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:core_kit/dropdown/common_drop_down.dart';
 import 'package:core_kit/text/common_text.dart';

@@ -3,7 +3,6 @@
  * @Date: 2026-01-05 16:39:26
  * @Email: km.muzahid@gmail.com
  */
-import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/snackbar/snackbar.dart';
 import 'package:core_kit/utils/app_log.dart';
