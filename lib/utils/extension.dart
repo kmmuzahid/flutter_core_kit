@@ -217,18 +217,61 @@ String? _getMimeTypeFromXFile(XFile file) {
       return 'image/bmp';
     case 'webp':
       return 'image/webp';
+    case 'svg':
+      return 'image/svg+xml';
     case 'pdf':
       return 'application/pdf';
     case 'txt':
       return 'text/plain';
     case 'csv':
       return 'text/csv';
+    case 'json':
+      return 'application/json';
+    case 'xml':
+      return 'application/xml';
+    case 'html':
+      return 'text/html';
     case 'doc':
     case 'docx':
       return 'application/msword';
     case 'xls':
     case 'xlsx':
       return 'application/vnd.ms-excel';
+    case 'ppt':
+    case 'pptx':
+      return 'application/vnd.ms-powerpoint';
+    case 'mp4':
+      return 'video/mp4';
+    case 'mov':
+      return 'video/quicktime';
+    case 'avi':
+      return 'video/x-msvideo';
+    case 'mkv':
+      return 'video/x-matroska';
+    case 'flv':
+      return 'video/x-flv';
+    case 'wmv':
+      return 'video/x-ms-wmv';
+    case 'mp3':
+      return 'audio/mpeg';
+    case 'wav':
+      return 'audio/wav';
+    case 'm4a':
+      return 'audio/x-m4a';
+    case 'aac':
+      return 'audio/aac';
+    case 'ogg':
+      return 'audio/ogg';
+    case 'zip':
+      return 'application/zip';
+    case 'rar':
+      return 'application/x-rar-compressed';
+    case '7z':
+      return 'application/x-7z-compressed';
+    case 'tar':
+      return 'application/x-tar';
+    case 'gz':
+      return 'application/gzip';
     default:
       return 'application/octet-stream'; // Default MIME type for unknown extensions
   }
