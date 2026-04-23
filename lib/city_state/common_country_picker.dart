@@ -4,6 +4,7 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/dropdown/common_drop_down.dart';
+import 'package:core_kit/text/common_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
@@ -74,7 +75,7 @@ class CommonCountryPicker extends StatelessWidget {
             ),
           );
         }
-        return states.item.value;
+        return CommonText(text: states.item.value);
       },
     );
   }

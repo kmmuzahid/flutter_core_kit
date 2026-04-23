@@ -41,7 +41,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final Color? menuBackgroundColor;
   final TextStyle? textStyle;
   final Function(T? value) onChanged;
-  final dynamic Function(DropDownNameBuilderProperty<T> property) nameBuilder;
+  final Widget Function(DropDownNameBuilderProperty<T> property) nameBuilder;
   final bool isRequired;
   final bool isLoading;
   final double? borderRadius;
@@ -145,16 +145,11 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
           selectedItemBuilder: (context) {
             return _items.map((item) {
               return widget.selectedItemBuilder?.call(item) ??
-                  CommonText(
-                    text: widget
-                        .nameBuilder(
-                          DropDownNameBuilderProperty(
-                            item: item,
-                            isSelected: item == _selectedItem,
-                          ),
-                        )
-                        .toString(),
-                    style: _getTextStyle(context),
+                  widget.nameBuilder(
+                    DropDownNameBuilderProperty(
+                      item: item,
+                      isSelected: item == _selectedItem,
+                    ),
                   );
             }).toList();
           },
@@ -199,15 +194,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                 isSelected: item == _selectedItem,
               ),
             );
-            return DropdownMenuItem<T>(
-              value: item,
-              child: name is Widget
-                  ? name
-                  : CommonText(
-                      text: name.toString(),
-                      style: _getTextStyle(context),
-                    ),
-            );
+            return DropdownMenuItem<T>(value: item, child: name);
           }).toList(),
           onChanged: (T? newValue) {
             if (newValue == null) return;

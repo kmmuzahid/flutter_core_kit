@@ -6,6 +6,7 @@
 import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:core_kit/dropdown/common_drop_down.dart';
+import 'package:core_kit/text/common_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
@@ -93,7 +94,7 @@ class CommonCityDropDown extends StatelessWidget {
             ),
           );
         }
-        return state.item.value;
+        return CommonText(text: state.item.value);
       },
     );
   }
