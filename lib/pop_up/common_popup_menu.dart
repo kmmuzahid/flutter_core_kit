@@ -23,12 +23,13 @@ class CommonPopupMenu<T> extends StatefulWidget {
     this.menuBackgroundColor,
     this.itemPadding,
     this.borderRadius,
+    this.menuWidth,
   });
 
   final List<T> items;
   final void Function(T selectedItem) onItemSelected;
   final T? initialItem;
-  final Widget Function(T item) itemBuilder;
+  final Widget Function(CommonPopupMenuTriggerProperty<T> property) itemBuilder;
   final Widget Function(CommonPopupMenuTriggerProperty<T> property)
   triggerBuilder;
 
@@ -38,6 +39,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
   final Color? menuBackgroundColor;
   final EdgeInsets? itemPadding;
   final double? borderRadius;
+  final double? menuWidth;
 
   @override
   State<CommonPopupMenu<T>> createState() => _SelectablePopupMenuState<T>();
@@ -112,8 +114,16 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       value: item,
       padding: widget.itemPadding,
       child: Container(
+        constraints: widget.menuWidth != null
+            ? BoxConstraints(minWidth: widget.menuWidth!)
+            : null,
         alignment: widget.menuItemAlignment,
-        child: widget.itemBuilder(item),
+        child: widget.itemBuilder(
+          CommonPopupMenuTriggerProperty(
+            selectedItem: selectedItem,
+            isOpen: isOpen,
+          ),
+        ),
       ),
     );
   }

@@ -32,6 +32,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.borderType = BorderType.outline,
     this.borderWidth = 1.2,
     this.suffixIcon,
+    this.disableDropdownBehavior = false,
   });
 
   final String hint;
@@ -55,6 +56,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final BorderType borderType;
   final double borderWidth;
   final Widget? suffixIcon;
+  final bool disableDropdownBehavior;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -131,12 +133,121 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = widget.isLoading
-        ? coreKitInstance.primaryColor
-        : (widget.borderColor ??
+    final borderColor =
+        widget.isLoading
+            ? coreKitInstance.primaryColor
+            : (widget.borderColor ??
                   theme.inputDecorationTheme.border?.borderSide.color) ??
               coreKitInstance.outlineColor;
 
+    if (widget.disableDropdownBehavior) {
+      return _buildPopupMenuDropdown(context, borderColor);
+    }
+
+    return _buildStandardDropdown(context, borderColor);
+  }
+
+  Widget _buildPopupMenuDropdown(BuildContext context, Color borderColor) {
+    return FormField<T>(
+      initialValue: _selectedItem,
+      validator: (value) {
+        if (widget.isRequired && value == null) {
+          return '${widget.hint} is required';
+        }
+        return null;
+      },
+      builder: (FormFieldState<T> state) {
+        return GestureDetector(
+          onTap: () => _showPopupMenu(context, state),
+          child: InputDecorator(
+            decoration: _buildInputDecoration(context, borderColor).copyWith(
+              errorText: state.errorText,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child:
+                      _selectedItem == null
+                          ? CommonText(
+                            text: widget.hint,
+                            style:
+                                widget.hintStyle ??
+                                _getTextStyle(context).copyWith(
+                                  color: hintColor(),
+                                  fontSize:
+                                      coreKitInstance
+                                          .theme
+                                          .inputDecorationTheme
+                                          .hintStyle
+                                          ?.fontSize ??
+                                      16.sp,
+                                  fontStyle: widget.fontStyle,
+                                ),
+                          )
+                          : (widget.selectedItemBuilder?.call(_selectedItem!) ??
+                              widget.nameBuilder(
+                                DropDownNameBuilderProperty(
+                                  item: _selectedItem!,
+                                  isSelected: true,
+                                ),
+                              )),
+                ),
+                widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showPopupMenu(
+    BuildContext context,
+    FormFieldState<T> state,
+  ) async {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    final selected = await showMenu<T>(
+      context: context,
+      color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
+      shape:
+          widget.borderRadius != null
+              ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(widget.borderRadius!),
+              )
+              : null,
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy + renderBox.size.height,
+        offset.dx + renderBox.size.width,
+        offset.dy,
+      ),
+      items:
+          _items.map((item) {
+            return PopupMenuItem<T>(
+              value: item,
+              child: widget.nameBuilder(
+                DropDownNameBuilderProperty(
+                  item: item,
+                  isSelected: item == _selectedItem,
+                ),
+              ),
+            );
+          }).toList(),
+    );
+
+    if (selected != null) {
+      setState(() {
+        _selectedItem = selected;
+      });
+      state.didChange(selected);
+      widget.onChanged(selected);
+    }
+  }
+
+  Widget _buildStandardDropdown(BuildContext context, Color borderColor) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -164,8 +275,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
           },
           initialValue:
               (widget.enableInitalSelection || widget.initalValue != null)
-              ? _selectedItem
-              : null,
+                  ? _selectedItem
+                  : null,
           decoration: _buildInputDecoration(context, borderColor),
           hint: CommonText(
             text: widget.hint,
@@ -194,7 +305,10 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                 isSelected: item == _selectedItem,
               ),
             );
-            return DropdownMenuItem<T>(value: item, child: name);
+            return DropdownMenuItem<T>(
+              value: item,
+              child: name,
+            );
           }).toList(),
           onChanged: (T? newValue) {
             if (newValue == null) return;
