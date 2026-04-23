@@ -214,21 +214,17 @@ class CommonText extends StatelessWidget {
           style: effectiveTextStyle,
         );
       } else {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: _getAlignment(),
-              child: Text(
-                formattedData,
-                maxLines: 1,
-                overflow: TextOverflow.visible,
-                textAlign: textAlign,
-                textDirection: textDirection ?? TextDirection.ltr,
-                style: effectiveTextStyle,
-              ),
-            );
-          },
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: _getAlignment(),
+          child: Text(
+            formattedData,
+            maxLines: 1,
+            overflow: TextOverflow.visible,
+            textAlign: textAlign,
+            textDirection: textDirection ?? TextDirection.ltr,
+            style: effectiveTextStyle,
+          ),
         );
       }
     }

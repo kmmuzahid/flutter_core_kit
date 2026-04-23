@@ -47,6 +47,12 @@ class CommonDropDown<T> extends StatefulWidget {
     this.borderWidth = 1.2,
     this.suffixIcon,
     this.disableDropdownBehavior = false,
+    this.menuWidth,
+    this.isSeparated = false,
+    this.menuItemAlignment,
+    this.itemPadding,
+    this.menuElevation = 1.0,
+    this.menuBorderColor,
   });
 
   final String hint;
@@ -71,6 +77,12 @@ class CommonDropDown<T> extends StatefulWidget {
   final double borderWidth;
   final Widget? suffixIcon;
   final bool disableDropdownBehavior;
+  final double? menuWidth;
+  final bool isSeparated;
+  final AlignmentGeometry? menuItemAlignment;
+  final EdgeInsets? itemPadding;
+  final double menuElevation;
+  final Color? menuBorderColor;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -225,28 +237,47 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
     final selected = await showMenu<T>(
       context: context,
       color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
-      shape: widget.borderRadius != null
-          ? RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(widget.borderRadius!),
-            )
-          : null,
       position: RelativeRect.fromLTRB(
         offset.dx,
         offset.dy + renderBox.size.height,
         offset.dx + renderBox.size.width,
         offset.dy,
       ),
-      items: _items.map((item) {
-        return PopupMenuItem<T>(
-          value: item,
-          child: widget.nameBuilder(
-            DropDownNameBuilderProperty(
-              item: item,
-              isSelected: item == _selectedItem,
+      elevation: widget.menuElevation,
+      shadowColor: coreKitInstance.outlineColor,
+      constraints: BoxConstraints.tightFor(
+        width: widget.menuWidth ?? renderBox.size.width,
+      ),
+      shape: widget.menuBorderColor != null || widget.borderRadius != null
+          ? RoundedRectangleBorder(
+              side: widget.menuBorderColor != null
+                  ? BorderSide(color: widget.menuBorderColor!)
+                  : BorderSide.none,
+              borderRadius: widget.borderRadius != null
+                  ? BorderRadius.circular(widget.borderRadius!)
+                  : BorderRadius.circular(8.r),
+            )
+          : null,
+      items: [
+        for (int i = 0; i < _items.length; i++) ...[
+          PopupMenuItem<T>(
+            value: _items[i],
+            padding: widget.itemPadding,
+            child: Container(
+              width: widget.menuWidth ?? renderBox.size.width,
+              alignment: widget.menuItemAlignment,
+              child: widget.nameBuilder(
+                DropDownNameBuilderProperty(
+                  item: _items[i],
+                  isSelected: _items[i] == _selectedItem,
+                ),
+              ),
             ),
           ),
-        );
-      }).toList(),
+          if (widget.isSeparated && i < _items.length - 1)
+            const PopupMenuDivider(),
+        ],
+      ],
     );
 
     if (selected != null) {
