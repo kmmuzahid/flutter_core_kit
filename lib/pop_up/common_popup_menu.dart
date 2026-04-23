@@ -3,10 +3,45 @@ import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
 class CommonPopupMenuTriggerProperty<T> {
-  final T? item;
+  final T? value;
   final bool isOpen;
 
-  CommonPopupMenuTriggerProperty({this.item, required this.isOpen});
+  CommonPopupMenuTriggerProperty({this.value, required this.isOpen});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CommonPopupMenuTriggerProperty &&
+        other.value == value &&
+        other.isOpen == isOpen;
+  }
+
+  @override
+  int get hashCode {
+    return value.hashCode ^ isOpen.hashCode;
+  }
+}
+
+class CommonPopupMenuProperty<T> {
+  final T? item;
+  final bool isSelected;
+
+  CommonPopupMenuProperty({this.item, required this.isSelected});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CommonPopupMenuProperty &&
+        other.item == item &&
+        other.isSelected == isSelected;
+  }
+
+  @override
+  int get hashCode {
+    return item.hashCode ^ isSelected.hashCode;
+  }
 }
 
 class CommonPopupMenu<T> extends StatefulWidget {
@@ -29,7 +64,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
   final List<T> items;
   final void Function(T selectedItem) onItemSelected;
   final T? initialItem;
-  final Widget Function(CommonPopupMenuTriggerProperty<T> property) itemBuilder;
+  final Widget Function(CommonPopupMenuProperty<T> property) itemBuilder;
   final Widget Function(CommonPopupMenuTriggerProperty<T> property)
   triggerBuilder;
 
@@ -119,7 +154,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
             : null,
         alignment: widget.menuItemAlignment,
         child: widget.itemBuilder(
-          CommonPopupMenuTriggerProperty(item: selectedItem, isOpen: isOpen),
+          CommonPopupMenuProperty(item: item, isSelected: selectedItem == item),
         ),
       ),
     );
@@ -133,7 +168,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       key: _triggerKey,
       onTap: () => _showPopupMenu(context, _triggerKey),
       child: widget.triggerBuilder(
-        CommonPopupMenuTriggerProperty(item: selectedItem, isOpen: isOpen),
+        CommonPopupMenuTriggerProperty(value: selectedItem, isOpen: isOpen),
       ),
     );
   }

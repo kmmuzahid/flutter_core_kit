@@ -6,6 +6,20 @@ class DropDownNameBuilderProperty<T> {
   bool isSelected;
 
   DropDownNameBuilderProperty({required this.item, required this.isSelected});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is DropDownNameBuilderProperty &&
+        other.item == item &&
+        other.isSelected == isSelected;
+  }
+
+  @override
+  int get hashCode {
+    return item.hashCode ^ isSelected.hashCode;
+  }
 }
 
 class CommonDropDown<T> extends StatefulWidget {
@@ -133,10 +147,9 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        widget.isLoading
-            ? coreKitInstance.primaryColor
-            : (widget.borderColor ??
+    final borderColor = widget.isLoading
+        ? coreKitInstance.primaryColor
+        : (widget.borderColor ??
                   theme.inputDecorationTheme.border?.borderSide.color) ??
               coreKitInstance.outlineColor;
 
@@ -160,38 +173,38 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
         return GestureDetector(
           onTap: () => _showPopupMenu(context, state),
           child: InputDecorator(
-            decoration: _buildInputDecoration(context, borderColor).copyWith(
-              errorText: state.errorText,
-            ),
+            decoration: _buildInputDecoration(
+              context,
+              borderColor,
+            ).copyWith(errorText: state.errorText),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child:
-                      _selectedItem == null
-                          ? CommonText(
-                            text: widget.hint,
-                            style:
-                                widget.hintStyle ??
-                                _getTextStyle(context).copyWith(
-                                  color: hintColor(),
-                                  fontSize:
-                                      coreKitInstance
-                                          .theme
-                                          .inputDecorationTheme
-                                          .hintStyle
-                                          ?.fontSize ??
-                                      16.sp,
-                                  fontStyle: widget.fontStyle,
-                                ),
-                          )
-                          : (widget.selectedItemBuilder?.call(_selectedItem!) ??
-                              widget.nameBuilder(
-                                DropDownNameBuilderProperty(
-                                  item: _selectedItem!,
-                                  isSelected: true,
-                                ),
-                              )),
+                  child: _selectedItem == null
+                      ? CommonText(
+                          text: widget.hint,
+                          style:
+                              widget.hintStyle ??
+                              _getTextStyle(context).copyWith(
+                                color: hintColor(),
+                                fontSize:
+                                    coreKitInstance
+                                        .theme
+                                        .inputDecorationTheme
+                                        .hintStyle
+                                        ?.fontSize ??
+                                    16.sp,
+                                fontStyle: widget.fontStyle,
+                              ),
+                        )
+                      : (widget.selectedItemBuilder?.call(_selectedItem!) ??
+                            widget.nameBuilder(
+                              DropDownNameBuilderProperty(
+                                item: _selectedItem!,
+                                isSelected: true,
+                              ),
+                            )),
                 ),
                 widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
               ],
@@ -212,30 +225,28 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
     final selected = await showMenu<T>(
       context: context,
       color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
-      shape:
-          widget.borderRadius != null
-              ? RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius!),
-              )
-              : null,
+      shape: widget.borderRadius != null
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius!),
+            )
+          : null,
       position: RelativeRect.fromLTRB(
         offset.dx,
         offset.dy + renderBox.size.height,
         offset.dx + renderBox.size.width,
         offset.dy,
       ),
-      items:
-          _items.map((item) {
-            return PopupMenuItem<T>(
-              value: item,
-              child: widget.nameBuilder(
-                DropDownNameBuilderProperty(
-                  item: item,
-                  isSelected: item == _selectedItem,
-                ),
-              ),
-            );
-          }).toList(),
+      items: _items.map((item) {
+        return PopupMenuItem<T>(
+          value: item,
+          child: widget.nameBuilder(
+            DropDownNameBuilderProperty(
+              item: item,
+              isSelected: item == _selectedItem,
+            ),
+          ),
+        );
+      }).toList(),
     );
 
     if (selected != null) {
@@ -275,8 +286,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
           },
           initialValue:
               (widget.enableInitalSelection || widget.initalValue != null)
-                  ? _selectedItem
-                  : null,
+              ? _selectedItem
+              : null,
           decoration: _buildInputDecoration(context, borderColor),
           hint: CommonText(
             text: widget.hint,
@@ -305,10 +316,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                 isSelected: item == _selectedItem,
               ),
             );
-            return DropdownMenuItem<T>(
-              value: item,
-              child: name,
-            );
+            return DropdownMenuItem<T>(value: item, child: name);
           }).toList(),
           onChanged: (T? newValue) {
             if (newValue == null) return;
