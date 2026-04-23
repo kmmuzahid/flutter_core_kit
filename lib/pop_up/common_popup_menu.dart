@@ -3,10 +3,10 @@ import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
 class CommonPopupMenuTriggerProperty<T> {
-  final T? selectedItem;
+  final T? item;
   final bool isOpen;
 
-  CommonPopupMenuTriggerProperty({this.selectedItem, required this.isOpen});
+  CommonPopupMenuTriggerProperty({this.item, required this.isOpen});
 }
 
 class CommonPopupMenu<T> extends StatefulWidget {
@@ -119,10 +119,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
             : null,
         alignment: widget.menuItemAlignment,
         child: widget.itemBuilder(
-          CommonPopupMenuTriggerProperty(
-            selectedItem: selectedItem,
-            isOpen: isOpen,
-          ),
+          CommonPopupMenuTriggerProperty(item: selectedItem, isOpen: isOpen),
         ),
       ),
     );
@@ -136,10 +133,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       key: _triggerKey,
       onTap: () => _showPopupMenu(context, _triggerKey),
       child: widget.triggerBuilder(
-        CommonPopupMenuTriggerProperty(
-          selectedItem: selectedItem,
-          isOpen: isOpen,
-        ),
+        CommonPopupMenuTriggerProperty(item: selectedItem, isOpen: isOpen),
       ),
     );
   }
