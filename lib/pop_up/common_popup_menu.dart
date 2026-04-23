@@ -53,7 +53,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
     super.key,
     this.initialItem,
     this.menuItemAlignment,
-    this.isSeparated = false,
+    this.separator,
     this.borderColor,
     this.menuBackgroundColor,
     this.itemPadding,
@@ -69,7 +69,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
   triggerBuilder;
 
   final AlignmentGeometry? menuItemAlignment;
-  final bool isSeparated;
+  final PopupMenuDivider? separator;
   final Color? borderColor;
   final Color? menuBackgroundColor;
   final EdgeInsets? itemPadding;
@@ -125,8 +125,8 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       items: [
         for (int i = 0; i < widget.items.length; i++) ...[
           _itemBuilder(i),
-          if (widget.isSeparated && i < widget.items.length - 1)
-            const PopupMenuDivider(),
+          if (widget.separator != null && i < widget.items.length - 1)
+            widget.separator!,
         ],
       ],
     );
