@@ -3,6 +3,8 @@
  * @Date: 2026-01-05 12:53:28
  * @Email: km.muzahid@gmail.com
  */
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:core_kit/dropdown/common_drop_down.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
@@ -26,6 +28,8 @@ class CommonCityDropDown extends StatelessWidget {
     this.enableInitalSelection = false,
     this.contentPadding,
     this.suffixIcon,
+    this.menuBackgroundColor,
+    this.nameBuilder,
   });
   final String selectedState;
   final String selectedCountry;
@@ -43,6 +47,9 @@ class CommonCityDropDown extends StatelessWidget {
   final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
   final Widget? suffixIcon;
+  final Color? menuBackgroundColor;
+  final dynamic Function(DropDownNameBuilderProperty<String> property)?
+  nameBuilder;
   @override
   Widget build(BuildContext context) {
     final city =
@@ -55,6 +62,7 @@ class CommonCityDropDown extends StatelessWidget {
       hint: hint,
       prefix: prefix,
       suffixIcon: suffixIcon,
+      menuBackgroundColor: menuBackgroundColor,
       fontStyle: fontStyle,
       contentPadding: contentPadding,
       items: city,
@@ -76,8 +84,16 @@ class CommonCityDropDown extends StatelessWidget {
       onChanged: (states) {
         onChange(states?.value ?? '');
       },
-      nameBuilder: (states) {
-        return states.value;
+      nameBuilder: (state) {
+        if (nameBuilder != null) {
+          return nameBuilder?.call(
+            DropDownNameBuilderProperty(
+              item: state.item.value,
+              isSelected: state.isSelected,
+            ),
+          );
+        }
+        return state.item.value;
       },
     );
   }

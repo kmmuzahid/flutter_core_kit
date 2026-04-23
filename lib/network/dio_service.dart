@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:core_kit/core_kit.dart';
 import 'package:core_kit/network/dio_interceptor.dart';
 import 'package:core_kit/network/dio_request_builder.dart';
+import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:dio/dio.dart' as dio;
@@ -14,35 +15,6 @@ import 'package:dio/dio.dart' as dio;
 typedef OnRequestStateChange<T> = void Function(ResponseState<T> state);
 
 // Configuration class for initializing DioService
-class DioServiceConfig {
-  final String baseUrl;
-  final String refreshTokenEndpoint;
-  final Duration connectTimeout;
-  final Duration receiveTimeout;
-  final Function()? onLogout;
-  final String tokenHeaderKey;
-  final String refreshTokenHeaderKey;
-  final bool isBearerToken;
-  final RequestMethod refreshTokenRequestMethod;
-
-
-  final bool enableDebugLogs;
-
-  DioServiceConfig({
-    required this.baseUrl,
-    this.tokenHeaderKey = 'Authorization',
-    this.refreshTokenHeaderKey = 'refreshToken',
-    this.isBearerToken = true,
-    this.refreshTokenRequestMethod =  RequestMethod.POST,
-
-    ///Refresh token endpoint must be post method
-    required this.refreshTokenEndpoint,
-    this.connectTimeout = const Duration(seconds: 15),
-    this.receiveTimeout = const Duration(seconds: 15),
-    this.onLogout,
-    this.enableDebugLogs = false,
-  });
-}
 
 // Token provider interface - implement this in your app
 class TokenProvider {
@@ -88,6 +60,7 @@ class DioService {
         baseUrl: config.baseUrl,
         connectTimeout: config.connectTimeout,
         receiveTimeout: config.receiveTimeout,
+        sendTimeout: config.sendTimeout,
       ),
     );
 

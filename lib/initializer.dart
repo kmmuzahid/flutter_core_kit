@@ -2,16 +2,19 @@ import 'dart:async';
 
 import 'package:core_kit/app_bar/common_app_bar.dart';
 import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/permission_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-coreKitInstanceSingleton get coreKitInstance => coreKitInstanceSingleton.instance;
+coreKitInstanceSingleton get coreKitInstance =>
+    coreKitInstanceSingleton.instance;
 
 typedef NavigationBack = void Function();
 
-typedef CorkitInitBuilder = Widget Function(BuildContext context, Widget? child);
+typedef CorkitInitBuilder =
+    Widget Function(BuildContext context, Widget? child);
 
 class PasswordObscureIcon {
   final Widget show;
@@ -26,7 +29,8 @@ class PasswordObscureIcon {
 
 class coreKitInstanceSingleton {
   coreKitInstanceSingleton._();
-  static final coreKitInstanceSingleton _instance = coreKitInstanceSingleton._();
+  static final coreKitInstanceSingleton _instance = coreKitInstanceSingleton
+      ._();
   static coreKitInstanceSingleton get instance => _instance;
 
   late GlobalKey<NavigatorState> navigatorKey;
@@ -36,7 +40,8 @@ class coreKitInstanceSingleton {
   late DioServiceConfig dioServiceConfig;
   late TokenProvider tokenProvider;
 
-  PermissionHelperConfig permissionHelperConfig = const PermissionHelperConfig();
+  PermissionHelperConfig permissionHelperConfig =
+      const PermissionHelperConfig();
   PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
     padding: const EdgeInsetsDirectional.only(end: 10),
     show: const Icon(Icons.visibility, size: 20),
@@ -133,7 +138,11 @@ class CoreKitRouterGate extends StatefulWidget {
   final CoreKitConfig config;
   final Widget child;
 
-  const CoreKitRouterGate({required this.config, required this.child, super.key});
+  const CoreKitRouterGate({
+    required this.config,
+    required this.child,
+    super.key,
+  });
 
   @override
   State<CoreKitRouterGate> createState() => _CoreKitRouterGateState();
@@ -175,7 +184,10 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       }
       if (!_dioInitialized) {
         _dioInitialized = true;
-        await DioService.init(config: config.dioConfig, tokenProvider: config.tokenProvider);
+        await DioService.init(
+          config: config.dioConfig,
+          tokenProvider: config.tokenProvider,
+        );
       }
       CoreScreenUtils.init(context, () => completer.complete());
     });
@@ -260,7 +272,7 @@ class CoreKit extends StatefulWidget {
     this.onGenerateRoute,
     this.onUnknownRoute,
     this.navigatorObservers = const <NavigatorObserver>[],
-    this.scrollBehavior, 
+    this.scrollBehavior,
   }) : routerConfig = null,
        app = null;
 
@@ -421,5 +433,8 @@ class _CoreKitState extends State<CoreKit> {
   }
 
   Widget _buildRouteGate(BuildContext context, Widget? child) =>
-      CoreKitRouterGate(config: widget.config, child: child ?? const SizedBox.shrink());
+      CoreKitRouterGate(
+        config: widget.config,
+        child: child ?? const SizedBox.shrink(),
+      );
 }

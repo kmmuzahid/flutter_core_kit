@@ -25,7 +25,10 @@ class CommonStateDropdown extends StatelessWidget {
     this.enableInitalSelection = false,
     this.contentPadding,
     this.suffixIcon,
+    this.nameBuilder,
   });
+  final dynamic Function(DropDownNameBuilderProperty<String> property)?
+  nameBuilder;
 
   final String countryName;
   final Widget? prefix;
@@ -67,7 +70,15 @@ class CommonStateDropdown extends StatelessWidget {
       isRequired: isRequired,
       onChanged: onChanged,
       nameBuilder: (states) {
-        return states.value;
+        if (nameBuilder != null) {
+          return nameBuilder?.call(
+            DropDownNameBuilderProperty(
+              item: states.item.value,
+              isSelected: states.isSelected,
+            ),
+          );
+        }
+        return states.item.value;
       },
     );
   }

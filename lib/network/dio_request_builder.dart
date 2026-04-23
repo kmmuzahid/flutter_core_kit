@@ -115,68 +115,69 @@ class DioRequestBuilder {
 
     final needsMultipart = hasFiles || hasFields;
 
+    int totalBytes = 0;
+
+    Future<dynamic> processValue(dynamic value) async {
+      if (value is XFile) {
+        totalBytes += await value.length();
+        return await value.toMultipart();
+      } else if (value is List) {
+        return await Future.wait(value.map((e) => processValue(e)));
+      } else if (value is Map) {
+        final processedMap = <String, dynamic>{};
+        for (final entry in value.entries) {
+          processedMap[entry.key] = await processValue(entry.value);
+        }
+        return processedMap;
+      }
+      return value;
+    }
+
     if (needsMultipart) {
-      var formData = FormData();
       final form = <String, dynamic>{};
 
-      input.formFields?.forEach((key, value) async {
-        if (value is Map) {
-          form[key] = jsonEncode(value);
-        } else if (value is XFile) {
-          final multipartFile = await value.toMultipart();
-          form[key] = multipartFile;
-        } else if (value is List<XFile>) {
-          final imageFileList = await Future.wait(
-            value.map((e) async {
-              return await e.toMultipart();
-            }).toList(),
-          );
-          form[key] = imageFileList;
-        } else {
-          form[key] = value;
+      if (input.formFields != null) {
+        for (final entry in input.formFields!.entries) {
+          final value = entry.value;
+          if (value is Map && value is! XFile) {
+            form[entry.key] = jsonEncode(value);
+          } else {
+            form[entry.key] = await processValue(value);
+          }
         }
-      });
+      }
 
       if (hasJsonBody) {
         form['data'] = jsonEncode(input.jsonBody);
-        // formData.fields.add(MapEntry('data', jsonEncode(input.jsonBody)));
       }
       if (hasListBody) {
         form['data'] = jsonEncode(input.listBody);
-        // formData.fields.add(MapEntry('data', jsonEncode(input.listBody)));
       }
 
       if (hasFiles) {
         for (final entry in input.files!.entries) {
-          final key = entry.key;
-          final value = entry.value;
-          if (value is XFile) {
-            final multipartFile = await value.toMultipart();
-            // formData.files.add(MapEntry(key, multipartFile));
-            form[key] = multipartFile;
-          } else if (value is List<XFile>) {
-            final imageFileList = await Future.wait(
-              value.map((e) async {
-                return await e.toMultipart();
-              }).toList(),
-            );
-            form[key] = imageFileList;
-            // for (final file in value) {
-            //   final multipartFile = await file.toMultipart();
-            //   formData.files.add(MapEntry(key, multipartFile));
-            // }
-          }
+          form[entry.key] = await processValue(entry.value);
         }
       }
       contentType = 'multipart/form-data';
-      formData = FormData.fromMap(form);
-      body = formData;
+      body = FormData.fromMap(form);
     } else if (hasJsonBody) {
       body = input.jsonBody;
       contentType = 'application/json';
     } else if (hasListBody) {
       body = jsonEncode(input.listBody);
       contentType = 'application/json';
+    }
+
+    Duration? dynamicTimeout = input.timeout;
+    if (totalBytes > 0) {
+      // 15 seconds base + 1 second per 100KB
+      final calculatedSeconds = 15 + (totalBytes / 102400).ceil();
+      final calculatedTimeout = Duration(seconds: calculatedSeconds);
+
+      if (dynamicTimeout == null || calculatedTimeout > dynamicTimeout) {
+        dynamicTimeout = calculatedTimeout;
+      }
     }
 
     return _RequestOptionsData(
@@ -187,6 +188,9 @@ class DioRequestBuilder {
         method: input.method.name,
         headers: headers,
         contentType: contentType,
+        connectTimeout: dynamicTimeout,
+        receiveTimeout: dynamicTimeout,
+        sendTimeout: dynamicTimeout,
       ),
     );
   }

@@ -1,61 +1,70 @@
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
-class CommonPopupMenu extends StatefulWidget {
+class CommonPopupMenuTriggerProperty<T> {
+  final T? selectedItem;
+  final bool isOpen;
+
+  CommonPopupMenuTriggerProperty({this.selectedItem, required this.isOpen});
+}
+
+class CommonPopupMenu<T> extends StatefulWidget {
   const CommonPopupMenu({
     required this.items,
     required this.onItemSelected,
+    required this.itemBuilder,
+    required this.triggerBuilder,
     super.key,
-    this.icons,
-    this.initialText,
-    this.textStyle,
-    this.showTextTrigger = true,
-    this.showIconTrigger = false,
-    this.triggerIcon = Icons.more_vert,
-    this.onPrimaryColor,
-    this.primaryColor,
-    this.menuTextStyle,
-  }) : assert(
-         icons == null || icons.length == items.length,
-         'If icons are provided, they must match the length of items',
-       );
-  final List<String> items;
-  final List<IconData>? icons;
-  final void Function(String selectedItem) onItemSelected;
-  final String? initialText;
-  final TextStyle? textStyle;
-  final bool showTextTrigger; // show main button with text
-  final bool showIconTrigger; // show icon trigger
-  final IconData triggerIcon;
-  final Color? onPrimaryColor;
-  final Color? primaryColor;
-  final TextStyle? menuTextStyle;
+    this.initialItem,
+    this.menuItemAlignment,
+    this.isSeparated = false,
+    this.borderColor,
+    this.menuBackgroundColor,
+    this.itemPadding,
+    this.borderRadius,
+  });
+
+  final List<T> items;
+  final void Function(T selectedItem) onItemSelected;
+  final T? initialItem;
+  final Widget Function(T item) itemBuilder;
+  final Widget Function(CommonPopupMenuTriggerProperty<T> property)
+  triggerBuilder;
+
+  final AlignmentGeometry? menuItemAlignment;
+  final bool isSeparated;
+  final Color? borderColor;
+  final Color? menuBackgroundColor;
+  final EdgeInsets? itemPadding;
+  final double? borderRadius;
 
   @override
-  State<CommonPopupMenu> createState() => _SelectablePopupMenuState();
+  State<CommonPopupMenu<T>> createState() => _SelectablePopupMenuState<T>();
 }
 
-class _SelectablePopupMenuState extends State<CommonPopupMenu> {
-  String? selectedText;
+class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
+  T? selectedItem;
+  bool isOpen = false;
 
   @override
   void initState() {
     super.initState();
-    selectedText = widget.initialText ?? widget.items.first;
+    selectedItem =
+        widget.initialItem ??
+        (widget.items.isNotEmpty ? widget.items.first : null);
   }
 
   Future<void> _showPopupMenu(BuildContext context, GlobalKey key) async {
-    final button =
-        key.currentContext!.findRenderObject() as RenderBox;
-    final overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-    final position = button.localToGlobal(
-      Offset.zero,
-      ancestor: overlay,
-    );
+    final button = key.currentContext!.findRenderObject() as RenderBox;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final position = button.localToGlobal(Offset.zero, ancestor: overlay);
 
-    final selected = await showMenu<String>(
+    setState(() {
+      isOpen = true;
+    });
+
+    final selected = await showMenu<T>(
       context: context,
       position: RelativeRect.fromLTRB(
         position.dx,
@@ -63,73 +72,65 @@ class _SelectablePopupMenuState extends State<CommonPopupMenu> {
         position.dx + button.size.width,
         position.dy,
       ),
-      color: widget.primaryColor ?? coreKitInstance.primaryColor,
+      color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
       elevation: 1,
       shadowColor: coreKitInstance.outlineColor,
-      items: List.generate(widget.items.length, (index) {
-        return PopupMenuItem<String>(
-          value: widget.items[index],
-          child: Row(
-            children: [
-              if (widget.icons != null) Icon(widget.icons![index], size: 18.w),
-              if (widget.icons != null) SizedBox(width: 8.w),
-              Text(
-                widget.items[index],
-                style: widget.menuTextStyle ?? coreKitInstance.defaultTextStyle,
-              ),
-            ],
-          ),
-        );
-      }),
+      shape: widget.borderColor != null || widget.borderRadius != null
+          ? RoundedRectangleBorder(
+              side: widget.borderColor != null
+                  ? BorderSide(color: widget.borderColor!)
+                  : BorderSide.none,
+              borderRadius: widget.borderRadius != null
+                  ? BorderRadius.circular(widget.borderRadius!)
+                  : BorderRadius.circular(8.r),
+            )
+          : null,
+      items: [
+        for (int i = 0; i < widget.items.length; i++) ...[
+          _itemBuilder(i),
+          if (widget.isSeparated && i < widget.items.length - 1)
+            const PopupMenuDivider(),
+        ],
+      ],
     );
 
+    setState(() {
+      isOpen = false;
+      if (selected != null) {
+        selectedItem = selected;
+      }
+    });
+
     if (selected != null) {
-      setState(() {
-        selectedText = selected;
-      });
       widget.onItemSelected(selected);
     }
   }
 
-  final GlobalKey _textTriggerKey = GlobalKey();
-  final GlobalKey _iconTriggerKey = GlobalKey();
+  PopupMenuItem<T> _itemBuilder(int index) {
+    final item = widget.items[index];
+    return PopupMenuItem<T>(
+      value: item,
+      padding: widget.itemPadding,
+      child: Container(
+        alignment: widget.menuItemAlignment,
+        child: widget.itemBuilder(item),
+      ),
+    );
+  }
+
+  final GlobalKey _triggerKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.showTextTrigger)
-          GestureDetector(
-            key: _textTriggerKey,
-            onTap: () => _showPopupMenu(context, _textTriggerKey),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.w),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    selectedText ?? '',
-                    style:
-                        widget.textStyle ??
-                        Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  SizedBox(width: 8.w),
-                  const Icon(Icons.arrow_drop_down),
-                ],
-              ),
-            ),
-          ),
-        if (widget.showIconTrigger)
-          IconButton(
-            key: _iconTriggerKey,
-            icon: Icon(widget.triggerIcon, color: widget.onPrimaryColor),
-            onPressed: () => _showPopupMenu(context, _iconTriggerKey),
-          ),
-      ],
+    return GestureDetector(
+      key: _triggerKey,
+      onTap: () => _showPopupMenu(context, _triggerKey),
+      child: widget.triggerBuilder(
+        CommonPopupMenuTriggerProperty(
+          selectedItem: selectedItem,
+          isOpen: isOpen,
+        ),
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:dio/dio.dart' as dio;
@@ -49,7 +50,8 @@ class DioInterceptor extends Interceptor {
   Future<void> _injectToken(RequestOptions options) async {
     final accessToken = await _tokenProvider.accessToken();
     if (accessToken?.isNotEmpty == true) {
-      options.headers[_config.tokenHeaderKey] = '${_config.isBearerToken? 'Bearer ' : ''}$accessToken';
+      options.headers[_config.tokenHeaderKey] =
+          '${_config.isBearerToken ? 'Bearer ' : ''}$accessToken';
     }
   }
 
@@ -100,10 +102,13 @@ class DioInterceptor extends Interceptor {
       tag: 'POST::${_config.refreshTokenEndpoint}',
     );
     try {
-      
-     final response = await  _dio.request(_config.refreshTokenEndpoint,
-         options: Options(method: _config.refreshTokenRequestMethod.name, headers: {_config.refreshTokenHeaderKey: refreshToken}));
-
+      final response = await _dio.request(
+        _config.refreshTokenEndpoint,
+        options: Options(
+          method: _config.refreshTokenRequestMethod.name,
+          headers: {_config.refreshTokenHeaderKey: refreshToken},
+        ),
+      );
 
       if (response.data.isNotEmpty &&
           (response.statusCode == 200 || response.statusCode == 201)) {
@@ -111,7 +116,7 @@ class DioInterceptor extends Interceptor {
 
         await _tokenProvider.updateTokens(data['data']);
       } else if (response.statusCode == 401) {
-        final data =  response.data;
+        final data = response.data;
         DioUtils.showMessage(data['message'] ?? '', isError: true);
         _config.onLogout?.call();
         return;

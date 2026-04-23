@@ -1,6 +1,13 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
+class DropDownNameBuilderProperty<T> {
+  T item;
+  bool isSelected;
+
+  DropDownNameBuilderProperty({required this.item, required this.isSelected});
+}
+
 class CommonDropDown<T> extends StatefulWidget {
   const CommonDropDown({
     required this.hint,
@@ -10,6 +17,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.isRequired = false,
     this.borderColor,
     this.backgroundColor,
+    this.menuBackgroundColor,
     this.textStyle,
     this.isLoading = false,
     this.borderRadius,
@@ -30,9 +38,10 @@ class CommonDropDown<T> extends StatefulWidget {
   final List<T> items;
   final Color? borderColor;
   final Color? backgroundColor;
+  final Color? menuBackgroundColor;
   final TextStyle? textStyle;
   final Function(T? value) onChanged;
-  final dynamic Function(T value) nameBuilder;
+  final dynamic Function(DropDownNameBuilderProperty<T> property) nameBuilder;
   final bool isRequired;
   final bool isLoading;
   final double? borderRadius;
@@ -137,7 +146,14 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
             return _items.map((item) {
               return widget.selectedItemBuilder?.call(item) ??
                   CommonText(
-                    text: widget.nameBuilder(item).toString(),
+                    text: widget
+                        .nameBuilder(
+                          DropDownNameBuilderProperty(
+                            item: item,
+                            isSelected: item == _selectedItem,
+                          ),
+                        )
+                        .toString(),
                     style: _getTextStyle(context),
                   );
             }).toList();
@@ -173,10 +189,16 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                 ),
           ),
           icon: widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
-          dropdownColor: widget.backgroundColor ?? coreKitInstance.surfaceBG,
+          dropdownColor:
+              widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
           isExpanded: true,
           items: _items.map((item) {
-            final name = widget.nameBuilder(item);
+            final name = widget.nameBuilder(
+              DropDownNameBuilderProperty(
+                item: item,
+                isSelected: item == _selectedItem,
+              ),
+            );
             return DropdownMenuItem<T>(
               value: item,
               child: name is Widget
