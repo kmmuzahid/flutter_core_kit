@@ -188,7 +188,6 @@ class DioRequestBuilder {
         method: input.method.name,
         headers: headers,
         contentType: contentType,
-        connectTimeout: dynamicTimeout,
         receiveTimeout: dynamicTimeout,
         sendTimeout: dynamicTimeout,
       ),
