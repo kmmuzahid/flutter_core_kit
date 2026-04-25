@@ -94,15 +94,20 @@ class _CommonButtonState extends State<CommonButton>
     return padding.resolve(Directionality.of(context));
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     final elevatedButtonTheme = Theme.of(context).elevatedButtonTheme;
 
     // Extract theme values
     final themeShape = elevatedButtonTheme.style?.shape?.resolve({});
-    final resolvedShape = themeShape is RoundedRectangleBorder ? themeShape : null;
+    final resolvedShape = themeShape is RoundedRectangleBorder
+        ? themeShape
+        : null;
 
-    final themeBorderRadius = resolvedShape?.borderRadius.resolve(TextDirection.ltr).topLeft.x;
+    final themeBorderRadius = resolvedShape?.borderRadius
+        .resolve(TextDirection.ltr)
+        .topLeft
+        .x;
 
     final themeBorderWidth = resolvedShape?.side.width;
     final themeBorderColor = resolvedShape?.side.color;
@@ -110,17 +115,20 @@ class _CommonButtonState extends State<CommonButton>
     final themeMinSize = elevatedButtonTheme.style?.minimumSize?.resolve({});
     final themePadding = elevatedButtonTheme.style?.padding?.resolve({});
 
-    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({});
+    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor
+        ?.resolve({});
 
     final titleColor = elevatedButtonTheme.style?.textStyle?.resolve({})?.color;
 
-    final themeDisabledBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({
-      WidgetState.disabled,
-    });
+    final themeDisabledBackgroundColor = elevatedButtonTheme
+        .style
+        ?.backgroundColor
+        ?.resolve({WidgetState.disabled});
 
-    final themeDisabledForegroundColor = elevatedButtonTheme.style?.foregroundColor?.resolve({
-      WidgetState.disabled,
-    });
+    final themeDisabledForegroundColor = elevatedButtonTheme
+        .style
+        ?.foregroundColor
+        ?.resolve({WidgetState.disabled});
 
     final themeElevation = elevatedButtonTheme.style?.elevation?.resolve({});
 
@@ -131,18 +139,22 @@ class _CommonButtonState extends State<CommonButton>
 
     final borderWidth = widget.borderWidth?.w ?? themeBorderWidth ?? 1.5;
 
-    final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
+    final borderColor =
+        widget.borderColor ?? themeBorderColor ?? Colors.transparent;
 
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
 
     final backgroundColor =
-        widget.buttonColor ?? themeBackgroundColor ?? coreKitInstance.primaryColor;
+        widget.buttonColor ??
+        themeBackgroundColor ??
+        coreKitInstance.primaryColor;
 
     final foregroundColor =
-      widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
+        widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
 
     final loaderColor =
-        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ?? coreKitInstance.secondaryColor;
+        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ??
+        coreKitInstance.secondaryColor;
 
     final disabledBackgroundColor =
         widget.buttonColor ?? themeDisabledBackgroundColor ?? backgroundColor;
@@ -154,8 +166,9 @@ class _CommonButtonState extends State<CommonButton>
 
     final padding = toEdgeInsets(
       context,
-      widget.padding ?? themePadding ??
-        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      widget.padding ??
+          themePadding ??
+          const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
     );
 
     return LayoutBuilder(
@@ -166,7 +179,10 @@ class _CommonButtonState extends State<CommonButton>
         final textStyle = (themeTextStyle ?? const TextStyle()).copyWith(
           fontFamily: coreKitInstance.fontFamily,
           fontSize: fontSize(elevatedButtonTheme),
-          fontWeight: widget.titleWeight ?? themeTextStyle?.fontWeight ?? FontWeight.w600,
+          fontWeight:
+              widget.titleWeight ??
+              themeTextStyle?.fontWeight ??
+              FontWeight.w600,
         );
 
         final minRequiredWidth = _measureMinWidth(
@@ -179,7 +195,9 @@ class _CommonButtonState extends State<CommonButton>
         final themeMinWidthRaw = themeMinSize?.width;
         final isThemeFullWidth = themeMinWidthRaw == double.infinity;
 
-        final themeMinWidth = isThemeFullWidth ? 0.0 : (themeMinWidthRaw ?? 88.0);
+        final themeMinWidth = isThemeFullWidth
+            ? 0.0
+            : (themeMinWidthRaw ?? 88.0);
         // FIX END
 
         final requestedWidth = widget.buttonWidth ?? double.nan;
@@ -190,28 +208,29 @@ class _CommonButtonState extends State<CommonButton>
         if (requestedWidth == double.infinity) {
           calculatedWidth = hasBoundedWidth ? maxAvailableWidth : null;
         }
-
         // CASE 2: explicit width
         else if (!requestedWidth.isNaN) {
           if (requestedWidth == double.infinity) {
             calculatedWidth = hasBoundedWidth ? maxAvailableWidth : null;
           } else if (hasBoundedWidth) {
-            calculatedWidth = requestedWidth.clamp(minRequiredWidth, maxAvailableWidth);
+            calculatedWidth = requestedWidth.clamp(
+              minRequiredWidth,
+              maxAvailableWidth,
+            );
           } else {
             calculatedWidth = requestedWidth;
           }
         }
-
         // CASE 3: auto
         else {
           if (hasBoundedWidth) {
             if (isThemeFullWidth) {
               calculatedWidth = maxAvailableWidth;
             } else {
-            calculatedWidth = minRequiredWidth.clamp(
-              themeMinWidth,
-              maxAvailableWidth,
-            );
+              calculatedWidth = minRequiredWidth.clamp(
+                themeMinWidth,
+                maxAvailableWidth,
+              );
             }
           } else {
             calculatedWidth = isThemeFullWidth ? null : minRequiredWidth;
@@ -240,7 +259,7 @@ class _CommonButtonState extends State<CommonButton>
     );
   }
 
-double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
+  double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
     final themeTextStyle = elevatedButtonTheme.style?.textStyle?.resolve({});
     return widget.titleSize?.sp ?? themeTextStyle?.fontSize?.sp ?? 16.sp;
   }
@@ -293,7 +312,9 @@ double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
                     decoration: BoxDecoration(
                       // Use null for color when gradient is provided,
                       // since BoxDecoration does not allow both simultaneously.
-                      color: widget.gradient != null ? null : widget.buttonColor,
+                      color: widget.gradient != null
+                          ? null
+                          : widget.buttonColor,
                       gradient: widget.gradient,
                       borderRadius: BorderRadius.circular(borderRadius),
                       border: Border.all(
@@ -332,16 +353,14 @@ double fontSize(ElevatedButtonThemeData elevatedButtonTheme) {
 
         if (widget.isLoading)
           Positioned.fill(
-            child: Positioned(
-              child: IgnorePointer(
-                child: AnimatedBuilder(
-                  animation: _animation,
-                  builder: (_, _) => CustomPaint(
-                    painter: _BorderLoaderPainter(
-                      _animation.value,
-                      loaderColor,
-                      borderRadius,
-                    ),
+            child: IgnorePointer(
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (_, _) => CustomPaint(
+                  painter: _BorderLoaderPainter(
+                    _animation.value,
+                    loaderColor,
+                    borderRadius,
                   ),
                 ),
               ),
