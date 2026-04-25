@@ -5,6 +5,7 @@
  */
 import 'package:core_kit/dropdown/common_drop_down.dart';
 import 'package:core_kit/text/common_text.dart';
+import 'package:core_kit/text_field/common_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
@@ -27,6 +28,18 @@ class CommonStateDropdown extends StatelessWidget {
     this.contentPadding,
     this.suffixIcon,
     this.nameBuilder,
+
+    this.menuWidth,
+    this.isSeparated = false,
+    this.menuItemAlignment,
+    this.itemPadding,
+    this.menuElevation = 1.0,
+    this.menuBorderColor,
+    this.selectedItemBuilder,
+    this.hintStyle,
+    this.borderType = BorderType.outline,
+    this.borderWidth = 1.2,
+    this.dropDownType = DropDownType.menu,
   });
   final dynamic Function(DropDownNameBuilderProperty<String> property)?
   nameBuilder;
@@ -47,6 +60,19 @@ class CommonStateDropdown extends StatelessWidget {
   final bool enableInitalSelection;
   final EdgeInsets? contentPadding;
   final Widget? suffixIcon;
+
+  final Widget Function(String value)? selectedItemBuilder;
+  final TextStyle? hintStyle;
+  final BorderType borderType;
+  final double borderWidth;
+  final DropDownType dropDownType;
+  final double? menuWidth;
+  final bool isSeparated;
+  final AlignmentGeometry? menuItemAlignment;
+  final EdgeInsets? itemPadding;
+  final double menuElevation;
+  final Color? menuBorderColor;
+
   @override
   Widget build(BuildContext context) {
     final state =
@@ -70,6 +96,19 @@ class CommonStateDropdown extends StatelessWidget {
       enableInitalSelection: enableInitalSelection,
       isRequired: isRequired,
       onChanged: onChanged,
+      selectedItemBuilder: (value) {
+        if (selectedItemBuilder != null) {
+          return selectedItemBuilder!(value.value);
+        }
+        return CommonText(text: value.value);
+      },
+      dropDownType: dropDownType,
+      menuWidth: menuWidth,
+      isSeparated: isSeparated,
+      menuItemAlignment: menuItemAlignment,
+      itemPadding: itemPadding,
+      menuElevation: menuElevation,
+      menuBorderColor: menuBorderColor,
       nameBuilder: (states) {
         if (nameBuilder != null) {
           return nameBuilder?.call(

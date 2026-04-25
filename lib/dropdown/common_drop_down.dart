@@ -22,6 +22,8 @@ class DropDownNameBuilderProperty<T> {
   }
 }
 
+enum DropDownType { normal, menu }
+
 class CommonDropDown<T> extends StatefulWidget {
   const CommonDropDown({
     required this.hint,
@@ -46,7 +48,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.borderType = BorderType.outline,
     this.borderWidth = 1.2,
     this.suffixIcon,
-    this.disableDropdownBehavior = false,
+    this.dropDownType = DropDownType.menu,
     this.menuWidth,
     this.isSeparated = false,
     this.menuItemAlignment,
@@ -76,7 +78,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final BorderType borderType;
   final double borderWidth;
   final Widget? suffixIcon;
-  final bool disableDropdownBehavior;
+  final DropDownType dropDownType;
   final double? menuWidth;
   final bool isSeparated;
   final AlignmentGeometry? menuItemAlignment;
@@ -165,7 +167,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                   theme.inputDecorationTheme.border?.borderSide.color) ??
               coreKitInstance.outlineColor;
 
-    if (widget.disableDropdownBehavior) {
+    if (widget.dropDownType == DropDownType.menu) {
       return _buildPopupMenuDropdown(context, borderColor);
     }
 
@@ -234,14 +236,17 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
 
+    final RenderBox overlay =
+        Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+
     final selected = await showMenu<T>(
       context: context,
       color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
       position: RelativeRect.fromLTRB(
         offset.dx,
         offset.dy + renderBox.size.height,
-        offset.dx + renderBox.size.width,
-        offset.dy,
+        overlay.size.width - (offset.dx + renderBox.size.width),
+        overlay.size.height - offset.dy,
       ),
       elevation: widget.menuElevation,
       shadowColor: coreKitInstance.outlineColor,

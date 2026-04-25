@@ -106,8 +106,8 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       position: RelativeRect.fromLTRB(
         position.dx,
         position.dy + button.size.height,
-        position.dx + button.size.width,
-        position.dy,
+        overlay.size.width - (position.dx + button.size.width),
+        overlay.size.height - position.dy,
       ),
       color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
       elevation: 1,
