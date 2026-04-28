@@ -58,6 +58,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
     this.itemPadding,
     this.borderRadius,
     this.menuWidth,
+    this.itemHeight,
   });
 
   final List<T> items;
@@ -74,6 +75,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
   final EdgeInsets? itemPadding;
   final double? borderRadius;
   final double? menuWidth;
+  final double? itemHeight;
 
   static Future<void> showPopupMenu<T>({
     required BuildContext context,
@@ -87,6 +89,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
     EdgeInsets? itemPadding,
     double? borderRadius,
     double? menuWidth,
+    double? itemHeight,
     T? initialItem,
     required GlobalKey globalKey,
   }) async {
@@ -124,6 +127,7 @@ class CommonPopupMenu<T> extends StatefulWidget {
           PopupMenuItem<T>(
             value: items[i],
             padding: itemPadding,
+            height: itemHeight ?? 0,
             child: Container(
               constraints: menuWidth != null
                   ? BoxConstraints(minWidth: menuWidth)
@@ -170,7 +174,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       });
     }
 
-    CommonPopupMenu.showPopupMenu<T>(
+    await CommonPopupMenu.showPopupMenu<T>(
       context: context,
       items: widget.items,
       onItemSelected: (selected) {
@@ -190,6 +194,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
       itemPadding: widget.itemPadding,
       borderRadius: widget.borderRadius,
       menuWidth: widget.menuWidth,
+      itemHeight: widget.itemHeight,
       initialItem: selectedItem,
     );
 
@@ -200,22 +205,6 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
     }
   }
 
-  PopupMenuItem<T> _itemBuilder(int index) {
-    final item = widget.items[index];
-    return PopupMenuItem<T>(
-      value: item,
-      padding: widget.itemPadding,
-      child: Container(
-        constraints: widget.menuWidth != null
-            ? BoxConstraints(minWidth: widget.menuWidth!)
-            : null,
-        alignment: widget.menuItemAlignment,
-        child: widget.itemBuilder(
-          CommonPopupMenuProperty(item: item, isSelected: selectedItem == item),
-        ),
-      ),
-    );
-  }
 
   final GlobalKey _triggerKey = GlobalKey();
 
