@@ -1,5 +1,4 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
 
 class CommonPopupMenuTriggerProperty<T> {
@@ -76,6 +75,25 @@ class CommonPopupMenu<T> extends StatefulWidget {
   final double? borderRadius;
   final double? menuWidth;
 
+  static void showPopupMenu<T>({
+    required BuildContext context,
+    required List<dynamic> items,
+    required void Function(T) onItemSelected,
+    required Widget Function(CommonPopupMenuProperty<dynamic> property)
+    itemBuilder,
+    AlignmentGeometry? menuItemAlignment,
+    PopupMenuDivider? separator,
+    Color? borderColor,
+    Color? menuBackgroundColor,
+    EdgeInsets? itemPadding,
+    double? borderRadius,
+    double? menuWidth,
+    T? initialItem,
+    required GlobalKey globalKey,
+  }) {
+    _SelectablePopupMenuState<T>().showPopupMenu(context, globalKey);
+  }
+
   @override
   State<CommonPopupMenu<T>> createState() => _SelectablePopupMenuState<T>();
 }
@@ -92,7 +110,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
         (widget.items.isNotEmpty ? widget.items.first : null);
   }
 
-  Future<void> _showPopupMenu(BuildContext context, GlobalKey key) async {
+  Future<void> showPopupMenu(BuildContext context, GlobalKey key) async {
     final button = key.currentContext!.findRenderObject() as RenderBox;
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final position = button.localToGlobal(Offset.zero, ancestor: overlay);
@@ -166,7 +184,7 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
   Widget build(BuildContext context) {
     return GestureDetector(
       key: _triggerKey,
-      onTap: () => _showPopupMenu(context, _triggerKey),
+      onTap: () => showPopupMenu(context, _triggerKey),
       child: widget.triggerBuilder(
         CommonPopupMenuTriggerProperty(value: selectedItem, isOpen: isOpen),
       ),

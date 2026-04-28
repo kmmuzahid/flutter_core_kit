@@ -55,6 +55,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.itemPadding,
     this.menuElevation = 1.0,
     this.menuBorderColor,
+    this.menuBorderRadius = 8,
   });
 
   final String hint;
@@ -85,6 +86,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final EdgeInsets? itemPadding;
   final double menuElevation;
   final Color? menuBorderColor;
+  final double menuBorderRadius;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -149,7 +151,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
     return widget.textStyle?.copyWith(fontFamily: fontFamily) ??
         TextStyle(
           fontFamily: fontFamily,
-          fontSize: 16.sp,
+          fontSize: 16,
           color: coreKitInstance.outlineColor,
         );
   }
@@ -208,7 +210,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                                         .inputDecorationTheme
                                         .hintStyle
                                         ?.fontSize ??
-                                    16.sp,
+                                    16,
                                 fontStyle: widget.fontStyle,
                               ),
                         )
@@ -337,7 +339,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
                           .inputDecorationTheme
                           .hintStyle
                           ?.fontSize ??
-                      16.sp,
+                      16,
                   fontStyle: widget.fontStyle,
                 ),
           ),
