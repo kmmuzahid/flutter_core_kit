@@ -75,12 +75,11 @@ class CommonPopupMenu<T> extends StatefulWidget {
   final double? borderRadius;
   final double? menuWidth;
 
-  static void showPopupMenu<T>({
+  static Future<void> showPopupMenu<T>({
     required BuildContext context,
-    required List<dynamic> items,
+    required List<T> items,
     required void Function(T) onItemSelected,
-    required Widget Function(CommonPopupMenuProperty<dynamic> property)
-    itemBuilder,
+    required Widget Function(CommonPopupMenuProperty<T> property) itemBuilder,
     AlignmentGeometry? menuItemAlignment,
     PopupMenuDivider? separator,
     Color? borderColor,
@@ -90,8 +89,62 @@ class CommonPopupMenu<T> extends StatefulWidget {
     double? menuWidth,
     T? initialItem,
     required GlobalKey globalKey,
-  }) {
-    _SelectablePopupMenuState<T>().showPopupMenu(context, globalKey);
+  }) async {
+    final button = globalKey.currentContext?.findRenderObject();
+    if (button == null) return;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final position = (button as RenderBox).localToGlobal(
+      Offset.zero,
+      ancestor: overlay,
+    );
+
+    final selected = await showMenu<T>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy + button.size.height,
+        overlay.size.width - (position.dx + button.size.width),
+        overlay.size.height - position.dy,
+      ),
+      color: menuBackgroundColor ?? coreKitInstance.surfaceBG,
+      elevation: 1,
+      shadowColor: coreKitInstance.outlineColor,
+      shape: borderColor != null || borderRadius != null
+          ? RoundedRectangleBorder(
+              side: borderColor != null
+                  ? BorderSide(color: borderColor)
+                  : BorderSide.none,
+              borderRadius: borderRadius != null
+                  ? BorderRadius.circular(borderRadius)
+                  : BorderRadius.circular(8.r),
+            )
+          : null,
+      items: [
+        for (int i = 0; i < items.length; i++) ...[
+          PopupMenuItem<T>(
+            value: items[i],
+            padding: itemPadding,
+            child: Container(
+              constraints: menuWidth != null
+                  ? BoxConstraints(minWidth: menuWidth)
+                  : null,
+              alignment: menuItemAlignment,
+              child: itemBuilder(
+                CommonPopupMenuProperty(
+                  item: items[i],
+                  isSelected: initialItem == items[i],
+                ),
+              ),
+            ),
+          ),
+          if (separator != null && i < items.length - 1) separator,
+        ],
+      ],
+    );
+
+    if (selected != null) {
+      onItemSelected(selected);
+    }
   }
 
   @override
@@ -111,53 +164,39 @@ class _SelectablePopupMenuState<T> extends State<CommonPopupMenu<T>> {
   }
 
   Future<void> showPopupMenu(BuildContext context, GlobalKey key) async {
-    final button = key.currentContext!.findRenderObject() as RenderBox;
-    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final position = button.localToGlobal(Offset.zero, ancestor: overlay);
+    if (context.mounted) {
+      setState(() {
+        isOpen = true;
+      });
+    }
 
-    setState(() {
-      isOpen = true;
-    });
-
-    final selected = await showMenu<T>(
+    CommonPopupMenu.showPopupMenu<T>(
       context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy + button.size.height,
-        overlay.size.width - (position.dx + button.size.width),
-        overlay.size.height - position.dy,
-      ),
-      color: widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
-      elevation: 1,
-      shadowColor: coreKitInstance.outlineColor,
-      shape: widget.borderColor != null || widget.borderRadius != null
-          ? RoundedRectangleBorder(
-              side: widget.borderColor != null
-                  ? BorderSide(color: widget.borderColor!)
-                  : BorderSide.none,
-              borderRadius: widget.borderRadius != null
-                  ? BorderRadius.circular(widget.borderRadius!)
-                  : BorderRadius.circular(8.r),
-            )
-          : null,
-      items: [
-        for (int i = 0; i < widget.items.length; i++) ...[
-          _itemBuilder(i),
-          if (widget.separator != null && i < widget.items.length - 1)
-            widget.separator!,
-        ],
-      ],
+      items: widget.items,
+      onItemSelected: (selected) {
+        if (mounted) {
+          setState(() {
+            selectedItem = selected;
+          });
+        }
+        widget.onItemSelected(selected);
+      },
+      itemBuilder: widget.itemBuilder,
+      globalKey: key,
+      menuItemAlignment: widget.menuItemAlignment,
+      separator: widget.separator,
+      borderColor: widget.borderColor,
+      menuBackgroundColor: widget.menuBackgroundColor,
+      itemPadding: widget.itemPadding,
+      borderRadius: widget.borderRadius,
+      menuWidth: widget.menuWidth,
+      initialItem: selectedItem,
     );
 
-    setState(() {
-      isOpen = false;
-      if (selected != null) {
-        selectedItem = selected;
-      }
-    });
-
-    if (selected != null) {
-      widget.onItemSelected(selected);
+    if (context.mounted) {
+      setState(() {
+        isOpen = false;
+      });
     }
   }
 
