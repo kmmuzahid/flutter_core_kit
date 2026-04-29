@@ -43,7 +43,10 @@ class CommonTextField extends StatefulWidget {
     this.fontSize,
     this.onFocusChanged,
     this.textStyle,
+    this.footer,
   });
+
+  final Widget? footer;
 
   final double borderWidth;
   final int? maxWords;
@@ -193,26 +196,76 @@ class _CommonTextFieldState extends State<CommonTextField> {
   Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
-      child: ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
-          ? Column(
-              children: [
-                _buildTextField(),
-                if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      (widget.maxLength ?? 0) > 0
-                          ? '$lengthCount/${widget.maxLength}'
-                          : '$wordCount/${widget.maxWords}',
-                      style: _getStyle(
-                        fontSize: 12.sp,
-                        textColor: coreKitInstance.outlineColor,
-                      ),
-                    ),
+      child: Column(
+        children: [
+          () {
+            final textField = _buildTextField();
+            if (widget.footer != null) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: widget.backgroundColor,
+                  borderRadius: BorderRadius.circular(
+                    widget.borderRadius?.r ?? 12.r,
                   ),
-              ],
-            )
-          : _buildTextField(),
+                  border: Border.all(
+                    color: _focusNode.hasFocus
+                        ? (theme
+                                  .inputDecorationTheme
+                                  .focusedBorder
+                                  ?.borderSide
+                                  .color ??
+                              coreKitInstance.primaryColor)
+                        : (widget.isReadOnly
+                              ? (widget.borderColor ??
+                                    theme
+                                        .inputDecorationTheme
+                                        .disabledBorder
+                                        ?.borderSide
+                                        .color ??
+                                    coreKitInstance.outlineColor)
+                              : (widget.borderColor ??
+                                    theme
+                                        .inputDecorationTheme
+                                        .enabledBorder
+                                        ?.borderSide
+                                        .color ??
+                                    coreKitInstance.outlineColor)),
+                    width: widget.borderWidth.w,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    textField,
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: widget.paddingHorizontal.w,
+                        right: widget.paddingHorizontal.w,
+                        bottom: 8.h,
+                      ),
+                      child: widget.footer!,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return textField;
+          }(),
+
+          if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                (widget.maxLength ?? 0) > 0
+                    ? '$lengthCount/${widget.maxLength}'
+                    : '$wordCount/${widget.maxWords}',
+                style: _getStyle(
+                  fontSize: 12.sp,
+                  textColor: coreKitInstance.outlineColor,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -382,7 +435,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
 
         prefixIconColor: _iconColor(),
         suffixIconColor: _iconColor(),
-        focusedBorder: _buildBorder(
+        focusedBorder: widget.footer != null ? InputBorder.none : _buildBorder(
           color: widget.isReadOnly
               ? (widget.borderColor ??
                     theme
@@ -395,23 +448,30 @@ class _CommonTextFieldState extends State<CommonTextField> {
                     coreKitInstance.primaryColor,
           width: widget.borderWidth.w,
         ),
-        enabledBorder: _buildBorder(
+
+        enabledBorder: widget.footer != null ? InputBorder.none : _buildBorder(
           color:
               widget.borderColor ??
               theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
               coreKitInstance.outlineColor,
           width: widget.borderWidth.w,
         ),
-        errorBorder: _buildBorder(
+
+        errorBorder: widget.footer != null ? InputBorder.none : _buildBorder(
           color:
               theme.inputDecorationTheme.errorBorder?.borderSide.color ??
               Colors.red,
           width: widget.borderWidth.w,
         ),
+
         contentPadding: EdgeInsets.symmetric(
           horizontal: widget.paddingHorizontal.w,
           vertical: widget.paddingVertical.h,
         ),
+        border: widget.footer != null ? InputBorder.none : null,
+
+        disabledBorder: widget.footer != null ? InputBorder.none : null,
+
         hintText: widget.hintText,
         labelText: widget.labelText,
       ),

@@ -56,7 +56,10 @@ class CommonDropDown<T> extends StatefulWidget {
     this.menuElevation = 1.0,
     this.menuBorderColor,
     this.menuBorderRadius = 8,
+    this.footer,
   });
+
+  final Widget? footer;
 
   final String hint;
   final List<T> items;
@@ -193,39 +196,63 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
               context,
               borderColor,
             ).copyWith(errorText: state.errorText),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: _selectedItem == null
-                      ? CommonText(
-                          text: widget.hint,
-                          style:
-                              widget.hintStyle ??
-                              _getTextStyle(context).copyWith(
-                                color: hintColor(),
-                                fontSize:
-                                    coreKitInstance
-                                        .theme
-                                        .inputDecorationTheme
-                                        .hintStyle
-                                        ?.fontSize ??
-                                    16,
-                                fontStyle: widget.fontStyle,
-                              ),
-                        )
-                      : (widget.selectedItemBuilder?.call(_selectedItem!) ??
-                            widget.nameBuilder(
-                              DropDownNameBuilderProperty(
-                                item: _selectedItem!,
-                                isSelected: true,
-                              ),
-                            )),
-                ),
-                widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
-              ],
-            ),
+            child: () {
+              final content = Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child:
+                        _selectedItem == null
+                            ? CommonText(
+                              text: widget.hint,
+                              style:
+                                  widget.hintStyle ??
+                                  _getTextStyle(context).copyWith(
+                                    color: hintColor(),
+                                    fontSize:
+                                        coreKitInstance
+                                            .theme
+                                            .inputDecorationTheme
+                                            .hintStyle
+                                            ?.fontSize ??
+                                        16,
+                                    fontStyle: widget.fontStyle,
+                                  ),
+                            )
+                            : (widget.selectedItemBuilder?.call(
+                                  _selectedItem!,
+                                ) ??
+                                widget.nameBuilder(
+                                  DropDownNameBuilderProperty(
+                                    item: _selectedItem!,
+                                    isSelected: true,
+                                  ),
+                                )),
+                  ),
+                  widget.suffixIcon ?? const Icon(Icons.arrow_drop_down),
+                ],
+              );
+
+              if (widget.footer != null) {
+                return Column(
+                  children: [
+                    content,
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: 10.w,
+                        right: 10.w,
+                        bottom: 8.h,
+                      ),
+                      child: widget.footer!,
+                    ),
+                  ],
+                );
+              }
+
+              return content;
+            }(),
           ),
+
         );
       },
     );
@@ -437,7 +464,14 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
       prefixIconConstraints: const BoxConstraints(),
       contentPadding:
           widget.contentPadding ??
-          EdgeInsets.only(left: 10.w, right: 2.w, top: 14.w, bottom: 14.w),
+          EdgeInsets.only(
+            left: 10.w,
+            right: 2.w,
+            top: 14.w,
+            bottom: 14.w,
+
+          ),
+
       border: _buildBorder(color: borderColor),
       enabledBorder: _buildBorder(color: borderColor),
       focusedBorder: _buildBorder(color: borderColor),

@@ -40,9 +40,11 @@ class CommonMultilineTextField extends StatefulWidget {
     this.hintStyle,
     this.multilineLimitHintBuilder,
     this.onFocusChanged,
+    this.footer,
   });
 
   final double borderWidth;
+
   final Function(String value, TextEditingController controller)? onSaved;
   final Function(String value)? onChanged;
   final String? initialText;
@@ -75,6 +77,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final TextStyle? hintStyle;
   final MultilineHintLimitBuilder? multilineLimitHintBuilder;
   final Function(FocusNode focusNode)? onFocusChanged;
+  final Widget? footer;
 
   final String? Function(String? value)? validation;
 
@@ -232,30 +235,56 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     // }
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: widget.height),
+
+
       child: Column(
         children: [
           Expanded(
-            child: TextFormField(
-              onTapOutside: (event) {
-                _focusNode.unfocus();
-              },
-              textAlignVertical: TextAlignVertical.top,
-              readOnly: widget.isReadOnly,
-              maxLines: null,
+            child: () {
+              final textFormField = TextFormField(
+                onTapOutside: (event) {
+                  _focusNode.unfocus();
+                },
+                textAlignVertical: TextAlignVertical.top,
+                readOnly: widget.isReadOnly,
+                maxLines: null,
 
-              scrollPhysics: const BouncingScrollPhysics(),
-              inputFormatters: [
-                ...InputHelper.getInputFormatters(widget.validationType),
-                if (widget.maxWords != null || widget.maxLength != null)
-                  TextInputFormatter.withFunction((oldValue, newValue) {
-                    // Clean the text before processing
-                    final cleanedText = _cleanText(newValue.text);
+                scrollPhysics: const BouncingScrollPhysics(),
+                inputFormatters: [
+                  ...InputHelper.getInputFormatters(widget.validationType),
+                  if (widget.maxWords != null || widget.maxLength != null)
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      // Clean the text before processing
+                      final cleanedText = _cleanText(newValue.text);
 
-                    if (widget.maxLength != null) {
-                      final length = cleanedText.length;
-                      if (length <= widget.maxLength!) {
+                      if (widget.maxLength != null) {
+                        final length = cleanedText.length;
+                        if (length <= widget.maxLength!) {
+                          setState(() {
+                            lengthCount = length;
+                          });
+                          // Return the cleaned text
+                          return TextEditingValue(
+                            text: newValue.text,
+                            selection: TextSelection.collapsed(
+                              offset: newValue.text.length,
+                            ),
+                          );
+                        }
+                        return oldValue;
+                      }
+
+                      // Count words by splitting on whitespace and filtering out empty strings
+                      final words = cleanedText
+                          .split(' ')
+                          .where((word) => word.isNotEmpty)
+                          .length;
+
+                      // Allow the change if word count is within limit or if text is being deleted
+                      if (words <= widget.maxWords! ||
+                          newValue.text.length < oldValue.text.length) {
                         setState(() {
-                          lengthCount = length;
+                          wordCount = words;
                         });
                         // Return the cleaned text
                         return TextEditingValue(
@@ -266,230 +295,251 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                         );
                       }
                       return oldValue;
-                    }
-
-                    // Count words by splitting on whitespace and filtering out empty strings
-                    final words = cleanedText
-                        .split(' ')
-                        .where((word) => word.isNotEmpty)
-                        .length;
-
-                    // Allow the change if word count is within limit or if text is being deleted
-                    if (words <= widget.maxWords! ||
-                        newValue.text.length < oldValue.text.length) {
-                      setState(() {
-                        wordCount = words;
-                      });
-                      // Return the cleaned text
-                      return TextEditingValue(
-                        text: newValue.text,
-                        selection: TextSelection.collapsed(
-                          offset: newValue.text.length,
-                        ),
+                    }),
+                ],
+                keyboardType: TextInputType.multiline,
+                textAlign: widget.textAlign,
+                controller: _controller,
+                focusNode: _focusNode,
+                enableInteractiveSelection: !widget.isReadOnly,
+                obscureText: _obscureText,
+                onChanged: widget.onChanged,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onSaved: (v) {
+                  _onSave(v?.trim() ?? '');
+                },
+                maxLength: widget.maxLength,
+                onFieldSubmitted: (v) {
+                  _onSave(v.trim());
+                },
+                onTap: widget.onTap,
+                validator:
+                    widget.validation ??
+                    (value) {
+                      final newValue = _cleanText(value?.trim() ?? '');
+                      var error = InputHelper.validate(
+                        widget.validationType,
+                        newValue,
+                        originalPassword: widget.originalPassword?.call(),
                       );
-                    }
-                    return oldValue;
-                  }),
-              ],
-              keyboardType: .multiline,
-              textAlign: widget.textAlign,
-              controller: _controller,
-              focusNode: _focusNode,
-              enableInteractiveSelection: !widget.isReadOnly,
-              obscureText: _obscureText,
-              onChanged: widget.onChanged,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              onSaved: (v) {
-                _onSave(v?.trim() ?? '');
-              },
-              maxLength: widget.maxLength,
-              onFieldSubmitted: (v) {
-                _onSave(v.trim());
-              },
-              onTap: widget.onTap,
-              validator:
-                  widget.validation ??
-                  (value) {
-                    final newValue = _cleanText(value?.trim() ?? '');
-                    var error = InputHelper.validate(
-                      widget.validationType,
-                      newValue,
-                      originalPassword: widget.originalPassword?.call(),
-                    );
 
-                    if (newValue.isNotEmpty) {
-                      if (widget.minLength > 0 &&
-                          newValue.length < widget.minLength) {
-                        error =
-                            'Minimum ${widget.minLength} characters required';
-                      }
+                      if (newValue.isNotEmpty) {
+                        if (widget.minLength > 0 &&
+                            newValue.length < widget.minLength) {
+                          error =
+                              'Minimum ${widget.minLength} characters required';
+                        }
 
-                      final wordCount = newValue.split(' ').length;
+                        final wordCount = newValue.split(' ').length;
 
-                      if (widget.minWords > 0 && wordCount < widget.minWords) {
-                        error = 'Minimum ${widget.minWords} words required';
-                      }
+                        if (widget.minWords > 0 &&
+                            wordCount < widget.minWords) {
+                          error = 'Minimum ${widget.minWords} words required';
+                        }
 
-                      if (widget.maxWords != null) {
-                        if (wordCount - 1 > widget.maxWords!) {
-                          error = 'Maximum ${widget.maxWords} words allowed';
+                        if (widget.maxWords != null) {
+                          if (wordCount - 1 > widget.maxWords!) {
+                            error = 'Maximum ${widget.maxWords} words allowed';
+                          }
                         }
                       }
-                    }
 
-                    // Return the error to show the error border, but return null for the message if showValidationMessage is false
-                    return widget.showValidationMessage
-                        ? error
-                        : (error != null ? '' : null);
-                  },
+                      // Return the error to show the error border, but return null for the message if showValidationMessage is false
+                      return widget.showValidationMessage
+                          ? error
+                          : (error != null ? '' : null);
+                    },
 
-              style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
+                style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
 
-              expands: true, // expands to fill parent height
-              decoration: InputDecoration(
-                filled: true,
-                counterText: '',
+                expands: true, // expands to fill parent height
+                decoration: InputDecoration(
+                  filled: true,
+                  counterText: '',
 
-                // errorMaxLines: 1,
-                errorStyle: _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
-                fillColor: widget.backgroundColor,
-                hintStyle:
-                    widget.hintStyle ??
-                    _getStyle(
-                      fontSize:
-                          coreKitInstance
-                              .theme
-                              .inputDecorationTheme
-                              .hintStyle
-                              ?.fontSize ??
-                          16.sp,
-                      fontStyle:
-                          coreKitInstance
-                              .theme
-                              .inputDecorationTheme
-                              .hintStyle
-                              ?.fontStyle ??
-                          FontStyle.italic,
-                      textColor: hintColor(),
-                    ),
-                prefixIcon: Column(
-                  children: [
-                    widget.prefixText?.isNotEmpty == true
-                        ? Padding(
-                            padding: const EdgeInsets.only(
-                              left: 10,
-                              right: 5,
-                            ), // add some right padding to allow hint space
-                            child: CommonText(
-                              text: widget.prefixText!,
-                              textColor: _iconColor(),
-                            ),
-                          )
-                        : Padding(
-                            padding: EdgeInsets.only(
-                              left: 10.w,
-                              right: widget.paddingHorizontal,
-                            ),
-                            child: widget.prefixIcon,
-                          ),
-                  ],
-                ),
-                suffixIconConstraints: BoxConstraints(
-                  maxWidth:
-                      widget.suffixIcon == null &&
-                          widget.validationType !=
-                              ValidationType.validatePassword
-                      ? widget.paddingHorizontal
-                      : double.infinity,
-                ),
-
-                prefixIconConstraints: BoxConstraints(
-                  maxWidth: widget.prefixIcon == null
-                      ? widget.paddingHorizontal
-                      : double.infinity,
-                ),
-                suffixIcon: widget.showActionButton
-                    ? GestureDetector(
-                        onTap: () {
-                          _onSave(_controller.text.trim());
-                        },
-                        child:
-                            widget.actionButtonIcon ?? const Icon(Icons.search),
-                      )
-                    : widget.validationType == ValidationType.validatePassword
-                    ? (_obscureText
-                          ? _buildPasswordSuffixIcon()
-                          : _buildPasswordSuffixIcon())
-                    : Padding(
-                        padding: EdgeInsets.only(
-                          right: 10,
-                          left: widget.paddingHorizontal,
-                        ),
-                        child: widget.suffixIcon,
+                  // errorMaxLines: 1,
+                  errorStyle: _getStyle(
+                    fontSize: 0,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  fillColor: widget.backgroundColor,
+                  hintStyle:
+                      widget.hintStyle ??
+                      _getStyle(
+                        fontSize:
+                            coreKitInstance
+                                .theme
+                                .inputDecorationTheme
+                                .hintStyle
+                                ?.fontSize ??
+                            16.sp,
+                        fontStyle:
+                            coreKitInstance
+                                .theme
+                                .inputDecorationTheme
+                                .hintStyle
+                                ?.fontStyle ??
+                            FontStyle.italic,
+                        textColor: hintColor(),
                       ),
-                prefixIconColor: _iconColor(),
-                suffixIconColor: _iconColor(),
+                  prefixIcon: Column(
+                    children: [
+                      widget.prefixText?.isNotEmpty == true
+                          ? Padding(
+                              padding: const EdgeInsets.only(
+                                left: 10,
+                                right: 5,
+                              ), // add some right padding to allow hint space
+                              child: CommonText(
+                                text: widget.prefixText!,
+                                textColor: _iconColor(),
+                              ),
+                            )
+                          : Padding(
+                              padding: EdgeInsets.only(
+                                left: 10.w,
+                                right: widget.paddingHorizontal,
+                              ),
+                              child: widget.prefixIcon,
+                            ),
+                    ],
+                  ),
+                  suffixIconConstraints: BoxConstraints(
+                    maxWidth:
+                        widget.suffixIcon == null &&
+                            widget.validationType !=
+                                ValidationType.validatePassword
+                        ? widget.paddingHorizontal
+                        : double.infinity,
+                  ),
 
-                focusedBorder: _buildBorder(
-                  color: widget.isReadOnly
-                      ? (widget.borderColor ??
+                  prefixIconConstraints: BoxConstraints(
+                    maxWidth: widget.prefixIcon == null
+                        ? widget.paddingHorizontal
+                        : double.infinity,
+                  ),
+                  suffixIcon: widget.showActionButton
+                      ? GestureDetector(
+                          onTap: () {
+                            _onSave(_controller.text.trim());
+                          },
+                          child:
+                              widget.actionButtonIcon ??
+                              const Icon(Icons.search),
+                        )
+                      : widget.validationType == ValidationType.validatePassword
+                      ? (_obscureText
+                            ? _buildPasswordSuffixIcon()
+                            : _buildPasswordSuffixIcon())
+                      : Padding(
+                          padding: EdgeInsets.only(
+                            right: 10,
+                            left: widget.paddingHorizontal,
+                          ),
+                          child: widget.suffixIcon,
+                        ),
+                  prefixIconColor: _iconColor(),
+                  suffixIconColor: _iconColor(),
+
+                  border: widget.footer != null ? InputBorder.none : null,
+                  enabledBorder: widget.footer != null ? InputBorder.none : null,
+                  disabledBorder: widget.footer != null ? InputBorder.none : null,
+                  focusedBorder: widget.footer != null
+                      ? InputBorder.none
+                      : _buildBorder(
+                        color: widget.isReadOnly
+                            ? (widget.borderColor ??
+                                  theme
+                                      .inputDecorationTheme
+                                      .disabledBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.outlineColor)
+                            : theme
+                                      .inputDecorationTheme
+                                      .focusedBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.primaryColor,
+                        width: widget.borderWidth.w,
+                      ),
+                  errorBorder: widget.footer != null
+                      ? InputBorder.none
+                      : _buildBorder(
+                        color:
                             theme
                                 .inputDecorationTheme
-                                .disabledBorder
+                                .errorBorder
                                 ?.borderSide
                                 .color ??
-                            coreKitInstance.outlineColor)
-                      : theme
+                            Colors.red,
+                        width: widget.borderWidth.w,
+                      ),
+                  focusedErrorBorder: widget.footer != null
+                      ? InputBorder.none
+                      : _buildBorder(
+                        color:
+                            theme
                                 .inputDecorationTheme
-                                .focusedBorder
+                                .errorBorder
                                 ?.borderSide
                                 .color ??
-                            coreKitInstance.primaryColor,
-                  width: widget.borderWidth.w,
-                ),
-                enabledBorder: _buildBorder(
-                  color:
-                      widget.borderColor ??
-                      theme
-                          .inputDecorationTheme
-                          .enabledBorder
-                          ?.borderSide
-                          .color ??
-                      coreKitInstance.outlineColor,
-                  width: widget.borderWidth.w,
-                ),
-                errorBorder: _buildBorder(
-                  color:
-                      theme
-                          .inputDecorationTheme
-                          .errorBorder
-                          ?.borderSide
-                          .color ??
-                      Colors.red,
-                  width: widget.borderWidth.w,
-                ),
-                focusedErrorBorder: _buildBorder(
-                  color:
-                      theme
-                          .inputDecorationTheme
-                          .errorBorder
-                          ?.borderSide
-                          .color ??
-                      Colors.red,
-                  width: widget.borderWidth.w,
-                ),
+                            Colors.red,
+                        width: widget.borderWidth.w,
+                      ),
 
-                contentPadding: EdgeInsets.only(
-                  left: widget.paddingHorizontal.w,
-                  right: widget.paddingHorizontal.w,
-                  top: widget.paddingVertical.h,
-                  bottom: widget.paddingVertical.h,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: widget.paddingHorizontal.w,
+                    vertical: widget.paddingVertical.h,
+                  ),
+
+
+                  hintText: widget.hintText,
+                  labelText: widget.labelText,
                 ),
-                hintText: widget.hintText,
-                labelText: widget.labelText,
-              ),
-            ),
+              );
+
+              final content = Column(
+                children: [
+                  Expanded(child: textFormField),
+                  if (widget.footer != null)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: widget.paddingHorizontal.w,
+                        right: widget.paddingHorizontal.w,
+                        bottom: 8.h,
+                      ),
+                      child: widget.footer!,
+                    ),
+                ],
+              );
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: widget.backgroundColor,
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  border: Border.all(
+                    color: _focusNode.hasFocus
+                        ? (theme.inputDecorationTheme.focusedBorder?.borderSide
+                                .color ??
+                            coreKitInstance.primaryColor)
+                        : (widget.isReadOnly
+                            ? (widget.borderColor ??
+                                theme.inputDecorationTheme.disabledBorder
+                                    ?.borderSide.color ??
+                                coreKitInstance.outlineColor)
+                            : (widget.borderColor ??
+                                theme.inputDecorationTheme.enabledBorder
+                                    ?.borderSide.color ??
+                                coreKitInstance.outlineColor)),
+                    width: widget.borderWidth.w,
+                  ),
+                ),
+                child: content,
+              );
+            }(),
           ),
+
 
           Row(
             children: [
