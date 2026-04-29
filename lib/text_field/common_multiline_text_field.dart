@@ -39,6 +39,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.minWords = 0,
     this.hintStyle,
     this.multilineLimitHintBuilder,
+    this.onFocusChanged,
   });
 
   final double borderWidth;
@@ -73,6 +74,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final TextStyle? counterTextStyle;
   final TextStyle? hintStyle;
   final MultilineHintLimitBuilder? multilineLimitHintBuilder;
+  final Function(FocusNode focusNode)? onFocusChanged;
 
   final String? Function(String? value)? validation;
 
@@ -107,6 +109,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     }
 
     _focusNode.addListener(() {
+      widget.onFocusChanged?.call(_focusNode);
       setState(() {}); // rebuild to reflect focus changes
     });
   }
@@ -288,7 +291,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     return oldValue;
                   }),
               ],
-              keyboardType:  .multiline,
+              keyboardType: .multiline,
               textAlign: widget.textAlign,
               controller: _controller,
               focusNode: _focusNode,

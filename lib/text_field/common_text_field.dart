@@ -41,6 +41,7 @@ class CommonTextField extends StatefulWidget {
     this.suffixBuilder,
     this.prefixBuilder,
     this.fontSize,
+    this.onFocusChanged,
     this.textStyle,
   });
 
@@ -82,6 +83,8 @@ class CommonTextField extends StatefulWidget {
   final Widget? Function(TextEditingController controller, FocusNode focusNode)?
   prefixBuilder;
 
+  final Function(FocusNode focusNode)? onFocusChanged;
+
   @override
   State<CommonTextField> createState() => _CommonTextFieldState();
 }
@@ -118,6 +121,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
     }
 
     _focusNode.addListener(() {
+      widget.onFocusChanged?.call(_focusNode);
       if (!_focusNode.hasFocus) {
         _onSave(_controller.text);
       }
