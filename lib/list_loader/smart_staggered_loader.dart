@@ -70,6 +70,7 @@ class SmartStaggeredLoader extends StatefulWidget {
     this.scrollController,
     this.isSeperated = false,
     this.emptyWidget,
+    this.onReorder,
   });
 
   final int itemCount;
@@ -90,6 +91,7 @@ class SmartStaggeredLoader extends StatefulWidget {
 
   final bool isSeperated;
   final GridConfig? gridConfig;
+  final void Function(int oldIndex, int newIndex)? onReorder;
 
   @override
   State<SmartStaggeredLoader> createState() => _SmartStaggeredLoaderState();
@@ -285,6 +287,26 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
               ? SliverToBoxAdapter(
                   // hasScrollBody: false,
                   child: _empty(),
+                )
+              : widget.onReorder != null
+              ? SliverReorderableList(
+                  onReorder: widget.onReorder!,
+                  itemCount: widget.itemCount,
+                  itemBuilder: (context, index) {
+                    var child = widget.itemBuilder(context, index);
+                    if (widget.isSeperated) {
+                      child = LayoutBuilder(
+                        builder: (context, constraints) {
+                          return _seprated(index, child, constraints.maxWidth);
+                        },
+                      );
+                    }
+                    return ReorderableDragStartListener(
+                      key: ValueKey('item_$index'),
+                      index: index,
+                      child: child,
+                    );
+                  },
                 )
               : SliverGrid(
                   gridDelegate: gridConfig.itemInRow > 0

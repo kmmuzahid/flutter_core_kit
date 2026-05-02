@@ -27,6 +27,7 @@ class SmartListLoader extends StatefulWidget {
     this.scrollController,
     this.emptyWidget,
     this.topWidget,
+    this.onReorder,
   });
 
   final int itemCount;
@@ -44,6 +45,7 @@ class SmartListLoader extends StatefulWidget {
   final ScrollController? scrollController;
   final Widget? emptyWidget;
   final Widget? topWidget;
+  final void Function(int oldIndex, int newIndex)? onReorder;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -193,33 +195,53 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         ),
     ];
 
-    final listSliver =
-        widget.initalLoader != null && widget.isLoading && widget.itemCount == 0
-        ? SliverToBoxAdapter(child: widget.initalLoader!)
-        : SliverPadding(
-            padding: widget.padding ?? EdgeInsets.zero,
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  if (widget.topWidget != null && index == 0) {
-                    return widget.topWidget!;
-                  }
-                  if (!widget.isReverse && index == widget.itemCount ||
-                      (widget.isReverse && index == 0 ||
-                          widget.topWidget != null && index == 1)) {
-                    return _buildFooter();
-                  }
-                  final actualIndex = widget.isReverse ? index - 1 : index;
-                  if (actualIndex >= 0 && actualIndex < widget.itemCount) {
-                    return widget.itemBuilder(context, actualIndex);
-                  }
-                  return null;
+    final sliverContent = widget.itemCount == 0 && !widget.isLoading
+        ? SliverToBoxAdapter(child: _empty())
+        : widget.onReorder != null
+            ? SliverReorderableList(
+                onReorder: widget.onReorder!,
+                itemCount: widget.itemCount,
+                itemBuilder: (context, index) {
+                  final actualIndex = widget.isReverse ? (widget.itemCount - 1 - index) : index;
+                  return ReorderableDragStartListener(
+                    key: ValueKey('item_$actualIndex'),
+                    index: index,
+                    child: widget.itemBuilder(context, actualIndex),
+                  );
                 },
-                childCount:
-                    widget.itemCount + 1 + (widget.topWidget != null ? 1 : 0),
-              ),
-            ),
-          );
+              )
+            : SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final actualIndex = widget.isReverse ? (widget.itemCount - 1 - index) : index;
+                    return widget.itemBuilder(context, actualIndex);
+                  },
+                  childCount: widget.itemCount,
+                ),
+              );
+
+    final slivers = [
+      if (widget.initalLoader != null && widget.isLoading && widget.itemCount == 0)
+        SliverToBoxAdapter(child: widget.initalLoader!)
+      else ...[
+        if (!widget.isReverse && widget.topWidget != null)
+          SliverToBoxAdapter(child: widget.topWidget!),
+        
+        if (widget.isReverse)
+          SliverToBoxAdapter(child: _buildFooter()),
+
+        SliverPadding(
+          padding: widget.padding ?? EdgeInsets.zero,
+          sliver: sliverContent,
+        ),
+
+        if (!widget.isReverse)
+          SliverToBoxAdapter(child: _buildFooter()),
+
+        if (widget.isReverse && widget.topWidget != null)
+          SliverToBoxAdapter(child: widget.topWidget!),
+      ]
+    ];
 
     return Scaffold(
       body: Stack(
@@ -241,7 +263,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
             ),
           ),
 
-          if (widget.itemCount == 0 && !widget.isLoading) _empty(),
+          // Measurement layer
 
           // Only show RefreshIndicator if onRefresh is provided
           widget.onRefresh != null
@@ -254,9 +276,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
                     }
                     return notification.depth == 0;
                   },
-                  child: _buildScrollView(appBarWidgets, listSliver),
+                  child: _buildScrollView(appBarWidgets, slivers),
                 )
-              : _buildScrollView(appBarWidgets, listSliver),
+              : _buildScrollView(appBarWidgets, slivers),
         ],
       ),
     );
@@ -274,7 +296,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         );
   }
 
-  Widget _buildScrollView(List<Widget> appBarWidgets, Widget listSliver) {
+  Widget _buildScrollView(List<Widget> appBarWidgets, List<Widget> listSlivers) {
     return CustomScrollView(
       controller: _scrollController,
       reverse: widget.isReverse,
@@ -282,8 +304,8 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         parent: BouncingScrollPhysics(),
       ),
       slivers: [
-        if (widget.isReverse) listSliver else ...appBarWidgets,
-        if (widget.isReverse) ...appBarWidgets.reversed else listSliver,
+        if (widget.isReverse) ...listSlivers else ...appBarWidgets,
+        if (widget.isReverse) ...appBarWidgets.reversed else ...listSlivers,
       ],
     );
   }
