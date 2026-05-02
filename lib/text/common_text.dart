@@ -121,43 +121,47 @@ class CommonText extends StatelessWidget {
     final effectiveOverflow = overflow ?? TextOverflow.ellipsis;
     final formattedData = _formatNumbersInText(text);
     final isHtml = _isHtml(text);
-    if (isHtml) {
-      return Html(
-        data: formattedData,
-        style: {
-          'body': Style(
-            fontFamily: coreKitInstance.fontFamily,
-            maxLines: isDescription ? null : maxLines,
-            textOverflow: isDescription ? null : effectiveOverflow,
-            textAlign: textAlign,
-            fontSize: FontSize(effectiveTextStyle.fontSize ?? 16.0),
-            color: textColor,
-            fontWeight: fontWeight,
-          ),
-          'p': Style(
-            fontFamily: coreKitInstance.fontFamily,
-            maxLines: isDescription ? null : maxLines,
-            textOverflow: isDescription ? null : effectiveOverflow,
-            textAlign: textAlign,
-            fontSize: FontSize(effectiveTextStyle.fontSize ?? 20),
-            color: textColor,
-            fontWeight: fontWeight,
-          ),
-          'h1,h2,h3,h4,h5,h6': Style(
-            fontFamily: coreKitInstance.fontFamily,
-            maxLines: isDescription ? null : maxLines,
-            textOverflow: isDescription ? null : effectiveOverflow,
-            textAlign: textAlign,
-            fontSize: FontSize(effectiveTextStyle.fontSize ?? 25),
-            color: textColor,
-            fontWeight: fontWeight,
-          ),
-        },
-      );
-    }
-
     Widget buildText() {
-      // For HTML content
+      if (isHtml) {
+        // To make maxLines work for the whole text, we treat block elements as inline
+        // and add line breaks. This forces flutter_html to render a single RichText.
+        final htmlData = formattedData
+            .replaceAll(RegExp(r'</p>', caseSensitive: false), '</p><br/>')
+            .replaceAll(RegExp(r'</h1>', caseSensitive: false), '</h1><br/>')
+            .replaceAll(RegExp(r'</h2>', caseSensitive: false), '</h2><br/>')
+            .replaceAll(RegExp(r'</h3>', caseSensitive: false), '</h3><br/>')
+            .replaceAll(RegExp(r'</h4>', caseSensitive: false), '</h4><br/>')
+            .replaceAll(RegExp(r'</h5>', caseSensitive: false), '</h5><br/>')
+            .replaceAll(RegExp(r'</h6>', caseSensitive: false), '</h6><br/>');
+
+        return Html(
+          data: htmlData,
+          style: {
+            'body': Style(
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+              fontFamily: coreKitInstance.fontFamily,
+              maxLines: isDescription ? null : maxLines,
+              textOverflow: isDescription ? null : effectiveOverflow,
+              textAlign: textAlign,
+              fontSize: FontSize(effectiveTextStyle.fontSize ?? 16.0),
+              color: textColor ?? effectiveTextStyle.color,
+              fontWeight: fontWeight ?? effectiveTextStyle.fontWeight,
+            ),
+            'p': Style(
+              display: Display.inline,
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+            ),
+            'h1,h2,h3,h4,h5,h6': Style(
+              display: Display.inline,
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+              fontWeight: FontWeight.bold,
+            ),
+          },
+        );
+      }
 
       // For description text - no resizing
       if (isDescription) {
@@ -231,7 +235,7 @@ class CommonText extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ?preffix,
+        if (preffix != null) preffix!,
         if (preffix != null) textSpacing.width,
         Flexible(
           child: gradient != null
@@ -245,7 +249,7 @@ class CommonText extends StatelessWidget {
               : buildText(),
         ),
         if (suffix != null) textSpacing.width,
-        ?suffix,
+        if (suffix != null) suffix!,
       ],
     );
   }
