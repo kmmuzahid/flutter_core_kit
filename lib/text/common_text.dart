@@ -127,28 +127,27 @@ class CommonText extends StatelessWidget {
         style: {
           'body': Style(
             fontFamily: coreKitInstance.fontFamily,
-            // margin: Margins.zero,
-            // padding: HtmlPaddings.zero,
-            // textOverflow: effectiveOverflow,
-            // textAlign: textAlign,
+            maxLines: isDescription ? null : maxLines,
+            textOverflow: isDescription ? null : effectiveOverflow,
+            textAlign: textAlign,
             fontSize: FontSize(effectiveTextStyle.fontSize ?? 16.0),
             color: textColor,
             fontWeight: fontWeight,
           ),
           'p': Style(
             fontFamily: coreKitInstance.fontFamily,
-            // margin: Margins.zero,
-            // padding: HtmlPaddings.zero,
-            // textAlign: textAlign,
+            maxLines: isDescription ? null : maxLines,
+            textOverflow: isDescription ? null : effectiveOverflow,
+            textAlign: textAlign,
             fontSize: FontSize(effectiveTextStyle.fontSize ?? 20),
             color: textColor,
             fontWeight: fontWeight,
           ),
           'h1,h2,h3,h4,h5,h6': Style(
             fontFamily: coreKitInstance.fontFamily,
-            // margin: Margins.zero,
-            // padding: HtmlPaddings.zero,
-            // textAlign: textAlign,
+            maxLines: isDescription ? null : maxLines,
+            textOverflow: isDescription ? null : effectiveOverflow,
+            textAlign: textAlign,
             fontSize: FontSize(effectiveTextStyle.fontSize ?? 25),
             color: textColor,
             fontWeight: fontWeight,
@@ -237,8 +236,9 @@ class CommonText extends StatelessWidget {
         Flexible(
           child: gradient != null
               ? ShaderMask(
-                  shaderCallback: (bounds) =>
-                      gradient!.createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+                  shaderCallback: (bounds) => gradient!.createShader(
+                    Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                  ),
                   blendMode: BlendMode.srcIn,
                   child: buildText(),
                 )
@@ -336,7 +336,6 @@ class _AdaptiveText extends StatelessWidget {
     // Binary search for optimal font size
     var low = minFontSize;
     var high = maxFontSize;
-    
 
     while (high - low > 0.5) {
       final mid = (low + high) / 2;
