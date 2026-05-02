@@ -203,7 +203,7 @@ class _SmartListLoaderState extends State<SmartListLoader> {
                 itemCount: widget.itemCount,
                 itemBuilder: (context, index) {
                   final actualIndex = widget.isReverse ? (widget.itemCount - 1 - index) : index;
-                  return ReorderableDragStartListener(
+                  return ReorderableDelayedDragStartListener(
                     key: ValueKey('item_$actualIndex'),
                     index: index,
                     child: widget.itemBuilder(context, actualIndex),

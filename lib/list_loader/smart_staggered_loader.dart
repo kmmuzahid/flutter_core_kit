@@ -8,6 +8,7 @@ library;
 import 'package:core_kit/utils/debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 
 class GridConfig {
   final double maxCrossAxisExtent;
@@ -102,6 +103,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   final GlobalKey _stickyKey = GlobalKey();
   late final ScrollController _scrollController;
   late final GridConfig gridConfig;
+  int? _dragStartIndex;
 
   double _appBarHeight = 0.0;
   double _stickyHeight = 0.0;
@@ -289,22 +291,56 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
                   child: _empty(),
                 )
               : widget.onReorder != null
-              ? SliverReorderableList(
-                  onReorder: widget.onReorder!,
+              ? ReorderableBuilder.builder(
                   itemCount: widget.itemCount,
-                  itemBuilder: (context, index) {
-                    var child = widget.itemBuilder(context, index);
-                    if (widget.isSeperated) {
-                      child = LayoutBuilder(
-                        builder: (context, constraints) {
-                          return _seprated(index, child, constraints.maxWidth);
-                        },
-                      );
+                  onDragStarted: (index) {
+                    _dragStartIndex = index;
+                  },
+                  onDragEnd: (index) {
+                    if (_dragStartIndex != null) {
+                      widget.onReorder!(_dragStartIndex!, index);
+                      _dragStartIndex = null;
                     }
-                    return ReorderableDragStartListener(
-                      key: ValueKey('item_$index'),
-                      index: index,
-                      child: child,
+                  },
+                  onReorderPositions: (positions) {
+                     // Empty callback to satisfy ReorderableBuilder requirements
+                  },
+                  childBuilder: (itemBuilder) {
+                    return SliverGrid(
+                      gridDelegate: gridConfig.itemInRow > 0
+                          ? SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: gridConfig.itemInRow,
+                              childAspectRatio: gridConfig.aspectRatio,
+                              mainAxisSpacing: gridConfig.mainAxisSpacing,
+                              crossAxisSpacing: widget.isSeperated
+                                  ? 0
+                                  : gridConfig.crossAxisSpacing,
+                            )
+                          : SliverGridDelegateWithMaxCrossAxisExtent(
+                              childAspectRatio: gridConfig.aspectRatio,
+                              maxCrossAxisExtent: gridConfig.maxCrossAxisExtent,
+                              mainAxisSpacing: gridConfig.mainAxisSpacing,
+                              crossAxisSpacing: widget.isSeperated
+                                  ? 0
+                                  : gridConfig.crossAxisSpacing,
+                            ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          var child = widget.itemBuilder(context, index);
+                          if (widget.isSeperated) {
+                            child = LayoutBuilder(
+                              builder: (context, constraints) {
+                                return _seprated(index, child, constraints.maxWidth);
+                              },
+                            );
+                          }
+                          return itemBuilder(
+                            KeyedSubtree(key: ValueKey('item_$index'), child: child),
+                            index,
+                          );
+                        },
+                        childCount: widget.itemCount,
+                      ),
                     );
                   },
                 )
