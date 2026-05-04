@@ -200,60 +200,58 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final sliverContent = widget.itemCount == 0 && !widget.isLoading
         ? SliverToBoxAdapter(child: _empty())
         : widget.onReorder != null
-            ? SliverReorderableList(
-                onReorder: widget.onReorder!,
-                itemCount: widget.itemCount,
-                itemBuilder: (context, index) {
-                  final actualIndex =
-                      widget.isReverse ? (widget.itemCount - 1 - index) : index;
+        ? SliverReorderableList(
+            onReorder: widget.onReorder!,
+            itemCount: widget.itemCount,
+            itemBuilder: (context, index) {
+              final actualIndex = widget.isReverse
+                  ? (widget.itemCount - 1 - index)
+                  : index;
 
-                  Widget item = widget.itemBuilder(context, actualIndex);
+              var item = widget.itemBuilder(context, actualIndex);
 
-                  if (widget.seperator != null) {
-                    final bool showSeparator = widget.isReverse
-                        ? index > 0
-                        : index < widget.itemCount - 1;
-                    if (showSeparator) {
-                      item = Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          item,
-                          widget.seperator!,
-                        ],
-                      );
-                    }
-                  }
-
-                  return ReorderableDelayedDragStartListener(
-                    key: ValueKey('item_$actualIndex'),
-                    index: index,
-                    child: item,
+              if (widget.seperator != null) {
+                final showSeparator = widget.isReverse
+                    ? index > 0
+                    : index < widget.itemCount - 1;
+                if (showSeparator) {
+                  item = Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [item, widget.seperator!],
                   );
-                },
-              )
-            : SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (widget.seperator != null) {
-                      final itemIndex = index ~/ 2;
-                      if (index.isOdd) {
-                        return widget.seperator!;
-                      }
-                      final actualIndex = widget.isReverse
-                          ? (widget.itemCount - 1 - itemIndex)
-                          : itemIndex;
-                      return widget.itemBuilder(context, actualIndex);
-                    }
-                    final actualIndex = widget.isReverse
-                        ? (widget.itemCount - 1 - index)
-                        : index;
-                    return widget.itemBuilder(context, actualIndex);
-                  },
-                  childCount: widget.seperator != null
-                      ? (widget.itemCount > 0 ? widget.itemCount * 2 - 1 : 0)
-                      : widget.itemCount,
-                ),
+                }
+              }
+
+              return ReorderableDelayedDragStartListener(
+                key: ValueKey('item_$actualIndex'),
+                index: index,
+                child: item,
               );
+            },
+          )
+        : SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                if (widget.seperator != null) {
+                  final itemIndex = index ~/ 2;
+                  if (index.isOdd) {
+                    return widget.seperator!;
+                  }
+                  final actualIndex = widget.isReverse
+                      ? (widget.itemCount - 1 - itemIndex)
+                      : itemIndex;
+                  return widget.itemBuilder(context, actualIndex);
+                }
+                final actualIndex = widget.isReverse
+                    ? (widget.itemCount - 1 - index)
+                    : index;
+                return widget.itemBuilder(context, actualIndex);
+              },
+              childCount: widget.seperator != null
+                  ? (widget.itemCount > 0 ? widget.itemCount * 2 - 1 : 0)
+                  : widget.itemCount,
+            ),
+          );
 
     final slivers = [
       if (widget.initalLoader != null &&
