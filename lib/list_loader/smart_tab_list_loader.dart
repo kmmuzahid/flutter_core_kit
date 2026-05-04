@@ -48,7 +48,10 @@ class SmartTabConfig<T> {
     this.subAppBar,
     this.subOnColapsAppbar,
     this.onReorder,
+    this.seperator,
   });
+
+  final Widget? seperator;
 
   final T tab;
 
@@ -81,8 +84,11 @@ class SmartTabListLoader<T> extends StatefulWidget {
     this.gridConfig,
     this.emptyWidget,
     this.onReorder,
+    this.seperator,
     super.key,
   }) : assert(tabs.isNotEmpty, 'tabs must not be empty');
+
+  final Widget? seperator;
 
   final T value;
 
@@ -264,6 +270,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       onColapsAppbar: _buildOncolupse(cfg),
       limit: widget.limit,
       onReorder: cfg.onReorder ?? widget.onReorder,
+      seperator: cfg.seperator ?? widget.seperator,
     );
   }
 

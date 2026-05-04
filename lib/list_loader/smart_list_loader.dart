@@ -28,8 +28,10 @@ class SmartListLoader extends StatefulWidget {
     this.emptyWidget,
     this.topWidget,
     this.onReorder,
+    this.seperator,
   });
 
+  final Widget? seperator;
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
   final void Function()? onRefresh;
@@ -202,45 +204,78 @@ class _SmartListLoaderState extends State<SmartListLoader> {
                 onReorder: widget.onReorder!,
                 itemCount: widget.itemCount,
                 itemBuilder: (context, index) {
-                  final actualIndex = widget.isReverse ? (widget.itemCount - 1 - index) : index;
+                  final actualIndex =
+                      widget.isReverse ? (widget.itemCount - 1 - index) : index;
+
+                  Widget item = widget.itemBuilder(context, actualIndex);
+
+                  if (widget.seperator != null) {
+                    final bool showSeparator = widget.isReverse
+                        ? index > 0
+                        : index < widget.itemCount - 1;
+                    if (showSeparator) {
+                      item = Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          item,
+                          widget.seperator!,
+                        ],
+                      );
+                    }
+                  }
+
                   return ReorderableDelayedDragStartListener(
                     key: ValueKey('item_$actualIndex'),
                     index: index,
-                    child: widget.itemBuilder(context, actualIndex),
+                    child: item,
                   );
                 },
               )
             : SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final actualIndex = widget.isReverse ? (widget.itemCount - 1 - index) : index;
+                    if (widget.seperator != null) {
+                      final itemIndex = index ~/ 2;
+                      if (index.isOdd) {
+                        return widget.seperator!;
+                      }
+                      final actualIndex = widget.isReverse
+                          ? (widget.itemCount - 1 - itemIndex)
+                          : itemIndex;
+                      return widget.itemBuilder(context, actualIndex);
+                    }
+                    final actualIndex = widget.isReverse
+                        ? (widget.itemCount - 1 - index)
+                        : index;
                     return widget.itemBuilder(context, actualIndex);
                   },
-                  childCount: widget.itemCount,
+                  childCount: widget.seperator != null
+                      ? (widget.itemCount > 0 ? widget.itemCount * 2 - 1 : 0)
+                      : widget.itemCount,
                 ),
               );
 
     final slivers = [
-      if (widget.initalLoader != null && widget.isLoading && widget.itemCount == 0)
+      if (widget.initalLoader != null &&
+          widget.isLoading &&
+          widget.itemCount == 0)
         SliverToBoxAdapter(child: widget.initalLoader!)
       else ...[
         if (!widget.isReverse && widget.topWidget != null)
           SliverToBoxAdapter(child: widget.topWidget!),
-        
-        if (widget.isReverse)
-          SliverToBoxAdapter(child: _buildFooter()),
+
+        if (widget.isReverse) SliverToBoxAdapter(child: _buildFooter()),
 
         SliverPadding(
           padding: widget.padding ?? EdgeInsets.zero,
           sliver: sliverContent,
         ),
 
-        if (!widget.isReverse)
-          SliverToBoxAdapter(child: _buildFooter()),
+        if (!widget.isReverse) SliverToBoxAdapter(child: _buildFooter()),
 
         if (widget.isReverse && widget.topWidget != null)
           SliverToBoxAdapter(child: widget.topWidget!),
-      ]
+      ],
     ];
 
     return Scaffold(
@@ -296,7 +331,10 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         );
   }
 
-  Widget _buildScrollView(List<Widget> appBarWidgets, List<Widget> listSlivers) {
+  Widget _buildScrollView(
+    List<Widget> appBarWidgets,
+    List<Widget> listSlivers,
+  ) {
     return CustomScrollView(
       controller: _scrollController,
       reverse: widget.isReverse,
