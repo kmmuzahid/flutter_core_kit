@@ -55,23 +55,27 @@ class DioRequestBuilder {
     //   DioUtils.log(_config, response.data.toString(), tag: input.endpoint);
     // }
 
-    final parsed = response.data['data'] != null
+    final isMap = response.data is Map;
+    final parsed = isMap && response.data['data'] != null
         ? responseBuilder(response.data['data'])
         : null;
 
-    final message = response.data is Map && response.data['message'] != null
+    final message = isMap && response.data['message'] != null
         ? response.data['message'].toString()
         : response.statusMessage;
 
-    if (showMessage &&
-        (response.statusCode == 200 || response.statusCode == 201)) {
-      DioUtils.showMessage(message ?? '', isError: false);
+    if (showMessage) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        DioUtils.showMessage(message ?? '', isError: false);
+      } else if (response.statusCode != null && response.statusCode! >= 400) {
+        DioUtils.showMessage(message ?? '', isError: true);
+      }
     }
 
     return ResponseState(
       data: parsed,
       message: message,
-      isSuccess: response.data['success'],
+      isSuccess: isMap ? (response.data['success'] ?? false) : false,
       cancelToken: cancelToken,
       statusCode: response.statusCode,
     );
@@ -190,6 +194,11 @@ class DioRequestBuilder {
         contentType: contentType,
         receiveTimeout: dynamicTimeout,
         sendTimeout: dynamicTimeout,
+        validateStatus: (status) {
+          if (status == null) return false;
+          if (status == 401) return false; // Throw 401 to trigger token refresh
+          return status < 500; // Allow other 4xx errors to pass normally
+        },
       ),
     );
   }
