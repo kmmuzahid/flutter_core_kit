@@ -326,8 +326,8 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 fontWeight: FontWeight.w500,
                 fontSize: widget.fontSize,
               ),
-              expands: false,
-              minLines: 1,
+              expands: true,
+              minLines: null,
               decoration: InputDecoration(
                 isDense: widget.isDense,
                 filled: true,
@@ -462,9 +462,8 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
             );
 
             final content = Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                textFormField,
+                Expanded(child: textFormField),
                 if (widget.footer != null)
                   Padding(
                     padding: EdgeInsets.only(
