@@ -31,7 +31,9 @@ class CommonMultilineTextField extends StatefulWidget {
     this.showValidationMessage = true,
     this.textAlign = TextAlign.left,
     this.enableHtml = false,
-    this.height = 100,
+    this.maxHeight = 150,
+    this.minHeight,
+    this.isDense = false,
     this.maxLength,
     this.maxWords,
     this.minLength = 0,
@@ -71,7 +73,9 @@ class CommonMultilineTextField extends StatefulWidget {
   final TextAlign textAlign;
   final int? maxLength;
   final bool enableHtml;
-  final double height;
+  final double maxHeight;
+  final double? minHeight;
+  final bool isDense;
   final int? maxWords;
   final int minLength;
   final int minWords;
@@ -223,73 +227,34 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
 
   @override
   Widget build(BuildContext context) {
-    // if (enableHtml) {
-    //   return CustomQuillField(
-    //     height: height,
-    //     onSave: onSave,
-    //     validator: validationType,
-    //     initialText: initialText,
-    //     readOnly: readOnly,
-    //     hintText: hintText,
-    //     borderRadius: borderRadius,
-    //     backgroundColor: backgroundColor,
-    //     borderColor: borderColor,
-    //     borderWidth: borderWidth,
-    //   );
-    // }
     return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: widget.height),
-
+      constraints: BoxConstraints(
+        maxHeight: widget.maxHeight,
+        minHeight: widget.minHeight ?? widget.maxHeight,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: () {
-              final textFormField = TextFormField(
-                onTapOutside: (event) {
-                  _focusNode.unfocus();
-                },
-                textAlignVertical: TextAlignVertical.top,
-                readOnly: widget.isReadOnly,
-                maxLines: null,
-
-                scrollPhysics: const BouncingScrollPhysics(),
-                inputFormatters: [
-                  ...InputHelper.getInputFormatters(widget.validationType),
-                  if (widget.maxWords != null || widget.maxLength != null)
-                    TextInputFormatter.withFunction((oldValue, newValue) {
-                      // Clean the text before processing
-                      final cleanedText = _cleanText(newValue.text);
-
-                      if (widget.maxLength != null) {
-                        final length = cleanedText.length;
-                        if (length <= widget.maxLength!) {
-                          setState(() {
-                            lengthCount = length;
-                          });
-                          // Return the cleaned text
-                          return TextEditingValue(
-                            text: newValue.text,
-                            selection: TextSelection.collapsed(
-                              offset: newValue.text.length,
-                            ),
-                          );
-                        }
-                        return oldValue;
-                      }
-
-                      // Count words by splitting on whitespace and filtering out empty strings
-                      final words = cleanedText
-                          .split(' ')
-                          .where((word) => word.isNotEmpty)
-                          .length;
-
-                      // Allow the change if word count is within limit or if text is being deleted
-                      if (words <= widget.maxWords! ||
-                          newValue.text.length < oldValue.text.length) {
+          () {
+            final textFormField = TextFormField(
+              onTapOutside: (event) {
+                _focusNode.unfocus();
+              },
+              textAlignVertical: TextAlignVertical.top,
+              readOnly: widget.isReadOnly,
+              maxLines: null,
+              scrollPhysics: const BouncingScrollPhysics(),
+              inputFormatters: [
+                ...InputHelper.getInputFormatters(widget.validationType),
+                if (widget.maxWords != null || widget.maxLength != null)
+                  TextInputFormatter.withFunction((oldValue, newValue) {
+                    final cleanedText = _cleanText(newValue.text);
+                    if (widget.maxLength != null) {
+                      final length = cleanedText.length;
+                      if (length <= widget.maxLength!) {
                         setState(() {
-                          wordCount = words;
+                          lengthCount = length;
                         });
-                        // Return the cleaned text
                         return TextEditingValue(
                           text: newValue.text,
                           selection: TextSelection.collapsed(
@@ -298,272 +263,269 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                         );
                       }
                       return oldValue;
-                    }),
-                ],
-                keyboardType: TextInputType.multiline,
-                textAlign: widget.textAlign,
-                controller: _controller,
-                focusNode: _focusNode,
-                enableInteractiveSelection: !widget.isReadOnly,
-                obscureText: _obscureText,
-                onChanged: widget.onChanged,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                onSaved: (v) {
-                  _onSave(v?.trim() ?? '');
-                },
-                maxLength: widget.maxLength,
-                onFieldSubmitted: (v) {
-                  _onSave(v.trim());
-                },
-                onTap: widget.onTap,
-                validator:
-                    widget.validation ??
-                    (value) {
-                      final newValue = _cleanText(value?.trim() ?? '');
-                      var error = InputHelper.validate(
-                        widget.validationType,
-                        newValue,
-                        originalPassword: widget.originalPassword?.call(),
+                    }
+                    final words = cleanedText
+                        .split(' ')
+                        .where((word) => word.isNotEmpty)
+                        .length;
+                    if (words <= widget.maxWords! ||
+                        newValue.text.length < oldValue.text.length) {
+                      setState(() {
+                        wordCount = words;
+                      });
+                      return TextEditingValue(
+                        text: newValue.text,
+                        selection: TextSelection.collapsed(
+                          offset: newValue.text.length,
+                        ),
                       );
+                    }
+                    return oldValue;
+                  }),
+              ],
+              keyboardType: TextInputType.multiline,
+              textAlign: widget.textAlign,
+              controller: _controller,
+              focusNode: _focusNode,
+              enableInteractiveSelection: !widget.isReadOnly,
+              obscureText: _obscureText,
+              onChanged: widget.onChanged,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              onSaved: (v) {
+                _onSave(v?.trim() ?? '');
+              },
+              maxLength: widget.maxLength,
+              onFieldSubmitted: (v) {
+                _onSave(v.trim());
+              },
+              onTap: widget.onTap,
+              validator:
+                  widget.validation ??
+                  (value) {
+                    final newValue = _cleanText(value?.trim() ?? '');
+                    var error = InputHelper.validate(
+                      widget.validationType,
+                      newValue,
+                      originalPassword: widget.originalPassword?.call(),
+                    );
 
-                      if (newValue.isNotEmpty) {
-                        if (widget.minLength > 0 &&
-                            newValue.length < widget.minLength) {
-                          error =
-                              'Minimum ${widget.minLength} characters required';
-                        }
-
-                        final wordCount = newValue.split(' ').length;
-
-                        if (widget.minWords > 0 &&
-                            wordCount < widget.minWords) {
-                          error = 'Minimum ${widget.minWords} words required';
-                        }
-
-                        if (widget.maxWords != null) {
-                          if (wordCount - 1 > widget.maxWords!) {
-                            error = 'Maximum ${widget.maxWords} words allowed';
-                          }
-                        }
+                    if (newValue.isNotEmpty) {
+                      if (widget.minLength > 0 &&
+                          newValue.length < widget.minLength) {
+                        error =
+                            'Minimum ${widget.minLength} characters required';
                       }
 
-                      // Return the error to show the error border, but return null for the message if showValidationMessage is false
-                      return widget.showValidationMessage
-                          ? error
-                          : (error != null ? '' : null);
-                    },
+                      final wordCount = newValue.split(' ').length;
 
-                style: _getStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: widget.fontSize,
-                ),
+                      if (widget.minWords > 0 && wordCount < widget.minWords) {
+                        error = 'Minimum ${widget.minWords} words required';
+                      }
 
-                expands: true, // expands to fill parent height
-                decoration: InputDecoration(
-                  filled: true,
-                  counterText: '',
+                      if (widget.maxWords != null) {
+                        if (wordCount - 1 > widget.maxWords!) {
+                          error = 'Maximum ${widget.maxWords} words allowed';
+                        }
+                      }
+                    }
 
-                  // errorMaxLines: 1,
-                  errorStyle: _getStyle(
-                    fontSize: 0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  fillColor: widget.backgroundColor,
-                  hintStyle:
-                      widget.hintStyle ??
-                      _getStyle(
-                        fontSize:
-                            coreKitInstance
-                                .theme
-                                .inputDecorationTheme
-                                .hintStyle
-                                ?.fontSize ??
-                            16.sp,
-                        fontStyle:
-                            coreKitInstance
-                                .theme
-                                .inputDecorationTheme
-                                .hintStyle
-                                ?.fontStyle ??
-                            FontStyle.italic,
-                        textColor: hintColor(),
-                      ),
-                  prefixIcon: Column(
-                    children: [
-                      widget.prefixText?.isNotEmpty == true
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                left: 10,
-                                right: 5,
-                              ), // add some right padding to allow hint space
-                              child: CommonText(
-                                text: widget.prefixText!,
-                                textColor: _iconColor(),
-                              ),
-                            )
-                          : Padding(
-                              padding: EdgeInsets.only(
-                                left: 10.w,
-                                right: widget.paddingHorizontal,
-                              ),
-                              child: widget.prefixIcon,
-                            ),
-                    ],
-                  ),
-                  suffixIconConstraints: BoxConstraints(
-                    maxWidth:
-                        widget.suffixIcon == null &&
-                            widget.validationType !=
-                                ValidationType.validatePassword
-                        ? widget.paddingHorizontal
-                        : double.infinity,
-                  ),
-
-                  prefixIconConstraints: BoxConstraints(
-                    maxWidth: widget.prefixIcon == null
-                        ? widget.paddingHorizontal
-                        : double.infinity,
-                  ),
-                  suffixIcon: widget.showActionButton
-                      ? GestureDetector(
-                          onTap: () {
-                            _onSave(_controller.text.trim());
-                          },
-                          child:
-                              widget.actionButtonIcon ??
-                              const Icon(Icons.search),
-                        )
-                      : widget.validationType == ValidationType.validatePassword
-                      ? (_obscureText
-                            ? _buildPasswordSuffixIcon()
-                            : _buildPasswordSuffixIcon())
-                      : Padding(
-                          padding: EdgeInsets.only(
-                            right: 10,
-                            left: widget.paddingHorizontal,
-                          ),
-                          child: widget.suffixIcon,
-                        ),
-                  prefixIconColor: _iconColor(),
-                  suffixIconColor: _iconColor(),
-
-                  border: widget.footer != null ? InputBorder.none : null,
-                  enabledBorder: widget.footer != null
-                      ? InputBorder.none
-                      : null,
-                  disabledBorder: widget.footer != null
-                      ? InputBorder.none
-                      : null,
-                  focusedBorder: widget.footer != null
-                      ? InputBorder.none
-                      : _buildBorder(
-                          color: widget.isReadOnly
-                              ? (widget.borderColor ??
-                                    theme
-                                        .inputDecorationTheme
-                                        .disabledBorder
-                                        ?.borderSide
-                                        .color ??
-                                    coreKitInstance.outlineColor)
-                              : theme
-                                        .inputDecorationTheme
-                                        .focusedBorder
-                                        ?.borderSide
-                                        .color ??
-                                    coreKitInstance.primaryColor,
-                          width: widget.borderWidth.w,
-                        ),
-                  errorBorder: widget.footer != null
-                      ? InputBorder.none
-                      : _buildBorder(
-                          color:
-                              theme
-                                  .inputDecorationTheme
-                                  .errorBorder
-                                  ?.borderSide
-                                  .color ??
-                              Colors.red,
-                          width: widget.borderWidth.w,
-                        ),
-                  focusedErrorBorder: widget.footer != null
-                      ? InputBorder.none
-                      : _buildBorder(
-                          color:
-                              theme
-                                  .inputDecorationTheme
-                                  .errorBorder
-                                  ?.borderSide
-                                  .color ??
-                              Colors.red,
-                          width: widget.borderWidth.w,
-                        ),
-
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: widget.paddingHorizontal.w,
-                    vertical: widget.paddingVertical.h,
-                  ),
-
-                  hintText: widget.hintText,
-                  labelText: widget.labelText,
-                ),
-              );
-
-              final content = Column(
-                children: [
-                  Expanded(child: textFormField),
-                  if (widget.footer != null)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: widget.paddingHorizontal.w,
-                        right: widget.paddingHorizontal.w,
-                        bottom: 8.h,
-                      ),
-                      child: widget.footer!,
+                    return widget.showValidationMessage
+                        ? error
+                        : (error != null ? '' : null);
+                  },
+              style: _getStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: widget.fontSize,
+              ),
+              expands: false,
+              minLines: 1,
+              decoration: InputDecoration(
+                isDense: widget.isDense,
+                filled: true,
+                counterText: '',
+                errorStyle: _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
+                fillColor: widget.backgroundColor,
+                hintStyle:
+                    widget.hintStyle ??
+                    _getStyle(
+                      fontSize:
+                          coreKitInstance
+                              .theme
+                              .inputDecorationTheme
+                              .hintStyle
+                              ?.fontSize ??
+                          16.sp,
+                      fontStyle:
+                          coreKitInstance
+                              .theme
+                              .inputDecorationTheme
+                              .hintStyle
+                              ?.fontStyle ??
+                          FontStyle.italic,
+                      textColor: hintColor(),
                     ),
-                ],
-              );
-
-              return Container(
-                decoration: BoxDecoration(
-                  color: widget.backgroundColor,
-                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
-                  border: Border.all(
-                    color: _focusNode.hasFocus
-                        ? (theme
-                                  .inputDecorationTheme
-                                  .focusedBorder
-                                  ?.borderSide
-                                  .color ??
-                              coreKitInstance.primaryColor)
-                        : (widget.isReadOnly
-                              ? (widget.borderColor ??
-                                    theme
-                                        .inputDecorationTheme
-                                        .disabledBorder
-                                        ?.borderSide
-                                        .color ??
-                                    coreKitInstance.outlineColor)
-                              : (widget.borderColor ??
-                                    theme
-                                        .inputDecorationTheme
-                                        .enabledBorder
-                                        ?.borderSide
-                                        .color ??
-                                    coreKitInstance.outlineColor)),
-                    width: widget.borderWidth.w,
-                  ),
+                prefixIcon: Column(
+                  children: [
+                    widget.prefixText?.isNotEmpty == true
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 10, right: 5),
+                            child: CommonText(
+                              text: widget.prefixText!,
+                              textColor: _iconColor(),
+                            ),
+                          )
+                        : Padding(
+                            padding: EdgeInsets.only(
+                              left: 10.w,
+                              right: widget.paddingHorizontal,
+                            ),
+                            child: widget.prefixIcon,
+                          ),
+                  ],
                 ),
-                child: content,
-              );
-            }(),
-          ),
+                suffixIconConstraints: BoxConstraints(
+                  maxWidth:
+                      widget.suffixIcon == null &&
+                          widget.validationType !=
+                              ValidationType.validatePassword
+                      ? widget.paddingHorizontal
+                      : double.infinity,
+                ),
+                prefixIconConstraints: BoxConstraints(
+                  maxWidth: widget.prefixIcon == null
+                      ? widget.paddingHorizontal
+                      : double.infinity,
+                ),
+                suffixIcon: widget.showActionButton
+                    ? GestureDetector(
+                        onTap: () {
+                          _onSave(_controller.text.trim());
+                        },
+                        child:
+                            widget.actionButtonIcon ?? const Icon(Icons.search),
+                      )
+                    : widget.validationType == ValidationType.validatePassword
+                    ? (_obscureText
+                          ? _buildPasswordSuffixIcon()
+                          : _buildPasswordSuffixIcon())
+                    : Padding(
+                        padding: EdgeInsets.only(
+                          right: 10,
+                          left: widget.paddingHorizontal,
+                        ),
+                        child: widget.suffixIcon,
+                      ),
+                prefixIconColor: _iconColor(),
+                suffixIconColor: _iconColor(),
+                border: widget.footer != null ? InputBorder.none : null,
+                enabledBorder: widget.footer != null ? InputBorder.none : null,
+                disabledBorder: widget.footer != null ? InputBorder.none : null,
+                focusedBorder: widget.footer != null
+                    ? InputBorder.none
+                    : _buildBorder(
+                        color: widget.isReadOnly
+                            ? (widget.borderColor ??
+                                  theme
+                                      .inputDecorationTheme
+                                      .disabledBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.outlineColor)
+                            : theme
+                                      .inputDecorationTheme
+                                      .focusedBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.primaryColor,
+                        width: widget.borderWidth.w,
+                      ),
+                errorBorder: widget.footer != null
+                    ? InputBorder.none
+                    : _buildBorder(
+                        color:
+                            theme
+                                .inputDecorationTheme
+                                .errorBorder
+                                ?.borderSide
+                                .color ??
+                            Colors.red,
+                        width: widget.borderWidth.w,
+                      ),
+                focusedErrorBorder: widget.footer != null
+                    ? InputBorder.none
+                    : _buildBorder(
+                        color:
+                            theme
+                                .inputDecorationTheme
+                                .errorBorder
+                                ?.borderSide
+                                .color ??
+                            Colors.red,
+                        width: widget.borderWidth.w,
+                      ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: widget.paddingHorizontal.w,
+                  vertical: widget.paddingVertical.h,
+                ),
+                hintText: widget.hintText,
+                labelText: widget.labelText,
+              ),
+            );
 
+            final content = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                textFormField,
+                if (widget.footer != null)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: widget.paddingHorizontal.w,
+                      right: widget.paddingHorizontal.w,
+                      bottom: 8.h,
+                    ),
+                    child: widget.footer!,
+                  ),
+              ],
+            );
+
+            return Container(
+              decoration: BoxDecoration(
+                color: widget.backgroundColor,
+                borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                border: Border.all(
+                  color: _focusNode.hasFocus
+                      ? (theme
+                                .inputDecorationTheme
+                                .focusedBorder
+                                ?.borderSide
+                                .color ??
+                            coreKitInstance.primaryColor)
+                      : (widget.isReadOnly
+                            ? (widget.borderColor ??
+                                  theme
+                                      .inputDecorationTheme
+                                      .disabledBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.outlineColor)
+                            : (widget.borderColor ??
+                                  theme
+                                      .inputDecorationTheme
+                                      .enabledBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.outlineColor)),
+                  width: widget.borderWidth.w,
+                ),
+              ),
+              child: content,
+            );
+          }(),
           Row(
             children: [
               if (((widget.minLength != lengthCount && widget.minLength > 0) ||
                   (widget.minWords != wordCount && widget.minWords > 0)))
                 _minimumHintBuilder(),
-
               const Spacer(),
               if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
                 _maximumHintBuilder(),
@@ -579,7 +541,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
         theme.textTheme.bodySmall?.copyWith(
           color: theme.inputDecorationTheme.hintStyle?.color,
         ) ??
-        TextStyle(fontSize: 12, color: Colors.grey.shade200);
+        const TextStyle(fontSize: 12, color: Colors.grey);
   }
 
   Widget _maximumHintBuilder() {
