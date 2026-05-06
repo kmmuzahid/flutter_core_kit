@@ -420,41 +420,27 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                     : _buildBorder(
                         color: widget.isReadOnly
                             ? (widget.borderColor ??
-                                  theme
-                                      .inputDecorationTheme
-                                      .disabledBorder
-                                      ?.borderSide
-                                      .color ??
-                                  coreKitInstance.outlineColor)
-                            : theme
-                                      .inputDecorationTheme
-                                      .focusedBorder
-                                      ?.borderSide
-                                      .color ??
-                                  coreKitInstance.primaryColor,
+                                theme.inputDecorationTheme.disabledBorder
+                                    ?.borderSide.color ??
+                                coreKitInstance.outlineColor)
+                            : theme.inputDecorationTheme.focusedBorder
+                                    ?.borderSide.color ??
+                                coreKitInstance.primaryColor,
                         width: widget.borderWidth.w,
                       ),
                 errorBorder: widget.footer != null
                     ? InputBorder.none
                     : _buildBorder(
-                        color:
-                            theme
-                                .inputDecorationTheme
-                                .errorBorder
-                                ?.borderSide
-                                .color ??
+                        color: theme.inputDecorationTheme.errorBorder
+                                ?.borderSide.color ??
                             Colors.red,
                         width: widget.borderWidth.w,
                       ),
                 focusedErrorBorder: widget.footer != null
                     ? InputBorder.none
                     : _buildBorder(
-                        color:
-                            theme
-                                .inputDecorationTheme
-                                .errorBorder
-                                ?.borderSide
-                                .color ??
+                        color: theme.inputDecorationTheme.errorBorder
+                                ?.borderSide.color ??
                             Colors.red,
                         width: widget.borderWidth.w,
                       ),
@@ -485,38 +471,32 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               ],
             );
 
-            return Container(
-              decoration: BoxDecoration(
-                color: widget.backgroundColor,
-                borderRadius: BorderRadius.circular(widget.borderRadius.r),
-                border: Border.all(
-                  color: _focusNode.hasFocus
-                      ? (theme
-                                .inputDecorationTheme
-                                .focusedBorder
-                                ?.borderSide
+            if (widget.footer != null) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: widget.backgroundColor,
+                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                  border: Border.all(
+                    color: _focusNode.hasFocus
+                        ? (theme.inputDecorationTheme.focusedBorder?.borderSide
                                 .color ??
                             coreKitInstance.primaryColor)
-                      : (widget.isReadOnly
+                        : (widget.isReadOnly
                             ? (widget.borderColor ??
-                                  theme
-                                      .inputDecorationTheme
-                                      .disabledBorder
-                                      ?.borderSide
-                                      .color ??
-                                  coreKitInstance.outlineColor)
+                                theme.inputDecorationTheme.disabledBorder
+                                    ?.borderSide.color ??
+                                coreKitInstance.outlineColor)
                             : (widget.borderColor ??
-                                  theme
-                                      .inputDecorationTheme
-                                      .enabledBorder
-                                      ?.borderSide
-                                      .color ??
-                                  coreKitInstance.outlineColor)),
-                  width: widget.borderWidth.w,
+                                theme.inputDecorationTheme.enabledBorder
+                                    ?.borderSide.color ??
+                                coreKitInstance.outlineColor)),
+                    width: widget.borderWidth.w,
+                  ),
                 ),
-              ),
-              child: content,
-            );
+                child: content,
+              );
+            }
+            return content;
           }(),
         ),
         Row(
