@@ -44,7 +44,10 @@ class CommonMultilineTextField extends StatefulWidget {
     this.textStyle,
     this.fontSize,
     this.contentPadding,
+    this.expand = false,
   });
+
+  final bool expand;
 
   final double borderWidth;
 
@@ -222,7 +225,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
         ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: widget.height,
-            minHeight: widget.minHeight ?? widget.height,
+            minHeight: widget.expand ? widget.height : (widget.minHeight ?? 0),
           ),
           child: () {
             final textFormField = TextFormField(
@@ -326,8 +329,8 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                 fontWeight: FontWeight.w500,
                 fontSize: widget.fontSize,
               ),
-              expands: true,
-              minLines: null,
+              expands: widget.expand,
+              minLines: widget.expand ? null : 1,
               decoration: InputDecoration(
                 isDense: widget.isDense,
                 filled: true,
@@ -462,8 +465,12 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
             );
 
             final content = Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(child: textFormField),
+                Flexible(
+                  fit: widget.expand ? FlexFit.tight : FlexFit.loose,
+                  child: textFormField,
+                ),
                 if (widget.footer != null)
                   Padding(
                     padding: EdgeInsets.only(
