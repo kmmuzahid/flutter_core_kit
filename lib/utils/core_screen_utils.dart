@@ -96,3 +96,21 @@ extension WidgetAspectRatio on Widget {
     child: AspectRatio(aspectRatio: (width, height).arValue, child: this),
   );
 }
+
+extension EdgeInsetsResponsive on EdgeInsets {
+  EdgeInsets get responsive => EdgeInsets.fromLTRB(
+        left.w,
+        top.h,
+        right.w,
+        bottom.h,
+      );
+}
+
+extension EdgeInsetsGeometryResponsive on EdgeInsetsGeometry {
+  EdgeInsetsGeometry get responsive {
+    if (this is EdgeInsets) {
+      return (this as EdgeInsets).responsive;
+    }
+    return this;
+  }
+}

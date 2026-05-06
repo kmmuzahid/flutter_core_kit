@@ -45,6 +45,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.footer,
     this.textStyle,
     this.fontSize,
+    this.contentPadding,
   });
 
   final double borderWidth;
@@ -86,6 +87,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final Widget? footer;
   final TextStyle? textStyle;
   final double? fontSize;
+  final EdgeInsetsGeometry? contentPadding;
 
   final String? Function(String? value)? validation;
 
@@ -476,10 +478,11 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                               Colors.red,
                           width: widget.borderWidth.w,
                         ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: widget.paddingHorizontal.w,
-                    vertical: widget.paddingVertical.h,
-                  ),
+                  contentPadding: widget.contentPadding?.responsive ??
+                      EdgeInsets.symmetric(
+                        horizontal: widget.paddingHorizontal.w,
+                        vertical: widget.paddingVertical.h,
+                      ),
                   hintText: widget.hintText,
                   labelText: widget.labelText,
                 ),
