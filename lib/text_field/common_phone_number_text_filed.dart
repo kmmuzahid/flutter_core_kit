@@ -11,8 +11,8 @@ import 'package:intl_phone_field_v2/country_picker_dialog.dart';
 import 'package:intl_phone_field_v2/intl_phone_field.dart';
 import 'package:intl_phone_field_v2/phone_number.dart';
 
-class CommonPhoneNumberTextFiled extends StatelessWidget {
-  const CommonPhoneNumberTextFiled({
+class CommonPhoneNumberTextField extends StatelessWidget {
+  const CommonPhoneNumberTextField({
     required this.countryChange,
     super.key,
     this.initalCountryCode = 'US',
@@ -46,7 +46,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
   /// Called on every keystroke.
   final void Function(PhoneNumber value)? onChanged;
 
-  /// Called when the country code changes.
+  /// Called only when the country code actually changes.
   final Function(PhoneNumber value) countryChange;
 
   final double borderWidth;
@@ -76,6 +76,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
 
     return IntlPhoneField(
       initialCountryCode: initalCountryCode,
+      initialValue: initialText,
       readOnly: isReadOnly,
       textInputAction: textInputAction,
       textAlign: textAlign,
@@ -88,7 +89,20 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
       },
       onChanged: (value) {
         onChanged?.call(value);
-        countryChange(value);
+      },
+
+      // Fires only when the user picks a different country flag
+      onCountryChanged: (country) {
+        // Re-wrap into a PhoneNumber so the caller always gets a consistent type.
+        // completeNumber and number will be empty until the user types digits —
+        // that is expected behaviour for a country-change event.
+        countryChange(
+          PhoneNumber(
+            countryISOCode: country.code,
+            countryCode: '+${country.dialCode}',
+            number: '',
+          ),
+        );
       },
 
       validator: (value) => showValidationMessage
@@ -97,11 +111,12 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
               value?.number ?? '',
             )
           : null,
+
       style: (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
           ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
       keyboardType: InputHelper.getKeyboardType(ValidationType.validatePhone),
 
-      // --- Decoration Section ---
+      // --- Decoration ---
       decoration: InputDecoration(
         hintText: hintText,
         labelText: labelText,
@@ -112,7 +127,6 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
           vertical: paddingVertical,
         ),
         suffixIcon: showActionButton ? actionButtonIcon : null,
-
         border: OutlineInputBorder(
           borderRadius: effectiveBorderRadius,
           borderSide: BorderSide(
@@ -143,17 +157,16 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
         ),
       ),
 
-      // --- Dropdown/Flag Section ---
+      // --- Dropdown / Flag ---
       flagsButtonPadding: const EdgeInsets.only(left: 12, right: 8),
       dropdownIconPosition: IconPosition.trailing,
       dropdownTextStyle:
           (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
               ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
-
       showCountryFlag: true,
       textAlignVertical: TextAlignVertical.center,
 
-      // Picker Dialog styling
+      // --- Picker Dialog ---
       pickerDialogStyle:
           pickerDialogStyle ??
           PickerDialogStyle(
@@ -177,7 +190,7 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
                             .hintStyle
                             ?.fontStyle ??
                         FontStyle.italic,
-                    textColor: hintColor(),
+                    textColor: _hintColor(),
                   ),
               suffixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
@@ -205,7 +218,8 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
     );
   }
 
-  Color hintColor() {
+  // Renamed from hintColor() → _hintColor() to follow private naming convention
+  Color _hintColor() {
     return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
         coreKitInstance.outlineColor;
   }
