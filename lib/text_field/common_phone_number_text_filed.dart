@@ -97,9 +97,21 @@ class _CommonPhoneNumberTextFieldState
     super.initState();
     _countryList = countries;
     filteredCountries = _countryList;
-    number = widget.initialText ?? '';
     _inputFormatters = [PhoneNumberFormatter()];
+    _initData();
+  }
 
+  @override
+  void didUpdateWidget(covariant CommonPhoneNumberTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialText != oldWidget.initialText) {
+      _initData();
+      if (mounted) setState(() {});
+    }
+  }
+
+  void _initData() {
+    number = widget.initialText ?? '';
     var rawDigits = number.replaceAll(RegExp(r'[^\d]'), '');
 
     // 1. Detect country from initialText if it starts with '+'
@@ -107,7 +119,8 @@ class _CommonPhoneNumberTextFieldState
       Country? detectedCountry;
       // Sort countries by dial code length descending to match longest possible code (e.g. +1 242 vs +1)
       final sortedCountries = List<Country>.from(_countryList)
-        ..sort((a, b) => b.fullCountryCode.length.compareTo(a.fullCountryCode.length));
+        ..sort((a, b) =>
+            b.fullCountryCode.length.compareTo(a.fullCountryCode.length));
 
       for (final country in sortedCountries) {
         if (rawDigits.startsWith(country.fullCountryCode)) {
@@ -118,7 +131,8 @@ class _CommonPhoneNumberTextFieldState
 
       if (detectedCountry != null) {
         _selectedCountry = detectedCountry;
-        rawDigits = rawDigits.replaceFirst(_selectedCountry.fullCountryCode, '');
+        rawDigits =
+            rawDigits.replaceFirst(_selectedCountry.fullCountryCode, '');
       } else {
         // Fallback if dial code not found
         _selectedCountry = _countryList.firstWhere(
@@ -135,7 +149,8 @@ class _CommonPhoneNumberTextFieldState
 
       // Strip country code if it was provided without '+' but still matches
       if (rawDigits.startsWith(_selectedCountry.fullCountryCode)) {
-        rawDigits = rawDigits.replaceFirst(_selectedCountry.fullCountryCode, '');
+        rawDigits =
+            rawDigits.replaceFirst(_selectedCountry.fullCountryCode, '');
       }
     }
 

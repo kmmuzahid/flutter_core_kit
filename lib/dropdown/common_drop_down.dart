@@ -126,6 +126,23 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
     }
   }
 
+  @override
+  void didUpdateWidget(covariant CommonDropDown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    bool changed = false;
+    if (widget.items != oldWidget.items) {
+      _items = widget.items;
+      changed = true;
+    }
+    if (widget.initalValue != oldWidget.initalValue) {
+      _selectedItem = _getInitialSelection();
+      changed = true;
+    }
+    if (changed && mounted) {
+      setState(() {});
+    }
+  }
+
   T? _getInitialSelection() {
     if (widget.initalValue != null) {
       if (widget.initalValue is MapEntry) {
