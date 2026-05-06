@@ -44,7 +44,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.textStyle,
     this.fontSize,
     this.contentPadding,
-    this.expand = false,
+    this.expand = true,
   });
 
   final bool expand;
