@@ -264,18 +264,9 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
   ) async {
     final renderBox = context.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
-    final screenHeight = MediaQuery.of(context).size.height;
 
     final overlay =
         Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
-
-    // Space available below the widget
-    final spaceBelow = screenHeight - (offset.dy + renderBox.size.height);
-
-    // Cap at menuMaxHeight, or 50% of screen, whichever is smaller
-    final maxMenuHeight = widget.menuMaxHeight != null
-        ? widget.menuMaxHeight!.clamp(0.0, spaceBelow)
-        : (screenHeight * 0.5).clamp(0.0, spaceBelow);
 
     final selected = await showMenu<T>(
       context: context,
@@ -288,10 +279,8 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
       ),
       elevation: widget.menuElevation,
       shadowColor: coreKitInstance.outlineColor,
-      constraints: BoxConstraints(
-        minWidth: widget.menuWidth ?? renderBox.size.width,
-        maxWidth: widget.menuWidth ?? renderBox.size.width,
-        maxHeight: maxMenuHeight, // ✅ this is what was missing
+      constraints: BoxConstraints.tightFor(
+        width: widget.menuWidth ?? renderBox.size.width,
       ),
       shape: widget.menuBorderColor != null || widget.borderRadius != null
           ? RoundedRectangleBorder(

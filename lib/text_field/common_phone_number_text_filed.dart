@@ -4,11 +4,11 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/core_kit_internal.dart';
+import 'package:core_kit/text_field/custom_intl.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field_v2/country_picker_dialog.dart';
-import 'package:intl_phone_field_v2/intl_phone_field.dart';
 import 'package:intl_phone_field_v2/phone_number.dart';
 
 class CommonPhoneNumberTextField extends StatelessWidget {
@@ -74,7 +74,7 @@ class CommonPhoneNumberTextField extends StatelessWidget {
     final effectiveBorderRadius = BorderRadius.circular(borderRadius ?? 12.r);
     final effectiveBorderColor = borderColor ?? theme.dividerColor;
 
-    return IntlPhoneField(
+    return CustomIntl(
       initialCountryCode: initalCountryCode,
       initialValue: initialText,
       readOnly: isReadOnly,
@@ -104,13 +104,6 @@ class CommonPhoneNumberTextField extends StatelessWidget {
           ),
         );
       },
-
-      validator: (value) => showValidationMessage
-          ? InputHelper.validate(
-              ValidationType.validatePhone,
-              value?.number ?? '',
-            )
-          : null,
 
       style: (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
           ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
