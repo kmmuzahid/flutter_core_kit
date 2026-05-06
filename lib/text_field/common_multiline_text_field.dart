@@ -42,6 +42,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.onFocusChanged,
     this.footer,
     this.textStyle,
+    this.fontSize,
   });
 
   final double borderWidth;
@@ -80,6 +81,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final Function(FocusNode focusNode)? onFocusChanged;
   final Widget? footer;
   final TextStyle? textStyle;
+  final double? fontSize;
 
   final String? Function(String? value)? validation;
 
@@ -197,7 +199,7 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
     return (widget.textStyle ?? const TextStyle()).copyWith(
       fontFamily: coreKitInstance.fontFamily,
       fontWeight: fontWeight,
-      fontSize: fontSize,
+      fontSize: fontSize?.sp,
       color: textColor,
       height: height,
       fontStyle: fontStyle,
@@ -351,7 +353,10 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
                           : (error != null ? '' : null);
                     },
 
-                style: _getStyle(fontWeight: FontWeight.w500, fontSize: 16.sp),
+                style: _getStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: widget.fontSize,
+                ),
 
                 expands: true, // expands to fill parent height
                 decoration: InputDecoration(
