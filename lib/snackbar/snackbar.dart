@@ -134,9 +134,12 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
             colorScheme,
           );
 
+          // IgnorePointer(ignoring: true) makes the full-screen overlay transparent
+          // to ALL touch events — exactly like GetX snackbar behaviour.
+          // The inner IgnorePointer(ignoring: false) re-enables touches only on the
+          // visible snackbar widget so swipe-to-dismiss still works.
           return IgnorePointer(
-            // Pass all touches through the overlay except on the snackbar itself
-            ignoring: false,
+            ignoring: true,
             child: Material(
               color: Colors.transparent,
               child: Align(
@@ -144,13 +147,12 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
                 alignment: Alignment.bottomCenter,
                 child: SlideTransition(
                   position: _slideAnimation,
-                  child: Dismissible(
-                    key: UniqueKey(),
-                    direction: DismissDirection.down,
-                    onDismissed: (_) => _dismiss(),
-                    child: GestureDetector(
-                      // Absorb touches only on the snackbar, not on the rest of the screen
-                      behavior: HitTestBehavior.opaque,
+                  child: IgnorePointer(
+                    ignoring: false,
+                    child: Dismissible(
+                      key: UniqueKey(),
+                      direction: DismissDirection.down,
+                      onDismissed: (_) => _dismiss(),
                       child: Container(
                         padding: EdgeInsets.zero,
                         margin:
