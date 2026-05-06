@@ -92,18 +92,38 @@ class _CommonPhoneNumberTextFieldState
   late String number;
   late List<TextInputFormatter> _inputFormatters;
 
+  TextEditingController? _internalController;
+
   @override
   void initState() {
     super.initState();
     _countryList = countries;
     filteredCountries = _countryList;
     _inputFormatters = [PhoneNumberFormatter()];
+    if (widget.controller == null) {
+      _internalController = TextEditingController();
+    }
     _initData();
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant CommonPhoneNumberTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      if (oldWidget.controller == null) {
+        _internalController?.dispose();
+        _internalController = null;
+      }
+      if (widget.controller == null) {
+        _internalController = TextEditingController();
+      }
+    }
     if (widget.initialText != oldWidget.initialText) {
       _initData();
       if (mounted) setState(() {});
@@ -162,9 +182,10 @@ class _CommonPhoneNumberTextFieldState
       maxDigits: _selectedCountry.maxLength,
     );
 
-    if (widget.controller != null) {
-      widget.controller!.text = number;
-      widget.controller!.selection = TextSelection.collapsed(
+    final effectiveController = widget.controller ?? _internalController;
+    if (effectiveController != null) {
+      effectiveController.text = number;
+      effectiveController.selection = TextSelection.collapsed(
         offset: number.length,
       );
     }
@@ -237,20 +258,16 @@ class _CommonPhoneNumberTextFieldState
             _updateFormatterMaxDigits();
 
             // Re-format existing number to match the new country's max length
-            if (widget.controller != null) {
-              final currentDigits = widget.controller!.text.replaceAll(RegExp(r'[^\d]'), '');
-              widget.controller!.text = PhoneNumberFormatter.formatString(
+            final effectiveController = widget.controller ?? _internalController;
+            if (effectiveController != null) {
+              final currentDigits =
+                  effectiveController.text.replaceAll(RegExp(r'[^\d]'), '');
+              effectiveController.text = PhoneNumberFormatter.formatString(
                 currentDigits,
                 maxDigits: _selectedCountry.maxLength,
               );
-              widget.controller!.selection = TextSelection.collapsed(
-                offset: widget.controller!.text.length,
-              );
-            } else {
-              final currentDigits = number.replaceAll(RegExp(r'[^\d]'), '');
-              number = PhoneNumberFormatter.formatString(
-                currentDigits,
-                maxDigits: _selectedCountry.maxLength,
+              effectiveController.selection = TextSelection.collapsed(
+                offset: effectiveController.text.length,
               );
             }
 
@@ -278,8 +295,7 @@ class _CommonPhoneNumberTextFieldState
     final effectiveBorderColor = widget.borderColor ?? theme.dividerColor;
 
     return TextFormField(
-      initialValue: (widget.controller == null) ? number : null,
-      controller: widget.controller,
+      controller: widget.controller ?? _internalController,
       focusNode: widget.focusNode,
       readOnly: widget.isReadOnly,
       textInputAction: widget.textInputAction,
