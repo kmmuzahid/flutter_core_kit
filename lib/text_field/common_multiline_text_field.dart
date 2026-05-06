@@ -31,7 +31,7 @@ class CommonMultilineTextField extends StatefulWidget {
     this.showValidationMessage = true,
     this.textAlign = TextAlign.left,
     this.enableHtml = false,
-    this.maxHeight = 150,
+    this.height = 150,
     this.minHeight,
     this.isDense = false,
     this.maxLength,
@@ -73,7 +73,7 @@ class CommonMultilineTextField extends StatefulWidget {
   final TextAlign textAlign;
   final int? maxLength;
   final bool enableHtml;
-  final double maxHeight;
+  final double height;
   final double? minHeight;
   final bool isDense;
   final int? maxWords;
@@ -229,8 +229,8 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: widget.maxHeight,
-        minHeight: widget.minHeight ?? widget.maxHeight,
+        maxHeight: widget.height,
+        minHeight: widget.minHeight ?? widget.height,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
