@@ -39,9 +39,10 @@ class CommonCountryPicker extends StatelessWidget {
     this.borderWidth = 1.2,
     this.dropDownType = DropDownType.menu,
     this.footer,
+    this.menuMaxHeight,
   });
   final Widget? footer;
-
+  final double? menuMaxHeight;
   final dynamic Function(DropDownNameBuilderProperty<String> property)?
   nameBuilder;
   final Widget? prefix;
@@ -108,6 +109,7 @@ class CommonCountryPicker extends StatelessWidget {
       menuElevation: menuElevation,
       menuBorderColor: menuBorderColor,
       footer: footer,
+      menuMaxHeight: menuMaxHeight,
       nameBuilder: (states) {
         if (nameBuilder != null) {
           return nameBuilder?.call(

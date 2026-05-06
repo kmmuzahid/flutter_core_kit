@@ -43,6 +43,7 @@ class CommonCityDropDown extends StatelessWidget {
     this.borderType = BorderType.outline,
     this.borderWidth = 1.2,
     this.dropDownType = DropDownType.menu,
+    this.menuMaxHeight,
   });
   final String selectedState;
   final String selectedCountry;
@@ -75,6 +76,7 @@ class CommonCityDropDown extends StatelessWidget {
   final EdgeInsets? itemPadding;
   final double menuElevation;
   final Color? menuBorderColor;
+  final double? menuMaxHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +97,7 @@ class CommonCityDropDown extends StatelessWidget {
       textStyle: textStyle,
       isLoading: isLoading,
       borderRadius: borderRadius,
+      menuMaxHeight: menuMaxHeight,
       borderColor: borderColor,
       initalValue: initalCity != null
           ? city.firstWhere(

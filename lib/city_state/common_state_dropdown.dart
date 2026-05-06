@@ -40,6 +40,7 @@ class CommonStateDropdown extends StatelessWidget {
     this.borderType = BorderType.outline,
     this.borderWidth = 1.2,
     this.dropDownType = DropDownType.menu,
+    this.menuMaxHeight,
   });
   final dynamic Function(DropDownNameBuilderProperty<String> property)?
   nameBuilder;
@@ -72,6 +73,7 @@ class CommonStateDropdown extends StatelessWidget {
   final EdgeInsets? itemPadding;
   final double menuElevation;
   final Color? menuBorderColor;
+  final double? menuMaxHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +89,7 @@ class CommonStateDropdown extends StatelessWidget {
       contentPadding: contentPadding,
       borderRadius: borderRadius,
       isLoading: isLoading,
+      menuMaxHeight: menuMaxHeight,
       backgroundColor: backgroundColor,
       fontStyle: fontStyle,
       items: state,

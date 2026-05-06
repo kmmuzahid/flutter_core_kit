@@ -57,6 +57,7 @@ class CommonDropDown<T> extends StatefulWidget {
     this.menuBorderColor,
     this.menuBorderRadius = 8,
     this.footer,
+    this.menuMaxHeight,
   });
 
   final Widget? footer;
@@ -90,6 +91,7 @@ class CommonDropDown<T> extends StatefulWidget {
   final double menuElevation;
   final Color? menuBorderColor;
   final double menuBorderRadius;
+  final double? menuMaxHeight;
 
   @override
   State<CommonDropDown<T>> createState() => _CommonDropDownState<T>();
@@ -374,6 +376,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
           dropdownColor:
               widget.menuBackgroundColor ?? coreKitInstance.surfaceBG,
           isExpanded: true,
+          menuMaxHeight: widget.menuMaxHeight,
           items: _items.map((item) {
             final name = widget.nameBuilder(
               DropDownNameBuilderProperty(

@@ -5,6 +5,7 @@
  */
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
+import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field_v2/country_picker_dialog.dart';
 import 'package:intl_phone_field_v2/intl_phone_field.dart';
@@ -12,7 +13,6 @@ import 'package:intl_phone_field_v2/phone_number.dart';
 
 class CommonPhoneNumberTextFiled extends StatelessWidget {
   const CommonPhoneNumberTextFiled({
-    this.controller,
     required this.countryChange,
     super.key,
     this.initalCountryCode = 'US',
@@ -34,11 +34,21 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
     this.hint = 'Enter your phone number',
     this.pickerDialogStyle,
     this.hintStyle,
+    this.onSave,
+    this.onChanged,
   });
 
   final String initalCountryCode;
-  final TextEditingController? controller;
+
+  /// Called when the field loses focus (on save).
+  final void Function(PhoneNumber value)? onSave;
+
+  /// Called on every keystroke.
+  final void Function(PhoneNumber value)? onChanged;
+
+  /// Called when the country code changes.
   final Function(PhoneNumber value) countryChange;
+
   final double borderWidth;
   final String? initialText;
   final bool isReadOnly;
@@ -66,23 +76,30 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
 
     return IntlPhoneField(
       initialCountryCode: initalCountryCode,
-
-      controller: controller,
       readOnly: isReadOnly,
       textInputAction: textInputAction,
       textAlign: textAlign,
+
+      // Formatter: counts only digits, dashes are cosmetic
+      inputFormatters: [PhoneNumberFormatter()],
+
+      onSaved: (value) {
+        if (value != null) onSave?.call(value);
+      },
+      onChanged: (value) {
+        onChanged?.call(value);
+        countryChange(value);
+      },
+
       validator: (value) => showValidationMessage
           ? InputHelper.validate(
               ValidationType.validatePhone,
-              value?.completeNumberWithPlus ?? '',
+              value?.number ?? '',
             )
           : null,
       style: (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
           ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
       keyboardType: InputHelper.getKeyboardType(ValidationType.validatePhone),
-      inputFormatters: InputHelper.getInputFormatters(
-        ValidationType.validatePhone,
-      ),
 
       // --- Decoration Section ---
       decoration: InputDecoration(
@@ -94,7 +111,6 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
           horizontal: paddingHorizontal,
           vertical: paddingVertical,
         ),
-        // Adding the action button if enabled
         suffixIcon: showActionButton ? actionButtonIcon : null,
 
         border: OutlineInputBorder(
@@ -134,10 +150,8 @@ class CommonPhoneNumberTextFiled extends StatelessWidget {
           (theme.textTheme.bodyMedium ?? coreKitInstance.defaultTextStyle)
               ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
 
-      // Ensures the vertical line between flag and text is clean
       showCountryFlag: true,
       textAlignVertical: TextAlignVertical.center,
-      onChanged: countryChange,
 
       // Picker Dialog styling
       pickerDialogStyle:
