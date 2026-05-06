@@ -23,7 +23,7 @@ class CommonPhoneNumberTextField extends StatefulWidget {
     this.initalCountryCode = 'US',
     this.isReadOnly = false,
     this.borderColor,
-    this.initialText,
+    this.initialPhoneNumber,
     this.showActionButton = false,
     this.actionButtonIcon,
     this.backgroundColor,
@@ -41,7 +41,6 @@ class CommonPhoneNumberTextField extends StatefulWidget {
     this.hintStyle,
     this.onSave,
     this.onChanged,
-    this.controller,
     this.focusNode,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
   });
@@ -58,7 +57,7 @@ class CommonPhoneNumberTextField extends StatefulWidget {
   final Function(PhoneNumber value) countryChange;
 
   final double borderWidth;
-  final String? initialText;
+  final String? initialPhoneNumber;
   final bool isReadOnly;
   final String? hintText;
   final String? labelText;
@@ -75,7 +74,6 @@ class CommonPhoneNumberTextField extends StatefulWidget {
   final String hint;
   final TextStyle? hintStyle;
   final PickerDialogStyle? pickerDialogStyle;
-  final TextEditingController? controller;
   final FocusNode? focusNode;
   final AutovalidateMode? autovalidateMode;
 
@@ -92,7 +90,7 @@ class _CommonPhoneNumberTextFieldState
   late String number;
   late List<TextInputFormatter> _inputFormatters;
 
-  TextEditingController? _internalController;
+  late TextEditingController _internalController;
 
   @override
   void initState() {
@@ -100,38 +98,29 @@ class _CommonPhoneNumberTextFieldState
     _countryList = countries;
     filteredCountries = _countryList;
     _inputFormatters = [PhoneNumberFormatter()];
-    if (widget.controller == null) {
-      _internalController = TextEditingController();
-    }
+    _internalController = TextEditingController();
+
     _initData();
   }
 
   @override
   void dispose() {
-    _internalController?.dispose();
+    _internalController.dispose();
     super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant CommonPhoneNumberTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller) {
-      if (oldWidget.controller == null) {
-        _internalController?.dispose();
-        _internalController = null;
-      }
-      if (widget.controller == null) {
-        _internalController = TextEditingController();
-      }
-    }
-    if (widget.initialText != oldWidget.initialText) {
+
+    if (widget.initialPhoneNumber != oldWidget.initialPhoneNumber) {
       _initData();
       if (mounted) setState(() {});
     }
   }
 
   void _initData() {
-    number = widget.initialText ?? '';
+    number = widget.initialPhoneNumber ?? '';
     var rawDigits = number.replaceAll(RegExp(r'[^\d]'), '');
 
     // 1. Detect country from initialText if it starts with '+'
@@ -139,8 +128,10 @@ class _CommonPhoneNumberTextFieldState
       Country? detectedCountry;
       // Sort countries by dial code length descending to match longest possible code (e.g. +1 242 vs +1)
       final sortedCountries = List<Country>.from(_countryList)
-        ..sort((a, b) =>
-            b.fullCountryCode.length.compareTo(a.fullCountryCode.length));
+        ..sort(
+          (a, b) =>
+              b.fullCountryCode.length.compareTo(a.fullCountryCode.length),
+        );
 
       for (final country in sortedCountries) {
         if (rawDigits.startsWith(country.fullCountryCode)) {
@@ -151,8 +142,10 @@ class _CommonPhoneNumberTextFieldState
 
       if (detectedCountry != null) {
         _selectedCountry = detectedCountry;
-        rawDigits =
-            rawDigits.replaceFirst(_selectedCountry.fullCountryCode, '');
+        rawDigits = rawDigits.replaceFirst(
+          _selectedCountry.fullCountryCode,
+          '',
+        );
       } else {
         // Fallback if dial code not found
         _selectedCountry = _countryList.firstWhere(
@@ -169,8 +162,10 @@ class _CommonPhoneNumberTextFieldState
 
       // Strip country code if it was provided without '+' but still matches
       if (rawDigits.startsWith(_selectedCountry.fullCountryCode)) {
-        rawDigits =
-            rawDigits.replaceFirst(_selectedCountry.fullCountryCode, '');
+        rawDigits = rawDigits.replaceFirst(
+          _selectedCountry.fullCountryCode,
+          '',
+        );
       }
     }
 
@@ -182,13 +177,26 @@ class _CommonPhoneNumberTextFieldState
       maxDigits: _selectedCountry.maxLength,
     );
 
-    final effectiveController = widget.controller ?? _internalController;
-    if (effectiveController != null) {
-      effectiveController.text = number;
-      effectiveController.selection = TextSelection.collapsed(
-        offset: number.length,
-      );
-    }
+    _internalController.text = number;
+    _internalController.selection = TextSelection.collapsed(
+      offset: number.length,
+    );
+
+    widget.onChanged?.call(
+      PhoneNumber(
+        countryISOCode: _selectedCountry.code,
+        countryCode: '+${_selectedCountry.dialCode}',
+        number: rawDigits,
+      ),
+    );
+
+    widget.onSave?.call(
+      PhoneNumber(
+        countryISOCode: _selectedCountry.code,
+        countryCode: '+${_selectedCountry.dialCode}',
+        number: rawDigits,
+      ),
+    );
   }
 
   /// Updates the PhoneNumberFormatter's maxDigits to match the selected country.
@@ -257,25 +265,23 @@ class _CommonPhoneNumberTextFieldState
             _selectedCountry = country;
             _updateFormatterMaxDigits();
 
-            // Re-format existing number to match the new country's max length
-            final effectiveController = widget.controller ?? _internalController;
-            if (effectiveController != null) {
-              final currentDigits =
-                  effectiveController.text.replaceAll(RegExp(r'[^\d]'), '');
-              effectiveController.text = PhoneNumberFormatter.formatString(
-                currentDigits,
-                maxDigits: _selectedCountry.maxLength,
-              );
-              effectiveController.selection = TextSelection.collapsed(
-                offset: effectiveController.text.length,
-              );
-            }
+            final currentDigits = _internalController.text.replaceAll(
+              RegExp(r'[^\d]'),
+              '',
+            );
+            _internalController.text = PhoneNumberFormatter.formatString(
+              currentDigits,
+              maxDigits: _selectedCountry.maxLength,
+            );
+            _internalController.selection = TextSelection.collapsed(
+              offset: _internalController.text.length,
+            );
 
             widget.countryChange(
               PhoneNumber(
                 countryISOCode: country.code,
                 countryCode: '+${country.dialCode}',
-                number: '',
+                number: _internalController.text,
               ),
             );
             setState(() {});
@@ -295,7 +301,7 @@ class _CommonPhoneNumberTextFieldState
     final effectiveBorderColor = widget.borderColor ?? theme.dividerColor;
 
     return TextFormField(
-      controller: widget.controller ?? _internalController,
+      controller: _internalController,
       focusNode: widget.focusNode,
       readOnly: widget.isReadOnly,
       textInputAction: widget.textInputAction,
@@ -346,24 +352,12 @@ class _CommonPhoneNumberTextFieldState
         ),
       ),
       onSaved: (value) {
-        final digits = (value ?? '').replaceAll(RegExp(r'[^\d]'), '');
-        widget.onSave?.call(
-          PhoneNumber(
-            countryISOCode: _selectedCountry.code,
-            countryCode: '+${_selectedCountry.dialCode}',
-            number: digits,
-          ),
-        );
+        final phone = _getPhoneNumber(value);
+        widget.onSave?.call(phone);
       },
       onChanged: (value) {
-        final digits = value.replaceAll(RegExp(r'[^\d]'), '');
-        widget.onChanged?.call(
-          PhoneNumber(
-            countryISOCode: _selectedCountry.code,
-            countryCode: '+${_selectedCountry.dialCode}',
-            number: digits,
-          ),
-        );
+        final phone = _getPhoneNumber(value);
+        widget.onChanged?.call(phone);
       },
       validator: (value) {
         if (!widget.showValidationMessage) return null;
@@ -395,6 +389,16 @@ class _CommonPhoneNumberTextFieldState
             );
           },
     );
+  }
+
+  PhoneNumber _getPhoneNumber(String? value) {
+    final digits = (value ?? '').replaceAll(RegExp(r'[^\d]'), '');
+    final phone = PhoneNumber(
+      countryISOCode: _selectedCountry.code,
+      countryCode: '+${_selectedCountry.dialCode}',
+      number: digits,
+    );
+    return phone;
   }
 
   Widget _buildFlagsButton() {
