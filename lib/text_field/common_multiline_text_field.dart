@@ -225,7 +225,9 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
         ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: widget.height,
-            minHeight: widget.expand ? widget.height : (widget.minHeight ?? 0),
+            minHeight: widget.expand
+                ? widget.height
+                : (widget.minHeight ?? widget.height),
           ),
           child: () {
             final textFormField = TextFormField(
