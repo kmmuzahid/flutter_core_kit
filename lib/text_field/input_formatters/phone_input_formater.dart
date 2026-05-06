@@ -56,4 +56,26 @@ class PhoneNumberFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: newCursor),
     );
   }
+
+  /// Static helper to format a plain string.
+  static String formatString(String input, {int maxDigits = 10}) {
+    final allDigits = input.replaceAll(RegExp(r'[^\d]'), '');
+    final capped = allDigits.length > maxDigits
+        ? allDigits.substring(0, maxDigits)
+        : allDigits;
+
+    final buffer = StringBuffer();
+    if (capped.isNotEmpty) {
+      buffer.write(capped.substring(0, capped.length.clamp(0, 3)));
+    }
+    if (capped.length > 3) {
+      buffer.write('-');
+      buffer.write(capped.substring(3, capped.length.clamp(3, 6)));
+    }
+    if (capped.length > 6) {
+      buffer.write('-');
+      buffer.write(capped.substring(6));
+    }
+    return buffer.toString();
+  }
 }

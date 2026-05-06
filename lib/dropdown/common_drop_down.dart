@@ -279,8 +279,10 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
       ),
       elevation: widget.menuElevation,
       shadowColor: coreKitInstance.outlineColor,
-      constraints: BoxConstraints.tightFor(
-        width: widget.menuWidth ?? renderBox.size.width,
+      constraints: BoxConstraints(
+        minWidth: widget.menuWidth ?? renderBox.size.width,
+        maxWidth: widget.menuWidth ?? renderBox.size.width,
+        maxHeight: widget.menuMaxHeight ?? (MediaQuery.of(context).size.height * 0.5),
       ),
       shape: widget.menuBorderColor != null || widget.borderRadius != null
           ? RoundedRectangleBorder(
