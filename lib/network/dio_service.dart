@@ -149,15 +149,15 @@ class DioService {
         }
       }
 
-      if (e.response?.data != null) {
+      if (e.response?.data != null && e.response?.data is Map) {
         try {
-          final parsed = e.response?.data['data'] != null
-              ? responseBuilder(e.response?.data['data'])
+          final dataMap = e.response?.data as Map<String, dynamic>;
+          final parsed = dataMap['data'] != null
+              ? responseBuilder(dataMap['data'])
               : null;
-          final bool isSuccess = e.response?.data['success'] ?? false;
-          final message =
-              e.response!.data is Map && e.response!.data['message'] != null
-              ? e.response!.data['message'].toString()
+          final bool isSuccess = dataMap['success'] ?? false;
+          final message = dataMap['message'] != null
+              ? dataMap['message'].toString()
               : e.response!.statusMessage;
           if (showMessage) {
             DioUtils.showMessage(message ?? '', isError: true);

@@ -169,7 +169,7 @@ class DioRequestBuilder {
       body = input.jsonBody;
       contentType = 'application/json';
     } else if (hasListBody) {
-      body = jsonEncode(input.listBody);
+      body = input.listBody;
       contentType = 'application/json';
     }
 
