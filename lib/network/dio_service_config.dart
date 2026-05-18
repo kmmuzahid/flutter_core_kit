@@ -1,5 +1,6 @@
 // import 'package:core_kit/network/request_input.dart';
 
+import 'package:core_kit/network/dio_result_extractor.dart';
 import 'package:core_kit/network/request_input.dart';
 
 class DioServiceConfig {
@@ -14,6 +15,7 @@ class DioServiceConfig {
   final bool isBearerToken;
   final RequestMethod refreshTokenRequestMethod;
   final bool enableDebugLogs;
+  final DioResultExtractor responseExtractor;
 
   DioServiceConfig({
     required this.baseUrl,
@@ -27,5 +29,11 @@ class DioServiceConfig {
     this.sendTimeout = const Duration(seconds: 15),
     this.onLogout,
     this.enableDebugLogs = false,
-  });
+    DioResultExtractor? responseExtractor,
+  }) : responseExtractor =
+           responseExtractor ??
+           DioResultExtractor(
+             data: (response) => response['data'],
+             message: (response) => response['message'],
+           );
 }

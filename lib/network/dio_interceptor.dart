@@ -10,7 +10,6 @@ import 'package:core_kit/network/dio_service.dart';
 import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/app_log.dart';
-import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,7 +23,6 @@ class DioInterceptor extends Interceptor {
   bool get isNetworkOff => _isNetworkOff;
   bool _hasShownNetworkError = false;
   DateTime? _lastServerShutdown;
-  final List<_QueuedRequest> _queue = [];
 
   DioInterceptor({
     required Dio dio,
@@ -35,16 +33,6 @@ class DioInterceptor extends Interceptor {
        _tokenProvider = tokenProvider;
 
   bool get isServerOff => _isServerOff;
-
-  void _processQueue() {
-    while (_queue.isNotEmpty) {
-      final req = _queue.removeAt(0);
-      _dio
-          .fetch(req.requestOptions)
-          .then(req.completer.complete)
-          .catchError(req.completer.completeError);
-    }
-  }
 
   Future<void> _injectToken(RequestOptions options) async {
     final accessToken = await _tokenProvider.accessToken();
@@ -93,7 +81,8 @@ class DioInterceptor extends Interceptor {
 
     if (refreshToken?.isEmpty == true || refreshToken == null) {
       DioUtils.log(_config, 'No refresh token available.', tag: 'DioService');
-      return;
+      _config.onLogout?.call();
+      throw Exception('No refresh token available');
     }
     DioUtils.log(
       _config,
@@ -101,24 +90,28 @@ class DioInterceptor extends Interceptor {
       tag: 'POST::${_config.refreshTokenEndpoint}',
     );
     try {
-      final response = await _dio.request(
+      final refreshDio = Dio(BaseOptions(baseUrl: _dio.options.baseUrl));
+      final response = await refreshDio.request(
         _config.refreshTokenEndpoint,
         options: Options(
           method: _config.refreshTokenRequestMethod.name,
           headers: {_config.refreshTokenHeaderKey: refreshToken},
+          validateStatus: (status) => true, // Handle status codes manually
         ),
       );
 
-      if (response.data.isNotEmpty &&
-          (response.statusCode == 200 || response.statusCode == 201)) {
-        final data = response.data;
-
-        await _tokenProvider.updateTokens(data['data']);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data != null) {
+          final extractedData = _config.responseExtractor.data(response.data);
+          await _tokenProvider.updateTokens(extractedData);
+        }
       } else if (response.statusCode == 401) {
-        final data = response.data;
-        DioUtils.showMessage(data['message'] ?? '', isError: true);
+        final extractedMessage = _config.responseExtractor.message(response.data);
+        if (extractedMessage != null && extractedMessage.isNotEmpty) {
+          DioUtils.showMessage(extractedMessage, isError: true);
+        }
         _config.onLogout?.call();
-        return;
+        throw Exception('Refresh token unauthorized');
       } else {
         DioUtils.log(
           _config,
@@ -126,6 +119,7 @@ class DioInterceptor extends Interceptor {
           tag: 'Auth',
           isError: true,
         );
+        _config.onLogout?.call();
         throw Exception(
           'Refresh token failed with status: ${response.statusCode}',
         );
@@ -137,6 +131,7 @@ class DioInterceptor extends Interceptor {
         tag: 'Auth',
         isError: true,
       );
+      _config.onLogout?.call();
       throw Exception('Refresh token failed: ${e.message}');
     } catch (e) {
       DioUtils.log(
@@ -145,6 +140,7 @@ class DioInterceptor extends Interceptor {
         tag: 'Auth',
         isError: true,
       );
+      _config.onLogout?.call();
       throw Exception('Refresh token failed: $e');
     }
   }
@@ -154,27 +150,11 @@ class DioInterceptor extends Interceptor {
   ) async {
     await _injectToken(requestOptions);
 
-    final options = Options(
-      method: requestOptions.method,
-      headers: Map<String, dynamic>.from(requestOptions.headers),
-      responseType: requestOptions.responseType,
-      contentType: requestOptions.contentType,
-      followRedirects: requestOptions.followRedirects,
-      validateStatus: requestOptions.validateStatus,
-      receiveTimeout: requestOptions.receiveTimeout,
-      sendTimeout: requestOptions.sendTimeout,
-      extra: requestOptions.extra,
-    );
+    if (requestOptions.data is FormData) {
+      requestOptions.data = (requestOptions.data as FormData).clone();
+    }
 
-    return _dio.request(
-      requestOptions.path,
-      data: requestOptions.data,
-      queryParameters: requestOptions.queryParameters,
-      options: options,
-      cancelToken: requestOptions.cancelToken,
-      onSendProgress: requestOptions.onSendProgress,
-      onReceiveProgress: requestOptions.onReceiveProgress,
-    );
+    return _dio.fetch(requestOptions);
   }
 
   void intercept() {
@@ -262,6 +242,28 @@ class DioInterceptor extends Interceptor {
           await _checkAndHandleNetworkStatus();
 
           if (statusCode == 401 && path != _config.refreshTokenEndpoint) {
+            final currentToken = await _tokenProvider.accessToken();
+            final requestHeader =
+                error.requestOptions.headers[_config.tokenHeaderKey]
+                    ?.toString() ??
+                '';
+            final requestToken = _config.isBearerToken
+                ? requestHeader.replaceFirst('Bearer ', '')
+                : requestHeader;
+
+            // If token has already been refreshed by a previous queued request, just retry.
+            if (currentToken != null &&
+                currentToken.isNotEmpty &&
+                requestToken != currentToken) {
+              try {
+                final response = await _retryAfterRefresh(error.requestOptions);
+                handler.resolve(response);
+              } catch (e) {
+                handler.reject(error);
+              }
+              return;
+            }
+
             if (_refreshCompleter == null) {
               _refreshCompleter = Completer<void>();
               DioUtils.log(
@@ -291,35 +293,21 @@ class DioInterceptor extends Interceptor {
                   tag: 'Auth',
                   isError: true,
                 );
+                // _config.onLogout is already called in _refreshTokenIfNeeded, but safe to call again
                 _config.onLogout?.call();
                 handler.reject(error);
               } finally {
                 _refreshCompleter?.complete();
                 _refreshCompleter = null;
-                _processQueue();
               }
             } else {
-              final responseCompleter = Completer<dio.Response>();
-              _queue.add(
-                _QueuedRequest(error.requestOptions, responseCompleter),
-              );
-              return responseCompleter.future.then(handler.resolve).catchError((
-                Object err,
-                StackTrace stackTrace,
-              ) {
-                if (err is DioException) {
-                  handler.reject(err);
-                } else {
-                  handler.reject(
-                    DioException(
-                      requestOptions: error.requestOptions,
-                      error: err,
-                      stackTrace: stackTrace,
-                      message: err.toString(),
-                    ),
-                  );
-                }
-              });
+              try {
+                await _refreshCompleter!.future;
+                final response = await _retryAfterRefresh(error.requestOptions);
+                handler.resolve(response);
+              } catch (e) {
+                handler.reject(error);
+              }
             }
           } else if (statusCode == 401 &&
               path == _config.refreshTokenEndpoint) {
@@ -338,11 +326,4 @@ class DioInterceptor extends Interceptor {
       ),
     );
   }
-}
-
-class _QueuedRequest {
-  _QueuedRequest(this.requestOptions, this.completer);
-
-  final RequestOptions requestOptions;
-  final Completer<dio.Response> completer;
 }
