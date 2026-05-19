@@ -30,6 +30,8 @@ class SmartListLoader extends StatefulWidget {
     this.onReorder,
     this.seperator,
     this.listLoaderConfig,
+    this.backgroundColor = Colors.transparent,
+    this.physics,
   });
 
   final Widget? seperator;
@@ -52,6 +54,12 @@ class SmartListLoader extends StatefulWidget {
 
   /// Per-instance loader config. Overrides the global ListLoaderConfig.
   final ListLoaderConfig? listLoaderConfig;
+
+  /// Background color for the header delegate. Defaults to transparent.
+  final Color backgroundColor;
+
+  /// Custom scroll physics. Defaults to AlwaysScrollableScrollPhysics.
+  final ScrollPhysics? physics;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -225,10 +233,9 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     // When onColapsAppbar is null, the appbar should never hide — it stays
     // permanently pinned. We achieve this by setting collapsedHeight = _appBarHeight
     // so minExtent == maxExtent and the header never shrinks.
-    final collapsedHeight =
-        widget.onColapsAppbar != null && _stickyHeight > 0
-            ? _stickyHeight
-            : _appBarHeight;
+    final collapsedHeight = widget.onColapsAppbar != null && _stickyHeight > 0
+        ? _stickyHeight
+        : _appBarHeight;
 
     // When _appBarHeight hasn't been measured yet (frame 1), show the appbar
     // as a plain SliverToBoxAdapter so content is correctly positioned from
@@ -248,12 +255,13 @@ class _SmartListLoaderState extends State<SmartListLoader> {
           collapsedHeight: collapsedHeight,
           expandedChild: widget.appbar!,
           collapsedChild: widget.onColapsAppbar,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: widget.backgroundColor,
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: widget.backgroundColor,
       body: Stack(
         children: [
           // Measurement layer — scoped to a dummy Form so any FormFields
@@ -304,16 +312,13 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         );
   }
 
-  Widget _buildScrollView(
-    Widget? appBarSliver,
-    List<Widget> listSlivers,
-  ) {
+  Widget _buildScrollView(Widget? appBarSliver, List<Widget> listSlivers) {
     return CustomScrollView(
       controller: _scrollController,
       reverse: widget.isReverse,
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
+      physics:
+          widget.physics ??
+          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       slivers: [
         if (widget.isReverse) ...listSlivers,
         if (!widget.isReverse && appBarSliver != null) appBarSliver,
@@ -373,8 +378,9 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
   ) {
     final shrinkRange = expandedHeight - collapsedHeight;
     // progress: 0.0 = fully expanded, 1.0 = fully collapsed
-    final progress =
-        shrinkRange > 0 ? (shrinkOffset / shrinkRange).clamp(0.0, 1.0) : 0.0;
+    final progress = shrinkRange > 0
+        ? (shrinkOffset / shrinkRange).clamp(0.0, 1.0)
+        : 0.0;
 
     // The appbar content is always rendered and gets clipped by the header
     // bounds as the header shrinks — this is natural and gap-free.
@@ -391,12 +397,7 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
           fit: StackFit.expand,
           children: [
             // Appbar anchored to top — clips naturally as header shrinks
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: expandedChild,
-            ),
+            Positioned(top: 0, left: 0, right: 0, child: expandedChild),
 
             // Collapsed bar anchored to bottom — slides in as header shrinks,
             // then fades in for a clean handoff

@@ -74,6 +74,7 @@ class SmartStaggeredLoader extends StatefulWidget {
     this.emptyWidget,
     this.onReorder,
     this.listLoaderConfig,
+    this.backgroundColor = Colors.transparent,
   });
 
   final int itemCount;
@@ -98,6 +99,9 @@ class SmartStaggeredLoader extends StatefulWidget {
 
   /// Per-instance loader config. Overrides the global ListLoaderConfig.
   final ListLoaderConfig? listLoaderConfig;
+
+  /// Background color for the header delegate. Defaults to transparent.
+  final Color backgroundColor;
 
   @override
   State<SmartStaggeredLoader> createState() => _SmartStaggeredLoaderState();
@@ -212,7 +216,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
           collapsedHeight: collapsedHeight,
           expandedChild: widget.appbar!,
           collapsedChild: widget.onColapsAppbar,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: widget.backgroundColor,
         ),
       );
     }

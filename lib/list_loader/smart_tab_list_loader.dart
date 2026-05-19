@@ -50,6 +50,8 @@ class SmartTabConfig<T> {
     this.onReorder,
     this.seperator,
     this.listLoaderConfig,
+    this.backgroundColor,
+    this.physics,
   });
 
   final Widget? seperator;
@@ -68,6 +70,12 @@ class SmartTabConfig<T> {
 
   /// Per-tab loader config. Overrides the global/parent ListLoaderConfig.
   final ListLoaderConfig? listLoaderConfig;
+
+  /// Per-tab background color for the header delegate.
+  final Color? backgroundColor;
+
+  /// Per-tab scroll physics.
+  final ScrollPhysics? physics;
 }
 
 // ignore: must_be_immutable
@@ -90,6 +98,8 @@ class SmartTabListLoader<T> extends StatefulWidget {
     this.onReorder,
     this.seperator,
     this.listLoaderConfig,
+    this.backgroundColor = Colors.transparent,
+    this.physics,
     super.key,
   }) : assert(tabs.isNotEmpty, 'tabs must not be empty');
 
@@ -106,6 +116,12 @@ class SmartTabListLoader<T> extends StatefulWidget {
   /// Per-instance loader config passed to child loaders.
   /// Per-tab listLoaderConfig in SmartTabConfig takes priority.
   final ListLoaderConfig? listLoaderConfig;
+
+  /// Background color for the header delegate. Defaults to transparent.
+  final Color backgroundColor;
+
+  /// Custom scroll physics passed to child loaders.
+  final ScrollPhysics? physics;
 
   /// One config entry per tab — data/state only.
   List<SmartTabConfig<T>> tabs;
@@ -281,6 +297,8 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       onReorder: cfg.onReorder ?? widget.onReorder,
       seperator: cfg.seperator ?? widget.seperator,
       listLoaderConfig: cfg.listLoaderConfig ?? widget.listLoaderConfig,
+      backgroundColor: cfg.backgroundColor ?? widget.backgroundColor,
+      physics: cfg.physics ?? widget.physics,
     );
   }
 
@@ -338,6 +356,8 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       limit: widget.limit,
       onReorder: cfg.onReorder ?? widget.onReorder,
       listLoaderConfig: cfg.listLoaderConfig ?? widget.listLoaderConfig,
+      backgroundColor: cfg.backgroundColor ?? widget.backgroundColor,
+      physics: cfg.physics ?? widget.physics,
     );
   }
 
