@@ -193,10 +193,9 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   @override
   Widget build(BuildContext context) {
     // When onColapsAppbar is null, the appbar stays permanently pinned.
-    final collapsedHeight =
-        widget.onColapsAppbar != null && _stickyHeight > 0
-            ? _stickyHeight
-            : _appBarHeight;
+    final collapsedHeight = widget.onColapsAppbar != null && _stickyHeight > 0
+        ? _stickyHeight
+        : _appBarHeight;
 
     // When _appBarHeight hasn't been measured yet (frame 1), show the appbar
     // as a plain SliverToBoxAdapter so content is correctly positioned from
@@ -222,6 +221,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
     }
 
     return Scaffold(
+      backgroundColor: widget.backgroundColor,
       body: Stack(
         children: [
           Form(
@@ -272,9 +272,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
         SliverPadding(
           padding: widget.padding ?? EdgeInsets.zero,
           sliver: widget.itemCount == 0 && !widget.isLoading
-              ? SliverToBoxAdapter(
-                  child: _empty(),
-                )
+              ? SliverToBoxAdapter(child: _empty())
               : widget.onReorder != null
               ? ReorderableBuilder.builder(
                   itemCount: widget.itemCount,
@@ -288,7 +286,7 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
                     }
                   },
                   onReorderPositions: (positions) {
-                     // Empty callback to satisfy ReorderableBuilder requirements
+                    // Empty callback to satisfy ReorderableBuilder requirements
                   },
                   childBuilder: (itemBuilder) {
                     return SliverGrid(
@@ -309,23 +307,27 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
                                   ? 0
                                   : gridConfig.crossAxisSpacing,
                             ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          var child = widget.itemBuilder(context, index);
-                          if (widget.isSeperated) {
-                            child = LayoutBuilder(
-                              builder: (context, constraints) {
-                                return _seprated(index, child, constraints.maxWidth);
-                              },
-                            );
-                          }
-                          return itemBuilder(
-                            KeyedSubtree(key: ValueKey('item_$index'), child: child),
-                            index,
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        var child = widget.itemBuilder(context, index);
+                        if (widget.isSeperated) {
+                          child = LayoutBuilder(
+                            builder: (context, constraints) {
+                              return _seprated(
+                                index,
+                                child,
+                                constraints.maxWidth,
+                              );
+                            },
                           );
-                        },
-                        childCount: widget.itemCount,
-                      ),
+                        }
+                        return itemBuilder(
+                          KeyedSubtree(
+                            key: ValueKey('item_$index'),
+                            child: child,
+                          ),
+                          index,
+                        );
+                      }, childCount: widget.itemCount),
                     );
                   },
                 )
@@ -489,8 +491,9 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final shrinkRange = expandedHeight - collapsedHeight;
-    final progress =
-        shrinkRange > 0 ? (shrinkOffset / shrinkRange).clamp(0.0, 1.0) : 0.0;
+    final progress = shrinkRange > 0
+        ? (shrinkOffset / shrinkRange).clamp(0.0, 1.0)
+        : 0.0;
 
     final collapsedOpacity = collapsedChild != null
         ? ((progress - 0.7) / 0.3).clamp(0.0, 1.0)
@@ -502,12 +505,7 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: expandedChild,
-            ),
+            Positioned(top: 0, left: 0, right: 0, child: expandedChild),
             if (collapsedChild != null)
               Positioned(
                 bottom: 0,
@@ -537,7 +535,6 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
         old.backgroundColor != backgroundColor;
   }
 }
-
 
 class GridChildInfo {
   GridChildInfo({
