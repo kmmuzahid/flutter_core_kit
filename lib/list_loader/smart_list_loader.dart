@@ -29,6 +29,7 @@ class SmartListLoader extends StatefulWidget {
     this.topWidget,
     this.onReorder,
     this.seperator,
+    this.listLoaderConfig,
   });
 
   final Widget? seperator;
@@ -48,6 +49,9 @@ class SmartListLoader extends StatefulWidget {
   final Widget? emptyWidget;
   final Widget? topWidget;
   final void Function(int oldIndex, int newIndex)? onReorder;
+
+  /// Per-instance loader config. Overrides the global ListLoaderConfig.
+  final ListLoaderConfig? listLoaderConfig;
 
   @override
   State<SmartListLoader> createState() => _SmartListLoaderState();
@@ -221,18 +225,28 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     final collapsedHeight =
         widget.onColapsAppbar != null && _stickyHeight > 0 ? _stickyHeight : 0.0;
 
-    final appBarSliver = widget.appbar != null && _appBarHeight > 0
-        ? SliverPersistentHeader(
-            pinned: true,
-            delegate: _AppBarCollapseDelegate(
-              expandedHeight: _appBarHeight,
-              collapsedHeight: collapsedHeight,
-              expandedChild: widget.appbar!,
-              collapsedChild: widget.onColapsAppbar,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            ),
-          )
-        : null;
+    // When _appBarHeight hasn't been measured yet (frame 1), show the appbar
+    // as a plain SliverToBoxAdapter so content is correctly positioned from
+    // the very first paint — no flash of missing appbar.
+    // Once height is known (frame 2+) we switch to the pinned collapsing header.
+    final Widget? appBarSliver;
+    if (widget.appbar == null) {
+      appBarSliver = null;
+    } else if (_appBarHeight == 0) {
+      // Frame 1: no height known yet, render as a normal scrollable item.
+      appBarSliver = SliverToBoxAdapter(child: widget.appbar!);
+    } else {
+      appBarSliver = SliverPersistentHeader(
+        pinned: true,
+        delegate: _AppBarCollapseDelegate(
+          expandedHeight: _appBarHeight,
+          collapsedHeight: collapsedHeight,
+          expandedChild: widget.appbar!,
+          collapsedChild: widget.onColapsAppbar,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        ),
+      );
+    }
 
     return Scaffold(
       body: Stack(
@@ -296,27 +310,27 @@ class _SmartListLoaderState extends State<SmartListLoader> {
         parent: BouncingScrollPhysics(),
       ),
       slivers: [
+        if (widget.isReverse) ...listSlivers,
         if (!widget.isReverse && appBarSliver != null) appBarSliver,
-        if (widget.isReverse) ...listSlivers else ...listSlivers,
+        if (!widget.isReverse) ...listSlivers,
         if (widget.isReverse && appBarSliver != null) appBarSliver,
       ],
     );
   }
 
   Widget _buildFooter() {
+    final globalConfig = coreKitInstance.listLoaderConfig;
+    final config = widget.listLoaderConfig != null
+        ? globalConfig.copyWith(
+            loaderWidget: widget.listLoaderConfig!.loaderWidget,
+            noMoreDataWidget: widget.listLoaderConfig!.noMoreDataWidget,
+          )
+        : globalConfig;
     if (widget.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(20),
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return config.loaderWidget;
     }
     if (widget.isLoadDone && widget.itemCount > 0) {
-      return const Padding(
-        padding: EdgeInsets.all(20),
-        child: Center(
-          child: Text('No more data', style: TextStyle(color: Colors.grey)),
-        ),
-      );
+      return config.noMoreDataWidget;
     }
     return const SizedBox.shrink();
   }
@@ -357,34 +371,43 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
     final progress =
         shrinkRange > 0 ? (shrinkOffset / shrinkRange).clamp(0.0, 1.0) : 0.0;
 
+    // The appbar content is always rendered and gets clipped by the header
+    // bounds as the header shrinks — this is natural and gap-free.
+    // The collapsed bar fades in starting at 70% progress so it appears
+    // only when the appbar is almost gone (no overlap, no invisible gap).
+    final collapsedOpacity = collapsedChild != null
+        ? ((progress - 0.7) / 0.3).clamp(0.0, 1.0)
+        : 0.0;
+
     return Material(
       color: backgroundColor,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Expanded appbar — fades out as user scrolls
-          if (progress < 1.0)
-            Opacity(
-              opacity: (1.0 - progress * 2).clamp(0.0, 1.0),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: expandedChild,
-              ),
+      child: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Appbar anchored to top — clips naturally as header shrinks
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: expandedChild,
             ),
 
-          // Collapsed bar — fades in as user scrolls
-          if (collapsedChild != null && progress > 0.5)
-            Opacity(
-              opacity: ((progress - 0.5) * 2).clamp(0.0, 1.0),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SizedBox(
-                  height: collapsedHeight,
+            // Collapsed bar anchored to bottom — slides in as header shrinks,
+            // then fades in for a clean handoff
+            if (collapsedChild != null)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: collapsedHeight,
+                child: Opacity(
+                  opacity: collapsedOpacity,
                   child: collapsedChild,
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

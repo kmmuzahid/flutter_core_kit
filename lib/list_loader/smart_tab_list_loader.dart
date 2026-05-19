@@ -49,6 +49,7 @@ class SmartTabConfig<T> {
     this.subOnColapsAppbar,
     this.onReorder,
     this.seperator,
+    this.listLoaderConfig,
   });
 
   final Widget? seperator;
@@ -64,6 +65,9 @@ class SmartTabConfig<T> {
   final Widget? subAppBar;
   final Widget? subOnColapsAppbar;
   final void Function(int oldIndex, int newIndex)? onReorder;
+
+  /// Per-tab loader config. Overrides the global/parent ListLoaderConfig.
+  final ListLoaderConfig? listLoaderConfig;
 }
 
 // ignore: must_be_immutable
@@ -85,6 +89,7 @@ class SmartTabListLoader<T> extends StatefulWidget {
     this.emptyWidget,
     this.onReorder,
     this.seperator,
+    this.listLoaderConfig,
     super.key,
   }) : assert(tabs.isNotEmpty, 'tabs must not be empty');
 
@@ -97,6 +102,10 @@ class SmartTabListLoader<T> extends StatefulWidget {
   final GridConfig? gridConfig;
 
   final void Function(int oldIndex, int newIndex)? onReorder;
+
+  /// Per-instance loader config passed to child loaders.
+  /// Per-tab listLoaderConfig in SmartTabConfig takes priority.
+  final ListLoaderConfig? listLoaderConfig;
 
   /// One config entry per tab — data/state only.
   List<SmartTabConfig<T>> tabs;
@@ -271,6 +280,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       limit: widget.limit,
       onReorder: cfg.onReorder ?? widget.onReorder,
       seperator: cfg.seperator ?? widget.seperator,
+      listLoaderConfig: cfg.listLoaderConfig ?? widget.listLoaderConfig,
     );
   }
 
@@ -327,6 +337,7 @@ class _SmartTabListLoaderState<T> extends State<SmartTabListLoader<T>>
       onColapsAppbar: _buildOncolupse(cfg),
       limit: widget.limit,
       onReorder: cfg.onReorder ?? widget.onReorder,
+      listLoaderConfig: cfg.listLoaderConfig ?? widget.listLoaderConfig,
     );
   }
 

@@ -27,6 +27,40 @@ class PasswordObscureIcon {
   });
 }
 
+/// Global configuration for list/grid loader widgets.
+/// Allows customizing the default loading indicator and "no more data" widget
+/// both globally (via CoreKitConfig) and per-instance.
+class ListLoaderConfig {
+  /// Widget shown when loading more items (pagination footer).
+  final Widget loaderWidget;
+
+  /// Widget shown when all pages have been loaded.
+  final Widget noMoreDataWidget;
+
+  const ListLoaderConfig({
+    this.loaderWidget = const Padding(
+      padding: EdgeInsets.all(20),
+      child: Center(child: CircularProgressIndicator()),
+    ),
+    this.noMoreDataWidget = const Padding(
+      padding: EdgeInsets.all(20),
+      child: Center(
+        child: Text('No more data', style: TextStyle(color: Colors.grey)),
+      ),
+    ),
+  });
+
+  ListLoaderConfig copyWith({
+    Widget? loaderWidget,
+    Widget? noMoreDataWidget,
+  }) {
+    return ListLoaderConfig(
+      loaderWidget: loaderWidget ?? this.loaderWidget,
+      noMoreDataWidget: noMoreDataWidget ?? this.noMoreDataWidget,
+    );
+  }
+}
+
 class coreKitInstanceSingleton {
   coreKitInstanceSingleton._();
   static final coreKitInstanceSingleton _instance = coreKitInstanceSingleton
@@ -37,6 +71,7 @@ class coreKitInstanceSingleton {
   late String imageBaseUrl;
   late Size designSize;
   late AppbarConfig appbarConfig;
+  ListLoaderConfig listLoaderConfig = const ListLoaderConfig();
   late DioServiceConfig dioServiceConfig;
   late TokenProvider tokenProvider;
 
@@ -107,6 +142,7 @@ abstract class CoreKitConfig {
   Size get designSize;
 
   AppbarConfig? get appbarConfig => null;
+  ListLoaderConfig? get listLoaderConfig => null;
   PermissionHelperConfig? get permissionHelperConfig => null;
   PermissionHadlerColors? get permissionHandlerColors => null;
   PasswordObscureIcon? get passwordObscureIcon => null;
@@ -118,6 +154,8 @@ abstract class CoreKitConfig {
 mixin CoreKitConfigDefaults implements CoreKitConfig {
   @override
   AppbarConfig? get appbarConfig => null;
+  @override
+  ListLoaderConfig? get listLoaderConfig => null;
   @override
   PermissionHelperConfig? get permissionHelperConfig => null;
   @override
@@ -181,6 +219,9 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
         instance.appbarConfig = instance.appbarConfig.copyWith(
           onBack: () => instance.navigatorKey.currentState?.pop(),
         );
+      }
+      if (config.listLoaderConfig != null) {
+        instance.listLoaderConfig = config.listLoaderConfig!;
       }
       if (!_dioInitialized) {
         _dioInitialized = true;
