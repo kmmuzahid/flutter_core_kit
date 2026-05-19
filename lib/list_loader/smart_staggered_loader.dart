@@ -188,8 +188,11 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   @override
   Widget build(BuildContext context) {
+    // When onColapsAppbar is null, the appbar stays permanently pinned.
     final collapsedHeight =
-        widget.onColapsAppbar != null && _stickyHeight > 0 ? _stickyHeight : 0.0;
+        widget.onColapsAppbar != null && _stickyHeight > 0
+            ? _stickyHeight
+            : _appBarHeight;
 
     // When _appBarHeight hasn't been measured yet (frame 1), show the appbar
     // as a plain SliverToBoxAdapter so content is correctly positioned from

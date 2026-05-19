@@ -222,8 +222,13 @@ class _SmartListLoaderState extends State<SmartListLoader> {
     // snapping) so there are zero involuntary scroll animations. It shrinks
     // from _appBarHeight (full appbar) to _stickyHeight (collapsed bar) as
     // the user scrolls. Works correctly for any item count — no mode switching.
+    // When onColapsAppbar is null, the appbar should never hide — it stays
+    // permanently pinned. We achieve this by setting collapsedHeight = _appBarHeight
+    // so minExtent == maxExtent and the header never shrinks.
     final collapsedHeight =
-        widget.onColapsAppbar != null && _stickyHeight > 0 ? _stickyHeight : 0.0;
+        widget.onColapsAppbar != null && _stickyHeight > 0
+            ? _stickyHeight
+            : _appBarHeight;
 
     // When _appBarHeight hasn't been measured yet (frame 1), show the appbar
     // as a plain SliverToBoxAdapter so content is correctly positioned from
