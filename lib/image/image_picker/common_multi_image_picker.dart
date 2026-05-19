@@ -15,6 +15,14 @@ class CommonMultiImagePickerFormField extends StatefulWidget {
   final String Function(List<XFile> list)? validator;
   final void Function(List<XFile> value)? onSaved;
   final void Function(XFile? file, String path)? onRemove;
+
+  /// Called when an item from [initialValue] is removed.
+  /// Receives the removed source string and its original index.
+  final void Function(String item, int index)? onInitialItemRemove;
+
+  /// Widget shown when there are no images (no initial items and no picks).
+  final Widget? emptyWidget;
+
   const CommonMultiImagePickerFormField({
     super.key,
     this.isMulti = true,
@@ -23,7 +31,9 @@ class CommonMultiImagePickerFormField extends StatefulWidget {
     this.initialValue = const [],
     this.onSaved,
     this.onRemove,
+    this.onInitialItemRemove,
     this.validator,
+    this.emptyWidget,
   });
 
   @override
@@ -145,12 +155,14 @@ class _CommonMultiImagePickerField
       } else if (_initialSources.isNotEmpty) {
         final s = _initialSources.first;
         widget.onRemove?.call(null, s);
+        widget.onInitialItemRemove?.call(s, 0);
         _initialSources.removeAt(0);
       }
     } else {
       if (index < _initialSources.length) {
         final s = _initialSources[index];
         widget.onRemove?.call(null, s);
+        widget.onInitialItemRemove?.call(s, index);
         _initialSources.removeAt(index);
       } else {
         final j = index - _initialSources.length;
@@ -174,6 +186,7 @@ class _CommonMultiImagePickerField
         widget.onSaved?.call(fields ?? []);
       },
       builder: (fieldState) {
+        final isEmpty = _initialSources.isEmpty && _picked.isEmpty;
         final itemCount = _displayCount + (_showAddButton ? 1 : 0);
 
         return Container(
@@ -189,7 +202,10 @@ class _CommonMultiImagePickerField
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GridView.builder(
+              if (isEmpty && widget.emptyWidget != null)
+                widget.emptyWidget!
+              else
+                GridView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),

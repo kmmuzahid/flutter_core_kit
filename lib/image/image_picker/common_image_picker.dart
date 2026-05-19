@@ -13,6 +13,7 @@ class CommonImagePicker extends StatefulWidget {
     this.pickerIconWidget,
     this.src,
     this.onChange,
+    this.intialWidget,
   });
 
   final double width;
@@ -24,6 +25,9 @@ class CommonImagePicker extends StatefulWidget {
   final void Function(XFile?)? onChange;
   final FormFieldValidator<XFile>? validator;
   final String? src;
+
+  /// Widget shown when no image is selected and no [src] is provided.
+  final Widget? intialWidget;
 
   @override
   State<CommonImagePicker> createState() => _CommonImagePickerState();
@@ -85,7 +89,8 @@ class _CommonImagePickerState extends State<CommonImagePicker> {
                                 : widget.src!,
                             fill: BoxFit.cover,
                           )
-                        : widget.pickerIconWidget ??
+                        : widget.intialWidget ??
+                              widget.pickerIconWidget ??
                               Icon(
                                 widget.pickerIcon,
                                 size: widget.width / 1.8,
