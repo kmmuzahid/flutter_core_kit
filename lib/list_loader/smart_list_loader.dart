@@ -401,9 +401,12 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
                 left: 0,
                 right: 0,
                 height: collapsedHeight,
-                child: Opacity(
-                  opacity: collapsedOpacity,
-                  child: collapsedChild,
+                child: IgnorePointer(
+                  ignoring: collapsedOpacity == 0,
+                  child: Opacity(
+                    opacity: collapsedOpacity,
+                    child: collapsedChild,
+                  ),
                 ),
               ),
           ],
