@@ -107,7 +107,6 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   double _appBarHeight = 0.0;
   double _stickyHeight = 0.0;
-  double _currentOffset = 0.0;
   final Debouncer _debounce = Debouncer(milliseconds: 500);
   bool _isContentScrollable = false;
 
@@ -130,12 +129,6 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   void _scrollListener() {
     if (!_scrollController.hasClients) return;
 
-    if (mounted) {
-      setState(() {
-        _currentOffset = _scrollController.offset;
-      });
-    }
-
     _checkScrollability();
 
     final pos = _scrollController.position;
@@ -157,10 +150,8 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   void _checkScrollability() {
     if (!_scrollController.hasClients) return;
-
     final pos = _scrollController.position;
     final isScrollable = pos.maxScrollExtent > 0;
-
     if (_isContentScrollable != isScrollable && mounted) {
       setState(() {
         _isContentScrollable = isScrollable;
@@ -192,25 +183,21 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
 
   @override
   Widget build(BuildContext context) {
-    final isAppBarCollapsed =
-        _scrollController.hasClients &&
-        _currentOffset >= _appBarHeight &&
-        _isContentScrollable;
+    final collapsedHeight =
+        widget.onColapsAppbar != null && _stickyHeight > 0 ? _stickyHeight : 0.0;
 
-    // Show main appbar when at top or content is not scrollable
-    final showMainAppBar =
-        widget.appbar != null &&
-        _appBarHeight > 0 &&
-        (_scrollController.hasClients
-            ? (_scrollController.offset < _appBarHeight ||
-                  !_isContentScrollable)
-            : true);
-
-    // Show collapsed appbar when content is scrollable and scrolled past threshold
-    final showCollapsedAppBar =
-        widget.onColapsAppbar != null &&
-        ((isAppBarCollapsed && _isContentScrollable) ||
-            (!showMainAppBar && _isContentScrollable));
+    final appBarSliver = widget.appbar != null && _appBarHeight > 0
+        ? SliverPersistentHeader(
+            pinned: true,
+            delegate: _AppBarCollapseDelegate(
+              expandedHeight: _appBarHeight,
+              collapsedHeight: collapsedHeight,
+              expandedChild: widget.appbar!,
+              collapsedChild: widget.onColapsAppbar,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            ),
+          )
+        : null;
 
     return Scaffold(
       body: Stack(
@@ -236,51 +223,26 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
           widget.onRefresh != null
               ? RefreshIndicator(
                   onRefresh: () async => widget.onRefresh?.call(),
-                  // Disable refresh when content doesn't fill the screen
                   notificationPredicate: (notification) {
-                    if (!_isContentScrollable) {
-                      return false;
-                    }
+                    if (!_isContentScrollable) return false;
                     return notification.depth == 0;
                   },
-                  child: _buildScrollView(showMainAppBar, showCollapsedAppBar),
+                  child: _buildScrollView(appBarSliver),
                 )
-              : _buildScrollView(showMainAppBar, showCollapsedAppBar),
+              : _buildScrollView(appBarSliver),
         ],
       ),
     );
   }
 
-  Widget _buildScrollView(bool showMainAppBar, bool showCollapsedAppBar) {
+  Widget _buildScrollView(Widget? appBarSliver) {
     return CustomScrollView(
       controller: _scrollController,
       physics:
           widget.physics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       slivers: [
-        if (showMainAppBar)
-          SliverAppBar(
-            primary: false,
-            floating: true,
-            snap: true,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            toolbarHeight: _appBarHeight,
-            automaticallyImplyLeading: false,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            titleSpacing: 0,
-            title: widget.appbar,
-          ),
-
-        if (showCollapsedAppBar)
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _StickyHeaderDelegate(
-              height: _stickyHeight,
-              visible: true,
-              child: widget.onColapsAppbar!,
-            ),
-          ),
+        ?appBarSliver,
 
         if (widget.topWidget != null)
           SliverToBoxAdapter(child: widget.topWidget),
@@ -289,7 +251,6 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
           padding: widget.padding ?? EdgeInsets.zero,
           sliver: widget.itemCount == 0 && !widget.isLoading
               ? SliverToBoxAdapter(
-                  // hasScrollBody: false,
                   child: _empty(),
                 )
               : widget.onReorder != null
@@ -476,20 +437,29 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
   }
 }
 
-class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _StickyHeaderDelegate({
-    required this.height,
-    required this.child,
-    required this.visible,
+/// Handles the smooth collapse from the full appbar to the compact sticky bar.
+/// Uses [pinned: true] — no floating, no snap — so scrolling is always
+/// 1-to-1 with user input. No auto-animation, no flicker.
+class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
+  _AppBarCollapseDelegate({
+    required this.expandedHeight,
+    required this.collapsedHeight,
+    required this.expandedChild,
+    required this.collapsedChild,
+    required this.backgroundColor,
   });
-  final double height;
-  final Widget child;
-  final bool visible;
+
+  final double expandedHeight;
+  final double collapsedHeight;
+  final Widget expandedChild;
+  final Widget? collapsedChild;
+  final Color backgroundColor;
 
   @override
-  double get minExtent => visible ? height : 0.0;
+  double get minExtent => collapsedHeight;
+
   @override
-  double get maxExtent => visible ? height : 0.0;
+  double get maxExtent => expandedHeight;
 
   @override
   Widget build(
@@ -497,14 +467,53 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return visible ? child : const SizedBox.shrink();
+    final shrinkRange = expandedHeight - collapsedHeight;
+    // progress: 0.0 = fully expanded, 1.0 = fully collapsed
+    final progress =
+        shrinkRange > 0 ? (shrinkOffset / shrinkRange).clamp(0.0, 1.0) : 0.0;
+
+    return Material(
+      color: backgroundColor,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Expanded appbar — fades out as user scrolls
+          if (progress < 1.0)
+            Opacity(
+              opacity: (1.0 - progress * 2).clamp(0.0, 1.0),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: expandedChild,
+              ),
+            ),
+
+          // Collapsed bar — fades in as user scrolls
+          if (collapsedChild != null && progress > 0.5)
+            Opacity(
+              opacity: ((progress - 0.5) * 2).clamp(0.0, 1.0),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: collapsedHeight,
+                  child: collapsedChild,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
-  bool shouldRebuild(covariant _StickyHeaderDelegate oldDelegate) {
-    return oldDelegate.visible != visible || oldDelegate.child != child;
+  bool shouldRebuild(covariant _AppBarCollapseDelegate old) {
+    return old.expandedHeight != expandedHeight ||
+        old.collapsedHeight != collapsedHeight ||
+        old.expandedChild != expandedChild ||
+        old.collapsedChild != collapsedChild ||
+        old.backgroundColor != backgroundColor;
   }
 }
+
 
 class GridChildInfo {
   GridChildInfo({
