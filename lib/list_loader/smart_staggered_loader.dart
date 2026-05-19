@@ -215,19 +215,21 @@ class _SmartStaggeredLoaderState extends State<SmartStaggeredLoader> {
     return Scaffold(
       body: Stack(
         children: [
-          Offstage(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  key: _appBarKey,
-                  child: widget.appbar ?? const SizedBox(),
-                ),
-                Container(
-                  key: _stickyKey,
-                  child: widget.onColapsAppbar ?? const SizedBox(),
-                ),
-              ],
+          Form(
+            child: Offstage(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    key: _appBarKey,
+                    child: widget.appbar ?? const SizedBox(),
+                  ),
+                  Container(
+                    key: _stickyKey,
+                    child: widget.onColapsAppbar ?? const SizedBox(),
+                  ),
+                ],
+              ),
             ),
           ),
 
