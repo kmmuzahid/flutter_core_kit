@@ -61,6 +61,9 @@ extension StringExtensions on String {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
+
+  /// Parses the string into a [DateTime] object, returning null if the format is invalid.
+  DateTime? get toDateTime => DateTime.tryParse(this);
 }
 
 extension View on num {
@@ -81,6 +84,52 @@ extension Alignments on Widget {
 
 // All Alignments Time Formatter Extensions
 extension TimeFormater on DateTime {
+  String get ago {
+    final now = DateTime.now();
+    final difference = now.difference(this);
+
+    // If future or less than a minute
+    if (difference.isNegative || difference.inSeconds < 60) {
+      return 'Just now';
+    }
+
+    // 1. Minutes stage: up to 59 minutes
+    final minutes = difference.inMinutes;
+    if (minutes < 60) {
+      return '${minutes}m ago';
+    }
+
+    // 2. Hours stage: up to 23.9 hours
+    final hours = difference.inSeconds / 3600.0;
+    final roundedHours = (hours * 10).round() / 10;
+    if (roundedHours < 24.0) {
+      final hourStr = roundedHours % 1 == 0
+          ? '${roundedHours.toInt()}'
+          : roundedHours.toStringAsFixed(1);
+      return '${hourStr}h ago';
+    }
+
+    // 3. Days stage: up to 365 days (3 digits)
+    final days = difference.inSeconds / 86400.0;
+    final roundedDays = (days * 10).round() / 10;
+    if (roundedDays < 365.0) {
+      final dayStr = roundedDays % 1 == 0
+          ? '${roundedDays.toInt()}'
+          : roundedDays.toStringAsFixed(1);
+      return '${dayStr}d ago';
+    }
+
+    // 4. Years stage: up to 3 digits (999 years)
+    final years = days / 365.0;
+    final yearsInt = years.toInt();
+    if (yearsInt < 1000) {
+      return '${yearsInt}y ago';
+    }
+
+    // Fallback for dates beyond 999 years
+    return DateFormat('dd-MM-yyyy').format(this);
+  }
+
   String get time => DateFormat('h:mm a').format(this);
 
   String get date => DateFormat('dd-MM-yyyy').format(this);
