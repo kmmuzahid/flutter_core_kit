@@ -276,6 +276,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
 
   TextFormField _buildTextField() {
     return TextFormField(
+      cursorColor: _focusNode.hasFocus
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
+      cursorErrorColor: _focusNode.hasFocus
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
       textAlign: widget.textAlign,
       controller: _controller,
       focusNode: _focusNode,

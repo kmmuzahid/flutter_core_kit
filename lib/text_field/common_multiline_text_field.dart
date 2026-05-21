@@ -237,8 +237,12 @@ class _CommonMultilineTextFieldState extends State<CommonMultilineTextField> {
               textAlignVertical: TextAlignVertical.top,
               readOnly: widget.isReadOnly,
               maxLines: null,
-              cursorColor: theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
-                  coreKitInstance.primaryColor,
+              cursorColor: _focusNode.hasFocus
+                  ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+                  : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
+              cursorErrorColor: _focusNode.hasFocus
+                  ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+                  : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
               scrollPhysics: const BouncingScrollPhysics(),
               inputFormatters: [
                 ...InputHelper.getInputFormatters(widget.validationType),

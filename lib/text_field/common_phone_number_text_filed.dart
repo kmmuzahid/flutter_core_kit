@@ -91,6 +91,7 @@ class _CommonPhoneNumberTextFieldState
   late List<TextInputFormatter> _inputFormatters;
 
   late TextEditingController _internalController;
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
@@ -99,12 +100,19 @@ class _CommonPhoneNumberTextFieldState
     filteredCountries = _countryList;
     _inputFormatters = [PhoneNumberFormatter()];
     _internalController = TextEditingController();
+    _focusNode = widget.focusNode ?? FocusNode();
+    _focusNode.addListener(() {
+      setState(() {});
+    });
 
     _initData();
   }
 
   @override
   void dispose() {
+    if (widget.focusNode == null) {
+      _focusNode.dispose();
+    }
     _internalController.dispose();
     super.dispose();
   }
@@ -301,8 +309,14 @@ class _CommonPhoneNumberTextFieldState
     final effectiveBorderColor = widget.borderColor ?? theme.dividerColor;
 
     return TextFormField(
+      cursorColor: _focusNode.hasFocus
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? theme.colorScheme.error),
+      cursorErrorColor: _focusNode.hasFocus
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? theme.colorScheme.error),
       controller: _internalController,
-      focusNode: widget.focusNode,
+      focusNode: _focusNode,
       readOnly: widget.isReadOnly,
       textInputAction: widget.textInputAction,
       textAlign: widget.textAlign,
