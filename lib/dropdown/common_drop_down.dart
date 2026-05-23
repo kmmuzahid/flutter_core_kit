@@ -157,7 +157,7 @@ class _CommonDropDownState<T> extends State<CommonDropDown<T>>
             ? widget.initalValue
             : (_items.isNotEmpty ? _items.first : null);
       }
-    } else if (_items.isNotEmpty) {
+    } else if (widget.enableInitalSelection && _items.isNotEmpty) {
       return _items.first;
     }
     return null;
