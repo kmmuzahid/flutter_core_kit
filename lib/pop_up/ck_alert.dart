@@ -71,6 +71,3 @@ class CkAlert {
   }
 }
 
-/// @deprecated Use [CkAlert] instead.
-@Deprecated('Use CkAlert instead')
-typedef CommonAlert = CkAlert;

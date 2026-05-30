@@ -113,6 +113,3 @@ abstract class CkStorage {
   }
 }
 
-/// @deprecated Use [CkStorage] instead.
-@Deprecated('Use CkStorage instead')
-typedef CoreKitStorage = CkStorage;

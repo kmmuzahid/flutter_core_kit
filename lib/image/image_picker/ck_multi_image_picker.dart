@@ -315,11 +315,5 @@ class _CkMultiImagePickerField
   }
 }
 
-/// @deprecated Use [CkMultiImagePickerFormField] instead.
-@Deprecated('Use CkMultiImagePickerFormField instead')
-typedef CommonMultiImagePickerFormField = CkMultiImagePickerFormField;
 
-/// @deprecated Use [CkMultiImagePicker] instead.
-@Deprecated('Use CkMultiImagePicker instead')
-typedef CommonMultiImagePicker = CkMultiImagePicker;
 

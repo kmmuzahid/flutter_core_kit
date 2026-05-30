@@ -90,7 +90,7 @@ class CkGridView extends StatefulWidget {
   final CkGridConfig? gridConfig;
   final void Function(int oldIndex, int newIndex)? onReorder;
 
-  /// Per-instance loader config. Overrides the global ListLoaderConfig.
+  /// Per-instance loader config. Overrides the global CkListLoaderConfig.
   final CkListLoaderConfig? listLoaderConfig;
 
   /// Background color for the header delegate. Defaults to transparent.
@@ -544,14 +544,5 @@ class CkGridChildInfo {
   final bool isItInLastRow;
 }
 
-/// @deprecated Use [CkGridView] instead.
-@Deprecated('Use CkGridView instead')
-typedef SmartStaggeredLoader = CkGridView;
 
-/// @deprecated Use [CkGridConfig] instead.
-@Deprecated('Use CkGridConfig instead')
-typedef GridConfig = CkGridConfig;
 
-/// @deprecated Use [CkGridChildInfo] instead.
-@Deprecated('Use CkGridChildInfo instead')
-typedef GridChildInfo = CkGridChildInfo;

@@ -1,4 +1,5 @@
 import 'package:core_kit/core_kit_internal.dart';
+import 'package:core_kit/utils/ck_logger.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
@@ -160,7 +161,7 @@ extension AsyncTryCatch on Function() {
     try {
       await this();
     } catch (e, stackTrace) {
-      AppLogger.error(stackTrace.toString(), tag: 'Global Try Catch');
+      CkLogger.error(stackTrace.toString(), tag: 'Global Try Catch');
     }
   }
 }

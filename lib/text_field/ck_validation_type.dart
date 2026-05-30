@@ -25,6 +25,3 @@ enum CkValidationType {
   validateYear,
 }
 
-/// @deprecated Use [CkValidationType] instead.
-@Deprecated('Use CkValidationType instead')
-typedef ValidationType = CkValidationType;

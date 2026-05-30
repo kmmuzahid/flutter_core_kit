@@ -220,14 +220,5 @@ class _SelectablePopupMenuState<T> extends State<CkPopupMenu<T>> {
   }
 }
 
-/// @deprecated Use [CkPopupMenuTriggerProperty] instead.
-@Deprecated('Use CkPopupMenuTriggerProperty instead')
-typedef CommonPopupMenuTriggerProperty<T> = CkPopupMenuTriggerProperty<T>;
 
-/// @deprecated Use [CkPopupMenuProperty] instead.
-@Deprecated('Use CkPopupMenuProperty instead')
-typedef CommonPopupMenuProperty<T> = CkPopupMenuProperty<T>;
 
-/// @deprecated Use [CkPopupMenu] instead.
-@Deprecated('Use CkPopupMenu instead')
-typedef CommonPopupMenu<T> = CkPopupMenu<T>;

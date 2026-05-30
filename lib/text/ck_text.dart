@@ -368,6 +368,3 @@ class _AdaptiveText extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkText] instead.
-@Deprecated('Use CkText instead')
-typedef CommonText = CkText;

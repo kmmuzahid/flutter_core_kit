@@ -2,7 +2,7 @@ import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
 
 /// For any OAuth/social provider not covered by built-in ones
-class CustomSocialAuthConfig {
+class CkCustomSocialAuthConfig {
   final String providerName;       // e.g., 'github', 'twitter'
   final String backendUrl;
   final RequestMethod method;
@@ -13,9 +13,9 @@ class CustomSocialAuthConfig {
   /// Build body to send to backend
   final Map<String, dynamic> Function(Map<String, dynamic> authData) bodyBuilder;
   
-  final AuthExtractors? responseExtractors;
+  final CkAuthExtractors? responseExtractors;
 
-  const CustomSocialAuthConfig({
+  const CkCustomSocialAuthConfig({
     required this.providerName,
     required this.backendUrl,
     required this.authenticate,

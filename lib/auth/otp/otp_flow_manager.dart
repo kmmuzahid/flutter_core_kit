@@ -5,13 +5,13 @@ import 'package:core_kit/auth/auth_extractors.dart';
 import 'package:core_kit/auth/auth_result.dart';
 import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
-import 'package:core_kit/network/ck_network.dart';
+import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 
 /// Manages complete OTP lifecycle with stream-based timer
-class OtpFlowManager {
-  final OtpConfig _config;
-  final AuthExtractors _extractors;
+class CkOtpFlowManager {
+  final CkOtpConfig _config;
+  final CkAuthExtractors<dynamic> _extractors;
   final String? _sendUrl;
   final String? _verifyUrl;
   final RequestMethod _sendMethod;
@@ -21,15 +21,15 @@ class OtpFlowManager {
   int _resendAttempts = 0;
   
   // Stores verification tokens per flow in-memory
-  final Map<OtpTrigger, String?> _verificationTokens = {};
+  final Map<CkOtpTrigger, String?> _verificationTokens = {};
   
-  /// Resend countdown — BehaviorStream so UI gets current value immediately
+  /// Resend countdown — CkBehaviorStream so UI gets current value immediately
   /// Emits remaining seconds. When 0, resend is allowed.
-  late final BehaviorStream<int> resendCountdown;
+  late final CkBehaviorStream<int> resendCountdown;
   
-  OtpFlowManager({
-    required OtpConfig config,
-    required AuthExtractors extractors,
+  CkOtpFlowManager({
+    required CkOtpConfig config,
+    required CkAuthExtractors<dynamic> extractors,
     String? sendUrl,
     String? verifyUrl,
     RequestMethod sendMethod = RequestMethod.POST,
@@ -40,7 +40,7 @@ class OtpFlowManager {
         _verifyUrl = verifyUrl,
         _sendMethod = sendMethod,
         _verifyMethod = verifyMethod {
-    resendCountdown = BehaviorStream(initialValue: 0);
+    resendCountdown = CkBehaviorStream(initialValue: 0);
   }
 
   /// Whether resend is currently allowed
@@ -48,22 +48,22 @@ class OtpFlowManager {
     (_config.maxResendAttempts == 0 || _resendAttempts < _config.maxResendAttempts);
   
   /// Store verification token from a response
-  Future<void> storeVerificationToken(OtpTrigger trigger, String? token) async {
+  Future<void> storeVerificationToken(CkOtpTrigger trigger, String? token) async {
     _verificationTokens[trigger] = token;
     if (token != null) {
-      await CkStorage.write('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}', token);
+      await CkStorage.write('${CkAuthStorageKeys.verificationTokenPrefix}${trigger.name}', token);
     } else {
-      await CkStorage.delete('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
+      await CkStorage.delete('${CkAuthStorageKeys.verificationTokenPrefix}${trigger.name}');
     }
   }
   
   /// Get stored verification token
-  String? getVerificationToken(OtpTrigger trigger) => _verificationTokens[trigger];
+  String? getVerificationToken(CkOtpTrigger trigger) => _verificationTokens[trigger];
 
   /// Restore verification tokens from secure storage
   Future<void> restoreTokens() async {
-    for (final trigger in OtpTrigger.values) {
-      final token = await CkStorage.read('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
+    for (final trigger in CkOtpTrigger.values) {
+      final token = await CkStorage.read('${CkAuthStorageKeys.verificationTokenPrefix}${trigger.name}');
       if (token != null) {
         _verificationTokens[trigger] = token;
       }
@@ -86,16 +86,16 @@ class OtpFlowManager {
   }
   
   /// Send/Resend OTP via API
-  Future<AuthResult<void>> sendOtp({
-    required OtpTrigger trigger,
+  Future<CkAuthResult<void>> sendOtp({
+    required CkOtpTrigger trigger,
     String? identifier,
   }) async {
     if (_sendUrl == null) {
-      return const AuthResult<void>.failure(message: 'OTP send URL is not configured');
+      return const CkAuthResult<void>.failure(message: 'OTP send URL is not configured');
     }
     
     if (!canResend) {
-      return const AuthResult<void>.failure(
+      return const CkAuthResult<void>.failure(
         message: 'Resend is locked. Please wait for the cooldown timer.',
       );
     }
@@ -111,39 +111,48 @@ class OtpFlowManager {
         if (vToken != null) body['token'] = vToken;
       }
 
-      final response = await CkNetwork.instance.request(
+      final response = await CkTransport.request(
         input: RequestInput(
           endpoint: _sendUrl!,
           method: _sendMethod,
           jsonBody: body,
+          requiresToken: false,
         ),
         responseBuilder: (data) => data,
+        showMessage: true,
       );
 
       if (response.isSuccess) {
         _resendAttempts++;
         startResendTimer();
-        final newToken = _extractors.verificationToken?.call(response.data);
+        final newToken = _extractors.verificationTokens?[trigger]?.call(response.data);
         if (newToken != null) {
           await storeVerificationToken(trigger, newToken);
         }
-        return AuthResult<void>.success(statusCode: response.statusCode, rawResponse: response.data);
+        return CkAuthResult<void>.success(
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
       }
-      
-      return AuthResult<void>.failure(message: response.message, statusCode: response.statusCode, rawResponse: response.data);
+
+      return CkAuthResult<void>.failure(
+        message: response.message,
+        statusCode: response.statusCode,
+        rawResponse: response.data,
+      );
     } catch (e) {
-      return AuthResult<void>.failure(message: e.toString());
+      return CkAuthResult<void>.failure(message: e.toString());
     }
   }
-  
+
   /// Verify OTP via API
-  Future<AuthResult<void>> verifyOtp({
+  Future<CkAuthResult<void>> verifyOtp({
     required String otp,
-    required OtpTrigger trigger,
+    required CkOtpTrigger trigger,
     Map<String, dynamic>? additionalBody,
   }) async {
     if (_verifyUrl == null) {
-      return const AuthResult<void>.failure(message: 'OTP verify URL is not configured');
+      return const CkAuthResult<void>.failure(message: 'OTP verify URL is not configured');
     }
 
     try {
@@ -154,7 +163,7 @@ class OtpFlowManager {
         body = _config.verifyBodyBuilder!(otp, vToken);
       } else {
         body['otp'] = otp;
-        if (_config.verificationStrategy == OtpVerificationStrategy.tokenBased &&
+        if (_config.verificationStrategy == CkOtpVerificationStrategy.tokenBased &&
             !_config.sendVerificationTokenInHeader &&
             vToken != null) {
           body[_config.verificationTokenHeaderKey] = vToken;
@@ -166,31 +175,40 @@ class OtpFlowManager {
       }
 
       Map<String, String> headers = {};
-      if (_config.verificationStrategy == OtpVerificationStrategy.tokenBased &&
+      if (_config.verificationStrategy == CkOtpVerificationStrategy.tokenBased &&
           _config.sendVerificationTokenInHeader &&
           vToken != null) {
         headers[_config.verificationTokenHeaderKey] = vToken;
       }
 
-      final response = await CkNetwork.instance.request(
+      final response = await CkTransport.request(
         input: RequestInput(
           endpoint: _verifyUrl!,
           method: _verifyMethod,
           jsonBody: body,
           headers: headers,
+          requiresToken: false,
         ),
         responseBuilder: (data) => data,
+        showMessage: true,
       );
 
       if (response.isSuccess) {
         // Successful verification clears verification token for this trigger
         await storeVerificationToken(trigger, null);
-        return AuthResult<void>.success(statusCode: response.statusCode, rawResponse: response.data);
+        return CkAuthResult<void>.success(
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
       }
 
-      return AuthResult<void>.failure(message: response.message, statusCode: response.statusCode, rawResponse: response.data);
+      return CkAuthResult<void>.failure(
+        message: response.message,
+        statusCode: response.statusCode,
+        rawResponse: response.data,
+      );
     } catch (e) {
-      return AuthResult<void>.failure(message: e.toString());
+      return CkAuthResult<void>.failure(message: e.toString());
     }
   }
   
@@ -200,8 +218,8 @@ class OtpFlowManager {
     _verificationTokens.clear();
     _resendAttempts = 0;
     resendCountdown.add(0);
-    for (final trigger in OtpTrigger.values) {
-      await CkStorage.delete('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
+    for (final trigger in CkOtpTrigger.values) {
+      await CkStorage.delete('${CkAuthStorageKeys.verificationTokenPrefix}${trigger.name}');
     }
   }
   

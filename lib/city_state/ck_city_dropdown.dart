@@ -40,7 +40,7 @@ class CkCityDropDown extends StatelessWidget {
     this.menuBorderColor,
     this.selectedItemBuilder,
     this.hintStyle,
-    this.borderType = BorderType.outline,
+    this.borderType = CkBorderType.outline,
     this.borderWidth = 1.2,
     this.dropDownType = CkDropDownType.menu,
     this.menuMaxHeight,
@@ -67,7 +67,7 @@ class CkCityDropDown extends StatelessWidget {
 
   final Widget Function(String value)? selectedItemBuilder;
   final TextStyle? hintStyle;
-  final BorderType borderType;
+  final CkBorderType borderType;
   final double borderWidth;
   final CkDropDownType dropDownType;
   final double? menuWidth;
@@ -169,6 +169,3 @@ class CkCityDropDown extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkCityDropDown] instead.
-@Deprecated('Use CkCityDropDown instead')
-typedef CommonCityDropDown = CkCityDropDown;

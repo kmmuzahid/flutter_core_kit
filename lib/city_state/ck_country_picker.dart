@@ -35,7 +35,7 @@ class CkCountryPicker extends StatelessWidget {
     this.menuBorderColor,
     this.selectedItemBuilder,
     this.hintStyle,
-    this.borderType = BorderType.outline,
+    this.borderType = CkBorderType.outline,
     this.borderWidth = 1.2,
     this.dropDownType = CkDropDownType.menu,
     this.footer,
@@ -63,7 +63,7 @@ class CkCountryPicker extends StatelessWidget {
 
   final Widget Function(String value)? selectedItemBuilder;
   final TextStyle? hintStyle;
-  final BorderType borderType;
+  final CkBorderType borderType;
   final double borderWidth;
   final CkDropDownType dropDownType;
   final double? menuWidth;
@@ -137,6 +137,3 @@ class CkCountryPicker extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkCountryPicker] instead.
-@Deprecated('Use CkCountryPicker instead')
-typedef CommonCountryPicker = CkCountryPicker;

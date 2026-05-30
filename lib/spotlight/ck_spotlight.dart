@@ -208,11 +208,5 @@ class _CkSpotlightAdvancedPainter extends CustomPainter {
   }
 }
 
-/// @deprecated Use [CkSpotlight] instead.
-@Deprecated('Use CkSpotlight instead')
-typedef CoreSpotlight = CkSpotlight;
 
-/// @deprecated Use [CkSpotlightAdvanced] instead.
-@Deprecated('Use CkSpotlightAdvanced instead')
-typedef CoreSpotlightAdvanced = CkSpotlightAdvanced;
 

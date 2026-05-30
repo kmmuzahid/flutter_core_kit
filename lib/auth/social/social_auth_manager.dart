@@ -5,69 +5,71 @@ import 'package:core_kit/auth/social/facebook_auth_config.dart';
 import 'package:core_kit/auth/auth_result.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/auth/state/profile_manager.dart';
+import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
-import 'package:core_kit/network/ck_network.dart';
+import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 
 /// Manages social login flows on the backend.
 /// Designed to be 100% compile-safe with zero plugin-side SDK dependencies.
 /// Developer obtains social auth credentials on project-side and passes them here.
-class SocialAuthManager<TProfile> {
-  final SocialLoginConfig? _config;
-  final AuthTokenManager _tokenManager;
-  final ProfileManager<TProfile> _profileManager;
-  final AuthStateController _stateController;
-  final LogoutHandler _logoutHandler;
-  final AuthExtractors _defaultExtractors;
+class CkSocialAuthManager<TProfile> {
+  final CkSocialLoginConfig? _config;
+  final CkAuthTokenManager _tokenManager;
+  final CkProfileExtractor<TProfile> _profileExtractor;
+  final CkAuthStateController _stateController;
+  final CkLogoutHandler _logoutHandler;
+  final CkAuthExtractors<TProfile> _defaultExtractors;
 
-  SocialAuthManager({
-    SocialLoginConfig? config,
-    required AuthTokenManager tokenManager,
-    required ProfileManager<TProfile> profileManager,
-    required AuthStateController stateController,
-    required LogoutHandler logoutHandler,
-    required AuthExtractors defaultExtractors,
+  CkSocialAuthManager({
+    CkSocialLoginConfig? config,
+    required CkAuthTokenManager tokenManager,
+    required CkProfileExtractor<TProfile> profileExtractor,
+    required CkAuthStateController stateController,
+    required CkLogoutHandler logoutHandler,
+    required CkAuthExtractors<TProfile> defaultExtractors,
   }) : _config = config,
        _tokenManager = tokenManager,
-       _profileManager = profileManager,
+       _profileExtractor = profileExtractor,
        _stateController = stateController,
        _logoutHandler = logoutHandler,
        _defaultExtractors = defaultExtractors;
 
   /// Check if a specific provider is configured
-  bool isProviderAvailable(SocialProvider provider) {
+  bool isProviderAvailable(CkSocialProvider provider) {
     if (_config == null) return false;
     switch (provider) {
-      case SocialProvider.google:
+      case CkSocialProvider.google:
         return _config.google != null;
-      case SocialProvider.apple:
+      case CkSocialProvider.apple:
         return _config.apple != null;
-      case SocialProvider.facebook:
+      case CkSocialProvider.facebook:
         return _config.facebook != null;
-      case SocialProvider.custom:
+      case CkSocialProvider.custom:
         return _config.customProviders?.isNotEmpty == true;
     }
   }
 
   /// Get list of configured social providers
-  List<SocialProvider> get availableProviders =>
+  List<CkSocialProvider> get availableProviders =>
       _config?.availableProviders ?? [];
 
   /// Authenticate Google credentials on backend
-  Future<AuthResult<TProfile>> authenticateGoogle(GoogleAuthData data) async {
+  Future<CkAuthResult<TProfile>> authenticateGoogle(CkGoogleAuthData data) async {
     if (_config?.google == null) {
-      return AuthResult<TProfile>.failure(
+      return CkAuthResult<TProfile>.failure(
         message: 'Google auth is not configured',
       );
     }
 
     final gConfig = _config!.google!;
     final body = gConfig.bodyBuilder(data);
-    final extractors = gConfig.responseExtractors ?? _defaultExtractors;
+    final extractors =
+        (gConfig.responseExtractors ?? _defaultExtractors)
+            as CkAuthExtractors<TProfile>;
 
     return _executeSocialRequest(
       url: gConfig.backendUrl,
@@ -78,16 +80,18 @@ class SocialAuthManager<TProfile> {
   }
 
   /// Authenticate Apple credentials on backend
-  Future<AuthResult<TProfile>> authenticateApple(AppleAuthData data) async {
+  Future<CkAuthResult<TProfile>> authenticateApple(CkAppleAuthData data) async {
     if (_config?.apple == null) {
-      return AuthResult<TProfile>.failure(
+      return CkAuthResult<TProfile>.failure(
         message: 'Apple auth is not configured',
       );
     }
 
     final aConfig = _config!.apple!;
     final body = aConfig.bodyBuilder(data);
-    final extractors = aConfig.responseExtractors ?? _defaultExtractors;
+    final extractors =
+        (aConfig.responseExtractors ?? _defaultExtractors)
+            as CkAuthExtractors<TProfile>;
 
     return _executeSocialRequest(
       url: aConfig.backendUrl,
@@ -98,18 +102,20 @@ class SocialAuthManager<TProfile> {
   }
 
   /// Authenticate Facebook credentials on backend
-  Future<AuthResult<TProfile>> authenticateFacebook(
-    FacebookAuthData data,
+  Future<CkAuthResult<TProfile>> authenticateFacebook(
+    CkFacebookAuthData data,
   ) async {
     if (_config?.facebook == null) {
-      return AuthResult<TProfile>.failure(
+      return CkAuthResult<TProfile>.failure(
         message: 'Facebook auth is not configured',
       );
     }
 
     final fConfig = _config!.facebook!;
     final body = fConfig.bodyBuilder(data);
-    final extractors = fConfig.responseExtractors ?? _defaultExtractors;
+    final extractors =
+        (fConfig.responseExtractors ?? _defaultExtractors)
+            as CkAuthExtractors<TProfile>;
 
     return _executeSocialRequest(
       url: fConfig.backendUrl,
@@ -120,12 +126,12 @@ class SocialAuthManager<TProfile> {
   }
 
   /// Authenticate custom OAuth credentials on backend
-  Future<AuthResult<TProfile>> authenticateCustom({
+  Future<CkAuthResult<TProfile>> authenticateCustom({
     required String providerName,
     required Map<String, dynamic> authData,
   }) async {
     if (_config?.customProviders == null) {
-      return AuthResult<TProfile>.failure(
+      return CkAuthResult<TProfile>.failure(
         message: 'No custom social providers configured',
       );
     }
@@ -137,7 +143,9 @@ class SocialAuthManager<TProfile> {
     );
 
     final body = cConfig.bodyBuilder(authData);
-    final extractors = cConfig.responseExtractors ?? _defaultExtractors;
+    final extractors =
+        (cConfig.responseExtractors ?? _defaultExtractors)
+            as CkAuthExtractors<TProfile>;
 
     return _executeSocialRequest(
       url: cConfig.backendUrl,
@@ -148,14 +156,14 @@ class SocialAuthManager<TProfile> {
   }
 
   /// Helper to execute the HTTP social request, save tokens, load profile, and redirect
-  Future<AuthResult<TProfile>> _executeSocialRequest({
+  Future<CkAuthResult<TProfile>> _executeSocialRequest({
     required String url,
     required RequestMethod method,
     required Map<String, dynamic> body,
-    required AuthExtractors extractors,
+    required CkAuthExtractors<TProfile> extractors,
   }) async {
     try {
-      final response = await CkNetwork.instance.request(
+      final response = await CkTransport.request(
         input: RequestInput(
           endpoint: url,
           method: method,
@@ -171,7 +179,7 @@ class SocialAuthManager<TProfile> {
         final refresh = extractors.refreshToken?.call(response.data);
 
         if (access == null) {
-          return AuthResult<TProfile>.failure(
+          return CkAuthResult<TProfile>.failure(
             message: 'Access token not found in social login response',
           );
         }
@@ -181,33 +189,29 @@ class SocialAuthManager<TProfile> {
           refreshToken: refresh,
         );
 
-        final profileExtracted = extractors.profileData?.call(response.data);
-        TProfile? profile;
-        if (profileExtracted != null) {
-          profile = _profileManager.fromJson(profileExtracted);
-          await _profileManager.updateProfile(profile);
-        }
+        await _profileExtractor.applyFromResponse(response);
+        final profile = _profileExtractor.current;
 
         _stateController.setAuthenticated();
-        await AuthStorageKeys.markNotFirstTimeUser();
+        await CkAuthStorageKeys.markNotFirstTimeUser();
 
         // Auto navigate to authenticated screen
         await _logoutHandler.autoNavigate();
 
-        return AuthResult.success(
+        return CkAuthResult.success(
           data: profile,
           statusCode: response.statusCode,
           rawResponse: response.data,
         );
       }
 
-      return AuthResult<TProfile>.failure(
+      return CkAuthResult<TProfile>.failure(
         message: response.message,
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
     } catch (e) {
-      return AuthResult<TProfile>.failure(message: e.toString());
+      return CkAuthResult<TProfile>.failure(message: e.toString());
     }
   }
 }

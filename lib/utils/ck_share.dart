@@ -64,6 +64,3 @@ class CkShare {
   }
 }
 
-/// @deprecated Use [CkShare] instead.
-@Deprecated('Use CkShare instead')
-typedef CommonShare = CkShare;

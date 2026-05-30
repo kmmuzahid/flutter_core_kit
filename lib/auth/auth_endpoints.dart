@@ -1,6 +1,6 @@
 import 'package:core_kit/network/request_input.dart';
 
-class AuthEndpoints {
+class CkAuthEndpoints {
   final String signupUrl;
   final String signinUrl;
   final String? forgetPasswordUrl;
@@ -23,7 +23,7 @@ class AuthEndpoints {
   final RequestMethod logoutMethod;          // default: POST
   final RequestMethod changePasswordMethod;  // default: PATCH
 
-  const AuthEndpoints({
+  const CkAuthEndpoints({
     required this.signupUrl,
     required this.signinUrl,
     this.forgetPasswordUrl,

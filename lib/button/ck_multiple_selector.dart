@@ -138,6 +138,3 @@ class _CkMultipleSelectorState extends State<CkMultipleSelector> {
   }
 }
 
-/// @deprecated Use [CkMultipleSelector] instead.
-@Deprecated('Use CkMultipleSelector instead')
-typedef MultipleSelector = CkMultipleSelector;

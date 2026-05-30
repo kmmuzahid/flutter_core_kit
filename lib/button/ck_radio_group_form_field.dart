@@ -44,6 +44,3 @@ class CkRadioGroupFormField<T> extends FormField<T> {
        );
 }
 
-/// @deprecated Use [CkRadioGroupFormField] instead.
-@Deprecated('Use CkRadioGroupFormField instead')
-typedef RadioGroupFormField<T> = CkRadioGroupFormField<T>;

@@ -1,6 +1,6 @@
 import 'package:core_kit/storage/ck_storage.dart';
 
-abstract class AuthStorageKeys {
+abstract class CkAuthStorageKeys {
   static const accessTokenKey = 'core_kit_access_token';
   static const refreshTokenKey = 'core_kit_refresh_token';
   static const profileDataKey = 'core_kit_profile_data';

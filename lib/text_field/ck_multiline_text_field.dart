@@ -619,10 +619,4 @@ class CkMultilineHintLimitBuilder {
   });
 }
 
-/// @deprecated Use [CkMultilineTextField] instead.
-@Deprecated('Use CkMultilineTextField instead')
-typedef CommonMultilineTextField = CkMultilineTextField;
 
-/// @deprecated Use [CkMultilineHintLimitBuilder] instead.
-@Deprecated('Use CkMultilineHintLimitBuilder instead')
-typedef MultilineHintLimitBuilder = CkMultilineHintLimitBuilder;

@@ -63,18 +63,6 @@ class CkRichText extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkRichTextContent] instead.
-@Deprecated('Use CkRichTextContent instead')
-typedef CommonRichTextContent = CkRichTextContent;
 
-/// @deprecated Use [CkRichTextSpan] instead.
-@Deprecated('Use CkRichTextSpan instead')
-typedef CommonRichTextSpan = CkRichTextSpan;
 
-/// @deprecated Use [CkSimpleRichTextContent] instead.
-@Deprecated('Use CkSimpleRichTextContent instead')
-typedef CommonSimpleRichTextContent = CkSimpleRichTextContent;
 
-/// @deprecated Use [CkRichText] instead.
-@Deprecated('Use CkRichText instead')
-typedef CommonRichText = CkRichText;

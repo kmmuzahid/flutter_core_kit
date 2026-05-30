@@ -1,10 +1,10 @@
 /// OTP configuration — null means no OTP flow
-class OtpConfig {
+class CkOtpConfig {
   /// Which flows auto-trigger OTP after the initial API call
-  final Set<OtpTrigger> autoTriggers; // e.g., {signup, forgetPassword}
+  final Set<CkOtpTrigger> autoTriggers; // e.g., {signup, forgetPassword}
   
   /// How the backend verifies OTP identity
-  final OtpVerificationStrategy verificationStrategy;
+  final CkOtpVerificationStrategy verificationStrategy;
   
   /// Resend cooldown duration (default: 120 seconds)
   final Duration resendCooldown;
@@ -29,9 +29,9 @@ class OtpConfig {
   final Map<String, dynamic> Function(String? identifier, String? verificationToken)?
       resendBodyBuilder;
   
-  const OtpConfig({
+  const CkOtpConfig({
     this.autoTriggers = const {},
-    this.verificationStrategy = OtpVerificationStrategy.tokenBased,
+    this.verificationStrategy = CkOtpVerificationStrategy.tokenBased,
     this.resendCooldown = const Duration(seconds: 120),
     this.maxResendAttempts = 0,
     this.otpLength = 6,
@@ -42,9 +42,9 @@ class OtpConfig {
   });
 }
 
-enum OtpTrigger { signup, login, forgetPassword }
+enum CkOtpTrigger { signup, login, forgetPassword }
 
-enum OtpVerificationStrategy {
+enum CkOtpVerificationStrategy {
   /// Token returned from signup/login/forgotPassword, sent back during verify
   /// (BetterHelp pattern: createUserToken, forgetToken)
   tokenBased,

@@ -148,7 +148,4 @@ class _CkImagePickerState extends State<CkImagePicker> {
   }
 }
 
-/// @deprecated Use [CkImagePicker] instead.
-@Deprecated('Use CkImagePicker instead')
-typedef CommonImagePicker = CkImagePicker;
 

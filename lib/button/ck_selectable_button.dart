@@ -80,6 +80,3 @@ class _SelectableButtonsState extends FormFieldState<String> {
   }
 }
 
-/// @deprecated Use [CkSelectableButton] instead.
-@Deprecated('Use CkSelectableButton instead')
-typedef CommonSelectableButton = CkSelectableButton;

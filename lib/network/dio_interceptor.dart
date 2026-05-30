@@ -6,8 +6,8 @@
 
 import 'dart:async';
 
-import 'package:core_kit/network/ck_network.dart';
-import 'package:core_kit/network/dio_service_config.dart';
+import 'package:core_kit/network/ck_transport.dart';
+import 'package:core_kit/network/ck_transport_config.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/ck_logger.dart';
 import 'package:dio/dio.dart';
@@ -16,7 +16,7 @@ import 'package:core_kit/auth/auth_service.dart';
 
 class DioInterceptor extends Interceptor {
   final Dio _dio;
-  final DioServiceConfig _config;
+  final CkTransportConfig _config;
   final CkTokenProvider _tokenProvider;
   Completer<void>? _refreshCompleter;
   bool _isServerOff = false;
@@ -27,8 +27,8 @@ class DioInterceptor extends Interceptor {
 
   DioInterceptor({
     required Dio dio,
-    required DioServiceConfig config,
-    required TokenProvider tokenProvider,
+    required CkTransportConfig config,
+    required CkTokenProvider tokenProvider,
   }) : _dio = dio,
        _config = config,
        _tokenProvider = tokenProvider;
@@ -36,8 +36,8 @@ class DioInterceptor extends Interceptor {
   bool get isServerOff => _isServerOff;
 
   Future<void> _triggerLogout() async {
-    if (AuthService.isInitialized) {
-      await AuthService.instance.logout();
+    if (CkAuthService.isInitialized) {
+      await CkAuthService.instance.logout();
     } else {
       _config.onLogout?.call();
     }
@@ -89,7 +89,7 @@ class DioInterceptor extends Interceptor {
     final refreshToken = await _tokenProvider.refreshToken();
 
     if (refreshToken?.isEmpty == true || refreshToken == null) {
-      DioUtils.log(_config, 'No refresh token available.', tag: 'DioService');
+      DioUtils.log(_config, 'No refresh token available.', tag: 'CkTransport');
       await _triggerLogout();
       throw Exception('No refresh token available');
     }

@@ -127,6 +127,3 @@ extension EdgeInsetsGeometryResponsive on EdgeInsetsGeometry {
   }
 }
 
-/// @deprecated Use [CkScreenUtils] instead.
-@Deprecated('Use CkScreenUtils instead')
-typedef CoreScreenUtils = CkScreenUtils;

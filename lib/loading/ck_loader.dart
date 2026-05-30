@@ -19,6 +19,3 @@ class CkLoader extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkLoader] instead.
-@Deprecated('Use CkLoader instead')
-typedef CommonLoader = CkLoader;

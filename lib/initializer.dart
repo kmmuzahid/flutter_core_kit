@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:core_kit/app_bar/ck_app_bar.dart';
-import 'package:core_kit/network/ck_network.dart';
-import 'package:core_kit/network/dio_service_config.dart';
+import 'package:core_kit/network/ck_transport.dart';
+import 'package:core_kit/network/ck_transport_config.dart';
 import 'package:core_kit/utils/ck_screen_utils.dart';
 import 'package:core_kit/utils/ck_permission_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -63,9 +63,6 @@ class CkListLoaderConfig {
   }
 }
 
-/// @deprecated Use [CkListLoaderConfig] instead.
-@Deprecated('Use CkListLoaderConfig instead')
-typedef ListLoaderConfig = CkListLoaderConfig;
 
 class coreKitInstanceSingleton {
   coreKitInstanceSingleton._();
@@ -78,8 +75,7 @@ class coreKitInstanceSingleton {
   late Size designSize;
   late CkAppBarConfig appbarConfig;
   CkListLoaderConfig listLoaderConfig = const CkListLoaderConfig();
-  late DioServiceConfig dioServiceConfig;
-  late CkTokenProvider tokenProvider;
+  late CkTransportConfig ckTransportConfig;
 
   CkPermissionHelperConfig permissionHelperConfig =
       const CkPermissionHelperConfig();
@@ -133,7 +129,7 @@ abstract class CoreKitConfig {
       '  - permissionHandlerColors\n'
       '  - passwordObscureIcon\n'
       '  - permissionHelperConfig\n'
-      'Do NOT use `context` in imageBaseUrl, dioConfig, tokenProvider, or designSize.\n',
+      'Do NOT use `context` in imageBaseUrl, ckTransportConfig, or designSize.\n',
     );
     return _context!;
   }
@@ -143,11 +139,10 @@ abstract class CoreKitConfig {
   void attachContext(BuildContext ctx) => _context = ctx;
 
   String get imageBaseUrl;
-  DioServiceConfig get dioConfig;
-  CkTokenProvider? get tokenProvider;
+  CkTransportConfig get ckTransportConfig;
   Size get designSize;
 
-  CoreKitAuthConfig? get authConfig => null;
+  CkAuthConfig? get authConfig => null;
   CkAppBarConfig? get appbarConfig => null;
   CkListLoaderConfig? get listLoaderConfig => null;
   CkPermissionHelperConfig? get permissionHelperConfig => null;
@@ -158,11 +153,9 @@ abstract class CoreKitConfig {
   Widget? get preInitChild => null;
 }
 
-mixin CoreKitConfigDefaults implements CoreKitConfig {
+mixin CoreKitConfigDefaults on CoreKitConfig implements CoreKitConfig {
   @override
-  CoreKitAuthConfig? get authConfig => null;
-  @override
-  CkTokenProvider? get tokenProvider => null;
+  CkAuthConfig? get authConfig => null;
   @override
   CkAppBarConfig? get appbarConfig => null;
   @override
@@ -198,7 +191,7 @@ class CoreKitRouterGate extends StatefulWidget {
 }
 
 class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
-  bool _dioInitialized = false;
+  bool _networkInitialized = false;
 
   @override
   void didChangeDependencies() {
@@ -234,21 +227,24 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       if (config.listLoaderConfig != null) {
         instance.listLoaderConfig = config.listLoaderConfig!;
       }
-      if (!_dioInitialized) {
-        _dioInitialized = true;
+      if (!_networkInitialized) {
+        _networkInitialized = true;
         if (config.authConfig != null) {
-          await AuthService.init(
+          final authNetwork = await CkAuthService.prepareNetwork(
             config: config.authConfig!,
-            dioConfig: config.dioConfig,
+          );
+          await CkTransport.init(
+            config: config.ckTransportConfig,
+            tokenProvider: authNetwork.tokenProvider,
+          );
+          await CkAuthService.init(
+            config: config.authConfig!,
+            tokenManager: authNetwork.tokenManager,
           );
         } else {
-          await CkNetwork.init(
-            config: config.dioConfig,
-            tokenProvider: config.tokenProvider ?? CkTokenProvider(
-              accessToken: () async => '',
-              refreshToken: () async => '',
-              updateTokens: (_) async {},
-            ),
+          await CkTransport.init(
+            config: config.ckTransportConfig,
+            tokenProvider: CkTokenProvider.unauthenticated(),
           );
         }
       }
@@ -262,7 +258,7 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_dioInitialized) {
+    if (!_networkInitialized) {
       return Scaffold(body: widget.config.preInitChild ?? Container());
     }
     return widget.child;
@@ -423,12 +419,7 @@ class _CoreKitState extends State<CoreKit> {
     instance.navigatorKey = widget.navigatorKey;
     instance.imageBaseUrl = config.imageBaseUrl;
     instance.designSize = config.designSize;
-    instance.dioServiceConfig = config.dioConfig;
-    instance.tokenProvider = config.tokenProvider ?? CkTokenProvider(
-      accessToken: () async => '',
-      refreshToken: () async => '',
-      updateTokens: (_) async {},
-    );
+    instance.ckTransportConfig = config.ckTransportConfig;
   }
 
   @override

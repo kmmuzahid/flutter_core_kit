@@ -535,10 +535,4 @@ class _CkTextFieldState extends State<CkTextField> {
   }
 }
 
-/// @deprecated Use [CkTextField] instead.
-@Deprecated('Use CkTextField instead')
-typedef CommonTextField = CkTextField;
 
-/// @deprecated Use [CkBorderType] instead.
-@Deprecated('Use CkBorderType instead')
-typedef BorderType = CkBorderType;

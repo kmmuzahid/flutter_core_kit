@@ -1,6 +1,7 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:flutter/material.dart';
 import 'package:core_kit/text/ck_text.dart';
+import 'package:core_kit/text_field/ck_text_field.dart';
+import 'package:flutter/material.dart';
 
 class CkDropDownNameBuilderProperty<T> {
   T item;
@@ -46,7 +47,7 @@ class CkDropDown<T> extends StatefulWidget {
     this.contentPadding,
     this.selectedItemBuilder,
     this.hintStyle,
-    this.borderType = BorderType.outline,
+    this.borderType = CkBorderType.outline,
     this.borderWidth = 1.2,
     this.suffixIcon,
     this.dropDownType = CkDropDownType.menu,
@@ -81,7 +82,7 @@ class CkDropDown<T> extends StatefulWidget {
   final EdgeInsets? contentPadding;
   final Widget Function(T value)? selectedItemBuilder;
   final TextStyle? hintStyle;
-  final BorderType borderType;
+  final CkBorderType borderType;
   final double borderWidth;
   final Widget? suffixIcon;
   final CkDropDownType dropDownType;
@@ -438,7 +439,7 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
   }
 
   InputBorder _buildBorder({required Color color, double? width}) {
-    if (widget.borderType == BorderType.underline) {
+    if (widget.borderType == CkBorderType.underline) {
       return UnderlineInputBorder(
         borderRadius: _borderRadious(),
         borderSide: BorderSide(
@@ -554,15 +555,6 @@ class _BorderLoaderPainter extends CustomPainter {
   }
 }
 
-/// @deprecated Use [CkDropDownNameBuilderProperty] instead.
-@Deprecated('Use CkDropDownNameBuilderProperty instead')
-typedef DropDownNameBuilderProperty<T> = CkDropDownNameBuilderProperty<T>;
 
-/// @deprecated Use [CkDropDownType] instead.
-@Deprecated('Use CkDropDownType instead')
-typedef DropDownType = CkDropDownType;
 
-/// @deprecated Use [CkDropDown] instead.
-@Deprecated('Use CkDropDown instead')
-typedef CommonDropDown<T> = CkDropDown<T>;
 

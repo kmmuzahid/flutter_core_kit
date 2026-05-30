@@ -75,6 +75,3 @@ class CkScreenshotPreview {
   }
 }
 
-/// @deprecated Use [CkScreenshotPreview] instead.
-@Deprecated('Use CkScreenshotPreview instead')
-typedef ScreenshotPreview = CkScreenshotPreview;

@@ -51,6 +51,3 @@ class _CkFormBuilderState<T> extends State<CkFormBuilder<T>> {
   }
 }
 
-/// @deprecated Use [CkFormBuilder] instead.
-@Deprecated('Use CkFormBuilder instead')
-typedef FormBuilder<T> = CkFormBuilder<T>;

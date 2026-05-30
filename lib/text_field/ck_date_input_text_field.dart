@@ -148,6 +148,3 @@ class _CkDateInputTextFieldState extends State<CkDateInputTextField> {
   }
 }
 
-/// @deprecated Use [CkDateInputTextField] instead.
-@Deprecated('Use CkDateInputTextField instead')
-typedef CommonDateInputTextField = CkDateInputTextField;

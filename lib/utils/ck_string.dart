@@ -81,6 +81,3 @@ class CkString {
   static const String invalidIP = 'Please enter a valid IP address';
 }
 
-/// @deprecated Use [CkString] instead.
-@Deprecated('Use CkString instead')
-typedef CoreKitString = CkString;

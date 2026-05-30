@@ -122,6 +122,3 @@ class _DashedBorderPainter extends CustomPainter {
   }
 }
 
-/// @deprecated Use [CkDottedBorder] instead.
-@Deprecated('Use CkDottedBorder instead')
-typedef DashedBorderContainer = CkDottedBorder;

@@ -477,6 +477,3 @@ class _CkPhoneNumberTextFieldState
   }
 }
 
-/// @deprecated Use [CkPhoneNumberTextField] instead.
-@Deprecated('Use CkPhoneNumberTextField instead')
-typedef CommonPhoneNumberTextField = CkPhoneNumberTextField;

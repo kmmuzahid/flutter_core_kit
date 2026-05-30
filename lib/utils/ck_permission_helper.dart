@@ -204,10 +204,4 @@ class CkPermissionHelperConfig {
   });
 }
 
-/// @deprecated Use [CkPermissionHelper] instead.
-@Deprecated('Use CkPermissionHelper instead')
-typedef PermissionHelper = CkPermissionHelper;
 
-/// @deprecated Use [CkPermissionHelperConfig] instead.
-@Deprecated('Use CkPermissionHelperConfig instead')
-typedef PermissionHelperConfig = CkPermissionHelperConfig;

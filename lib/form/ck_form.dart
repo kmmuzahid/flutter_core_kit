@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// @deprecated Use [CkFormBuilder] instead (same as original CustomForm).
-@Deprecated('Use CkFormBuilder instead')
 class CkForm extends StatefulWidget {
   const CkForm({required this.builder, super.key});
 
@@ -29,6 +27,3 @@ class _CkFormState extends State<CkForm> {
   }
 }
 
-/// @deprecated Use [CkForm] instead.
-@Deprecated('Use CkForm instead')
-typedef CustomForm = CkForm;

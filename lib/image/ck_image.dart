@@ -218,7 +218,4 @@ class CkImage extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkImage] instead.
-@Deprecated('Use CkImage instead')
-typedef CommonImage = CkImage;
 

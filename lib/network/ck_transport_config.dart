@@ -1,9 +1,7 @@
-// import 'package:core_kit/network/request_input.dart';
-
-import 'package:core_kit/network/dio_result_extractor.dart';
+import 'package:core_kit/network/ck_response_extractor.dart';
 import 'package:core_kit/network/request_input.dart';
 
-class DioServiceConfig {
+class CkTransportConfig {
   final String baseUrl;
   final String refreshTokenEndpoint;
   final Duration connectTimeout;
@@ -15,9 +13,9 @@ class DioServiceConfig {
   final bool isBearerToken;
   final RequestMethod refreshTokenRequestMethod;
   final bool enableDebugLogs;
-  final DioResultExtractor responseExtractor;
+  final CkResponseExtractor responseExtractor;
 
-  DioServiceConfig({
+  CkTransportConfig({
     required this.baseUrl,
     this.tokenHeaderKey = 'Authorization',
     this.refreshTokenHeaderKey = 'refreshToken',
@@ -29,11 +27,14 @@ class DioServiceConfig {
     this.sendTimeout = const Duration(seconds: 15),
     this.onLogout,
     this.enableDebugLogs = false,
-    DioResultExtractor? responseExtractor,
+    CkResponseExtractor? responseExtractor,
   }) : responseExtractor =
            responseExtractor ??
-           DioResultExtractor(
+           CkResponseExtractor(
              data: (response) => response['data'],
              message: (response) => response['message'],
+             meta: CkResponseExtractor.defaultMeta,
            );
 }
+
+

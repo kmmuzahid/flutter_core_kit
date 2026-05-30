@@ -106,6 +106,3 @@ class _CkDraggableBottomSheetState
   }
 }
 
-/// @deprecated Use [CkDraggableBottomSheet] instead.
-@Deprecated('Use CkDraggableBottomSheet instead')
-typedef CommonDraggableBottomSheet = CkDraggableBottomSheet;

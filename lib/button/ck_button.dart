@@ -337,6 +337,3 @@ class _BorderLoaderPainter extends CustomPainter {
       oldDelegate.progress != progress;
 }
 
-/// @deprecated Use [CkButton] instead.
-@Deprecated('Use CkButton instead')
-typedef CommonButton = CkButton;

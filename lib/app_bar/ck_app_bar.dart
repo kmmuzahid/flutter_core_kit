@@ -81,9 +81,6 @@ class CkAppBarConfig {
   }
 }
 
-/// @deprecated Use [CkAppBarConfig] instead.
-@Deprecated('Use CkAppBarConfig instead')
-typedef AppbarConfig = CkAppBarConfig;
 
 class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CkAppBar({
@@ -326,6 +323,3 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// @deprecated Use [CkAppBar] instead.
-@Deprecated('Use CkAppBar instead')
-typedef CommonAppBar = CkAppBar;

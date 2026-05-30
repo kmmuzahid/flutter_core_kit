@@ -173,10 +173,4 @@ class CkRadioFormField extends FormField<String> {
        );
 }
 
-/// @deprecated Use [CkRadioGroup] instead.
-@Deprecated('Use CkRadioGroup instead')
-typedef CommonRadioGroup = CkRadioGroup;
 
-/// @deprecated Use [CkRadioFormField] instead.
-@Deprecated('Use CkRadioFormField instead')
-typedef CommonRadioFormField = CkRadioFormField;

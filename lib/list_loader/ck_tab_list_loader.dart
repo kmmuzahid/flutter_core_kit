@@ -379,14 +379,5 @@ class _CkTabListLoaderState<T> extends State<CkTabListLoader<T>>
   }
 }
 
-/// @deprecated Use [CkTabContext] instead.
-@Deprecated('Use CkTabContext instead')
-typedef SmartTabContext<T> = CkTabContext<T>;
 
-/// @deprecated Use [CkTabConfig] instead.
-@Deprecated('Use CkTabConfig instead')
-typedef SmartTabConfig<T> = CkTabConfig<T>;
 
-/// @deprecated Use [CkTabListLoader] instead.
-@Deprecated('Use CkTabListLoader instead')
-typedef SmartTabListLoader<T> = CkTabListLoader<T>;

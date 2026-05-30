@@ -425,6 +425,3 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-/// @deprecated Use [CkListView] instead.
-@Deprecated('Use CkListView instead')
-typedef SmartListLoader = CkListView;

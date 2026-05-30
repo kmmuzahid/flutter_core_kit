@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
-@Deprecated('Use CkPermissionHelper instead')
 class CkPermissionHandler {
   const CkPermissionHandler({required this.permission});
   final Permission permission;
@@ -149,6 +148,3 @@ class CkPermissionHandler {
   }
 }
 
-/// @deprecated Use [CkPermissionHandler] instead.
-@Deprecated('Use CkPermissionHandler instead')
-typedef PermissionHandlerHelper = CkPermissionHandler;

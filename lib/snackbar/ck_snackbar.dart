@@ -3,13 +3,10 @@ import 'package:flutter/material.dart';
 
 enum CkSnackBarType { success, error, warning, info }
 
-/// @deprecated Use [CkSnackBarType] instead.
-@Deprecated('Use CkSnackBarType instead')
-typedef SnackBarType = CkSnackBarType;
-
 OverlayEntry? _currentSnackBarEntry;
 
-void ckShowSnackBar(
+// ignore: non_constant_identifier_names
+void CkSnackBar(
   String text, {
   required CkSnackBarType type,
   Duration? customDuration,
@@ -43,11 +40,6 @@ void ckShowSnackBar(
   _currentSnackBarEntry = entry;
   overlayState.insert(entry);
 }
-
-/// @deprecated Use [ckShowSnackBar] instead.
-@Deprecated('Use ckShowSnackBar instead')
-void showSnackBar(String text, {required CkSnackBarType type, Duration? customDuration}) =>
-    ckShowSnackBar(text, type: type, customDuration: customDuration);
 
 class _ThemeWrapper extends StatelessWidget {
   final Widget child;
@@ -196,8 +188,9 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
                                   style:
                                       snackBarTheme.contentTextStyle ??
                                       TextStyle(
-                                        color: colorScheme.onSurface
-                                            .withValues(alpha: 0.85),
+                                        color: colorScheme.onSurface.withValues(
+                                          alpha: 0.85,
+                                        ),
                                         fontWeight: FontWeight.w500,
                                         fontSize: 14,
                                       ),

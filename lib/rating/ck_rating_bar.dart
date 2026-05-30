@@ -71,7 +71,4 @@ class CkRatingBar extends StatelessWidget {
   }
 }
 
-/// @deprecated Use [CkRatingBar] instead.
-@Deprecated('Use CkRatingBar instead')
-typedef CommonRatingBar = CkRatingBar;
 

@@ -5,48 +5,48 @@ import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/logout/logout_config.dart';
 import 'package:core_kit/auth/social/social_login_config.dart';
 
-/// Main auth configuration.
-/// When provided in CoreKitConfig, auth module activates automatically.
-/// When null, CoreKit behaves exactly as before — zero impact.
-class CoreKitAuthConfig<TProfile> {
+/// Main auth configuration for [CkAuthService].
+///
+/// Set on [CoreKitConfig.authConfig]. When non-null, CoreKit initializes
+/// [CkAuthService], wires [CkTransport] token refresh, and restores session on launch.
+class CkAuthConfig<TProfile> {
   // ─── Endpoints ───
-  final AuthEndpoints endpoints;
+  final CkAuthEndpoints endpoints;
   
   // ─── Model Mapping ───
-  final TProfile Function(Map<String, dynamic> json) profileFromJson;
-  final Map<String, dynamic> Function(TProfile profile) profileToJson;
-  
+  /// Maps persisted profile JSON to [TProfile] (cold start / storage restore).
+  final TProfile Function(Map<String, dynamic> json) profileExtractor;
+
   // ─── Response Extractors (flexible backend mapping) ───
-  final AuthExtractors extractors;
+  final CkAuthExtractors<TProfile> extractors;
   
   // ─── Routing ───
-  final AuthRoutes routes;
+  final CkAuthRoutes? routes;
   
   // ─── OTP Configuration (optional — null means no OTP flow) ───
-  final OtpConfig? otpConfig;
+  final CkOtpConfig? otpConfig;
   
   // ─── Logout Strategy ───
-  final LogoutConfig logoutConfig;
+  final CkLogoutConfig logoutConfig;
   
   // ─── Social Login (optional — null providers are ignored) ───
-  final SocialLoginConfig? socialLoginConfig;
+  final CkSocialLoginConfig? socialLoginConfig;
   
   // ─── Lifecycle Hooks (optional) ───
   final Future<void> Function(TProfile profile)? onProfileLoaded;
   final Future<void> Function()? onTokenRestored;
   final Future<bool> Function()? customAuthValidator;
 
-  const CoreKitAuthConfig({
+  CkAuthConfig({
     required this.endpoints,
-    required this.profileFromJson,
-    required this.profileToJson,
-    required this.extractors,
-    required this.routes,
+    required this.profileExtractor,
+    CkAuthExtractors<TProfile>? extractors,
+    this.routes,
     this.otpConfig,
-    this.logoutConfig = const LogoutConfig(),
+    this.logoutConfig = const CkLogoutConfig(),
     this.socialLoginConfig,
     this.onProfileLoaded,
     this.onTokenRestored,
     this.customAuthValidator,
-  });
+  }) : extractors = extractors ?? CkAuthExtractors<TProfile>.standard();
 }

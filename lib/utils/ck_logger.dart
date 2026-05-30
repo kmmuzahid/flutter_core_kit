@@ -102,6 +102,3 @@ class CkLogger {
   }
 }
 
-/// @deprecated Use [CkLogger] instead.
-@Deprecated('Use CkLogger instead')
-typedef AppLogger = CkLogger;

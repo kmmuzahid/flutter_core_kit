@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/ck_response.dart';
+import 'package:core_kit/network/ck_response_extractor.dart';
+import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/utils/extension.dart';
@@ -11,12 +12,16 @@ import 'package:image_picker/image_picker.dart';
 class DioRequestBuilder {
   DioRequestBuilder._();
   static final instance = DioRequestBuilder._();
-  CkTokenProvider? _tokenProvider;
   Dio? _dio;
+  late CkResponseExtractor _responseExtractor;
 
-  void init({required CkTokenProvider tokenProvider, required Dio dio}) {
-    _tokenProvider = tokenProvider;
+  void init({
+    required CkTokenProvider tokenProvider,
+    required Dio dio,
+    required CkResponseExtractor responseExtractor,
+  }) {
     _dio = dio;
+    _responseExtractor = responseExtractor;
   }
 
   Future<CkResponse<T?>> build<T>({
@@ -28,15 +33,13 @@ class DioRequestBuilder {
     required int retryCount,
     required int maxRetry,
   }) async {
-    final tokenProvider = _tokenProvider;
     final dioInstance = _dio;
-    if (tokenProvider == null || dioInstance == null) {
+    if (dioInstance == null) {
       throw StateError('DioRequestBuilder not initialized. Call init() first.');
     }
 
     final requestOptions = await _buildOptions(
       input: input,
-      accessToken: await tokenProvider.accessToken(),
       retryCount: retryCount,
       maxRetry: maxRetry,
     );
@@ -55,14 +58,16 @@ class DioRequestBuilder {
     //   DioUtils.log(_config, response.data.toString(), tag: input.endpoint);
     // }
 
-    final isMap = response.data is Map;
-    final parsed = isMap && response.data['data'] != null
-        ? responseBuilder(response.data['data'])
-        : null;
+    final raw = response.data;
+    final extractedData = raw != null ? _responseExtractor.data(raw) : null;
+    final parsed =
+        extractedData != null ? responseBuilder(extractedData) : null;
 
-    final message = isMap && response.data['message'] != null
-        ? response.data['message'].toString()
-        : response.statusMessage;
+    final message =
+        (raw != null ? _responseExtractor.message(raw) : null) ??
+        response.statusMessage;
+
+    final meta = raw != null ? _responseExtractor.meta(raw) : null;
 
     if (showMessage) {
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -74,8 +79,10 @@ class DioRequestBuilder {
 
     return CkResponse(
       data: parsed,
+      raw: raw,
       message: message,
-      isSuccess: isMap ? (response.data['success'] ?? false) : false,
+      meta: meta,
+      isSuccess: CkResponseExtractor.readSuccess(raw),
       cancelToken: cancelToken,
       statusCode: response.statusCode,
     );
@@ -84,7 +91,6 @@ class DioRequestBuilder {
   // ignore: library_private_types_in_public_api
   Future<_RequestOptionsData> _buildOptions({
     required RequestInput input,
-    required String? accessToken,
     required int retryCount,
     required int maxRetry,
   }) async {
@@ -103,11 +109,8 @@ class DioRequestBuilder {
           "$url?${input.queryParams!.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }
 
-    final headers = {
-      if (input.requiresToken && accessToken?.isNotEmpty == true)
-        'Authorization': 'Bearer $accessToken',
-      ...?input.headers,
-    };
+    // Auth header is injected by [DioInterceptor] using [CkTokenProvider].
+    final headers = <String, String>{...?input.headers};
 
     dynamic body;
     var contentType = 'application/json';
@@ -188,7 +191,11 @@ class DioRequestBuilder {
       path: url,
       data: body,
       options: Options(
-        extra: {'retryCount': retryCount, 'maxRetry': maxRetry},
+        extra: {
+          'retryCount': retryCount,
+          'maxRetry': maxRetry,
+          'requiresToken': input.requiresToken,
+        },
         method: input.method.name,
         headers: headers,
         contentType: contentType,

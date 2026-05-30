@@ -1,30 +1,30 @@
 import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
-import 'package:core_kit/network/ck_network.dart';
+import 'package:core_kit/network/ck_transport.dart';
 
 /// Internal token manager — NOT exposed to developers.
-/// Creates TokenProvider internally for DioService/DioInterceptor.
-class AuthTokenManager {
+/// Creates [CkTokenProvider] internally for [CkTransport]/[DioInterceptor].
+class CkAuthTokenManager {
   // In-memory cache for fast synchronous access
   String? _cachedAccessToken;
   String? _cachedRefreshToken;
   
-  AuthTokenManager();
+  CkAuthTokenManager();
 
   /// Initialize: restore tokens from secure storage to memory cache
   Future<void> initialize() async {
-    _cachedAccessToken = await CkStorage.read(AuthStorageKeys.accessTokenKey);
-    _cachedRefreshToken = await CkStorage.read(AuthStorageKeys.refreshTokenKey);
+    _cachedAccessToken = await CkStorage.read(CkAuthStorageKeys.accessTokenKey);
+    _cachedRefreshToken = await CkStorage.read(CkAuthStorageKeys.refreshTokenKey);
   }
   
   /// Save tokens (called internally after login/signup/token refresh)
   Future<void> saveTokens({required String accessToken, String? refreshToken}) async {
     _cachedAccessToken = accessToken;
     _cachedRefreshToken = refreshToken ?? _cachedRefreshToken;
-    await CkStorage.write(AuthStorageKeys.accessTokenKey, accessToken);
+    await CkStorage.write(CkAuthStorageKeys.accessTokenKey, accessToken);
     if (refreshToken != null) {
-      await CkStorage.write(AuthStorageKeys.refreshTokenKey, refreshToken);
+      await CkStorage.write(CkAuthStorageKeys.refreshTokenKey, refreshToken);
     }
   }
   
@@ -41,13 +41,14 @@ class AuthTokenManager {
   Future<void> clearTokens() async {
     _cachedAccessToken = null;
     _cachedRefreshToken = null;
-    await CkStorage.delete(AuthStorageKeys.accessTokenKey);
-    await CkStorage.delete(AuthStorageKeys.refreshTokenKey);
+    await CkStorage.delete(CkAuthStorageKeys.accessTokenKey);
+    await CkStorage.delete(CkAuthStorageKeys.refreshTokenKey);
   }
   
-  /// Create TokenProvider for DioService — purely internal bridge
+  /// Creates [CkTokenProvider] for [CkTransport] — internal bridge only.
   /// Developer never sees or creates this.
-  CkTokenProvider createTokenProvider(AuthExtractors extractors) => CkTokenProvider(
+  CkTokenProvider createTokenProvider(CkAuthExtractors<dynamic> extractors) =>
+      CkTokenProvider(
     accessToken: () async => _cachedAccessToken ?? '',
     refreshToken: () async => _cachedRefreshToken ?? '',
     updateTokens: (data) async {

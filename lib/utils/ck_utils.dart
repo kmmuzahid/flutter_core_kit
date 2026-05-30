@@ -111,6 +111,3 @@ class CkUtils {
   }
 }
 
-/// @deprecated Use [CkUtils] instead.
-@Deprecated('Use CkUtils instead')
-typedef CoreUtils = CkUtils;

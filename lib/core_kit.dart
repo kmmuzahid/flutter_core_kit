@@ -15,7 +15,7 @@ export 'package:core_kit/auth/auth_endpoints.dart';
 export 'package:core_kit/auth/auth_extractors.dart';
 export 'package:core_kit/auth/auth_result.dart';
 export 'package:core_kit/auth/auth_routes.dart';
-export 'package:core_kit/auth/auth_service.dart';
+export 'package:core_kit/auth/ck_auth.dart';
 export 'package:core_kit/auth/logout/logout_config.dart';
 export 'package:core_kit/auth/otp/otp_config.dart';
 export 'package:core_kit/auth/otp/otp_flow_manager.dart';
@@ -26,9 +26,8 @@ export 'package:core_kit/auth/social/facebook_auth_config.dart';
 export 'package:core_kit/auth/social/google_auth_config.dart';
 export 'package:core_kit/auth/social/social_login_config.dart';
 export 'package:core_kit/auth/state/auth_state_controller.dart';
-export 'package:core_kit/auth/state/profile_manager.dart';
+export 'package:core_kit/auth/state/profile_extractor.dart';
 export 'package:core_kit/auth/token/auth_storage_keys.dart';
-export 'package:core_kit/auth/widget/auth_gate.dart';
 // bottomsheet
 export 'package:core_kit/bottomsheet/ck_draggable_bottom_sheet.dart';
 // button
@@ -63,8 +62,10 @@ export 'package:core_kit/list_loader/ck_tab_list_loader.dart';
 // loading
 export 'package:core_kit/loading/ck_loader.dart';
 // network
-export 'package:core_kit/network/ck_network.dart';
+export 'package:core_kit/network/ck_transport.dart';
+export 'package:core_kit/network/ck_transport_config.dart';
 export 'package:core_kit/network/ck_response.dart';
+export 'package:core_kit/network/ck_response_extractor.dart';
 // pop_up
 export 'package:core_kit/pop_up/ck_alert.dart';
 export 'package:core_kit/pop_up/ck_popup_menu.dart';
@@ -95,7 +96,6 @@ export 'package:core_kit/utils/ck_permission_handler.dart';
 export 'package:core_kit/utils/ck_permission_helper.dart';
 export 'package:core_kit/utils/ck_screen_utils.dart';
 export 'package:core_kit/utils/ck_share.dart';
-export 'package:core_kit/utils/ck_string.dart';
 export 'package:core_kit/utils/ck_utils.dart';
 export 'package:core_kit/utils/extension.dart';
 export 'package:dio/dio.dart';

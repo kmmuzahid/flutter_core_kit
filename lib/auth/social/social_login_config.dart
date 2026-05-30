@@ -5,20 +5,20 @@ import 'package:core_kit/auth/social/custom_social_auth_config.dart';
 
 /// Social login configuration — entirely optional.
 /// Only providers with non-null configs are available.
-class SocialLoginConfig {
+class CkSocialLoginConfig {
   /// Google Sign-In config (null = Google login not available)
-  final GoogleAuthConfig? google;
+  final CkGoogleAuthConfig? google;
   
   /// Apple Sign-In config (null = Apple login not available)
-  final AppleAuthConfig? apple;
+  final CkAppleAuthConfig? apple;
   
   /// Facebook Sign-In config (null = Facebook login not available)
-  final FacebookAuthConfig? facebook;
+  final CkFacebookAuthConfig? facebook;
   
   /// Custom social providers (for any other OAuth/social provider)
-  final List<CustomSocialAuthConfig>? customProviders;
+  final List<CkCustomSocialAuthConfig>? customProviders;
   
-  const SocialLoginConfig({
+  const CkSocialLoginConfig({
     this.google,
     this.apple,
     this.facebook,
@@ -26,12 +26,12 @@ class SocialLoginConfig {
   });
   
   /// Which providers are enabled
-  List<SocialProvider> get availableProviders => [
-    if (google != null) SocialProvider.google,
-    if (apple != null) SocialProvider.apple,
-    if (facebook != null) SocialProvider.facebook,
-    ...?customProviders?.map((c) => SocialProvider.custom),
+  List<CkSocialProvider> get availableProviders => [
+    if (google != null) CkSocialProvider.google,
+    if (apple != null) CkSocialProvider.apple,
+    if (facebook != null) CkSocialProvider.facebook,
+    ...?customProviders?.map((c) => CkSocialProvider.custom),
   ];
 }
 
-enum SocialProvider { google, apple, facebook, custom }
+enum CkSocialProvider { google, apple, facebook, custom }

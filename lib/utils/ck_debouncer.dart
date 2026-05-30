@@ -15,6 +15,3 @@ class CkDebouncer {
   }
 }
 
-/// @deprecated Use [CkDebouncer] instead.
-@Deprecated('Use CkDebouncer instead')
-typedef Debouncer = CkDebouncer;

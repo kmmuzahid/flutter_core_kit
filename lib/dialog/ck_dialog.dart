@@ -21,11 +21,6 @@ Future ckDialog({
   );
 }
 
-/// @deprecated Use [ckDialog] instead.
-@Deprecated('Use ckDialog instead')
-Future commonDialog({required Widget child, required BuildContext context, bool isDismissible = false}) =>
-    ckDialog(child: child, context: context, isDismissible: isDismissible);
-
 Future ckDialogWithActions({
   required List<Widget> content,
   required BuildContext context,
@@ -58,25 +53,6 @@ Future ckDialogWithActions({
     ),
   );
 }
-
-/// @deprecated Use [ckDialogWithActions] instead.
-@Deprecated('Use ckDialogWithActions instead')
-Future CommonDialogWithActions({
-  required List<Widget> content,
-  required BuildContext context,
-  required String title,
-  String? subTitle,
-  bool isDismissible = true,
-  bool validationRequired = false,
-  required Function() onConfirm,
-  Function()? onCancel,
-  String action = 'Confirm',
-  String cancel = 'Cancel',
-}) => ckDialogWithActions(
-      content: content, context: context, title: title, subTitle: subTitle,
-      isDismissible: isDismissible, validationRequired: validationRequired,
-      onConfirm: onConfirm, onCancel: onCancel, action: action, cancel: cancel,
-    );
 
 Column _body(
   String title,

@@ -138,7 +138,4 @@ class _CkTabBarState extends State<CkTabBar> {
   }
 }
 
-/// @deprecated Use [CkTabBar] instead.
-@Deprecated('Use CkTabBar instead')
-typedef CommonTabBar = CkTabBar;
 
