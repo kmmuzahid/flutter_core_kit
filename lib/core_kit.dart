@@ -80,3 +80,26 @@ export 'package:dio/dio.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:image_picker/image_picker.dart';
 export 'package:permission_handler/permission_handler.dart';
+export 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+// ─── CoreKit Authentication Module Exports ───
+export 'package:core_kit/auth/auth_config.dart';
+export 'package:core_kit/auth/auth_service.dart';
+export 'package:core_kit/auth/auth_endpoints.dart';
+export 'package:core_kit/auth/auth_extractors.dart';
+export 'package:core_kit/auth/auth_result.dart';
+export 'package:core_kit/auth/auth_routes.dart';
+export 'package:core_kit/auth/reactive/behavior_stream.dart';
+export 'package:core_kit/auth/otp/otp_config.dart';
+export 'package:core_kit/auth/otp/otp_flow_manager.dart';
+export 'package:core_kit/auth/logout/logout_config.dart';
+export 'package:core_kit/auth/state/auth_state_controller.dart';
+export 'package:core_kit/auth/state/profile_manager.dart';
+export 'package:core_kit/auth/widget/auth_gate.dart';
+export 'package:core_kit/auth/social/social_login_config.dart';
+export 'package:core_kit/auth/social/google_auth_config.dart';
+export 'package:core_kit/auth/social/apple_auth_config.dart';
+export 'package:core_kit/auth/social/facebook_auth_config.dart';
+export 'package:core_kit/auth/social/custom_social_auth_config.dart';
+export 'package:core_kit/storage/core_kit_storage.dart';
+export 'package:core_kit/auth/token/auth_storage_keys.dart';

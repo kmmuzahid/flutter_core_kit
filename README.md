@@ -24,12 +24,13 @@
 9. [Layout & Spacing](#layout--spacing)
 10. [Forms & Validation](#forms--validation)
 11. [Networking](#networking)
-12. [Pickers & Selectors](#pickers--selectors)
-13. [Dialogs & Overlays](#dialogs--overlays)
-14. [Location Pickers](#location-pickers)
-15. [Advanced Features](#advanced-features)
-16. [Custom Lints](#custom-lints)
-17. [License](#license)
+12. [Authentication Module](#authentication-module)
+13. [Pickers & Selectors](#pickers--selectors)
+14. [Dialogs & Overlays](#dialogs--overlays)
+15. [Location Pickers](#location-pickers)
+16. [Advanced Features](#advanced-features)
+17. [Custom Lints](#custom-lints)
+18. [License](#license)
 
 ---
 
@@ -85,25 +86,29 @@ void main() {
 
 Add CoreKit to your `pubspec.yaml` dependencies:
 
-**Stable Release (Recommended):**
+### 1. View Latest Version Tag
+The latest stable version tag is automatically fetched and displayed here: 
+[![Latest Version](https://img.shields.io/github/v/tag/kmmuzahid/flutter_core_kit?label=Latest%20Version&color=blue&sort=semver)](https://github.com/kmmuzahid/flutter_core_kit/releases)
+
+*Alternatively, you can run this command in your terminal to automatically query and print the latest tag from git:*
+```bash
+# On macOS / Linux / Git Bash:
+git ls-remote --tags --refs --sort='v:refname' https://github.com/kmmuzahid/flutter_core_kit.git | tail -n1 | awk -F/ '{print $3}'
+
+# On Windows (PowerShell):
+(git ls-remote --tags --refs --sort='v:refname' https://github.com/kmmuzahid/flutter_core_kit.git | Select-Object -Last 1) -split '/' | Select-Object -Last 1
+```
+
+### 2. Configure pubspec.yaml
 ```yaml
 dependencies:
   core_kit:
     git:
       url: https://github.com/kmmuzahid/flutter_core_kit.git
-      ref: 1.0.0  # Check releases for latest version
+      ref: <LATEST_VERSION_TAG> # Replace with the latest tag (e.g., 1.0.0) from the badge or command above
 ```
 
-**Development Branch:**
-```yaml
-dependencies:
-  core_kit:
-    git:
-      url: https://github.com/kmmuzahid/flutter_core_kit.git
-      ref: main
-```
-
-Then install:
+Then run:
 ```bash
 flutter pub get
 ```
@@ -131,11 +136,11 @@ class MyAppConfig extends CoreKitConfig with CoreKitConfigDefaults {
   
   @override
   TokenProvider get tokenProvider => TokenProvider(
-    accessToken: () async => await storage.read('token'),
-    refreshToken: () async => await storage.read('refresh_token'),
+    accessToken: () async => await CoreKitStorage.read('token'),
+    refreshToken: () async => await CoreKitStorage.read('refresh_token'),
     updateTokens: (data) async {
-      await storage.write('token', data['accessToken']);
-      await storage.write('refresh_token', data['refreshToken']);
+      await CoreKitStorage.write('token', data['accessToken']);
+      await CoreKitStorage.write('refresh_token', data['refreshToken']);
     },
   );
   
@@ -502,6 +507,256 @@ if (response.isSuccess) {
   // Handle error - response.message contains error details
   print(response.message);
 }
+```
+
+---
+
+## Authentication Module
+
+CoreKit includes a scalable, robust, and backward-compatible **Authentication Module** built with Clean Architecture principles. It handles secure token persistence, automatic response mapping, background token refreshing, active session checking, multi-flow OTP verification, responsive screen routing, and third-party social authentication.
+
+When `CoreKitAuthConfig` is provided inside your main config, the module activates automatically, feeds `DioService` internally, and manages your entire auth lifecycle.
+
+### Key Features
+- 🗝️ **Fully Internal Token Handling**: Developer never reads, writes, or deals with token management manually.
+- 🔄 **Auto-Navigation & Session Recovery**: Instant routing on app launch — if user is authenticated → dashboard, if not first time → login, if first time → onboarding (optional).
+- 💾 **Public Secure Storage**: Exposes the static `CoreKitStorage` class publicly so you can save custom key-value pairs without adding extra dependencies (like `flutter_secure_storage` or `shared_preferences`) in `pubspec.yaml`.
+- 📊 **Background Profile Persistence**: Profile data is automatically cached in secure storage, instantly loaded on app start (no blank screens!), and updated from API in the background.
+- ⚡ **Pure Dart BehaviorStreams**: Real-time streams with automatic replay. Late-subscribing screens immediately receive the last emitted state.
+
+---
+
+### Step 1: Configuration
+
+Create a custom User Profile class (e.g. `UserProfile`), then set up `CoreKitAuthConfig<UserProfile>` in your `CoreKitConfig` implementation:
+
+```dart
+import 'package:core_kit/core_kit.dart';
+
+class UserProfile {
+  final String id;
+  final String email;
+  final String name;
+
+  UserProfile({required this.id, required this.email, required this.name});
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
+    id: json['id'] ?? '',
+    email: json['email'] ?? '',
+    name: json['name'] ?? '',
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'email': email,
+    'name': name,
+  };
+}
+
+class AppConfig extends CoreKitConfig with CoreKitConfigDefaults {
+  @override
+  String get imageBaseUrl => 'https://api.myapp.com/images/';
+
+  @override
+  DioServiceConfig get dioConfig => DioServiceConfig(
+    baseUrl: 'https://api.myapp.com',
+    refreshTokenEndpoint: '/auth/refresh',
+  );
+
+  @override
+  CoreKitAuthConfig<UserProfile> get authConfig => CoreKitAuthConfig(
+    endpoints: AuthEndpoints(
+      signupUrl: '/auth/signup',
+      signinUrl: '/auth/login',
+      forgetPasswordUrl: '/auth/forgot-password',
+      otpSendUrl: '/auth/otp/send',
+      otpVerifyUrl: '/auth/otp/verify',
+      profileGetUrl: '/auth/profile',
+      profileUpdateUrl: '/auth/profile/update',
+      logoutUrl: '/auth/logout', // Optional — null is local-only
+    ),
+    profileFromJson: (json) => UserProfile.fromJson(json),
+    profileToJson: (profile) => profile.toJson(),
+    extractors: AuthExtractors.standard(
+      accessTokenKey: 'accessToken',
+      refreshTokenKey: 'refreshToken',
+      profileKey: 'user',
+      verificationTokenKey: 'createUserToken', // for OTP flows
+      forgetPasswordTokenKey: 'forgetToken',
+    ),
+    routes: AuthRoutes(
+      // Support direct routing callbacks to avoid forcing a navigation package:
+      routeOnSuccess: () => Get.offAllNamed('/home'), 
+      routeToLogin: () => Get.offAllNamed('/login'),
+      routeToOnboarding: () => Get.offAllNamed('/onboarding'), // Optional
+    ),
+    otpConfig: OtpConfig(
+      autoTriggers: {OtpTrigger.signup, OtpTrigger.forgetPassword},
+      resendCooldown: const Duration(seconds: 120),
+      verificationStrategy: OtpVerificationStrategy.tokenBased,
+    ),
+    logoutConfig: const LogoutConfig(
+      strategy: LogoutStrategy.apiWithForcedLocalClear,
+    ),
+  );
+}
+```
+
+---
+
+### Step 2: Routing with AuthGate
+
+Wrap your home or initial screen with `AuthGate`. It automatically monitors `AuthService` state streams to swap loading, authenticated (home), and unauthenticated (login) screens responsive to session availability:
+
+```dart
+class InitialAppScreen extends StatelessWidget {
+  const InitialAppScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AuthGate(
+      authenticatedChild: const HomeScreen(),
+      unauthenticatedChild: const LoginScreen(),
+      loadingChild: const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+}
+```
+
+---
+
+### Step 3: Auth Operations
+
+Run actions from your controllers, presenters, or state management layers:
+
+#### Login and SignUp
+```dart
+final result = await AuthService.instance.signIn(
+  body: {
+    'email': 'user@example.com',
+    'password': 'password123',
+  },
+);
+
+if (result.isSuccess) {
+  if (result.requiresOtp) {
+    // Navigate to OTP Verification Screen! 
+    // Countdown timer is already running
+    Navigator.pushNamed(context, '/otp', arguments: result.otpTrigger);
+  } else {
+    // CoreKit automatically saved tokens, loaded profile, and navigated to authenticatedRoute
+  }
+} else {
+  showSnackBar(result.message ?? 'Login failed', type: SnackBarType.error);
+}
+```
+
+#### OTP Flow & Cooldown Timer
+In your OTP verification screen, listen to the timer countdown stream and verify OTP codes:
+
+```dart
+// 1. Listen to countdown timer
+AuthService.instance.otpManager.resendCountdown.listen((seconds) {
+  setState(() => remainingSeconds = seconds);
+});
+
+// 2. Resend OTP code
+await AuthService.instance.resendOtp(trigger: OtpTrigger.signup);
+
+// 3. Verify OTP code
+final result = await AuthService.instance.verifyOtp(
+  otp: '123456',
+  trigger: OtpTrigger.signup,
+);
+
+if (result.isSuccess) {
+  // Session is fully established, access tokens saved, and routed automatically
+}
+```
+
+#### Listening to Profile Changes
+Access profile data synchronously or subscribe to stream updates reactively across your widgets:
+
+```dart
+// Synchronous access
+final UserProfile? user = AuthService.instance.currentProfile;
+
+// Stream builder reactive widget
+StreamBuilder<UserProfile?>(
+  stream: AuthService.instance.profileManager.profile.stream,
+  initialData: AuthService.instance.currentProfile,
+  builder: (context, snapshot) {
+    final profile = snapshot.data;
+    if (profile == null) return const Text('No Profile Data');
+    return Text('Welcome back, ${profile.name}!');
+  },
+)
+```
+
+#### Updating Profile remotely
+```dart
+final result = await AuthService.instance.profileManager.updateProfileRemote(
+  url: '/auth/profile/update',
+  method: RequestMethod.PATCH,
+  jsonBody: {'name': 'Km Muzahid Revised'},
+);
+
+if (result.isSuccess) {
+  showSnackBar('Profile updated!', type: SnackBarType.success);
+}
+```
+
+#### Social Login (Backend authentication)
+Obtain the OAuth credentials on the project-side (e.g. via `google_sign_in` or `sign_in_with_apple`), then easily authenticate with your backend API through `AuthService`:
+
+```dart
+// Google Sign-In Example
+final googleUser = await GoogleSignIn().signIn();
+final auth = await googleUser?.authentication;
+
+if (auth?.idToken != null) {
+  final result = await AuthService.instance.signInWithGoogle(
+    GoogleAuthData(
+      idToken: auth!.idToken,
+      accessToken: auth.accessToken,
+      email: googleUser!.email,
+      displayName: googleUser.displayName,
+    ),
+  );
+  
+  if (result.isSuccess) {
+    // Succeeded! Tokens saved and routed automatically.
+  }
+}
+```
+
+#### Logout
+```dart
+await AuthService.instance.logout();
+// Succeeded! State cleared and routed back to login screen automatically.
+```
+
+---
+
+Since CoreKit publicly exports `CoreKitStorage`, **you do not need to install secure storage packages in your pubspec.yaml**. You can import `core_kit` and use its static storage API for your own custom keys:
+
+```dart
+import 'package:core_kit/core_kit.dart';
+
+// Write custom key
+await CoreKitStorage.write('custom_user_preference', 'dark_mode');
+
+// Read custom key
+final theme = await CoreKitStorage.read('custom_user_preference');
+print(theme); // Output: dark_mode
+
+// Delete key
+await CoreKitStorage.delete('custom_user_preference');
+```
+
+---
 ```
 
 ---

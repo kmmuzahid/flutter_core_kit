@@ -12,6 +12,7 @@ import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:core_kit/auth/auth_service.dart';
 
 class DioInterceptor extends Interceptor {
   final Dio _dio;
@@ -33,6 +34,14 @@ class DioInterceptor extends Interceptor {
        _tokenProvider = tokenProvider;
 
   bool get isServerOff => _isServerOff;
+
+  Future<void> _triggerLogout() async {
+    if (AuthService.isInitialized) {
+      await AuthService.instance.logout();
+    } else {
+      _config.onLogout?.call();
+    }
+  }
 
   Future<void> _injectToken(RequestOptions options) async {
     final accessToken = await _tokenProvider.accessToken();
@@ -81,7 +90,7 @@ class DioInterceptor extends Interceptor {
 
     if (refreshToken?.isEmpty == true || refreshToken == null) {
       DioUtils.log(_config, 'No refresh token available.', tag: 'DioService');
-      _config.onLogout?.call();
+      await _triggerLogout();
       throw Exception('No refresh token available');
     }
     DioUtils.log(
@@ -110,7 +119,7 @@ class DioInterceptor extends Interceptor {
         if (extractedMessage != null && extractedMessage.isNotEmpty) {
           DioUtils.showMessage(extractedMessage, isError: true);
         }
-        _config.onLogout?.call();
+        await _triggerLogout();
         throw Exception('Refresh token unauthorized');
       } else {
         DioUtils.log(
@@ -119,7 +128,7 @@ class DioInterceptor extends Interceptor {
           tag: 'Auth',
           isError: true,
         );
-        _config.onLogout?.call();
+        await _triggerLogout();
         throw Exception(
           'Refresh token failed with status: ${response.statusCode}',
         );
@@ -131,7 +140,7 @@ class DioInterceptor extends Interceptor {
         tag: 'Auth',
         isError: true,
       );
-      _config.onLogout?.call();
+      await _triggerLogout();
       throw Exception('Refresh token failed: ${e.message}');
     } catch (e) {
       DioUtils.log(
@@ -140,7 +149,7 @@ class DioInterceptor extends Interceptor {
         tag: 'Auth',
         isError: true,
       );
-      _config.onLogout?.call();
+      await _triggerLogout();
       throw Exception('Refresh token failed: $e');
     }
   }
@@ -293,8 +302,8 @@ class DioInterceptor extends Interceptor {
                   tag: 'Auth',
                   isError: true,
                 );
-                // _config.onLogout is already called in _refreshTokenIfNeeded, but safe to call again
-                _config.onLogout?.call();
+                // _triggerLogout is already called in _refreshTokenIfNeeded, but safe to call again
+                await _triggerLogout();
                 handler.reject(error);
               } finally {
                 _refreshCompleter?.complete();
@@ -317,7 +326,7 @@ class DioInterceptor extends Interceptor {
               tag: 'Auth',
               isError: true,
             );
-            _config.onLogout?.call();
+            await _triggerLogout();
             handler.reject(error);
           } else {
             handler.next(error);

@@ -7,6 +7,8 @@ import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:core_kit/utils/permission_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:core_kit/auth/auth_config.dart';
+import 'package:core_kit/auth/auth_service.dart';
 
 coreKitInstanceSingleton get coreKitInstance =>
     coreKitInstanceSingleton.instance;
@@ -138,9 +140,10 @@ abstract class CoreKitConfig {
 
   String get imageBaseUrl;
   DioServiceConfig get dioConfig;
-  TokenProvider get tokenProvider;
+  TokenProvider? get tokenProvider;
   Size get designSize;
 
+  CoreKitAuthConfig? get authConfig => null;
   AppbarConfig? get appbarConfig => null;
   ListLoaderConfig? get listLoaderConfig => null;
   PermissionHelperConfig? get permissionHelperConfig => null;
@@ -152,6 +155,10 @@ abstract class CoreKitConfig {
 }
 
 mixin CoreKitConfigDefaults implements CoreKitConfig {
+  @override
+  CoreKitAuthConfig? get authConfig => null;
+  @override
+  TokenProvider? get tokenProvider => null;
   @override
   AppbarConfig? get appbarConfig => null;
   @override
@@ -225,10 +232,21 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       }
       if (!_dioInitialized) {
         _dioInitialized = true;
-        await DioService.init(
-          config: config.dioConfig,
-          tokenProvider: config.tokenProvider,
-        );
+        if (config.authConfig != null) {
+          await AuthService.init(
+            config: config.authConfig!,
+            dioConfig: config.dioConfig,
+          );
+        } else {
+          await DioService.init(
+            config: config.dioConfig,
+            tokenProvider: config.tokenProvider ?? TokenProvider(
+              accessToken: () async => '',
+              refreshToken: () async => '',
+              updateTokens: (_) async {},
+            ),
+          );
+        }
       }
       CoreScreenUtils.init(context, () => completer.complete());
     });
@@ -402,7 +420,11 @@ class _CoreKitState extends State<CoreKit> {
     instance.imageBaseUrl = config.imageBaseUrl;
     instance.designSize = config.designSize;
     instance.dioServiceConfig = config.dioConfig;
-    instance.tokenProvider = config.tokenProvider;
+    instance.tokenProvider = config.tokenProvider ?? TokenProvider(
+      accessToken: () async => '',
+      refreshToken: () async => '',
+      updateTokens: (_) async {},
+    );
   }
 
   @override
