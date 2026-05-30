@@ -6,7 +6,7 @@
 
 import 'package:core_kit/dropdown/ck_drop_down.dart';
 import 'package:core_kit/text/ck_text.dart';
-import 'package:core_kit/text_field/common_text_field.dart';
+import 'package:core_kit/text_field/ck_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
@@ -172,4 +172,3 @@ class CkCityDropDown extends StatelessWidget {
 /// @deprecated Use [CkCityDropDown] instead.
 @Deprecated('Use CkCityDropDown instead')
 typedef CommonCityDropDown = CkCityDropDown;
-

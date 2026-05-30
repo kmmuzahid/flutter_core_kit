@@ -1,5 +1,6 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CkAppBarConfig {
   /// ()=> Get.back() or Navigator.pop(context) etc
@@ -173,7 +174,11 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _appbarStackBased(CkAppBarConfig config, Widget leadingButton, Color contrastColor) {
+  Widget _appbarStackBased(
+    CkAppBarConfig config,
+    Widget leadingButton,
+    Color contrastColor,
+  ) {
     return Stack(
       children: [
         if (!hideBack)
@@ -205,7 +210,11 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Row _appbarRowBased(CkAppBarConfig config, Widget leadingButton, Color contrastColor) {
+  Row _appbarRowBased(
+    CkAppBarConfig config,
+    Widget leadingButton,
+    Color contrastColor,
+  ) {
     return Row(
       children: [
         if (!hideBack)
@@ -242,7 +251,13 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
           text: title ?? '',
           fontWeight: FontWeight.w600,
           fontSize:
-              coreKitInstanceSingleton.instance.theme.appBarTheme.titleTextStyle?.fontSize ?? 18,
+              coreKitInstanceSingleton
+                  .instance
+                  .theme
+                  .appBarTheme
+                  .titleTextStyle
+                  ?.fontSize ??
+              18,
           textColor: config.titleColor?.call() ?? contrastColor,
         );
   }
@@ -279,12 +294,14 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     if (decoration is BoxDecoration) {
       if (decoration.color != null) return _textFromColor(decoration.color!);
-      if (decoration.gradient != null) return _textFromGradient(decoration.gradient!);
+      if (decoration.gradient != null)
+        return _textFromGradient(decoration.gradient!);
     }
 
     if (decoration is ShapeDecoration) {
       if (decoration.color != null) return _textFromColor(decoration.color!);
-      if (decoration.gradient != null) return _textFromGradient(decoration.gradient!);
+      if (decoration.gradient != null)
+        return _textFromGradient(decoration.gradient!);
     }
 
     if (decoration is FlutterLogoDecoration) {
