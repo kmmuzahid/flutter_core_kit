@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
+import 'package:core_kit/network/ck_response.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:core_kit/network/response_state.dart' show ResponseState;
 import 'package:core_kit/utils/extension.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,16 +11,15 @@ import 'package:image_picker/image_picker.dart';
 class DioRequestBuilder {
   DioRequestBuilder._();
   static final instance = DioRequestBuilder._();
-  TokenProvider? _tokenProvider;
+  CkTokenProvider? _tokenProvider;
   Dio? _dio;
 
-  void init({required TokenProvider tokenProvider, required Dio dio}) {
+  void init({required CkTokenProvider tokenProvider, required Dio dio}) {
     _tokenProvider = tokenProvider;
     _dio = dio;
   }
-  
 
-  Future<ResponseState<T?>> build<T>({
+  Future<CkResponse<T?>> build<T>({
     required RequestInput input,
     // ignore: avoid_annotating_with_dynamic
     required T? Function(dynamic data) responseBuilder,
@@ -30,8 +29,8 @@ class DioRequestBuilder {
     required int maxRetry,
   }) async {
     final tokenProvider = _tokenProvider;
-    final dio = _dio;
-    if (tokenProvider == null || dio == null) {
+    final dioInstance = _dio;
+    if (tokenProvider == null || dioInstance == null) {
       throw StateError('DioRequestBuilder not initialized. Call init() first.');
     }
 
@@ -43,7 +42,7 @@ class DioRequestBuilder {
     );
 
     Response response;
-    response = await dio.request(
+    response = await dioInstance.request(
       requestOptions.path,
       data: requestOptions.data,
       options: requestOptions.options,
@@ -73,7 +72,7 @@ class DioRequestBuilder {
       }
     }
 
-    return ResponseState(
+    return CkResponse(
       data: parsed,
       message: message,
       isSuccess: isMap ? (response.data['success'] ?? false) : false,

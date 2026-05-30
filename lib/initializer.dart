@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:core_kit/app_bar/common_app_bar.dart';
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/app_bar/ck_app_bar.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/dio_service_config.dart';
-import 'package:core_kit/utils/core_screen_utils.dart';
-import 'package:core_kit/utils/permission_helper.dart';
+import 'package:core_kit/utils/ck_screen_utils.dart';
+import 'package:core_kit/utils/ck_permission_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:core_kit/auth/auth_config.dart';
@@ -32,14 +32,14 @@ class PasswordObscureIcon {
 /// Global configuration for list/grid loader widgets.
 /// Allows customizing the default loading indicator and "no more data" widget
 /// both globally (via CoreKitConfig) and per-instance.
-class ListLoaderConfig {
+class CkListLoaderConfig {
   /// Widget shown when loading more items (pagination footer).
   final Widget loaderWidget;
 
   /// Widget shown when all pages have been loaded.
   final Widget noMoreDataWidget;
 
-  const ListLoaderConfig({
+  const CkListLoaderConfig({
     this.loaderWidget = const Padding(
       padding: EdgeInsets.all(20),
       child: Center(child: CircularProgressIndicator()),
@@ -52,16 +52,20 @@ class ListLoaderConfig {
     ),
   });
 
-  ListLoaderConfig copyWith({
+  CkListLoaderConfig copyWith({
     Widget? loaderWidget,
     Widget? noMoreDataWidget,
   }) {
-    return ListLoaderConfig(
+    return CkListLoaderConfig(
       loaderWidget: loaderWidget ?? this.loaderWidget,
       noMoreDataWidget: noMoreDataWidget ?? this.noMoreDataWidget,
     );
   }
 }
+
+/// @deprecated Use [CkListLoaderConfig] instead.
+@Deprecated('Use CkListLoaderConfig instead')
+typedef ListLoaderConfig = CkListLoaderConfig;
 
 class coreKitInstanceSingleton {
   coreKitInstanceSingleton._();
@@ -72,13 +76,13 @@ class coreKitInstanceSingleton {
   late GlobalKey<NavigatorState> navigatorKey;
   late String imageBaseUrl;
   late Size designSize;
-  late AppbarConfig appbarConfig;
-  ListLoaderConfig listLoaderConfig = const ListLoaderConfig();
+  late CkAppBarConfig appbarConfig;
+  CkListLoaderConfig listLoaderConfig = const CkListLoaderConfig();
   late DioServiceConfig dioServiceConfig;
-  late TokenProvider tokenProvider;
+  late CkTokenProvider tokenProvider;
 
-  PermissionHelperConfig permissionHelperConfig =
-      const PermissionHelperConfig();
+  CkPermissionHelperConfig permissionHelperConfig =
+      const CkPermissionHelperConfig();
   PasswordObscureIcon passWordObscureIcon = PasswordObscureIcon(
     padding: const EdgeInsetsDirectional.only(end: 10),
     show: const Icon(Icons.visibility, size: 20),
@@ -140,13 +144,13 @@ abstract class CoreKitConfig {
 
   String get imageBaseUrl;
   DioServiceConfig get dioConfig;
-  TokenProvider? get tokenProvider;
+  CkTokenProvider? get tokenProvider;
   Size get designSize;
 
   CoreKitAuthConfig? get authConfig => null;
-  AppbarConfig? get appbarConfig => null;
-  ListLoaderConfig? get listLoaderConfig => null;
-  PermissionHelperConfig? get permissionHelperConfig => null;
+  CkAppBarConfig? get appbarConfig => null;
+  CkListLoaderConfig? get listLoaderConfig => null;
+  CkPermissionHelperConfig? get permissionHelperConfig => null;
   PermissionHadlerColors? get permissionHandlerColors => null;
   PasswordObscureIcon? get passwordObscureIcon => null;
 
@@ -158,13 +162,13 @@ mixin CoreKitConfigDefaults implements CoreKitConfig {
   @override
   CoreKitAuthConfig? get authConfig => null;
   @override
-  TokenProvider? get tokenProvider => null;
+  CkTokenProvider? get tokenProvider => null;
   @override
-  AppbarConfig? get appbarConfig => null;
+  CkAppBarConfig? get appbarConfig => null;
   @override
-  ListLoaderConfig? get listLoaderConfig => null;
+  CkListLoaderConfig? get listLoaderConfig => null;
   @override
-  PermissionHelperConfig? get permissionHelperConfig => null;
+  CkPermissionHelperConfig? get permissionHelperConfig => null;
   @override
   PermissionHadlerColors? get permissionHandlerColors => null;
   @override
@@ -221,7 +225,7 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
         instance.passWordObscureIcon = config.passwordObscureIcon!;
       }
 
-      instance.appbarConfig = config.appbarConfig ?? AppbarConfig();
+      instance.appbarConfig = config.appbarConfig ?? CkAppBarConfig();
       if (instance.appbarConfig.onBack == null) {
         instance.appbarConfig = instance.appbarConfig.copyWith(
           onBack: () => instance.navigatorKey.currentState?.pop(),
@@ -238,9 +242,9 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
             dioConfig: config.dioConfig,
           );
         } else {
-          await DioService.init(
+          await CkNetwork.init(
             config: config.dioConfig,
-            tokenProvider: config.tokenProvider ?? TokenProvider(
+            tokenProvider: config.tokenProvider ?? CkTokenProvider(
               accessToken: () async => '',
               refreshToken: () async => '',
               updateTokens: (_) async {},
@@ -248,7 +252,7 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
           );
         }
       }
-      CoreScreenUtils.init(context, () => completer.complete());
+      CkScreenUtils.init(context, () => completer.complete());
     });
 
     await completer.future;
@@ -420,7 +424,7 @@ class _CoreKitState extends State<CoreKit> {
     instance.imageBaseUrl = config.imageBaseUrl;
     instance.designSize = config.designSize;
     instance.dioServiceConfig = config.dioConfig;
-    instance.tokenProvider = config.tokenProvider ?? TokenProvider(
+    instance.tokenProvider = config.tokenProvider ?? CkTokenProvider(
       accessToken: () async => '',
       refreshToken: () async => '',
       updateTokens: (_) async {},

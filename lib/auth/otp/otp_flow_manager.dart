@@ -3,9 +3,9 @@ import 'package:core_kit/auth/reactive/behavior_stream.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
 import 'package:core_kit/auth/auth_result.dart';
-import 'package:core_kit/storage/core_kit_storage.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/request_input.dart';
 
 /// Manages complete OTP lifecycle with stream-based timer
@@ -51,9 +51,9 @@ class OtpFlowManager {
   Future<void> storeVerificationToken(OtpTrigger trigger, String? token) async {
     _verificationTokens[trigger] = token;
     if (token != null) {
-      await CoreKitStorage.write('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}', token);
+      await CkStorage.write('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}', token);
     } else {
-      await CoreKitStorage.delete('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
+      await CkStorage.delete('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
     }
   }
   
@@ -63,7 +63,7 @@ class OtpFlowManager {
   /// Restore verification tokens from secure storage
   Future<void> restoreTokens() async {
     for (final trigger in OtpTrigger.values) {
-      final token = await CoreKitStorage.read('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
+      final token = await CkStorage.read('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
       if (token != null) {
         _verificationTokens[trigger] = token;
       }
@@ -111,7 +111,7 @@ class OtpFlowManager {
         if (vToken != null) body['token'] = vToken;
       }
 
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: _sendUrl!,
           method: _sendMethod,
@@ -172,7 +172,7 @@ class OtpFlowManager {
         headers[_config.verificationTokenHeaderKey] = vToken;
       }
 
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: _verifyUrl!,
           method: _verifyMethod,
@@ -201,7 +201,7 @@ class OtpFlowManager {
     _resendAttempts = 0;
     resendCountdown.add(0);
     for (final trigger in OtpTrigger.values) {
-      await CoreKitStorage.delete('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
+      await CkStorage.delete('${AuthStorageKeys.verificationTokenPrefix}${trigger.name}');
     }
   }
   

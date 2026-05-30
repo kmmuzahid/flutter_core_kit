@@ -1,4 +1,4 @@
-import 'package:core_kit/storage/core_kit_storage.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 
 abstract class AuthStorageKeys {
   static const accessTokenKey = 'core_kit_access_token';
@@ -9,12 +9,12 @@ abstract class AuthStorageKeys {
 
   /// Check if this is a first-time user (for onboarding routing)
   static Future<bool> isFirstTimeUser() async {
-    final value = await CoreKitStorage.read(firstTimeUserKey);
+    final value = await CkStorage.read(firstTimeUserKey);
     return value == null; // null means never logged in before
   }
   
   /// Mark user as not first-time (called after first successful login)
   static Future<void> markNotFirstTimeUser() async {
-    await CoreKitStorage.write(firstTimeUserKey, 'false');
+    await CkStorage.write(firstTimeUserKey, 'false');
   }
 }

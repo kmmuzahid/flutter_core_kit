@@ -1,0 +1,233 @@
+import 'package:core_kit/core_kit_internal.dart';
+import 'package:flutter/material.dart';
+
+class CkPopupMenuTriggerProperty<T> {
+  final T? value;
+  final bool isOpen;
+
+  CkPopupMenuTriggerProperty({this.value, required this.isOpen});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CkPopupMenuTriggerProperty &&
+        other.value == value &&
+        other.isOpen == isOpen;
+  }
+
+  @override
+  int get hashCode {
+    return value.hashCode ^ isOpen.hashCode;
+  }
+}
+
+class CkPopupMenuProperty<T> {
+  final T? item;
+  final bool isSelected;
+
+  CkPopupMenuProperty({this.item, required this.isSelected});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CkPopupMenuProperty &&
+        other.item == item &&
+        other.isSelected == isSelected;
+  }
+
+  @override
+  int get hashCode {
+    return item.hashCode ^ isSelected.hashCode;
+  }
+}
+
+class CkPopupMenu<T> extends StatefulWidget {
+  const CkPopupMenu({
+    required this.items,
+    required this.onItemSelected,
+    required this.itemBuilder,
+    required this.triggerBuilder,
+    super.key,
+    this.initialItem,
+    this.menuItemAlignment,
+    this.separator,
+    this.borderColor,
+    this.menuBackgroundColor,
+    this.itemPadding,
+    this.borderRadius,
+    this.menuWidth,
+    this.itemHeight,
+  });
+
+  final List<T> items;
+  final void Function(T selectedItem) onItemSelected;
+  final T? initialItem;
+  final Widget Function(CkPopupMenuProperty<T> property) itemBuilder;
+  final Widget Function(CkPopupMenuTriggerProperty<T> property)
+  triggerBuilder;
+
+  final AlignmentGeometry? menuItemAlignment;
+  final PopupMenuDivider? separator;
+  final Color? borderColor;
+  final Color? menuBackgroundColor;
+  final EdgeInsets? itemPadding;
+  final double? borderRadius;
+  final double? menuWidth;
+  final double? itemHeight;
+
+  static Future<void> showPopupMenu<T>({
+    required BuildContext context,
+    required List<T> items,
+    required void Function(T) onItemSelected,
+    required Widget Function(CkPopupMenuProperty<T> property) itemBuilder,
+    AlignmentGeometry? menuItemAlignment,
+    PopupMenuDivider? separator,
+    Color? borderColor,
+    Color? menuBackgroundColor,
+    EdgeInsets? itemPadding,
+    double? borderRadius,
+    double? menuWidth,
+    double? itemHeight,
+    T? initialItem,
+    required GlobalKey globalKey,
+  }) async {
+    final button = globalKey.currentContext?.findRenderObject();
+    if (button == null) return;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final position = (button as RenderBox).localToGlobal(
+      Offset.zero,
+      ancestor: overlay,
+    );
+
+    final selected = await showMenu<T>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy + button.size.height,
+        overlay.size.width - (position.dx + button.size.width),
+        overlay.size.height - position.dy,
+      ),
+      color: menuBackgroundColor ?? coreKitInstance.surfaceBG,
+      elevation: 1,
+      shadowColor: coreKitInstance.outlineColor,
+      shape: borderColor != null || borderRadius != null
+          ? RoundedRectangleBorder(
+              side: borderColor != null
+                  ? BorderSide(color: borderColor)
+                  : BorderSide.none,
+              borderRadius: borderRadius != null
+                  ? BorderRadius.circular(borderRadius)
+                  : BorderRadius.circular(8.r),
+            )
+          : null,
+      items: [
+        for (int i = 0; i < items.length; i++) ...[
+          PopupMenuItem<T>(
+            value: items[i],
+            padding: itemPadding,
+            height: itemHeight ?? 0,
+            child: Container(
+              constraints: menuWidth != null
+                  ? BoxConstraints(minWidth: menuWidth)
+                  : null,
+              alignment: menuItemAlignment,
+              child: itemBuilder(
+                CkPopupMenuProperty(
+                  item: items[i],
+                  isSelected: initialItem == items[i],
+                ),
+              ),
+            ),
+          ),
+          if (separator != null && i < items.length - 1) separator,
+        ],
+      ],
+    );
+
+    if (selected != null) {
+      onItemSelected(selected);
+    }
+  }
+
+  @override
+  State<CkPopupMenu<T>> createState() => _SelectablePopupMenuState<T>();
+}
+
+class _SelectablePopupMenuState<T> extends State<CkPopupMenu<T>> {
+  T? selectedItem;
+  bool isOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedItem =
+        widget.initialItem ??
+        (widget.items.isNotEmpty ? widget.items.first : null);
+  }
+
+  Future<void> showPopupMenu(BuildContext context, GlobalKey key) async {
+    if (context.mounted) {
+      setState(() {
+        isOpen = true;
+      });
+    }
+
+    await CkPopupMenu.showPopupMenu<T>(
+      context: context,
+      items: widget.items,
+      onItemSelected: (selected) {
+        if (mounted) {
+          setState(() {
+            selectedItem = selected;
+          });
+        }
+        widget.onItemSelected(selected);
+      },
+      itemBuilder: widget.itemBuilder,
+      globalKey: key,
+      menuItemAlignment: widget.menuItemAlignment,
+      separator: widget.separator,
+      borderColor: widget.borderColor,
+      menuBackgroundColor: widget.menuBackgroundColor,
+      itemPadding: widget.itemPadding,
+      borderRadius: widget.borderRadius,
+      menuWidth: widget.menuWidth,
+      itemHeight: widget.itemHeight,
+      initialItem: selectedItem,
+    );
+
+    if (context.mounted) {
+      setState(() {
+        isOpen = false;
+      });
+    }
+  }
+
+
+  final GlobalKey _triggerKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      key: _triggerKey,
+      onTap: () => showPopupMenu(context, _triggerKey),
+      child: widget.triggerBuilder(
+        CkPopupMenuTriggerProperty(value: selectedItem, isOpen: isOpen),
+      ),
+    );
+  }
+}
+
+/// @deprecated Use [CkPopupMenuTriggerProperty] instead.
+@Deprecated('Use CkPopupMenuTriggerProperty instead')
+typedef CommonPopupMenuTriggerProperty<T> = CkPopupMenuTriggerProperty<T>;
+
+/// @deprecated Use [CkPopupMenuProperty] instead.
+@Deprecated('Use CkPopupMenuProperty instead')
+typedef CommonPopupMenuProperty<T> = CkPopupMenuProperty<T>;
+
+/// @deprecated Use [CkPopupMenu] instead.
+@Deprecated('Use CkPopupMenu instead')
+typedef CommonPopupMenu<T> = CkPopupMenu<T>;

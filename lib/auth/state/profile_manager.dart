@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:core_kit/auth/reactive/behavior_stream.dart';
-import 'package:core_kit/storage/core_kit_storage.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/auth/auth_result.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/request_input.dart';
 
 /// Generic profile manager — exposes BehaviorStream.
@@ -37,18 +37,18 @@ class ProfileManager<TProfile> {
   Future<void> updateProfile(TProfile? profile) async {
     _profile.add(profile);
     if (profile != null) {
-      await CoreKitStorage.write(
+      await CkStorage.write(
         AuthStorageKeys.profileDataKey,
         jsonEncode(_toJson(profile)),
       );
     } else {
-      await CoreKitStorage.delete(AuthStorageKeys.profileDataKey);
+      await CkStorage.delete(AuthStorageKeys.profileDataKey);
     }
   }
   
   /// Restore cached profile from storage (called on app launch)
   Future<void> restoreProfile() async {
-    final cached = await CoreKitStorage.read(AuthStorageKeys.profileDataKey);
+    final cached = await CkStorage.read(AuthStorageKeys.profileDataKey);
     if (cached != null) {
       try {
         final json = jsonDecode(cached) as Map<String, dynamic>;
@@ -60,7 +60,7 @@ class ProfileManager<TProfile> {
   /// Fetch profile from API
   Future<AuthResult<TProfile?>> fetchProfile(String url, RequestMethod method) async {
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(endpoint: url, method: method),
         responseBuilder: (data) => data,
       );
@@ -93,7 +93,7 @@ class ProfileManager<TProfile> {
     Map<String, dynamic>? jsonBody,
   }) async {
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: url,
           method: method,
@@ -124,6 +124,6 @@ class ProfileManager<TProfile> {
   /// Clear profile (logout)
   Future<void> clearProfile() async {
     _profile.add(null);
-    await CoreKitStorage.delete(AuthStorageKeys.profileDataKey);
+    await CkStorage.delete(AuthStorageKeys.profileDataKey);
   }
 }

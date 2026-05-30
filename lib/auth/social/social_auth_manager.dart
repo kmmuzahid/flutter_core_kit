@@ -8,9 +8,9 @@ import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/auth/state/profile_manager.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/logout/logout_handler.dart';
-import 'package:core_kit/storage/core_kit_storage.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/request_input.dart';
 
 /// Manages social login flows on the backend.
@@ -155,7 +155,7 @@ class SocialAuthManager<TProfile> {
     required AuthExtractors extractors,
   }) async {
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: url,
           method: method,

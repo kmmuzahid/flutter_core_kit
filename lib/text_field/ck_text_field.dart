@@ -1,0 +1,544 @@
+import 'package:core_kit/core_kit_internal.dart';
+import 'package:core_kit/text_field/ck_validation_type.dart';
+import 'package:core_kit/text/ck_text.dart';
+import 'package:core_kit/text_field/input_formatters/input_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+enum CkBorderType { outline, underline }
+
+class CkTextField extends StatefulWidget {
+  const CkTextField({
+    required this.validationType,
+    super.key,
+    this.hintText,
+    this.labelText,
+    this.prefixIcon,
+    this.controller,
+    this.textInputAction = TextInputAction.next,
+    this.maxLength,
+    this.prefixText,
+    this.paddingHorizontal = 16,
+    this.paddingVertical = 14,
+    this.borderRadius,
+    this.onSaved,
+    this.onChanged,
+    this.borderColor,
+    this.onTap,
+    this.suffixIcon,
+    this.isReadOnly = false,
+    this.initialText,
+    this.showActionButton = false,
+    this.actionButtonIcon,
+    this.originalPassword,
+    this.validation,
+    this.backgroundColor,
+    this.borderWidth = 1.2,
+    this.showValidationMessage = true,
+    this.textAlign = TextAlign.left,
+    this.passwordObscureIcon,
+    this.maxWords,
+    this.hintStyle,
+    this.borderType = CkBorderType.outline,
+    this.suffixBuilder,
+    this.prefixBuilder,
+    this.fontSize,
+    this.onFocusChanged,
+    this.textStyle,
+    this.footer,
+  });
+
+  final Widget? footer;
+
+  final double borderWidth;
+  final int? maxWords;
+  final Function(String value, TextEditingController controller)? onSaved;
+  final Function(String value)? onChanged;
+  final String? initialText;
+  final bool isReadOnly;
+  final String? hintText;
+  final String? labelText;
+  final String? prefixText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final Color? borderColor;
+  final double paddingHorizontal;
+  final double paddingVertical;
+  final double? borderRadius;
+  final int? maxLength;
+  final VoidCallback? onTap;
+  final TextEditingController? controller;
+  final TextInputAction textInputAction;
+  final bool showActionButton;
+  final Widget? actionButtonIcon;
+  final CkValidationType validationType;
+  final String Function()? originalPassword;
+  final Color? backgroundColor;
+  final bool showValidationMessage;
+  final TextAlign textAlign;
+  final PasswordObscureIcon? passwordObscureIcon;
+  final TextStyle? hintStyle;
+  final double? fontSize;
+  final TextStyle? textStyle;
+
+  final String? Function(String? value)? validation;
+  final CkBorderType borderType;
+  final Widget? Function(TextEditingController controller, FocusNode focusNode)?
+  suffixBuilder;
+  final Widget? Function(TextEditingController controller, FocusNode focusNode)?
+  prefixBuilder;
+
+  final Function(FocusNode focusNode)? onFocusChanged;
+
+  @override
+  State<CkTextField> createState() => _CkTextFieldState();
+}
+
+class _CkTextFieldState extends State<CkTextField> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+  late bool _obscureText;
+  int wordCount = 0;
+  int lengthCount = 0;
+  late ThemeData theme;
+
+  Widget? _getPrefix() {
+    return widget.prefixBuilder?.call(_controller, _focusNode) ??
+        widget.prefixIcon;
+  }
+
+  Widget? getSuffix() {
+    return widget.suffixBuilder?.call(_controller, _focusNode) ??
+        widget.suffixIcon;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText =
+        widget.validationType == CkValidationType.validatePassword ||
+        widget.validationType == CkValidationType.validateConfirmPassword;
+    _controller = widget.controller ?? TextEditingController();
+    _focusNode = FocusNode();
+
+    if (widget.initialText != null) {
+      _controller.text = widget.initialText ?? '';
+    }
+
+    _focusNode.addListener(() {
+      widget.onFocusChanged?.call(_focusNode);
+      if (!_focusNode.hasFocus) {
+        _onSave(_controller.text);
+      }
+      setState(() {});
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    theme = Theme.of(context);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
+  Color _iconColor() {
+    return _focusNode.hasFocus ? coreKitInstance.primaryColor : hintColor();
+  }
+
+  void _onSave(String? value) {
+    if (widget.validationType == CkValidationType.validateConfirmPassword) {
+      assert(
+        widget.originalPassword != null,
+        'Original Password cannot be null for Confirm password field',
+      );
+    }
+    if (widget.onSaved != null) {
+      widget.onSaved!(value?.trim() ?? '', _controller);
+    }
+  }
+
+  String _cleanText(String text) {
+    if (text.trim().isEmpty) return text;
+    var cleaned = text.replaceAll(RegExp(r'<[^>]*>'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return cleaned;
+  }
+
+  /// Helper: Returns TextStyle from theme with optional overrides
+  TextStyle _getStyle({
+    FontWeight? fontWeight,
+    double? fontSize,
+    Color? textColor,
+    double? height,
+    FontStyle? fontStyle,
+  }) {
+    return (widget.textStyle ?? const TextStyle()).copyWith(
+      fontFamily: coreKitInstance.fontFamily,
+      fontWeight: fontWeight,
+      fontSize: fontSize,
+      color: textColor,
+      height: height,
+      fontStyle: fontStyle,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        children: [
+          () {
+            final textField = _buildTextField();
+            if (widget.footer != null) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: widget.backgroundColor,
+                  borderRadius: BorderRadius.circular(
+                    widget.borderRadius?.r ?? 12.r,
+                  ),
+                  border: Border.all(
+                    color: _focusNode.hasFocus
+                        ? (theme
+                                  .inputDecorationTheme
+                                  .focusedBorder
+                                  ?.borderSide
+                                  .color ??
+                              coreKitInstance.primaryColor)
+                        : (widget.isReadOnly
+                              ? (widget.borderColor ??
+                                    theme
+                                        .inputDecorationTheme
+                                        .disabledBorder
+                                        ?.borderSide
+                                        .color ??
+                                    coreKitInstance.outlineColor)
+                              : (widget.borderColor ??
+                                    theme
+                                        .inputDecorationTheme
+                                        .enabledBorder
+                                        ?.borderSide
+                                        .color ??
+                                    coreKitInstance.outlineColor)),
+                    width: widget.borderWidth.w,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    textField,
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: widget.paddingHorizontal.w,
+                        right: widget.paddingHorizontal.w,
+                        bottom: 8.h,
+                      ),
+                      child: widget.footer!,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return textField;
+          }(),
+
+          if ((widget.maxLength ?? 0) > 0 || (widget.maxWords ?? 0) > 0)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                (widget.maxLength ?? 0) > 0
+                    ? '$lengthCount/${widget.maxLength}'
+                    : '$wordCount/${widget.maxWords}',
+                style: _getStyle(
+                  fontSize: 12.sp,
+                  textColor: coreKitInstance.outlineColor,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Color hintColor() {
+    return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
+        coreKitInstance.outlineColor;
+  }
+
+  TextFormField _buildTextField() {
+    return TextFormField(
+      cursorColor: _focusNode.hasFocus
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
+      cursorErrorColor: _focusNode.hasFocus
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
+      textAlign: widget.textAlign,
+      controller: _controller,
+      focusNode: _focusNode,
+      onTapOutside: (event) => _focusNode.unfocus(),
+      enableInteractiveSelection: !widget.isReadOnly,
+      obscureText: _obscureText,
+      onTapUpOutside: (event) {
+        _onSave(_controller.text);
+      },
+
+      readOnly: widget.isReadOnly,
+      onChanged: widget.onChanged,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      keyboardType: InputHelper.getKeyboardType(widget.validationType),
+      textInputAction: widget.textInputAction,
+      onSaved: (v) => _onSave(v?.trim() ?? ''),
+      maxLength: widget.maxLength,
+      inputFormatters: [
+        ...InputHelper.getInputFormatters(widget.validationType),
+        if (widget.maxWords != null || widget.maxLength != null)
+          TextInputFormatter.withFunction((oldValue, newValue) {
+            final cleanedText = _cleanText(newValue.text);
+
+            if (widget.maxLength != null) {
+              final length = cleanedText.length;
+              if (length <= widget.maxLength!) {
+                setState(() => lengthCount = length);
+                return newValue.copyWith(
+                  text: newValue.text,
+                  selection: TextSelection.collapsed(
+                    offset: newValue.text.length,
+                  ),
+                );
+              }
+              return oldValue;
+            }
+
+            if (widget.maxWords != null) {
+              final words = cleanedText
+                  .split(' ')
+                  .where((w) => w.isNotEmpty)
+                  .length;
+              if (words <= widget.maxWords! ||
+                  newValue.text.length < oldValue.text.length) {
+                setState(() => wordCount = words);
+                return newValue.copyWith(
+                  text: newValue.text,
+                  selection: TextSelection.collapsed(
+                    offset: newValue.text.length,
+                  ),
+                );
+              }
+            }
+
+            return oldValue;
+          }),
+      ],
+      onFieldSubmitted: (v) => _onSave(v.trim()),
+      onTap: widget.onTap,
+      validator:
+          widget.validation ??
+          (value) {
+            final newValue = _cleanText(value?.trim() ?? '');
+            var error = InputHelper.validate(
+              widget.validationType,
+              newValue,
+              originalPassword: widget.originalPassword?.call(),
+            );
+            if (widget.maxWords != null &&
+                newValue.isNotEmpty &&
+                wordCount > widget.maxWords!) {
+              error = 'Maximum ${widget.maxWords} words allowed';
+            }
+            return widget.showValidationMessage
+                ? error
+                : (error != null ? '' : null);
+          },
+      style: _getStyle(
+        fontWeight: FontWeight.w500,
+        fontSize:
+            widget.fontSize ??
+            coreKitInstance.theme.inputDecorationTheme.hintStyle?.fontSize ??
+            16.sp,
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        counterText: '',
+        errorMaxLines: widget.showValidationMessage ? 2 : 1,
+        errorStyle: widget.showValidationMessage
+            ? null
+            : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
+        fillColor: widget.backgroundColor,
+        hintStyle:
+            widget.hintStyle ??
+            _getStyle(
+              fontSize:
+                  widget.fontSize ??
+                  coreKitInstance
+                      .theme
+                      .inputDecorationTheme
+                      .hintStyle
+                      ?.fontSize ??
+                  16.sp,
+              fontStyle:
+                  coreKitInstance
+                      .theme
+                      .inputDecorationTheme
+                      .hintStyle
+                      ?.fontStyle ??
+                  FontStyle.italic,
+              textColor: hintColor(),
+            ),
+        //prefix
+        prefixIconConstraints: BoxConstraints(
+          maxWidth: (widget.prefixIcon == null && widget.prefixBuilder == null)
+              ? widget.paddingHorizontal
+              : double.infinity,
+        ),
+        prefixIcon: widget.prefixText?.isNotEmpty == true
+            ? Padding(
+                padding: const EdgeInsets.only(left: 10, right: 5),
+                child: CkText(
+                  text: widget.prefixText!,
+                  textColor: _iconColor(),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.only(
+                  left: 10.w,
+                  right: widget.paddingHorizontal,
+                ),
+                child: _getPrefix(),
+              ),
+
+        //sufix
+        suffixIconConstraints: BoxConstraints(
+          maxWidth:
+              (widget.suffixIcon == null && widget.suffixBuilder == null) &&
+                  widget.validationType != CkValidationType.validatePassword
+              ? widget.paddingHorizontal
+              : double.infinity,
+        ),
+        suffixIcon: widget.showActionButton
+            ? GestureDetector(
+                onTap: () => _onSave(_controller.text.trim()),
+                child: widget.actionButtonIcon ?? const Icon(Icons.search),
+              )
+            : widget.validationType == CkValidationType.validatePassword
+            ? (_buildPasswordSuffixIcon())
+            : Padding(
+                padding: EdgeInsets.only(
+                  right: 10,
+                  left: widget.paddingHorizontal,
+                ),
+                child: getSuffix(),
+              ),
+
+        prefixIconColor: _iconColor(),
+        suffixIconColor: _iconColor(),
+        focusedBorder: widget.footer != null ? InputBorder.none : _buildBorder(
+          color: widget.isReadOnly
+              ? (widget.borderColor ??
+                    theme
+                        .inputDecorationTheme
+                        .disabledBorder
+                        ?.borderSide
+                        .color ??
+                    coreKitInstance.outlineColor)
+              : theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                    coreKitInstance.primaryColor,
+          width: widget.borderWidth.w,
+        ),
+
+        enabledBorder: widget.footer != null ? InputBorder.none : _buildBorder(
+          color:
+              widget.borderColor ??
+              theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
+              coreKitInstance.outlineColor,
+          width: widget.borderWidth.w,
+        ),
+
+        errorBorder: widget.footer != null ? InputBorder.none : _buildBorder(
+          color:
+              theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+              Colors.red,
+          width: widget.borderWidth.w,
+        ),
+
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: widget.paddingHorizontal.w,
+          vertical: widget.paddingVertical.h,
+        ),
+        border: widget.footer != null ? InputBorder.none : null,
+
+        disabledBorder: widget.footer != null ? InputBorder.none : null,
+
+        hintText: widget.hintText,
+        labelText: widget.labelText,
+      ),
+    );
+  }
+
+  InputBorder _buildBorder({required Color color, double? width}) {
+    if (widget.borderType == CkBorderType.underline) {
+      return UnderlineInputBorder(
+        borderRadius: widget.borderRadius == null
+            ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline ==
+                      true
+                  ? (coreKitInstance.theme.inputDecorationTheme.border
+                            as OutlineInputBorder)
+                        .borderRadius
+                  : BorderRadius.circular(12)
+            : BorderRadius.circular(widget.borderRadius?.r ?? 0),
+        borderSide: BorderSide(
+          color: color,
+          width: width ?? widget.borderWidth.w,
+        ),
+      );
+    }
+    return OutlineInputBorder(
+      borderRadius: widget.borderRadius == null
+          ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline == true
+                ? (coreKitInstance.theme.inputDecorationTheme.border
+                          as OutlineInputBorder)
+                      .borderRadius
+                : BorderRadius.circular(12)
+          : BorderRadius.circular(widget.borderRadius?.r ?? 0),
+      borderSide: BorderSide(
+        color: color,
+        width: width ?? widget.borderWidth.w,
+      ),
+    );
+  }
+
+  Widget _buildPasswordSuffixIcon() {
+    return GestureDetector(
+      onTap: _togglePasswordVisibility,
+      child: Padding(
+        padding:
+            widget.passwordObscureIcon?.padding ??
+            coreKitInstance.passWordObscureIcon.padding,
+        child: _obscureText
+            ? widget.passwordObscureIcon?.hide ??
+                  coreKitInstance.passWordObscureIcon.hide
+            : widget.passwordObscureIcon?.show ??
+                  coreKitInstance.passWordObscureIcon.show,
+      ),
+    );
+  }
+}
+
+/// @deprecated Use [CkTextField] instead.
+@Deprecated('Use CkTextField instead')
+typedef CommonTextField = CkTextField;
+
+/// @deprecated Use [CkBorderType] instead.
+@Deprecated('Use CkBorderType instead')
+typedef BorderType = CkBorderType;

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:core_kit/auth/auth_config.dart';
 import 'package:core_kit/auth/auth_result.dart';
-import 'package:core_kit/storage/core_kit_storage.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
@@ -14,10 +14,10 @@ import 'package:core_kit/auth/social/social_login_config.dart';
 import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
 import 'package:core_kit/auth/social/facebook_auth_config.dart';
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:core_kit/network/response_state.dart';
+import 'package:core_kit/network/ck_response.dart';
 import 'package:core_kit/initializer.dart';
 
 /// Main orchestrator — singleton, initialized automatically by CoreKit
@@ -59,7 +59,7 @@ class AuthService<TProfile> {
     required CoreKitAuthConfig<TProfile> config,
     required DioServiceConfig dioConfig,
   }) async {
-    await CoreKitStorage.initialize();
+    await CkStorage.initialize();
 
     final tokenManager = AuthTokenManager();
     await tokenManager.initialize();
@@ -67,8 +67,8 @@ class AuthService<TProfile> {
     // Create TokenProvider internally — developer never touches this
     final tokenProvider = tokenManager.createTokenProvider(config.extractors);
 
-    // Feed to DioService init
-    await DioService.init(config: dioConfig, tokenProvider: tokenProvider);
+    // Feed to CkNetwork init
+    await CkNetwork.init(config: dioConfig, tokenProvider: tokenProvider);
 
     final authState = AuthStateController();
 
@@ -134,7 +134,7 @@ class AuthService<TProfile> {
     Map<String, String>? headers,
   }) async {
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: config.endpoints.signupUrl,
           method: config.endpoints.signupMethod,
@@ -218,7 +218,7 @@ class AuthService<TProfile> {
     Map<String, String>? headers,
   }) async {
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: config.endpoints.signinUrl,
           method: config.endpoints.signinMethod,
@@ -304,7 +304,7 @@ class AuthService<TProfile> {
     }
 
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: config.endpoints.forgetPasswordUrl!,
           method: config.endpoints.forgetPasswordMethod,
@@ -418,7 +418,7 @@ class AuthService<TProfile> {
     }
 
     try {
-      final response = await DioService.instance.request(
+      final response = await CkNetwork.instance.request(
         input: RequestInput(
           endpoint: config.endpoints.changePasswordUrl!,
           method: config.endpoints.changePasswordMethod,

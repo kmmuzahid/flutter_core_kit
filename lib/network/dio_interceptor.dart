@@ -6,10 +6,10 @@
 
 import 'dart:async';
 
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/dio_service_config.dart';
 import 'package:core_kit/network/dio_utils.dart';
-import 'package:core_kit/utils/app_log.dart';
+import 'package:core_kit/utils/ck_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:core_kit/auth/auth_service.dart';
@@ -17,7 +17,7 @@ import 'package:core_kit/auth/auth_service.dart';
 class DioInterceptor extends Interceptor {
   final Dio _dio;
   final DioServiceConfig _config;
-  final TokenProvider _tokenProvider;
+  final CkTokenProvider _tokenProvider;
   Completer<void>? _refreshCompleter;
   bool _isServerOff = false;
   bool _isNetworkOff = false;
@@ -215,7 +215,7 @@ class DioInterceptor extends Interceptor {
               error.requestOptions.extra['retryCount'] as int? ?? 0;
           final maxRetry = error.requestOptions.extra['maxRetry'] as int? ?? 1;
 
-          AppLogger.debug(
+          CkLogger.debug(
             'Retry count: $retryCount, Max retry: $maxRetry',
             tag: 'DioInterceptor',
           );

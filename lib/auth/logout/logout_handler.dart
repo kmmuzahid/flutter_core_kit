@@ -4,10 +4,10 @@ import 'package:core_kit/auth/state/profile_manager.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/auth_routes.dart';
-import 'package:core_kit/storage/core_kit_storage.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/initializer.dart';
-import 'package:core_kit/network/dio_service.dart';
+import 'package:core_kit/network/ck_network.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:flutter/widgets.dart';
 
@@ -54,7 +54,7 @@ class LogoutHandler {
       try {
         final body = _config.logoutBodyBuilder?.call();
         final headers = _config.logoutHeadersBuilder?.call();
-        final response = await DioService.instance.request(
+        final response = await CkNetwork.instance.request(
           input: RequestInput(
             endpoint: _logoutUrl!,
             method: _logoutMethod,

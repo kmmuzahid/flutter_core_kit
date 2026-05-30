@@ -1,0 +1,116 @@
+import 'package:core_kit/core_kit_internal.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class CkUtils {
+  static late Size deviceSize;
+
+  static RepaintBoundary divider() => RepaintBoundary(
+    child: Divider(color: coreKitInstance.outlineColor, thickness: 1.w),
+  );
+
+  static DateTime? parseDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) {
+      return null;
+    }
+    return DateTime.tryParse(dateString);
+  }
+
+  static DateTime subtractYears(DateTime date, int yearsToSubtract) {
+    final newYear = date.year - yearsToSubtract;
+    final newMonth = date.month;
+    final newDay = date.day;
+
+    DateTime newDate;
+    try {
+      newDate = DateTime(
+        newYear,
+        newMonth,
+        newDay,
+        date.hour,
+        date.minute,
+        date.second,
+        date.millisecond,
+        date.microsecond,
+      );
+    } catch (e) {
+      newDate = DateTime(
+        newYear,
+        newMonth + 1,
+        0,
+        date.hour,
+        date.minute,
+        date.second,
+        date.millisecond,
+        date.microsecond,
+      );
+    }
+    return newDate;
+  }
+
+  static String formatDateTimeToHms(DateTime dateTime) {
+    final localDate = dateTime.toLocal();
+    final hours = localDate.hour.toString().padLeft(2, '0');
+    final minutes = localDate.minute.toString().padLeft(2, '0');
+    final seconds = localDate.second.toString().padLeft(2, '0');
+
+    return '$hours:$minutes:$seconds';
+  }
+
+  static String formatDurationToHms(Duration duration) {
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+
+    return '$hours:$minutes:$seconds';
+  }
+
+  static String formatTime(DateTime time) {
+    return DateFormat.jm().format(time.toLocal());
+  }
+
+  static String formatDateTimeWithSHortMonth(DateTime dateTime) {
+    final localDate = dateTime.toLocal();
+    final hours = (localDate.hour % 12).toString().padLeft(2, '0');
+    final minutes = localDate.minute.toString().padLeft(2, '0');
+    final amPm = localDate.hour < 12 ? 'AM' : 'PM';
+
+    final shortMonth = DateFormat('MMM').format(localDate);
+    final day = DateFormat('d').format(localDate);
+
+    final shortDay = DateFormat('E').format(localDate).substring(0, 3);
+    return '$day $shortMonth $shortDay $hours:$minutes $amPm';
+  }
+
+  static String formatDateToShortMonth(DateTime dateTime) {
+    final localDate = dateTime.toLocal();
+    const monthAbbr = <String>[
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+
+    final day = localDate.day.toString().padLeft(2, '0');
+    final month = monthAbbr[localDate.month - 1];
+    final year = localDate.year.toString();
+
+    return '$day $month $year';
+  }
+
+  static String formatDateTime(DateTime dateTime) {
+    final dateFormat = DateFormat('MMM dd, h:mm a');
+    return dateFormat.format(dateTime.toLocal());
+  }
+
+  static String formatDouble(double value) {
+    final rounded = double.parse(value.toStringAsFixed(1));
+    if (rounded == rounded.toInt()) {
+      return rounded.toInt().toString();
+    } else {
+      return rounded.toStringAsFixed(1);
+    }
+  }
+}
+
+/// @deprecated Use [CkUtils] instead.
+@Deprecated('Use CkUtils instead')
+typedef CoreUtils = CkUtils;

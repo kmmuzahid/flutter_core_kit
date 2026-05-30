@@ -4,8 +4,8 @@
  * @Email: km.muzahid@gmail.com
  */
 import 'package:core_kit/network/dio_service_config.dart';
-import 'package:core_kit/snackbar/snackbar.dart';
-import 'package:core_kit/utils/app_log.dart';
+import 'package:core_kit/snackbar/ck_snackbar.dart';
+import 'package:core_kit/utils/ck_logger.dart';
 
 class DioUtils {
   static void log(
@@ -17,17 +17,17 @@ class DioUtils {
     if (!config.enableDebugLogs) return;
 
     if (isError) {
-      AppLogger.apiError(message, tag: tag);
+      CkLogger.apiError(message, tag: tag);
     } else {
-      AppLogger.apiDebug(message, tag: tag);
+      CkLogger.apiDebug(message, tag: tag);
     }
   }
 
   static void showMessage(String message, {bool isError = false}) {
     if (isError) {
-      showSnackBar(message, type: SnackBarType.error);
+      ckShowSnackBar(message, type: CkSnackBarType.error);
     } else {
-      showSnackBar(message, type: SnackBarType.success);
+      ckShowSnackBar(message, type: CkSnackBarType.success);
     }
   }
 }

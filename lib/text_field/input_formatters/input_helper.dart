@@ -1,53 +1,53 @@
 import 'package:core_kit/text_field/input_formatters/date_input_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
-import 'package:core_kit/text_field/validation_type.dart';
-import 'package:core_kit/utils/core_kit_string.dart';
+import 'package:core_kit/text_field/ck_validation_type.dart';
+import 'package:core_kit/utils/ck_string.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class InputHelper {
-  static List<TextInputFormatter> getInputFormatters(ValidationType type) {
+  static List<TextInputFormatter> getInputFormatters(CkValidationType type) {
     switch (type) {
-      case ValidationType.validateDate:
+      case CkValidationType.validateDate:
         return [
           DateFormatter(), // Deny spaces for email
         ];
 
-      case ValidationType.validateEmail:
+      case CkValidationType.validateEmail:
         return [
           FilteringTextInputFormatter.deny(
             RegExp(r'\s'),
           ), // Deny spaces for email
         ];
 
-      case ValidationType.validatePhone:
+      case CkValidationType.validatePhone:
         return [
           PhoneNumberFormatter(), // Allow only digits
         ];
 
-      case ValidationType.validatePassword:
+      case CkValidationType.validatePassword:
         return [
           LengthLimitingTextInputFormatter(20), // Limit password length to 20
         ];
 
-      case ValidationType.validateNumber:
+      case CkValidationType.validateNumber:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
         ];
 
-      case ValidationType.validateCreditCard:
+      case CkValidationType.validateCreditCard:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
           LengthLimitingTextInputFormatter(16), // Limit to 16 digits
         ];
 
-      case ValidationType.validatePostalCode:
+      case CkValidationType.validatePostalCode:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
           LengthLimitingTextInputFormatter(5), // Limit to 5 digits
         ];
 
-      case ValidationType.validateCurrency:
+      case CkValidationType.validateCurrency:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
           TextInputFormatter.withFunction((oldValue, newValue) {
@@ -59,39 +59,39 @@ class InputHelper {
           }), // Handle currency decimal points
         ];
 
-      case ValidationType.validateAlphaNumeric:
+      case CkValidationType.validateAlphaNumeric:
         return [
           FilteringTextInputFormatter.allow(
             RegExp(r'[a-zA-Z0-9]'),
           ), // Allow only alphanumeric characters
         ];
 
-      case ValidationType.validateUsername:
+      case CkValidationType.validateUsername:
         return [
           FilteringTextInputFormatter.allow(
             RegExp(r'[a-zA-Z0-9_]'),
           ), // Allow alphanumeric and underscores
         ];
 
-      case ValidationType.validateOTP:
+      case CkValidationType.validateOTP:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
           LengthLimitingTextInputFormatter(6), // Limit to 6 digits
         ];
 
-      case ValidationType.validateTime:
+      case CkValidationType.validateTime:
         return [
           FilteringTextInputFormatter.allow(
             RegExp(r'[0-9:]'),
           ), // Allow numbers and colon
         ];
 
-      case ValidationType.validateIP:
+      case CkValidationType.validateIP:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
           LengthLimitingTextInputFormatter(15), // Limit to a valid IPv4 length
         ];
-      case ValidationType.validateFullName:
+      case CkValidationType.validateFullName:
         return [
           FilteringTextInputFormatter.allow(
             RegExp(
@@ -99,7 +99,7 @@ class InputHelper {
             ), // Allow letters, apostrophes, hyphens, and spaces
           ),
         ];
-      case ValidationType.validateNID:
+      case CkValidationType.validateNID:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits for NID
         ];
@@ -109,82 +109,82 @@ class InputHelper {
     }
   }
 
-  static TextInputType getKeyboardType(ValidationType type) {
+  static TextInputType getKeyboardType(CkValidationType type) {
     switch (type) {
-      case ValidationType.validateRequired:
+      case CkValidationType.validateRequired:
         return TextInputType.text;
 
-      case ValidationType.validateEmail:
+      case CkValidationType.validateEmail:
         return TextInputType.emailAddress;
 
-      case ValidationType.validatePhone:
+      case CkValidationType.validatePhone:
         return TextInputType.phone;
 
-      case ValidationType.validatePassword:
+      case CkValidationType.validatePassword:
         return TextInputType.visiblePassword;
 
-      case ValidationType.validateDate:
+      case CkValidationType.validateDate:
         return TextInputType.datetime;
 
-      case ValidationType.validateConfirmPassword:
+      case CkValidationType.validateConfirmPassword:
         return TextInputType.visiblePassword;
 
-      case ValidationType.validateURL:
+      case CkValidationType.validateURL:
         return TextInputType.url;
 
-      case ValidationType.validateNumber:
+      case CkValidationType.validateNumber:
         return TextInputType.number;
 
-      case ValidationType.validateCreditCard:
+      case CkValidationType.validateCreditCard:
         return TextInputType.number;
 
-      case ValidationType.validatePostalCode:
+      case CkValidationType.validatePostalCode:
         return TextInputType.number;
 
-      case ValidationType.validateMinLength:
+      case CkValidationType.validateMinLength:
         return TextInputType.text;
 
-      case ValidationType.validateMaxLength:
+      case CkValidationType.validateMaxLength:
         return TextInputType.text;
 
-      case ValidationType.validateCustomPattern:
+      case CkValidationType.validateCustomPattern:
         return TextInputType.text;
 
-      case ValidationType.validateDateRange:
+      case CkValidationType.validateDateRange:
         return TextInputType.datetime;
 
-      case ValidationType.validateAlphaNumeric:
+      case CkValidationType.validateAlphaNumeric:
         return TextInputType.text;
 
-      case ValidationType.validateUsername:
+      case CkValidationType.validateUsername:
         return TextInputType.text;
 
-      case ValidationType.validateTime:
+      case CkValidationType.validateTime:
         return TextInputType.datetime;
 
-      case ValidationType.validateOTP:
+      case CkValidationType.validateOTP:
         return TextInputType.number;
 
-      case ValidationType.validateCurrency:
+      case CkValidationType.validateCurrency:
         return const TextInputType.numberWithOptions(decimal: true);
 
-      case ValidationType.validateIP:
+      case CkValidationType.validateIP:
         return TextInputType.number;
 
-      case ValidationType.validateFullName:
+      case CkValidationType.validateFullName:
         return TextInputType.text;
-      case ValidationType.validateNID:
+      case CkValidationType.validateNID:
         return TextInputType.number;
-      case ValidationType.notRequired:
+      case CkValidationType.notRequired:
         return TextInputType.text;
-      case ValidationType.validateYear:
+      case CkValidationType.validateYear:
         return TextInputType.number;
     }
   }
 
   // Required field check
   static String? validate(
-    ValidationType type,
+    CkValidationType type,
     String? value, {
     int? minLength,
     int? maxLength,
@@ -193,76 +193,76 @@ class InputHelper {
     String? originalPassword,
   }) {
     switch (type) {
-      case ValidationType.validateRequired:
+      case CkValidationType.validateRequired:
         return _validateRequired(value);
 
-      case ValidationType.validateEmail:
+      case CkValidationType.validateEmail:
         return _validateEmail(value);
 
-      case ValidationType.validatePhone:
+      case CkValidationType.validatePhone:
         return _validatePhone(value);
 
-      case ValidationType.validatePassword:
+      case CkValidationType.validatePassword:
         return _validatePassword(value);
 
-      case ValidationType.validateDate:
+      case CkValidationType.validateDate:
         return _validateDate(value);
 
-      case ValidationType.validateConfirmPassword:
+      case CkValidationType.validateConfirmPassword:
         return _validateConfirmPassword(value, originalPassword);
 
-      case ValidationType.validateURL:
+      case CkValidationType.validateURL:
         return _validateURL(value);
 
-      case ValidationType.validateNumber:
+      case CkValidationType.validateNumber:
         return _validateNumber(value);
 
-      case ValidationType.validateCreditCard:
+      case CkValidationType.validateCreditCard:
         return _validateCreditCard(value);
 
-      case ValidationType.validatePostalCode:
+      case CkValidationType.validatePostalCode:
         return _validatePostalCode(value);
 
-      case ValidationType.validateMinLength:
+      case CkValidationType.validateMinLength:
         return _validateMinLength(value, minLength!);
 
-      case ValidationType.validateMaxLength:
+      case CkValidationType.validateMaxLength:
         return _validateMaxLength(value, maxLength!);
 
-      case ValidationType.validateCustomPattern:
+      case CkValidationType.validateCustomPattern:
         return _validateCustomPattern(
           value,
           '',
           '',
         ); // Example, you can pass pattern and error message here
 
-      case ValidationType.validateDateRange:
+      case CkValidationType.validateDateRange:
         return _validateDateRange(value, startDate!, endDate!);
 
-      case ValidationType.validateAlphaNumeric:
+      case CkValidationType.validateAlphaNumeric:
         return _validateAlphaNumeric(value);
 
-      case ValidationType.validateUsername:
+      case CkValidationType.validateUsername:
         return _validateUsername(value);
 
-      case ValidationType.validateTime:
+      case CkValidationType.validateTime:
         return _validateTime(value);
 
-      case ValidationType.validateOTP:
+      case CkValidationType.validateOTP:
         return _validateOTP(value);
 
-      case ValidationType.validateCurrency:
+      case CkValidationType.validateCurrency:
         return _validateCurrency(value);
 
-      case ValidationType.validateIP:
+      case CkValidationType.validateIP:
         return _validateIP(value);
-      case ValidationType.validateFullName:
+      case CkValidationType.validateFullName:
         return _validateFullName(value);
-      case ValidationType.validateNID:
+      case CkValidationType.validateNID:
         return _validateNID(value);
-      case ValidationType.notRequired:
+      case CkValidationType.notRequired:
         return null;
-      case ValidationType.validateYear:
+      case CkValidationType.validateYear:
         return _validateYear(value);
     }
   }
@@ -270,10 +270,10 @@ class InputHelper {
   static String? _validateYear(String? value) {
     final yearRegex = RegExp(r'^\d{4}$'); // Assuming year is exactly 4 digits
     if (value == null || value.isEmpty) {
-      return CoreKitString.yearRequired;
+      return CkString.yearRequired;
     }
     if (!yearRegex.hasMatch(value)) {
-      return CoreKitString.yearInvalid;
+      return CkString.yearInvalid;
     }
     return null; // Return null if year is valid
   }
@@ -281,10 +281,10 @@ class InputHelper {
   static String? _validateNID(String? value) {
     final nidRegex = RegExp(r'^\d{12}$'); // Assuming NID is exactly 12 digits
     if (value == null || value.isEmpty) {
-      return CoreKitString.nidRequired;
+      return CkString.nidRequired;
     }
     if (!nidRegex.hasMatch(value)) {
-      return CoreKitString.nidInvalid;
+      return CkString.nidInvalid;
     }
     return null; // Return null if NID is valid
   }
@@ -292,17 +292,17 @@ class InputHelper {
   static String? _validateFullName(String? value) {
     final nameRegex = RegExp(r"^[a-zA-Z]+(?:[ '-][a-zA-Z]+)*$");
     if (value == null || value.isEmpty) {
-      return CoreKitString.fullNameRequired;
+      return CkString.fullNameRequired;
     }
     if (!nameRegex.hasMatch(value)) {
-      return CoreKitString.fullNameInvalid;
+      return CkString.fullNameInvalid;
     }
     return null; // Return null if the name is valid
   }
 
   static String? _validateRequired(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     return null;
   }
@@ -310,13 +310,13 @@ class InputHelper {
   // Email validation
   static String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
     if (!emailRegex.hasMatch(value)) {
-      return CoreKitString.invalidEmail;
+      return CkString.invalidEmail;
     }
     return null;
   }
@@ -324,11 +324,11 @@ class InputHelper {
   // Phone number validation
   static String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final phoneRegex = RegExp(r'^\d{3}-\d{3}-\d{4}$'); // Only xxx-xxx-xxxx
     if (!phoneRegex.hasMatch(value)) {
-      return CoreKitString.invalidPhone;
+      return CkString.invalidPhone;
     }
     return null;
   }
@@ -336,11 +336,11 @@ class InputHelper {
   // Password validation
   static String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$');
     if (!passwordRegex.hasMatch(value)) {
-      return CoreKitString.invalidPassword;
+      return CkString.invalidPassword;
     }
     return null;
   }
@@ -348,13 +348,13 @@ class InputHelper {
   // Date validation (YYYY-MM-DD format)
   static String? _validateDate(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     try {
       final dateFormat = DateFormat('yyyy-MM-dd');
       dateFormat.parseStrict(value);
     } catch (e) {
-      return CoreKitString.invalidDate;
+      return CkString.invalidDate;
     }
     return null;
   }
@@ -365,10 +365,10 @@ class InputHelper {
     String? originalPassword,
   ) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     if (value != originalPassword) {
-      return CoreKitString.passwordMismatch;
+      return CkString.passwordMismatch;
     }
     return null;
   }
@@ -376,14 +376,14 @@ class InputHelper {
   // URL validation
   static String? _validateURL(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final urlRegex = RegExp(
       r'^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,6}(\/[^\s]*)?$',
       caseSensitive: false,
     );
     if (!urlRegex.hasMatch(value)) {
-      return CoreKitString.invalidURL;
+      return CkString.invalidURL;
     }
     return null;
   }
@@ -391,10 +391,10 @@ class InputHelper {
   // Numeric input validation
   static String? _validateNumber(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     if (double.tryParse(value) == null) {
-      return CoreKitString.invalidNumber;
+      return CkString.invalidNumber;
     }
     return null;
   }
@@ -402,11 +402,11 @@ class InputHelper {
   // Credit card number validation
   static String? _validateCreditCard(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final cardRegex = RegExp(r'^\d{16}$');
     if (!cardRegex.hasMatch(value)) {
-      return CoreKitString.invalidCreditCard;
+      return CkString.invalidCreditCard;
     }
     return null;
   }
@@ -414,11 +414,11 @@ class InputHelper {
   // Postal code validation
   static String? _validatePostalCode(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final postalCodeRegex = RegExp(r'^[0-9]{5}(?:-[0-9]{4})?$');
     if (!postalCodeRegex.hasMatch(value)) {
-      return CoreKitString.invalidPostalCode;
+      return CkString.invalidPostalCode;
     }
     return null;
   }
@@ -426,10 +426,10 @@ class InputHelper {
   // Minimum length validation
   static String? _validateMinLength(String? value, int minLength) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     if (value.length < minLength) {
-      return CoreKitString.minLengthError(
+      return CkString.minLengthError(
         minLength,
       ).replaceAll('{minLength}', minLength.toString());
     }
@@ -439,10 +439,10 @@ class InputHelper {
   // Maximum length validation
   static String? _validateMaxLength(String? value, int maxLength) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     if (value.length > maxLength) {
-      return CoreKitString.maxLengthError(
+      return CkString.maxLengthError(
         maxLength,
       ).replaceAll('{maxLength}', maxLength.toString());
     }
@@ -456,7 +456,7 @@ class InputHelper {
     String errorMessage,
   ) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final regex = RegExp(pattern);
     if (!regex.hasMatch(value)) {
@@ -472,12 +472,12 @@ class InputHelper {
     DateTime endDate,
   ) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     try {
       final date = DateFormat('yyyy-MM-dd').parseStrict(value);
       if (date.isBefore(startDate) || date.isAfter(endDate)) {
-        return CoreKitString.invalidDateRange(endDate, startDate)
+        return CkString.invalidDateRange(endDate, startDate)
             .replaceAll(
               '{startDate}',
               DateFormat('yyyy-MM-dd').format(startDate),
@@ -485,7 +485,7 @@ class InputHelper {
             .replaceAll('{endDate}', DateFormat('yyyy-MM-dd').format(endDate));
       }
     } catch (e) {
-      return CoreKitString.invalidDate;
+      return CkString.invalidDate;
     }
     return null;
   }
@@ -493,11 +493,11 @@ class InputHelper {
   // Alphanumeric input validation
   static String? _validateAlphaNumeric(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final regex = RegExp(r'^[a-zA-Z0-9]+$');
     if (!regex.hasMatch(value)) {
-      return CoreKitString.alphaNumericError;
+      return CkString.alphaNumericError;
     }
     return null;
   }
@@ -505,11 +505,11 @@ class InputHelper {
   // Username validation
   static String? _validateUsername(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final regex = RegExp(r'^[a-zA-Z0-9_]{3,15}$');
     if (!regex.hasMatch(value)) {
-      return CoreKitString.usernameError;
+      return CkString.usernameError;
     }
     return null;
   }
@@ -517,11 +517,11 @@ class InputHelper {
   // Time format validation
   static String? _validateTime(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final timeRegex = RegExp(r'^[0-2]?[0-9]:[0-5][0-9]$');
     if (!timeRegex.hasMatch(value)) {
-      return CoreKitString.invalidTime;
+      return CkString.invalidTime;
     }
     return null;
   }
@@ -529,11 +529,11 @@ class InputHelper {
   // OTP validation
   static String? _validateOTP(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final otpRegex = RegExp(r'^\d{6}$');
     if (!otpRegex.hasMatch(value)) {
-      return CoreKitString.invalidOTP;
+      return CkString.invalidOTP;
     }
     return null;
   }
@@ -541,11 +541,11 @@ class InputHelper {
   // Currency amount validation
   static String? _validateCurrency(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final currencyRegex = RegExp(r'^\d+(\.\d{1,2})?$');
     if (!currencyRegex.hasMatch(value)) {
-      return CoreKitString.invalidCurrency;
+      return CkString.invalidCurrency;
     }
     return null;
   }
@@ -553,11 +553,11 @@ class InputHelper {
   // IP address validation
   static String? _validateIP(String? value) {
     if (value == null || value.isEmpty) {
-      return CoreKitString.requiredField;
+      return CkString.requiredField;
     }
     final ipRegex = RegExp(r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$');
     if (!ipRegex.hasMatch(value)) {
-      return CoreKitString.invalidIP;
+      return CkString.invalidIP;
     }
     return null;
   }
