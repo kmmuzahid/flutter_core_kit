@@ -100,49 +100,45 @@ class CkOtpFlowManager {
       );
     }
 
-    try {
-      final vToken = getVerificationToken(trigger);
-      
-      Map<String, dynamic> body = {};
-      if (_config.resendBodyBuilder != null) {
-        body = _config.resendBodyBuilder!(identifier, vToken);
-      } else {
-        if (identifier != null) body['identifier'] = identifier;
-        if (vToken != null) body['token'] = vToken;
+    final vToken = getVerificationToken(trigger);
+    
+    Map<String, dynamic> body = {};
+    if (_config.resendBodyBuilder != null) {
+      body = _config.resendBodyBuilder!(identifier, vToken);
+    } else {
+      if (identifier != null) body['identifier'] = identifier;
+      if (vToken != null) body['token'] = vToken;
+    }
+
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: _sendUrl!,
+        method: _sendMethod,
+        jsonBody: body,
+        requiresToken: false,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
+
+    if (response.isSuccess) {
+      _resendAttempts++;
+      startResendTimer();
+      final newToken = _extractors.verificationTokens?[trigger]?.call(response.data);
+      if (newToken != null) {
+        await storeVerificationToken(trigger, newToken);
       }
-
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: _sendUrl!,
-          method: _sendMethod,
-          jsonBody: body,
-          requiresToken: false,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
-
-      if (response.isSuccess) {
-        _resendAttempts++;
-        startResendTimer();
-        final newToken = _extractors.verificationTokens?[trigger]?.call(response.data);
-        if (newToken != null) {
-          await storeVerificationToken(trigger, newToken);
-        }
-        return CkAuthResult<void>.success(
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-
-      return CkAuthResult<void>.failure(
-        message: response.message,
+      return CkAuthResult<void>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<void>.failure(message: e.toString());
     }
+
+    return CkAuthResult<void>.failure(
+      message: response.message,
+      statusCode: response.statusCode,
+      rawResponse: response.data,
+    );
   }
 
   /// Verify OTP via API
@@ -155,61 +151,56 @@ class CkOtpFlowManager {
       return const CkAuthResult<void>.failure(message: 'OTP verify URL is not configured');
     }
 
-    try {
-      final vToken = getVerificationToken(trigger);
-      
-      Map<String, dynamic> body = {};
-      if (_config.verifyBodyBuilder != null) {
-        body = _config.verifyBodyBuilder!(otp, vToken);
-      } else {
-        body['otp'] = otp;
-        if (_config.verificationStrategy == CkOtpVerificationStrategy.tokenBased &&
-            !_config.sendVerificationTokenInHeader &&
-            vToken != null) {
-          body[_config.verificationTokenHeaderKey] = vToken;
-        }
-      }
-
-      if (additionalBody != null) {
-        body.addAll(additionalBody);
-      }
-
-      Map<String, String> headers = {};
+    final vToken = getVerificationToken(trigger);
+    
+    Map<String, dynamic> body = {};
+    if (_config.verifyBodyBuilder != null) {
+      body = _config.verifyBodyBuilder!(otp, vToken);
+    } else {
+      body['otp'] = otp;
       if (_config.verificationStrategy == CkOtpVerificationStrategy.tokenBased &&
-          _config.sendVerificationTokenInHeader &&
+          !_config.sendVerificationTokenInHeader &&
           vToken != null) {
-        headers[_config.verificationTokenHeaderKey] = vToken;
+        body[_config.verificationTokenHeaderKey] = vToken;
       }
+    }
 
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: _verifyUrl!,
-          method: _verifyMethod,
-          jsonBody: body,
-          headers: headers,
-          requiresToken: false,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
+    if (additionalBody != null) {
+      body.addAll(additionalBody);
+    }
 
-      if (response.isSuccess) {
-        // Successful verification clears verification token for this trigger
-        await storeVerificationToken(trigger, null);
-        return CkAuthResult<void>.success(
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
+    Map<String, String> headers = {};
+    if (_config.verificationStrategy == CkOtpVerificationStrategy.tokenBased &&
+        _config.sendVerificationTokenInHeader &&
+        vToken != null) {
+      headers[_config.verificationTokenHeaderKey] = vToken;
+    }
 
-      return CkAuthResult<void>.failure(
-        message: response.message,
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: _verifyUrl!,
+        method: _verifyMethod,
+        jsonBody: body,
+        headers: headers,
+        requiresToken: false,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
+
+    if (response.isSuccess) {
+      await storeVerificationToken(trigger, null);
+      return CkAuthResult<void>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<void>.failure(message: e.toString());
     }
+
+    return CkAuthResult<void>.failure(
+      message: response.message,
+      statusCode: response.statusCode,
+      rawResponse: response.data,
+    );
   }
   
   /// Clear all OTP state

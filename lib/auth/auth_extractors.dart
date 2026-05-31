@@ -10,7 +10,6 @@ class CkAuthExtractors<TProfile> {
   const CkAuthExtractors({
     required this.accessToken,
     this.refreshToken,
-    this.profileData,
     this.profile,
     this.verificationTokens,
     this.message,
@@ -19,15 +18,12 @@ class CkAuthExtractors<TProfile> {
   final String? Function(dynamic data) accessToken;
   final String? Function(dynamic data)? refreshToken;
 
-  /// Profile JSON fragment from [CkResponse.data] (persisted via jsonEncode).
-  final dynamic Function(dynamic data)? profileData;
-
   /// Optional full parse override. When null, [CkProfileExtractor] uses [profileData] + profileExtractor.
   final TProfile? Function(dynamic data)? profile;
 
   /// Trigger-specific verification token extractors.
   final Map<CkOtpTrigger, String? Function(dynamic data)>? verificationTokens;
-  
+
   final String? Function(dynamic data)? message;
 
   /// Standard keys on [CkResponse.data] (post-envelope `data` payload).
@@ -36,16 +32,19 @@ class CkAuthExtractors<TProfile> {
     String refreshTokenKey = 'refreshToken',
     String profileKey = 'user',
     String messageKey = 'message',
+    Map<CkOtpTrigger, String>? verificationTokenKeys = const {
+      CkOtpTrigger.signup: 'createUserToken',
+      CkOtpTrigger.login: 'loginUserToken',
+      CkOtpTrigger.forgetPassword: 'forgetToken',
+    },
   }) {
     return CkAuthExtractors<TProfile>(
       accessToken: (data) => _extractByKey(data, accessTokenKey)?.toString(),
       refreshToken: (data) => _extractByKey(data, refreshTokenKey)?.toString(),
-      profileData: (data) => _extractByKey(data, profileKey),
-      verificationTokens: {
-        CkOtpTrigger.signup: (data) => _extractByKey(data, 'createUserToken')?.toString(),
-        CkOtpTrigger.login: (data) => _extractByKey(data, 'loginUserToken')?.toString(),
-        CkOtpTrigger.forgetPassword: (data) => _extractByKey(data, 'forgetToken')?.toString(),
-      },
+      verificationTokens: _buildVerificationTokenExtractors(
+        verificationTokenKeys,
+        _extractByKey,
+      ),
       message: (data) => _extractByKey(data, messageKey)?.toString(),
     );
   }
@@ -55,23 +54,37 @@ class CkAuthExtractors<TProfile> {
     String? refreshTokenPath,
     String? profilePath,
     String? messagePath,
+    Map<CkOtpTrigger, String>? verificationTokenPaths = const {
+      CkOtpTrigger.signup: 'createUserToken',
+      CkOtpTrigger.login: 'loginUserToken',
+      CkOtpTrigger.forgetPassword: 'forgetToken',
+    },
   }) {
     return CkAuthExtractors<TProfile>(
       accessToken: (data) => _extractByPath(data, accessTokenPath)?.toString(),
       refreshToken: refreshTokenPath != null
           ? (data) => _extractByPath(data, refreshTokenPath)?.toString()
           : null,
-      profileData: profilePath != null
-          ? (data) => _extractByPath(data, profilePath)
-          : null,
-      verificationTokens: {
-        CkOtpTrigger.signup: (data) => _extractByPath(data, 'createUserToken')?.toString(),
-        CkOtpTrigger.login: (data) => _extractByPath(data, 'loginUserToken')?.toString(),
-        CkOtpTrigger.forgetPassword: (data) => _extractByPath(data, 'forgetToken')?.toString(),
-      },
+      verificationTokens: _buildVerificationTokenExtractors(
+        verificationTokenPaths,
+        _extractByPath,
+      ),
       message: messagePath != null
           ? (data) => _extractByPath(data, messagePath)?.toString()
           : null,
+    );
+  }
+
+  static Map<CkOtpTrigger, String? Function(dynamic data)> 
+      _buildVerificationTokenExtractors(
+    Map<CkOtpTrigger, String> tokenKeys,
+    dynamic Function(dynamic data, String key) extractor,
+  ) {
+    return tokenKeys.map(
+      (trigger, key) => MapEntry(
+        trigger,
+        (data) => extractor(data, key)?.toString(),
+      ),
     );
   }
 

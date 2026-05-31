@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:core_kit/auth/auth_config.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
@@ -144,89 +145,108 @@ class CkAuthService<TProfile> {
 
   // ─── Auth Actions ───
 
+  /// Handles OTP flow check and returns OTP result if triggered
+  CkAuthResult<TProfile>? _handleOtpFlow(
+    CkOtpTrigger trigger,
+    dynamic responseData,
+    int? statusCode,
+  ) {
+    final autoOtp = config.otpConfig?.autoTriggers.contains(trigger) ?? false;
+    final vToken = config.extractors.verificationTokens?[trigger]?.call(responseData);
+
+    if (autoOtp && vToken != null) {
+      otpManager.storeVerificationToken(trigger, vToken);
+      otpManager.startResendTimer();
+      return CkAuthResult<TProfile>(
+        isSuccess: true,
+        requiresOtp: true,
+        otpTrigger: trigger,
+        statusCode: statusCode,
+        rawResponse: responseData,
+      );
+    }
+    return null;
+  }
+
+  /// Completes authentication after successful token extraction
+  Future<CkAuthResult<TProfile>> _completeAuthentication(
+    dynamic responseData,
+    int? statusCode,
+  ) async {
+    final access = config.extractors.accessToken(responseData);
+    final refresh = config.extractors.refreshToken?.call(responseData);
+
+    if (access == null) {
+      return CkAuthResult<TProfile>.failure(
+        message: 'Authentication tokens not found in response',
+      );
+    }
+
+    await tokenManager.saveTokens(
+      accessToken: access,
+      refreshToken: refresh,
+    );
+    authState.setAuthenticated();
+    await CkAuthStorageKeys.markNotFirstTimeUser();
+
+    await fetchProfile();
+
+    final profile = _profileExtractor.current;
+    if (config.onProfileLoaded != null && profile != null) {
+      await config.onProfileLoaded?.call(profile);
+    }
+
+    autoNavigate();
+    return CkAuthResult<TProfile>.success(
+      data: profile,
+      statusCode: statusCode,
+      rawResponse: responseData,
+    );
+  }
+
   /// Sign up — returns CkAuthResult with OTP info if needed
   Future<CkAuthResult<TProfile>> signUp({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
-    try {
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: config.endpoints.signupUrl,
-          method: config.endpoints.signupMethod,
-          jsonBody: body,
-          headers: headers,
-          requiresToken: false,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: config.endpoints.signupUrl,
+        method: config.endpoints.signupMethod,
+        jsonBody: body,
+        headers: headers,
+        requiresToken: false,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
 
-      if (response.isSuccess) {
-        // Check if OTP flow is triggered
-        final autoOtp =
-            config.otpConfig?.autoTriggers.contains(CkOtpTrigger.signup) ??
-            false;
-        final vToken = config
-            .extractors
-            .verificationTokens?[CkOtpTrigger.signup]
-            ?.call(response.data);
-
-        if (autoOtp && vToken != null) {
-          await otpManager.storeVerificationToken(CkOtpTrigger.signup, vToken);
-          otpManager.startResendTimer();
-          return CkAuthResult<TProfile>(
-            isSuccess: true,
-            requiresOtp: true,
-            otpTrigger: CkOtpTrigger.signup,
-            statusCode: response.statusCode,
-            rawResponse: response.data,
-          );
-        }
-
-        // Otherwise, see if tokens exist to log in directly
-        final access = config.extractors.accessToken(response.data);
-        final refresh = config.extractors.refreshToken?.call(response.data);
-
-        if (access != null) {
-          await tokenManager.saveTokens(
-            accessToken: access,
-            refreshToken: refresh,
-          );
-          authState.setAuthenticated();
-          await CkAuthStorageKeys.markNotFirstTimeUser();
-
-          // Fetch profile from profileGetUrl after successful signup
-          await fetchProfile();
-
-          final profile = _profileExtractor.current;
-          if (config.onProfileLoaded != null && profile != null) {
-            await config.onProfileLoaded?.call(profile);
-          }
-
-          autoNavigate();
-          return CkAuthResult<TProfile>.success(
-            data: profile,
-            statusCode: response.statusCode,
-            rawResponse: response.data,
-          );
-        }
-
-        // Signup succeeded but no direct token (needs manual login or verification)
-        return CkAuthResult<TProfile>.success(
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-
+    if (!response.isSuccess) {
       return CkAuthResult<TProfile>.failure(
         message: response.message,
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<TProfile>.failure(message: e.toString());
     }
+
+    final otpResult = _handleOtpFlow(
+      CkOtpTrigger.signup,
+      response.data,
+      response.statusCode,
+    );
+    if (otpResult != null) return otpResult;
+
+    final authResult = await _completeAuthentication(
+      response.data,
+      response.statusCode,
+    );
+    
+    if (authResult.isSuccess) return authResult;
+
+    return CkAuthResult<TProfile>.success(
+      statusCode: response.statusCode,
+      rawResponse: response.data,
+    );
   }
 
   /// Sign in — auto-saves tokens, auto-fetches profile
@@ -234,89 +254,37 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
-    try {
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: config.endpoints.signinUrl,
-          method: config.endpoints.signinMethod,
-          jsonBody: body,
-          headers: headers,
-          requiresToken: false,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: config.endpoints.signinUrl,
+        method: config.endpoints.signinMethod,
+        jsonBody: body,
+        headers: headers,
+        requiresToken: false,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
 
-      if (response.isSuccess) {
-        // Check if OTP flow is triggered for login
-        final autoOtp =
-            config.otpConfig?.autoTriggers.contains(CkOtpTrigger.login) ??
-            false;
-        final vToken = config.extractors.verificationTokens?[CkOtpTrigger.login]
-            ?.call(response.data);
-
-        if (autoOtp && vToken != null) {
-          await otpManager.storeVerificationToken(CkOtpTrigger.login, vToken);
-          otpManager.startResendTimer();
-          return CkAuthResult(
-            isSuccess: true,
-            requiresOtp: true,
-            otpTrigger: CkOtpTrigger.login,
-            statusCode: response.statusCode,
-            rawResponse: response.data,
-          );
-        }
-
-        final access = config.extractors.accessToken(response.data);
-        final refresh = config.extractors.refreshToken?.call(response.data);
-
-        if (access != null) {
-          await tokenManager.saveTokens(
-            accessToken: access,
-            refreshToken: refresh,
-          );
-          authState.setAuthenticated();
-          print('[CkAuth] signIn: authState.setAuthenticated() called');
-          
-          print('[CkAuth] signIn: Calling markNotFirstTimeUser()');
-          await CkAuthStorageKeys.markNotFirstTimeUser();
-          print('[CkAuth] signIn: markNotFirstTimeUser() completed');
-
-          // Fetch profile from profileGetUrl after successful login
-          print('[CkAuth] signIn: Fetching profile');
-          await fetchProfile();
-
-          final profile = _profileExtractor.current;
-          print('[CkAuth] signIn: profile = $profile');
-          
-          if (config.onProfileLoaded != null && profile != null) {
-            print('[CkAuth] signIn: Calling onProfileLoaded');
-            await config.onProfileLoaded?.call(profile);
-            print('[CkAuth] signIn: onProfileLoaded completed');
-          }
-
-          print('[CkAuth] signIn: Calling autoNavigate()');
-          autoNavigate();
-          return CkAuthResult<TProfile>.success(
-            data: profile,
-            statusCode: response.statusCode,
-            rawResponse: response.data,
-          );
-        }
-
-        return CkAuthResult<TProfile>.failure(
-          message: 'Authentication tokens not found in sign-in response',
-        );
-      }
-
+    if (!response.isSuccess) {
       return CkAuthResult<TProfile>.failure(
         message: response.message,
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<TProfile>.failure(message: e.toString());
     }
+
+    final otpResult = _handleOtpFlow(
+      CkOtpTrigger.login,
+      response.data,
+      response.statusCode,
+    );
+    if (otpResult != null) return otpResult;
+
+    return await _completeAuthentication(
+      response.data,
+      response.statusCode,
+    );
   }
 
   /// Forgot password — auto-stores forgetToken
@@ -329,56 +297,45 @@ class CkAuthService<TProfile> {
       );
     }
 
-    try {
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: config.endpoints.forgetPasswordUrl!,
-          method: config.endpoints.forgetPasswordMethod,
-          jsonBody: body,
-          requiresToken: false,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: config.endpoints.forgetPasswordUrl!,
+        method: config.endpoints.forgetPasswordMethod,
+        jsonBody: body,
+        requiresToken: false,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
 
-      if (response.isSuccess) {
-        final autoOtp =
-            config.otpConfig?.autoTriggers.contains(
-              CkOtpTrigger.forgetPassword,
-            ) ??
-            false;
-        final fToken = config
-            .extractors
-            .verificationTokens?[CkOtpTrigger.forgetPassword]
-            ?.call(response.data);
-
-        if (fToken != null) {
-          await otpManager.storeVerificationToken(
-            CkOtpTrigger.forgetPassword,
-            fToken,
-          );
-          if (autoOtp) {
-            otpManager.startResendTimer();
-          }
-        }
-
-        return CkAuthResult<void>(
-          isSuccess: true,
-          requiresOtp: autoOtp,
-          otpTrigger: autoOtp ? CkOtpTrigger.forgetPassword : null,
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-
+    if (!response.isSuccess) {
       return CkAuthResult<void>.failure(
         message: response.message,
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<void>.failure(message: e.toString());
     }
+
+    final otpResult = _handleOtpFlow(
+      CkOtpTrigger.forgetPassword,
+      response.data,
+      response.statusCode,
+    );
+
+    if (otpResult != null) {
+      return CkAuthResult<void>(
+        isSuccess: true,
+        requiresOtp: otpResult.requiresOtp,
+        otpTrigger: otpResult.otpTrigger,
+        statusCode: response.statusCode,
+        rawResponse: response.data,
+      );
+    }
+
+    return CkAuthResult<void>.success(
+      statusCode: response.statusCode,
+      rawResponse: response.data,
+    );
   }
 
   /// Verify OTP — uses stored verification token automatically
@@ -394,7 +351,6 @@ class CkAuthService<TProfile> {
     );
 
     if (verifyResult.isSuccess) {
-      // In signup/login OTP verification, the response might return final access tokens
       final data = verifyResult.rawResponse;
       if (data != null) {
         final access = config.extractors.accessToken(data);
@@ -408,16 +364,14 @@ class CkAuthService<TProfile> {
           authState.setAuthenticated();
           await CkAuthStorageKeys.markNotFirstTimeUser();
 
-          await _profileExtractor.applyFromResponse(
-            CkResponse<dynamic>(
-              data: data,
-              isSuccess: true,
-              statusCode: verifyResult.statusCode,
-            ),
-          );
-          final profile = _profileExtractor.current;
-          if (config.onProfileLoaded != null && profile != null) {
-            await config.onProfileLoaded!(profile);
+          final profile = _profileExtractor._parseProfile(data);
+          if (profile != null) {
+            final fingerprint = jsonEncode(data);
+            _profileExtractor._cacheProfile(profile, fingerprint);
+            
+            if (config.onProfileLoaded != null) {
+              await config.onProfileLoaded!(profile);
+            }
           }
 
           autoNavigate();
@@ -448,32 +402,28 @@ class CkAuthService<TProfile> {
       );
     }
 
-    try {
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: config.endpoints.changePasswordUrl!,
-          method: config.endpoints.changePasswordMethod,
-          jsonBody: body,
-          headers: headers,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: config.endpoints.changePasswordUrl!,
+        method: config.endpoints.changePasswordMethod,
+        jsonBody: body,
+        headers: headers,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
 
-      if (response.isSuccess) {
-        return CkAuthResult<void>.success(
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-      return CkAuthResult<void>.failure(
-        message: response.message,
+    if (response.isSuccess) {
+      return CkAuthResult<void>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<void>.failure(message: e.toString());
     }
+    return CkAuthResult<void>.failure(
+      message: response.message,
+      statusCode: response.statusCode,
+      rawResponse: response.data,
+    );
   }
 
   // ─── Social Login ───
@@ -610,59 +560,36 @@ class CkAuthService<TProfile> {
   }
 
   void autoNavigate() async {
-    if (config.routes == null) {
-      print('[CkAuth] autoNavigate: routes is null, returning');
-      return;
-    }
+    if (config.routes == null) return;
 
-    // Resolve what to navigate to first (may involve async storage reads).
     final bool authenticated = authState.isAuthenticated;
-    print('[CkAuth] autoNavigate: authenticated = $authenticated');
-    
     bool? isFirstTime;
     if (!authenticated) {
       isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
-      print('[CkAuth] autoNavigate: isFirstTime = $isFirstTime');
     }
 
-    // Execute navigation immediately without delays
-    try {
-      print('[CkAuth] autoNavigate: Executing navigation (authenticated=$authenticated)');
+    void navigate() {
       if (authenticated) {
-        print('[CkAuth] autoNavigate: Calling routeOnSuccess');
         config.routes!.routeOnSuccess();
       } else {
         if (config.routes!.routeToOnboarding != null) {
           final showOnboarding =
               !config.routes!.firstTimeOnly || (isFirstTime ?? true);
-          print('[CkAuth] autoNavigate: showOnboarding = $showOnboarding');
           if (showOnboarding) {
-            print('[CkAuth] autoNavigate: Calling routeToOnboarding');
             config.routes!.routeToOnboarding!();
           } else {
-            print('[CkAuth] autoNavigate: Calling routeToLogin');
             config.routes!.routeToLogin();
           }
         } else {
-          print('[CkAuth] autoNavigate: routeToOnboarding is null, calling routeToLogin');
           config.routes!.routeToLogin();
         }
       }
-    } catch (e) {
-      print('[CkAuth] autoNavigate: Error: $e');
-      // Retry once with a small delay
-      Future.delayed(const Duration(milliseconds: 100), () {
-        try {
-          print('[CkAuth] autoNavigate: Retry attempt');
-          if (authenticated) {
-            config.routes!.routeOnSuccess();
-          } else {
-            config.routes!.routeToLogin();
-          }
-        } catch (e2) {
-          print('[CkAuth] autoNavigate: Retry failed: $e2');
-        }
-      });
+    }
+
+    try {
+      navigate();
+    } catch (_) {
+      Future.delayed(const Duration(milliseconds: 100), navigate);
     }
   }
 }

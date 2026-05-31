@@ -162,56 +162,52 @@ class CkSocialAuthManager<TProfile> {
     required Map<String, dynamic> body,
     required CkAuthExtractors<TProfile> extractors,
   }) async {
-    try {
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: url,
-          method: method,
-          jsonBody: body,
-          requiresToken:
-              false, // social sign-in usually doesn't require an access token yet
-        ),
-        responseBuilder: (data) => data,
-      );
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: url,
+        method: method,
+        jsonBody: body,
+        requiresToken:
+            false, // social sign-in usually doesn't require an access token yet
+      ),
+      responseBuilder: (data) => data,
+    );
 
-      if (response.isSuccess) {
-        final access = extractors.accessToken(response.data);
-        final refresh = extractors.refreshToken?.call(response.data);
-
-        if (access == null) {
-          return CkAuthResult<TProfile>.failure(
-            message: 'Access token not found in social login response',
-          );
-        }
-
-        await _tokenManager.saveTokens(
-          accessToken: access,
-          refreshToken: refresh,
-        );
-
-        await _profileExtractor.applyFromResponse(response);
-        final profile = _profileExtractor.current;
-
-        _stateController.setAuthenticated();
-        await CkAuthStorageKeys.markNotFirstTimeUser();
-
-        // Auto navigate to authenticated screen
-        await _logoutHandler.autoNavigate();
-
-        return CkAuthResult.success(
-          data: profile,
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-
+    if (!response.isSuccess) {
       return CkAuthResult<TProfile>.failure(
         message: response.message,
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    } catch (e) {
-      return CkAuthResult<TProfile>.failure(message: e.toString());
     }
+
+    final access = extractors.accessToken(response.data);
+    final refresh = extractors.refreshToken?.call(response.data);
+
+    if (access == null) {
+      return CkAuthResult<TProfile>.failure(
+        message: 'Access token not found in social login response',
+      );
+    }
+
+    await _tokenManager.saveTokens(
+      accessToken: access,
+      refreshToken: refresh,
+    );
+
+    await _profileExtractor.applyFromResponse(response);
+    final profile = _profileExtractor.current;
+
+    _stateController.setAuthenticated();
+    await CkAuthStorageKeys.markNotFirstTimeUser();
+
+    // Auto navigate to authenticated screen
+    await _logoutHandler.autoNavigate();
+
+    return CkAuthResult.success(
+      data: profile,
+      statusCode: response.statusCode,
+      rawResponse: response.data,
+    );
   }
 }
