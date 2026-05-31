@@ -584,20 +584,33 @@ class CkAuthService<TProfile> {
 
   void _autoNavigate() async {
     if (config.routes == null) return;
-    if (authState.isAuthenticated) {
-      config.routes!.routeOnSuccess();
-    } else {
-      final isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
-      if (config.routes!.routeToOnboarding != null) {
-        final showOnboarding = !config.routes!.firstTimeOnly || isFirstTime;
-        if (showOnboarding) {
-          config.routes!.routeToOnboarding!();
+
+    // Resolve what to navigate to first (may involve async storage reads).
+    final bool authenticated = authState.isAuthenticated;
+    bool? isFirstTime;
+    if (!authenticated) {
+      isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
+    }
+
+    // Defer the actual navigation to the next frame.
+    // This guarantees the widget tree (including GetMaterialApp / Navigator)
+    // is fully mounted before any contextless navigation is attempted.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (authenticated) {
+        config.routes!.routeOnSuccess();
+      } else {
+        if (config.routes!.routeToOnboarding != null) {
+          final showOnboarding =
+              !config.routes!.firstTimeOnly || (isFirstTime ?? true);
+          if (showOnboarding) {
+            config.routes!.routeToOnboarding!();
+          } else {
+            config.routes!.routeToLogin();
+          }
         } else {
           config.routes!.routeToLogin();
         }
-      } else {
-        config.routes!.routeToLogin();
       }
-    }
+    });
   }
 }
