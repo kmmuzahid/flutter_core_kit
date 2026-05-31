@@ -1,24 +1,25 @@
 import 'dart:async';
+
 import 'package:core_kit/auth/auth_config.dart';
 import 'package:core_kit/auth/auth_extractors.dart';
 import 'package:core_kit/auth/auth_result.dart';
-import 'package:core_kit/storage/ck_storage.dart';
-import 'package:core_kit/auth/token/auth_storage_keys.dart';
-import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/auth/state/auth_state_controller.dart';
-import 'package:core_kit/auth/state/profile_extractor.dart';
+import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
-import 'package:core_kit/auth/logout/logout_handler.dart';
-import 'package:core_kit/auth/social/social_auth_manager.dart';
-import 'package:core_kit/auth/social/social_login_config.dart';
-import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
 import 'package:core_kit/auth/social/facebook_auth_config.dart';
-import 'package:core_kit/network/ck_transport.dart';
+import 'package:core_kit/auth/social/google_auth_config.dart';
+import 'package:core_kit/auth/social/social_auth_manager.dart';
+import 'package:core_kit/auth/social/social_login_config.dart';
+import 'package:core_kit/auth/state/auth_state_controller.dart';
+import 'package:core_kit/auth/state/profile_extractor.dart';
+import 'package:core_kit/auth/token/auth_storage_keys.dart';
+import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/network/ck_response.dart';
+import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/storage/ck_storage.dart';
+import 'package:flutter/material.dart';
 
 /// Token layer prepared before [CkTransport.init] (CoreKit internal).
 class CkAuthNetworkBootstrap {
@@ -164,8 +165,12 @@ class CkAuthService<TProfile> {
       if (response.isSuccess) {
         // Check if OTP flow is triggered
         final autoOtp =
-            config.otpConfig?.autoTriggers.contains(CkOtpTrigger.signup) ?? false;
-        final vToken = config.extractors.verificationTokens?[CkOtpTrigger.signup]?.call(response.data);
+            config.otpConfig?.autoTriggers.contains(CkOtpTrigger.signup) ??
+            false;
+        final vToken = config
+            .extractors
+            .verificationTokens?[CkOtpTrigger.signup]
+            ?.call(response.data);
 
         if (autoOtp && vToken != null) {
           await otpManager.storeVerificationToken(CkOtpTrigger.signup, vToken);
@@ -243,8 +248,10 @@ class CkAuthService<TProfile> {
       if (response.isSuccess) {
         // Check if OTP flow is triggered for login
         final autoOtp =
-            config.otpConfig?.autoTriggers.contains(CkOtpTrigger.login) ?? false;
-        final vToken = config.extractors.verificationTokens?[CkOtpTrigger.login]?.call(response.data);
+            config.otpConfig?.autoTriggers.contains(CkOtpTrigger.login) ??
+            false;
+        final vToken = config.extractors.verificationTokens?[CkOtpTrigger.login]
+            ?.call(response.data);
 
         if (autoOtp && vToken != null) {
           await otpManager.storeVerificationToken(CkOtpTrigger.login, vToken);
@@ -326,7 +333,10 @@ class CkAuthService<TProfile> {
               CkOtpTrigger.forgetPassword,
             ) ??
             false;
-        final fToken = config.extractors.verificationTokens?[CkOtpTrigger.forgetPassword]?.call(response.data);
+        final fToken = config
+            .extractors
+            .verificationTokens?[CkOtpTrigger.forgetPassword]
+            ?.call(response.data);
 
         if (fToken != null) {
           await otpManager.storeVerificationToken(
@@ -465,7 +475,9 @@ class CkAuthService<TProfile> {
   }
 
   /// Authenticate with Facebook
-  Future<CkAuthResult<TProfile>> signInWithFacebook(CkFacebookAuthData data) async {
+  Future<CkAuthResult<TProfile>> signInWithFacebook(
+    CkFacebookAuthData data,
+  ) async {
     return socialManager.authenticateFacebook(data);
   }
 
@@ -543,7 +555,9 @@ class CkAuthService<TProfile> {
   /// Fetches the profile from the server using the configured [profileGetUrl].
   Future<CkAuthResult<TProfile?>> fetchProfile() async {
     if (config.endpoints.profileGetUrl == null) {
-      return const CkAuthResult.failure(message: 'Profile GET URL is not configured');
+      return const CkAuthResult.failure(
+        message: 'Profile GET URL is not configured',
+      );
     }
     return _profileExtractor.fetchProfile(
       config.endpoints.profileGetUrl!,
@@ -558,7 +572,9 @@ class CkAuthService<TProfile> {
     Map<String, dynamic>? jsonBody,
   }) async {
     if (config.endpoints.profileUpdateUrl == null) {
-      return const CkAuthResult.failure(message: 'Profile update URL is not configured');
+      return const CkAuthResult.failure(
+        message: 'Profile update URL is not configured',
+      );
     }
     final result = await _profileExtractor.updateProfileRemote(
       url: config.endpoints.profileUpdateUrl!,
