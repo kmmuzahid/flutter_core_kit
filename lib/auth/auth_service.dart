@@ -274,6 +274,7 @@ class CkAuthService<TProfile> {
             refreshToken: refresh,
           );
           authState.setAuthenticated();
+          print('[CkAuth] signIn: authState.setAuthenticated() called');
           await CkAuthStorageKeys.markNotFirstTimeUser();
 
           await _profileExtractor.applyFromResponse(response);
@@ -282,6 +283,7 @@ class CkAuthService<TProfile> {
             await config.onProfileLoaded?.call(profile);
           }
 
+          print('[CkAuth] signIn: Calling autoNavigate()');
           autoNavigate();
           return CkAuthResult<TProfile>.success(
             data: profile,
