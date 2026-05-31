@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 class CkLogger {
+  CkLogger._();
+
   static bool enableLogs = kDebugMode; // Only log in debug mode
   static final DateFormat _timeFormatter = DateFormat('HH:mm:ss');
 

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CkUtils {
+  CkUtils._();
+
   static late Size deviceSize;
 
   static RepaintBoundary divider() => RepaintBoundary(

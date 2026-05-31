@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 /// A helper class for handling permission requests.
 class CkPermissionHelper {
-  const CkPermissionHelper();
+  CkPermissionHelper._();
 
   static Future<bool> request(Permission permission) async {
     var currentStatus = false;
