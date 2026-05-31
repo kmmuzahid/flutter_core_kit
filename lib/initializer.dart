@@ -154,6 +154,10 @@ abstract class CoreKitConfig {
 
   /// Custom asynchronous initialization tasks run during the splash delay.
   Future<void> Function()? get onInit => null;
+
+  /// Splash delay in milliseconds (default: 3000ms = 3 seconds)
+  /// Set to 0 to disable the enforced delay
+  int get splashDelayMs => 3000;
 }
 
 mixin CoreKitConfigDefaults on CoreKitConfig {
@@ -175,6 +179,8 @@ mixin CoreKitConfigDefaults on CoreKitConfig {
   Widget? get preInitChild => null;
   @override
   Future<void> Function()? get onInit => null;
+  @override
+  int get splashDelayMs => 3000;
 }
 
 // ============================================================
@@ -265,35 +271,18 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
         } catch (_) {}
       }
 
-      // Enforce default 3 seconds splash delay
+      // Enforce configured splash delay (default: 3000ms)
       final elapsedMs = stopwatch.elapsedMilliseconds;
-      final remainingMs = 3000 - elapsedMs;
+      final delayMs = config.splashDelayMs;
+      final remainingMs = delayMs - elapsedMs;
       if (remainingMs > 0) {
         await Future.delayed(Duration(milliseconds: remainingMs));
       }
       stopwatch.stop();
 
-      // Trigger automatic navigation after the delay finishes
-      // Ensure this runs even if there are issues with the widget tree
+      // Trigger automatic navigation immediately after delay finishes
       if (config.authConfig != null && CkAuthService.isInitialized) {
-        // Delay slightly to ensure widget tree is ready
-        Future.delayed(const Duration(milliseconds: 50), () {
-          try {
-            CkAuthService.instance.autoNavigate();
-          } catch (e) {
-            // If autoNavigate fails, try again after a longer delay
-            Future.delayed(const Duration(milliseconds: 200), () {
-              try {
-                CkAuthService.instance.autoNavigate();
-              } catch (e2) {
-                // Last resort attempt
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  CkAuthService.instance.autoNavigate();
-                });
-              }
-            });
-          }
-        });
+        CkAuthService.instance.autoNavigate();
       }
 
       CkScreenUtils.init(context, () => completer.complete());

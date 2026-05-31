@@ -596,56 +596,59 @@ class CkAuthService<TProfile> {
   }
 
   void autoNavigate() async {
-    if (config.routes == null) return;
+    if (config.routes == null) {
+      print('[CkAuth] autoNavigate: routes is null, returning');
+      return;
+    }
 
     // Resolve what to navigate to first (may involve async storage reads).
     final bool authenticated = authState.isAuthenticated;
+    print('[CkAuth] autoNavigate: authenticated = $authenticated');
+    
     bool? isFirstTime;
     if (!authenticated) {
       isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
+      print('[CkAuth] autoNavigate: isFirstTime = $isFirstTime');
     }
 
-    // Schedule navigation with multiple fallbacks to ensure it runs
-    Future.delayed(const Duration(milliseconds: 100), () {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Execute navigation immediately without delays
+    try {
+      print('[CkAuth] autoNavigate: Executing navigation (authenticated=$authenticated)');
+      if (authenticated) {
+        print('[CkAuth] autoNavigate: Calling routeOnSuccess');
+        config.routes!.routeOnSuccess();
+      } else {
+        if (config.routes!.routeToOnboarding != null) {
+          final showOnboarding =
+              !config.routes!.firstTimeOnly || (isFirstTime ?? true);
+          print('[CkAuth] autoNavigate: showOnboarding = $showOnboarding');
+          if (showOnboarding) {
+            print('[CkAuth] autoNavigate: Calling routeToOnboarding');
+            config.routes!.routeToOnboarding!();
+          } else {
+            print('[CkAuth] autoNavigate: Calling routeToLogin');
+            config.routes!.routeToLogin();
+          }
+        } else {
+          print('[CkAuth] autoNavigate: routeToOnboarding is null, calling routeToLogin');
+          config.routes!.routeToLogin();
+        }
+      }
+    } catch (e) {
+      print('[CkAuth] autoNavigate: Error: $e');
+      // Retry once with a small delay
+      Future.delayed(const Duration(milliseconds: 100), () {
         try {
+          print('[CkAuth] autoNavigate: Retry attempt');
           if (authenticated) {
             config.routes!.routeOnSuccess();
           } else {
-            if (config.routes!.routeToOnboarding != null) {
-              final showOnboarding =
-                  !config.routes!.firstTimeOnly || (isFirstTime ?? true);
-              if (showOnboarding) {
-                config.routes!.routeToOnboarding!();
-              } else {
-                config.routes!.routeToLogin();
-              }
-            } else {
-              config.routes!.routeToLogin();
-            }
+            config.routes!.routeToLogin();
           }
-        } catch (e) {
-          // Fallback: try again after a longer delay if first attempt fails
-          Future.delayed(const Duration(milliseconds: 500), () {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              try {
-                if (authenticated) {
-                  config.routes!.routeOnSuccess();
-                } else {
-                  config.routes!.routeToLogin();
-                }
-              } catch (e2) {
-                // Last resort: direct navigation without postFrameCallback
-                if (authenticated) {
-                  config.routes!.routeOnSuccess();
-                } else {
-                  config.routes!.routeToLogin();
-                }
-              }
-            });
-          });
+        } catch (e2) {
+          print('[CkAuth] autoNavigate: Retry failed: $e2');
         }
       });
-    });
+    }
   }
 }
