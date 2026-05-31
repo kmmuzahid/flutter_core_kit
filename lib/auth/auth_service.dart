@@ -193,7 +193,7 @@ class CkAuthService<TProfile> {
 
     final profile = _profileExtractor.current;
     if (config.onProfileLoaded != null && profile != null) {
-      await config.onProfileLoaded?.call(profile);
+      await (config.onProfileLoaded as dynamic)(profile);
     }
 
     autoNavigate();
@@ -370,13 +370,13 @@ class CkAuthService<TProfile> {
             _profileExtractor.cacheProfile(profile, fingerprint);
             
             if (config.onProfileLoaded != null) {
-              await config.onProfileLoaded!(profile);
+              await (config.onProfileLoaded as dynamic)(profile);
             }
           } else {
             await fetchProfile();
             final fetchedProfile = _profileExtractor.current;
             if (config.onProfileLoaded != null && fetchedProfile != null) {
-              await config.onProfileLoaded!(fetchedProfile);
+              await (config.onProfileLoaded as dynamic)(fetchedProfile);
             }
           }
 
@@ -502,7 +502,7 @@ class CkAuthService<TProfile> {
             )
             .then((result) {
               if (result.isSuccess && result.data != null) {
-                 config.onProfileLoaded?.call(result.data as TProfile);
+                (config.onProfileLoaded as dynamic)(result.data as TProfile);
               }
             });
       }
