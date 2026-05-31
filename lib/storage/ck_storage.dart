@@ -1,8 +1,14 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Secure storage with guaranteed fallback.
-/// Chain: FlutterSecureStorage → SharedPreferences (plain)
+/// Secure storage with guaranteed fallback + zero-latency in-memory cache.
+///
+/// Read layer  : memory cache → (miss) disk read → populate cache
+/// Write layer : update cache immediately, persist to disk in background
+/// Delete layer: evict from cache, delete from disk
+/// deleteAll   : wipe cache, wipe disk
+///
+/// Disk chain  : FlutterSecureStorage → SharedPreferences (plain fallback)
 /// NEVER fails — always has an alternative.
 abstract class CkStorage {
   static FlutterSecureStorage? _secureStorage;
@@ -10,15 +16,33 @@ abstract class CkStorage {
   static bool _useSecure = true;
   static bool _initialized = false;
 
+  /// In-memory cache: key → value.
+  /// `null` value means the key was explicitly deleted (tombstone).
+  /// Absent key means never read from disk yet.
+  static final Map<String, String?> _cache = {};
+
+  // ─── Initialization ────────────────────────────────────────────────────────
+
   static Future<void> initialize() async {
     if (_initialized) return;
     try {
       _secureStorage = const FlutterSecureStorage();
-      await _secureStorage!.write(key: '_core_kit_test', value: 'ok');
-      await _secureStorage!.delete(key: '_core_kit_test');
+      // Wrap in a timeout — flutter_secure_storage can hang 10-20s on Android
+      // during first use if the Keystore hasn't warmed up yet (known upstream bug).
+      await Future.wait([
+        _secureStorage!.write(key: '_core_kit_test', value: 'ok'),
+      ]).timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => throw Exception('SecureStorage timeout'),
+      );
+      await _secureStorage!.delete(key: '_core_kit_test').timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => throw Exception('SecureStorage timeout'),
+      );
       _useSecure = true;
     } catch (_) {
       _useSecure = false;
+      _secureStorage = null;
       try {
         _fallbackStorage = await SharedPreferences.getInstance();
       } catch (_) {}
@@ -27,13 +51,25 @@ abstract class CkStorage {
   }
 
   static Future<void> _ensureInitialized() async {
-    if (!_initialized) {
-      await initialize();
-    }
+    if (!_initialized) await initialize();
   }
 
+  // ─── Write ─────────────────────────────────────────────────────────────────
+
+  /// Writes [value] for [key].
+  /// Cache is updated synchronously before returning so subsequent reads
+  /// are instant. Disk persistence runs concurrently in the background.
   static Future<void> write(String key, String value) async {
     await _ensureInitialized();
+
+    // 1. Update cache immediately — callers get zero-latency reads after this.
+    _cache[key] = value;
+
+    // 2. Persist to disk (fire-and-forget is intentional — cache stays consistent).
+    _writeToDisk(key, value);
+  }
+
+  static Future<void> _writeToDisk(String key, String value) async {
     try {
       if (_useSecure) {
         _secureStorage ??= const FlutterSecureStorage();
@@ -51,8 +87,24 @@ abstract class CkStorage {
     }
   }
 
+  // ─── Read ──────────────────────────────────────────────────────────────────
+
+  /// Reads the value for [key].
+  /// Returns from memory cache on every hit — O(1), no I/O.
+  /// On a cache miss, reads from disk and populates the cache for next time.
   static Future<String?> read(String key) async {
     await _ensureInitialized();
+
+    // Cache hit (including explicitly-deleted tombstone → null).
+    if (_cache.containsKey(key)) return _cache[key];
+
+    // Cache miss — read from disk and populate.
+    final value = await _readFromDisk(key);
+    _cache[key] = value; // store null too so we don't hit disk again
+    return value;
+  }
+
+  static Future<String?> _readFromDisk(String key) async {
     try {
       if (_useSecure) {
         _secureStorage ??= const FlutterSecureStorage();
@@ -73,8 +125,20 @@ abstract class CkStorage {
     }
   }
 
+  // ─── Delete ────────────────────────────────────────────────────────────────
+
+  /// Deletes [key] from both the memory cache and disk.
   static Future<void> delete(String key) async {
     await _ensureInitialized();
+
+    // Evict from cache immediately (tombstone so reads return null instantly).
+    _cache[key] = null;
+
+    // Remove from disk in background.
+    _deleteFromDisk(key);
+  }
+
+  static Future<void> _deleteFromDisk(String key) async {
     try {
       if (_useSecure) {
         _secureStorage ??= const FlutterSecureStorage();
@@ -92,9 +156,20 @@ abstract class CkStorage {
     }
   }
 
-  /// Clears ALL stored keys and values.
+  // ─── Delete All ────────────────────────────────────────────────────────────
+
+  /// Clears ALL stored keys and values from both memory cache and disk.
   static Future<void> deleteAll() async {
     await _ensureInitialized();
+
+    // Wipe memory cache immediately.
+    _cache.clear();
+
+    // Wipe disk in background.
+    _deleteAllFromDisk();
+  }
+
+  static Future<void> _deleteAllFromDisk() async {
     try {
       if (_useSecure) {
         _secureStorage ??= const FlutterSecureStorage();
@@ -112,4 +187,3 @@ abstract class CkStorage {
     }
   }
 }
-

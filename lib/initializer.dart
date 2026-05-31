@@ -191,11 +191,16 @@ class CoreKitRouterGate extends StatefulWidget {
 }
 
 class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
-  bool _networkInitialized = false;
+  bool _initStarted = false;
+  bool _initDone = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Guard: only run once — didChangeDependencies fires on every dependency
+    // change (theme, locale, MediaQuery, etc.) but init must run exactly once.
+    if (_initStarted) return;
+    _initStarted = true;
     _initializeCoreKit();
   }
 
@@ -227,38 +232,39 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       if (config.listLoaderConfig != null) {
         instance.listLoaderConfig = config.listLoaderConfig!;
       }
-      if (!_networkInitialized) {
-        _networkInitialized = true;
-        if (config.authConfig != null) {
-          final authNetwork = await CkAuthService.prepareNetwork(
-            config: config.authConfig!,
-          );
-          await CkTransport.init(
-            config: config.ckTransportConfig,
-            tokenProvider: authNetwork.tokenProvider,
-          );
-          await CkAuthService.init(
-            config: config.authConfig!,
-            tokenManager: authNetwork.tokenManager,
-          );
-        } else {
-          await CkTransport.init(
-            config: config.ckTransportConfig,
-            tokenProvider: CkTokenProvider.unauthenticated(),
-          );
-        }
+
+      if (config.authConfig != null) {
+        final authNetwork = await CkAuthService.prepareNetwork(
+          config: config.authConfig!,
+        );
+        await CkTransport.init(
+          config: config.ckTransportConfig,
+          tokenProvider: authNetwork.tokenProvider,
+        );
+        await CkAuthService.init(
+          config: config.authConfig!,
+          tokenManager: authNetwork.tokenManager,
+        );
+      } else {
+        await CkTransport.init(
+          config: config.ckTransportConfig,
+          tokenProvider: CkTokenProvider.unauthenticated(),
+        );
       }
+
       CkScreenUtils.init(context, () => completer.complete());
     });
 
     await completer.future;
 
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() => _initDone = true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_networkInitialized) {
+    if (!_initDone) {
       return Scaffold(body: widget.config.preInitChild ?? Container());
     }
     return widget.child;
