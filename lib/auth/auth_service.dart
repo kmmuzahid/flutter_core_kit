@@ -275,12 +275,22 @@ class CkAuthService<TProfile> {
           );
           authState.setAuthenticated();
           print('[CkAuth] signIn: authState.setAuthenticated() called');
+          
+          print('[CkAuth] signIn: Calling markNotFirstTimeUser()');
           await CkAuthStorageKeys.markNotFirstTimeUser();
+          print('[CkAuth] signIn: markNotFirstTimeUser() completed');
 
+          print('[CkAuth] signIn: Calling applyFromResponse');
           await _profileExtractor.applyFromResponse(response);
+          print('[CkAuth] signIn: applyFromResponse completed');
+          
           final profile = _profileExtractor.current;
+          print('[CkAuth] signIn: profile = $profile');
+          
           if (config.onProfileLoaded != null && profile != null) {
+            print('[CkAuth] signIn: Calling onProfileLoaded');
             await config.onProfileLoaded?.call(profile);
+            print('[CkAuth] signIn: onProfileLoaded completed');
           }
 
           print('[CkAuth] signIn: Calling autoNavigate()');
