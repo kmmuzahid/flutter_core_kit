@@ -196,7 +196,9 @@ class CkAuthService<TProfile> {
           authState.setAuthenticated();
           await CkAuthStorageKeys.markNotFirstTimeUser();
 
-          await _profileExtractor.applyFromResponse(response);
+          // Fetch profile from profileGetUrl after successful signup
+          await fetchProfile();
+
           final profile = _profileExtractor.current;
           if (config.onProfileLoaded != null && profile != null) {
             await config.onProfileLoaded?.call(profile);
@@ -280,10 +282,10 @@ class CkAuthService<TProfile> {
           await CkAuthStorageKeys.markNotFirstTimeUser();
           print('[CkAuth] signIn: markNotFirstTimeUser() completed');
 
-          print('[CkAuth] signIn: Calling applyFromResponse');
-          await _profileExtractor.applyFromResponse(response);
-          print('[CkAuth] signIn: applyFromResponse completed');
-          
+          // Fetch profile from profileGetUrl after successful login
+          print('[CkAuth] signIn: Fetching profile');
+          await fetchProfile();
+
           final profile = _profileExtractor.current;
           print('[CkAuth] signIn: profile = $profile');
           
