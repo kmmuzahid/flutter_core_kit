@@ -41,12 +41,11 @@ class CkLogoutHandler {
 
   /// Execute full logout sequence:
   /// 1. Call API (if configured)
-  /// 2. Call custom onLogout callback (if configured in authConfig)
-  /// 3. Clear tokens
-  /// 4. Clear profile
-  /// 5. Clear OTP state
-  /// 6. Set auth status to unauthenticated
-  /// 7. Navigate to login or onboarding (auto-detected)
+  /// 2. Clear tokens
+  /// 3. Clear profile
+  /// 4. Clear OTP state
+  /// 5. Set auth status to unauthenticated
+  /// 6. Navigate to login or onboarding (auto-detected)
   Future<void> execute() async {
     if (_logoutUrl != null) {
       try {
@@ -66,10 +65,6 @@ class CkLogoutHandler {
         // Ignore API failures to ensure local session is always cleared
       }
     }
-
-    // Call custom onLogout callback for app-specific cleanup
-    // This allows clearing custom storage without requiring logoutConfig
-    await _config.onLogout?.call();
 
     // Clear local states
     await _tokenManager.clearTokens();
