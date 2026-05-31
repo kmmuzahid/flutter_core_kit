@@ -1,9 +1,0 @@
-# include: package:custom_lint/rules.yaml
-
-# analyzer:
-#   plugins:
-#     - custom_lint
-
-# custom_lint:
-#   rules:
-#     - protected_lint

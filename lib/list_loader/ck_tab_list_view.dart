@@ -74,8 +74,8 @@ class CkTabConfig<T> {
 }
 
 // ignore: must_be_immutable
-class CkTabListLoader<T> extends StatefulWidget {
-  CkTabListLoader({
+class CkTabListView<T> extends StatefulWidget {
+  CkTabListView({
     required this.tabs,
     required this.itemBuilder,
     this.onTabControllerReady,
@@ -152,10 +152,10 @@ class CkTabListLoader<T> extends StatefulWidget {
   final int limit;
 
   @override
-  State<CkTabListLoader<T>> createState() => _CkTabListLoaderState<T>();
+  State<CkTabListView<T>> createState() => _CkTabListViewState<T>();
 }
 
-class _CkTabListLoaderState<T> extends State<CkTabListLoader<T>>
+class _CkTabListViewState<T> extends State<CkTabListView<T>>
     with TickerProviderStateMixin {
   late Map<T, ScrollController> _scrollControllers;
   int _currentIndex = 0;
@@ -176,7 +176,7 @@ class _CkTabListLoaderState<T> extends State<CkTabListLoader<T>>
   }
 
   @override
-  void didUpdateWidget(covariant CkTabListLoader<T> oldWidget) {
+  void didUpdateWidget(covariant CkTabListView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.gridConfig != widget.gridConfig) {
       _update();
@@ -378,6 +378,3 @@ class _CkTabListLoaderState<T> extends State<CkTabListLoader<T>>
           );
   }
 }
-
-
-

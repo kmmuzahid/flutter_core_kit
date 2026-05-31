@@ -102,3 +102,37 @@ class CkLogger {
   }
 }
 
+/// Global shortcut for [CkLogger.info]
+void ckInfo(String message, {String? tag}) {
+  CkLogger.info(message, tag: tag);
+}
+
+/// Global shortcut for [CkLogger.warning]
+void ckWarning(String message, {String? tag}) {
+  CkLogger.warning(message, tag: tag);
+}
+
+/// Global shortcut for [CkLogger.error]
+void ckError(String message, {String? tag}) {
+  CkLogger.error(message, tag: tag);
+}
+
+/// Global shortcut for [CkLogger.debug]
+void ckDebug(String message, {String? tag}) {
+  CkLogger.debug(message, tag: tag);
+}
+
+/// Global shortcut for [CkLogger.apiDebug]
+void ckApiDebug(String message, {String? tag}) {
+  CkLogger.apiDebug(message, tag: tag);
+}
+
+/// Global shortcut for [CkLogger.apiError]
+void ckApiError(String message, {String? tag}) {
+  CkLogger.apiError(message, tag: tag);
+}
+
+/// Global shortcut for [CkLogger.screen]
+void ckScreen(String message, {String? tag}) {
+  CkLogger.screen(message, tag: tag);
+}

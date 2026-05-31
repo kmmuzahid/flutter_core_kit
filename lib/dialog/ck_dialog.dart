@@ -1,7 +1,8 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
 
-Future ckDialog({
+// ignore: non_constant_identifier_names
+Future CkDialog({
   required Widget child,
   required BuildContext context,
   bool isDismissible = false,
@@ -21,7 +22,8 @@ Future ckDialog({
   );
 }
 
-Future ckDialogWithActions({
+// ignore: non_constant_identifier_names
+Future CkDialogWithActions({
   required List<Widget> content,
   required BuildContext context,
   required String title,
@@ -45,10 +47,26 @@ Future ckDialogWithActions({
         child: validationRequired
             ? CkForm(
                 builder: (context, formKey) => _body(
-                  title, subTitle, content, onConfirm, onCancel, formKey, action, cancel,
+                  title,
+                  subTitle,
+                  content,
+                  onConfirm,
+                  onCancel,
+                  formKey,
+                  action,
+                  cancel,
                 ),
               )
-            : _body(title, subTitle, content, onConfirm, onCancel, null, action, cancel),
+            : _body(
+                title,
+                subTitle,
+                content,
+                onConfirm,
+                onCancel,
+                null,
+                action,
+                cancel,
+              ),
       ),
     ),
   );

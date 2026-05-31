@@ -23,10 +23,6 @@ dependencies:
   intl_phone_field_v2: # another_flushbar:
 
   share_plus:
-  path:
-
-  analyzer: any
-  analyzer_plugin: any
   http: any
   path_provider: any
   http_parser: any

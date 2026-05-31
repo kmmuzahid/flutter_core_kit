@@ -28,8 +28,7 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 12. [Authentication Module](#authentication-module)
 13. [Location Pickers](#location-pickers)
 14. [Utilities & Extensions](#utilities--extensions)
-15. [Custom Lints (Experimental)](#custom-lints-experimental)
-16. [License](#license)
+15. [License](#license)
 
 ---
 
@@ -426,26 +425,53 @@ CkDropDown<User>(
 )
 
 CkRadioGroupFormField<String>(
-  options: const [
-    RadioOption('Option 1', 'opt1'),
-    RadioOption('Option 2', 'opt2'),
-  ],
-  selectedValue: _value,
-  onChanged: (v) => setState(() => _value = v),
+  options: const ['Option 1', 'Option 2'],
+  labelBuilder: (option) => option,
+  initialValue: _selectedOption,
+  onSaved: (value) => _selectedOption = value,
 )
 ```
 
 ### Images
 
+`CkImage` is a highly versatile image loading widget that dynamically resolves the source based on prefix or file type. It accepts SVG assets, network URLs, local file system paths, and standard asset images. It also provides built-in support for rendering images in grayscale.
+
 ```dart
-// Relative path — prefixed with imageBaseUrl
+// 1. Network Image (absolute URL or relative path prefixed with imageBaseUrl)
 CkImage(
-  src: 'products/item.jpg',
+  src: 'products/item.jpg', // relative
+  // src: 'https://example.com/logo.png', // absolute URL
   size: 100,
   borderRadius: 12,
   fill: BoxFit.cover,
 )
 
+// 2. SVG Asset Image (recognized automatically if starting with assets/ and ending/containing .svg)
+CkImage(
+  src: 'assets/svg/icon.svg',
+  size: 24,
+)
+
+// 3. Local File System Image (recognized by file path structure/existence)
+CkImage(
+  src: '/var/mobile/Containers/Data/Application/.../image.jpg',
+  size: 150,
+)
+
+// 4. Standard Png/Jpg Asset Image
+CkImage(
+  src: 'assets/images/banner.png',
+  size: 200,
+)
+
+// 5. Grayscale Support
+CkImage(
+  src: 'products/item.jpg',
+  enableGrayscale: true, // Converts image colors to grayscale
+  size: 100,
+)
+
+// Image pickers
 CkImagePicker(
   onImagePicked: (file) => setState(() => _image = file),
   placeholder: const Icon(Icons.add_a_photo),
@@ -530,10 +556,10 @@ CkGridView(
 )
 ```
 
-**Tabbed lists** use `CkTabListLoader` with one `CkTabConfig` per tab:
+**Tabbed lists** use `CkTabListView` with one `CkTabConfig` per tab:
 
 ```dart
-CkTabListLoader<String>(
+CkTabListView(
   value: _activeTab,
   tabs: [
     CkTabConfig(tab: 'all', itemCount: _all.length, isLoading: _loadingAll),
@@ -612,6 +638,32 @@ CkFormBuilder<LoginEntity>(
 
 `validateAndSave()` is an extension on `GlobalKey<FormState>` from `extension.dart`.
 
+### Simple Forms (`CkForm`)
+
+For basic form layouts that do not require binding to an entity object, you can use `CkForm`. It provides a clean way to manage the internal `GlobalKey<FormState>` automatically:
+
+```dart
+CkForm(
+  builder: (context, formKey) => Column(
+    children: [
+      CkTextField(
+        validationType: CkValidationType.validateRequired,
+        hintText: 'Full Name',
+      ),
+      CkButton(
+        titleText: 'Submit',
+        onTap: () {
+          if (formKey.currentState?.validate() ?? false) {
+            formKey.currentState?.save();
+            // process form submission
+          }
+        },
+      ),
+    ],
+  ),
+)
+```
+
 ---
 
 ## Dialogs & Overlays
@@ -628,7 +680,7 @@ CkAppBar(
 ### Dialogs
 
 ```dart
-await ckDialog(
+await CkDialog(
   context: context,
   child: Column(
     mainAxisSize: MainAxisSize.min,
@@ -642,13 +694,27 @@ await ckDialog(
   ),
 );
 
-await ckDialogWithActions(
+await CkDialogWithActions(
   context: context,
   title: 'Delete item?',
   content: [const CkText(text: 'This cannot be undone.')],
   action: 'Delete',
   cancel: 'Cancel',
   onConfirm: () => deleteItem(),
+);
+
+// Form validation inside dialog actions
+await CkDialogWithActions(
+  context: context,
+  title: 'Enter feedback',
+  content: [
+    CkTextField(
+      validationType: CkValidationType.validateRequired,
+      hintText: 'Your comment',
+    ),
+  ],
+  validationRequired: true, // wraps in a CkForm automatically and validates before confirm
+  onConfirm: () => submitFeedback(),
 );
 ```
 
@@ -1161,11 +1227,23 @@ await CkShare.instance.shareContent(
 
 ### Logger
 
+Logs can be written using static methods on the `CkLogger` class, or by using convenient global helper functions directly.
+
 ```dart
+// Static class calls
 CkLogger.info('App started', tag: 'APP');
 CkLogger.warning('Low disk space', tag: 'SYS');
 CkLogger.error('Request failed', tag: 'API');
 CkLogger.debug('Payload: $payload', tag: 'API');
+
+// Global helper shortcuts
+ckInfo('App started', tag: 'APP');
+ckWarning('Low disk space', tag: 'SYS');
+ckError('Request failed', tag: 'API');
+ckDebug('Payload: $payload', tag: 'API');
+ckApiDebug('Payload: $payload', tag: 'API');
+ckApiError('Request failed', tag: 'API');
+ckScreen('Home loaded', tag: 'NAV');
 ```
 
 Logs are enabled in debug mode by default (`CkLogger.enableLogs`).
@@ -1198,7 +1276,23 @@ DateTime.now().subtract(Duration(hours: 2)).ago;  // 2h ago
 
 ### `CkUtils`
 
-Date helpers, dividers, and formatting utilities — see `lib/utils/ck_utils.dart`.
+`CkUtils` is a collection of static helpers for dividers, date calculations, and string/date formatting:
+
+```dart
+// 1. RepaintBoundary divider with outline color support
+final divider = CkUtils.divider();
+
+// 2. Date parsing and calculations
+final date = CkUtils.parseDate('2026-05-31');
+final birthDate = CkUtils.subtractYears(DateTime.now(), 18);
+
+// 3. String & date formatting helpers
+final hms = CkUtils.formatDateTimeToHms(DateTime.now());        // "14:30:00"
+final duration = CkUtils.formatDurationToHms(const Duration(minutes: 75)); // "01:15:00"
+final formattedTime = CkUtils.formatTime(DateTime.now());       // "2:30 PM"
+final shortDate = CkUtils.formatDateToShortMonth(DateTime.now()); // "31 May 2026"
+final doubleStr = CkUtils.formatDouble(3.1415);                // "3.1"
+```
 
 ### Screenshot preview & spotlight
 
@@ -1214,22 +1308,6 @@ CkSpotlight(
   radius: 80,
   color: Colors.black54,
 )
-```
-
----
-
-## Custom Lints (Experimental)
-
-A `custom_lint` package lives under `tools/custom_lint/`. The `@Protected` annotation source is currently commented out in the repo; wire up the lint package only if you maintain that tooling locally.
-
-```yaml
-dev_dependencies:
-  core_kit_lints:
-    git:
-      url: https://github.com/kmmuzahid/flutter_core_kit.git
-      ref: main
-      path: tools/custom_lint
-  custom_lint:
 ```
 
 ---

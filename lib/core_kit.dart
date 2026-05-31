@@ -5,8 +5,6 @@
  */
 library;
 
-//annotations
-export 'package:core_kit/annotations/protected.dart';
 // app_bar
 export 'package:core_kit/app_bar/ck_app_bar.dart';
 // ─── CoreKit Authentication Module Exports ───
@@ -58,7 +56,7 @@ export 'package:core_kit/initializer.dart';
 export 'package:core_kit/list_loader/ck_grid_view.dart';
 //list loadaer
 export 'package:core_kit/list_loader/ck_list_view.dart';
-export 'package:core_kit/list_loader/ck_tab_list_loader.dart';
+export 'package:core_kit/list_loader/ck_tab_list_view.dart';
 // loading
 export 'package:core_kit/loading/ck_loader.dart';
 // network
