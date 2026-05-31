@@ -153,7 +153,7 @@ abstract class CoreKitConfig {
   Widget? get preInitChild => null;
 }
 
-mixin CoreKitConfigDefaults on CoreKitConfig implements CoreKitConfig {
+mixin CoreKitConfigDefaults on CoreKitConfig {
   @override
   CkAuthConfig? get authConfig => null;
   @override
