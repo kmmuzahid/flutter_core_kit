@@ -19,19 +19,23 @@ class CkAuth {
   CkAuth._();
 
   /// The token manager for stored auth tokens.
-  static CkAuthTokenManager get tokenManager => CkAuthService.instance.tokenManager;
+  static CkAuthTokenManager get tokenManager =>
+      CkAuthService.instance.tokenManager;
 
   /// The state controller for reactive auth status.
-  static CkAuthStateController get authState => CkAuthService.instance.authState;
+  static CkAuthStateController get authState =>
+      CkAuthService.instance.authState;
 
   /// The OTP manager for OTP sending and verification countdowns.
   static CkOtpFlowManager get otpManager => CkAuthService.instance.otpManager;
 
   /// The logout handler.
-  static CkLogoutHandler get logoutHandler => CkAuthService.instance.logoutHandler;
+  static CkLogoutHandler get logoutHandler =>
+      CkAuthService.instance.logoutHandler;
 
   /// The social authentication manager.
-  static CkSocialAuthManager<dynamic> get socialManager => CkAuthService.instance.socialManager;
+  static CkSocialAuthManager<dynamic> get socialManager =>
+      CkAuthService.instance.socialManager;
 
   /// The active configuration.
   static CkAuthConfig<dynamic> get config => CkAuthService.instance.config;
@@ -43,7 +47,8 @@ class CkAuth {
   static dynamic get profile => CkAuthService.instance.currentProfile;
 
   /// Stream of user profile changes.
-  static Stream<dynamic> get profileStream => CkAuthService.instance.profileStream;
+  static Stream<dynamic> get profileStream =>
+      CkAuthService.instance.profileStream;
 
   /// A simplified reactive StreamBuilder UI helper for the user profile.
   static Widget profileUi({
@@ -58,7 +63,8 @@ class CkAuth {
           return const SizedBox.shrink();
         }
         // If there's no data yet and we're waiting/loading
-        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
           return loading ?? const Center(child: CircularProgressIndicator());
         }
         return builder(context, snapshot.data);
@@ -89,69 +95,63 @@ class CkAuth {
   static Future<CkAuthResult<dynamic>> signUp({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) =>
-      CkAuthService.instance.signUp(body: body, headers: headers);
+  }) => CkAuthService.instance.signUp(body: body, headers: headers);
 
   /// Sign in — auto-saves tokens, auto-fetches profile.
   static Future<CkAuthResult<dynamic>> signIn({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) =>
-      CkAuthService.instance.signIn(body: body, headers: headers);
+  }) => CkAuthService.instance.signIn(body: body, headers: headers);
 
   /// Forgot password — auto-stores forgetToken.
   static Future<CkAuthResult<void>> forgotPassword({
     required Map<String, dynamic> body,
-  }) =>
-      CkAuthService.instance.forgotPassword(body: body);
+  }) => CkAuthService.instance.forgotPassword(body: body);
 
   /// Verify OTP — uses stored verification token automatically.
   static Future<CkAuthResult<void>> verifyOtp({
     required String otp,
     required CkOtpTrigger trigger,
     Map<String, dynamic>? additionalBody,
-  }) =>
-      CkAuthService.instance.verifyOtp(
-        otp: otp,
-        trigger: trigger,
-        additionalBody: additionalBody,
-      );
+  }) => CkAuthService.instance.verifyOtp(
+    otp: otp,
+    additionalBody: additionalBody,
+  );
 
   /// Resend OTP — auto-restarts timer.
   static Future<CkAuthResult<void>> resendOtp({
     required CkOtpTrigger trigger,
     String? identifier,
-  }) =>
-      CkAuthService.instance.resendOtp(trigger: trigger, identifier: identifier);
+  }) => CkAuthService.instance.resendOtp();
 
   /// Change password.
   static Future<CkAuthResult<void>> changePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) =>
-      CkAuthService.instance.changePassword(body: body, headers: headers);
+  }) => CkAuthService.instance.changePassword(body: body, headers: headers);
 
   /// Authenticate with Google.
-  static Future<CkAuthResult<dynamic>> signInWithGoogle(CkGoogleAuthData data) =>
-      CkAuthService.instance.signInWithGoogle(data);
+  static Future<CkAuthResult<dynamic>> signInWithGoogle(
+    CkGoogleAuthData data,
+  ) => CkAuthService.instance.signInWithGoogle(data);
 
   /// Authenticate with Apple.
   static Future<CkAuthResult<dynamic>> signInWithApple(CkAppleAuthData data) =>
       CkAuthService.instance.signInWithApple(data);
 
   /// Authenticate with Facebook.
-  static Future<CkAuthResult<dynamic>> signInWithFacebook(CkFacebookAuthData data) =>
-      CkAuthService.instance.signInWithFacebook(data);
+  static Future<CkAuthResult<dynamic>> signInWithFacebook(
+    CkFacebookAuthData data,
+  ) => CkAuthService.instance.signInWithFacebook(data);
 
   /// Authenticate with Custom Social Provider.
   static Future<CkAuthResult<dynamic>> signInWithCustom({
     required String providerName,
     required Map<String, dynamic> authData,
-  }) =>
-      CkAuthService.instance.signInWithCustom(
-        providerName: providerName,
-        authData: authData,
-      );
+  }) => CkAuthService.instance.signInWithCustom(
+    providerName: providerName,
+    authData: authData,
+  );
 
   /// Available social providers.
   static List<CkSocialProvider> get availableCkSocialProviders =>
@@ -177,5 +177,3 @@ class CkAuth {
     );
   }
 }
-
-

@@ -210,6 +210,14 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
+    final identifier = body['email']?.toString() ??
+                       body['phone']?.toString() ??
+                       body['phone_number']?.toString() ??
+                       body['username']?.toString() ??
+                       body['identifier']?.toString();
+    if (identifier != null) {
+      await otpManager.storeLastIdentifier(identifier);
+    }
     final response = await CkTransport.request(
       input: RequestInput(
         endpoint: config.endpoints.signupUrl,
@@ -255,6 +263,14 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
+    final identifier = body['email']?.toString() ??
+                       body['phone']?.toString() ??
+                       body['phone_number']?.toString() ??
+                       body['username']?.toString() ??
+                       body['identifier']?.toString();
+    if (identifier != null) {
+      await otpManager.storeLastIdentifier(identifier);
+    }
     final response = await CkTransport.request(
       input: RequestInput(
         endpoint: config.endpoints.signinUrl,
@@ -289,6 +305,14 @@ class CkAuthService<TProfile> {
   Future<CkAuthResult<void>> forgotPassword({
     required Map<String, dynamic> body,
   }) async {
+    final identifier = body['email']?.toString() ??
+                       body['phone']?.toString() ??
+                       body['phone_number']?.toString() ??
+                       body['username']?.toString() ??
+                       body['identifier']?.toString();
+    if (identifier != null) {
+      await otpManager.storeLastIdentifier(identifier);
+    }
     if (config.endpoints.forgetPasswordUrl == null) {
       return const CkAuthResult<void>.failure(
         message: 'Forgot password URL is not configured',
@@ -339,18 +363,19 @@ class CkAuthService<TProfile> {
   /// Verify OTP — uses stored verification token automatically
   Future<CkAuthResult<void>> verifyOtp({
     required String otp,
-    required CkOtpTrigger trigger,
     Map<String, dynamic>? additionalBody,
   }) async {
+    final activeTrigger = otpManager.lastTrigger;
     final verifyResult = await otpManager.verifyOtp(
       otp: otp,
-      trigger: trigger,
       additionalBody: additionalBody,
     );
 
     if (verifyResult.isSuccess) {
       final data = verifyResult.rawResponse;
-      if (data != null) {
+      final autoLogin = activeTrigger == CkOtpTrigger.signup || activeTrigger == CkOtpTrigger.login;
+
+      if (data != null && autoLogin) {
         final access = config.extractors.accessToken(data);
         final refresh = config.extractors.refreshToken?.call(data);
 
@@ -390,11 +415,15 @@ class CkAuthService<TProfile> {
   }
 
   /// Resend OTP — auto-restarts timer
-  Future<CkAuthResult<void>> resendOtp({
+  Future<CkAuthResult<void>> resendOtp() async {
+    return otpManager.sendOtp();
+  }
+
+  /// Send OTP manually — also updates lastTrigger for verify/resend
+  Future<CkAuthResult<void>> sendOtp({
     required CkOtpTrigger trigger,
-    String? identifier,
   }) async {
-    return otpManager.sendOtp(trigger: trigger, identifier: identifier);
+    return otpManager.sendOtp(trigger: trigger);
   }
 
   /// Change password

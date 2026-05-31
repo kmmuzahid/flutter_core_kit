@@ -19,6 +19,8 @@ class CkOtpFlowManager {
 
   Timer? _timer;
   int _resendAttempts = 0;
+  CkOtpTrigger? lastTrigger;
+  String? lastIdentifier;
   
   // Stores verification tokens per flow in-memory
   final Map<CkOtpTrigger, String?> _verificationTokens = {};
@@ -51,10 +53,18 @@ class CkOtpFlowManager {
   Future<void> storeVerificationToken(CkOtpTrigger trigger, String? token) async {
     _verificationTokens[trigger] = token;
     if (token != null) {
+      lastTrigger = trigger;
       await CkStorage.write('${CkAuthStorageKeys.verificationTokenPrefix}${trigger.name}', token);
+      await CkStorage.write('core_kit_last_otp_trigger', trigger.name);
     } else {
       await CkStorage.delete('${CkAuthStorageKeys.verificationTokenPrefix}${trigger.name}');
     }
+  }
+
+  /// Store the last used user identifier (email, phone, etc.) for resending OTPs
+  Future<void> storeLastIdentifier(String identifier) async {
+    lastIdentifier = identifier;
+    await CkStorage.write('core_kit_last_otp_identifier', identifier);
   }
   
   /// Get stored verification token
@@ -68,6 +78,14 @@ class CkOtpFlowManager {
         _verificationTokens[trigger] = token;
       }
     }
+    final lastTriggerName = await CkStorage.read('core_kit_last_otp_trigger');
+    if (lastTriggerName != null) {
+      lastTrigger = CkOtpTrigger.values.firstWhere(
+        (t) => t.name == lastTriggerName,
+        orElse: () => CkOtpTrigger.signup,
+      );
+    }
+    lastIdentifier = await CkStorage.read('core_kit_last_otp_identifier');
   }
   
   /// Start/restart the resend countdown timer
@@ -87,9 +105,18 @@ class CkOtpFlowManager {
   
   /// Send/Resend OTP via API
   Future<CkAuthResult<void>> sendOtp({
-    required CkOtpTrigger trigger,
-    String? identifier,
+    CkOtpTrigger? trigger,
   }) async {
+    final activeTrigger = trigger ?? lastTrigger;
+    if (activeTrigger == null) {
+      return const CkAuthResult<void>.failure(message: 'No active OTP trigger found');
+    }
+
+    if (trigger != null) {
+      lastTrigger = trigger;
+      await CkStorage.write('core_kit_last_otp_trigger', trigger.name);
+    }
+
     if (_sendUrl == null) {
       return const CkAuthResult<void>.failure(message: 'OTP send URL is not configured');
     }
@@ -100,13 +127,17 @@ class CkOtpFlowManager {
       );
     }
 
-    final vToken = getVerificationToken(trigger);
+    final vToken = getVerificationToken(activeTrigger);
     
     Map<String, dynamic> body = {};
     if (_config.resendBodyBuilder != null) {
-      body = _config.resendBodyBuilder!(identifier, vToken);
+      body = _config.resendBodyBuilder!(lastIdentifier, vToken);
     } else {
-      if (identifier != null) body['identifier'] = identifier;
+      if (lastIdentifier != null) {
+        body['email'] = lastIdentifier;
+        body['phone'] = lastIdentifier;
+        body['identifier'] = lastIdentifier;
+      }
       if (vToken != null) body['token'] = vToken;
     }
 
@@ -124,9 +155,9 @@ class CkOtpFlowManager {
     if (response.isSuccess) {
       _resendAttempts++;
       startResendTimer();
-      final newToken = _extractors.verificationTokens?[trigger]?.call(response.data);
+      final newToken = _extractors.verificationTokens?[activeTrigger]?.call(response.data);
       if (newToken != null) {
-        await storeVerificationToken(trigger, newToken);
+        await storeVerificationToken(activeTrigger, newToken);
       }
       return CkAuthResult<void>.success(
         statusCode: response.statusCode,
@@ -144,14 +175,20 @@ class CkOtpFlowManager {
   /// Verify OTP via API
   Future<CkAuthResult<void>> verifyOtp({
     required String otp,
-    required CkOtpTrigger trigger,
     Map<String, dynamic>? additionalBody,
   }) async {
+    final activeTrigger = lastTrigger;
+    if (activeTrigger == null) {
+      return const CkAuthResult<void>.failure(
+        message: 'No active OTP verification trigger found',
+      );
+    }
+
     if (_verifyUrl == null) {
       return const CkAuthResult<void>.failure(message: 'OTP verify URL is not configured');
     }
 
-    final vToken = getVerificationToken(trigger);
+    final vToken = getVerificationToken(activeTrigger);
     
     Map<String, dynamic> body = {};
     if (_config.verifyBodyBuilder != null) {
@@ -189,7 +226,11 @@ class CkOtpFlowManager {
     );
 
     if (response.isSuccess) {
-      await storeVerificationToken(trigger, null);
+      await storeVerificationToken(activeTrigger, null);
+      if (lastTrigger == activeTrigger) {
+        lastTrigger = null;
+        await CkStorage.delete('core_kit_last_otp_trigger');
+      }
       return CkAuthResult<void>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
