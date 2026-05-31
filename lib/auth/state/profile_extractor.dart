@@ -35,11 +35,11 @@ class CkProfileExtractor<TProfile> {
 
   /// Extracts [TProfile] from [CkResponse.data] via [CkAuthExtractors].
   TProfile? profileExtractor(CkResponse<dynamic> response) {
-    return _parseProfile(response.data);
+    return parseProfile(response.data);
   }
 
   /// Caches profile and persists to storage if changed
-  void _cacheProfile(TProfile profile, String fingerprint) {
+  void cacheProfile(TProfile profile, String fingerprint) {
     if (fingerprint == _storedPayload && _cachedProfile != null) return;
     
     _storedPayload = fingerprint;
@@ -55,7 +55,7 @@ class CkProfileExtractor<TProfile> {
     if (profile == null) return null;
 
     final fingerprint = jsonEncode(data);
-    _cacheProfile(profile, fingerprint);
+    cacheProfile(profile, fingerprint);
     return profile;
   }
 
@@ -80,14 +80,18 @@ class CkProfileExtractor<TProfile> {
     String url,
     RequestMethod method,
   ) async {
+    dynamic extractedProfileData;
     final response = await CkTransport.request<TProfile>(
       input: RequestInput(endpoint: url, method: method),
-      responseBuilder: (data) => _parseProfile(data),
+      responseBuilder: (data) {
+        extractedProfileData = data;
+        return parseProfile(data);
+      },
     );
     if (response.isSuccess && response.data != null) {
       final profile = response.data;
-      final fingerprint = jsonEncode(response.raw);
-      _cacheProfile(profile, fingerprint);
+      final fingerprint = jsonEncode(extractedProfileData);
+      cacheProfile(profile!, fingerprint);
       
       return CkAuthResult.success(
         data: profile,
@@ -109,6 +113,7 @@ class CkProfileExtractor<TProfile> {
     Map<String, dynamic>? files,
     Map<String, dynamic>? jsonBody,
   }) async {
+    dynamic extractedProfileData;
     final response = await CkTransport.request<TProfile>(
       input: RequestInput(
         endpoint: url,
@@ -117,12 +122,15 @@ class CkProfileExtractor<TProfile> {
         files: files,
         jsonBody: jsonBody,
       ),
-      responseBuilder: (data) => _parseProfile(data),
+      responseBuilder: (data) {
+        extractedProfileData = data;
+        return parseProfile(data);
+      },
     );
     if (response.isSuccess && response.data != null) {
       final profile = response.data;
-      final fingerprint = jsonEncode(response.raw);
-      _cacheProfile(profile, fingerprint);
+      final fingerprint = jsonEncode(extractedProfileData);
+      cacheProfile(profile!, fingerprint);
       
       return CkAuthResult.success(
         data: profile,
@@ -144,25 +152,21 @@ class CkProfileExtractor<TProfile> {
     await CkStorage.delete(CkAuthStorageKeys.profileDataKey);
   }
 
-  TProfile? _parseProfile(dynamic data) {
+  TProfile? parseProfile(dynamic data) {
     if (data == null) return null;
 
     // Use custom profile extractor if provided
     final custom = _extractors.profile;
     if (custom != null) return custom(data);
 
-    // Extract profile data using profileData extractor
-    final json = _extractors.profileData?.call(data);
-    if (json == null) return null;
-
     // If already the correct type (not a Map), return as-is
-    if (json is TProfile && json is! Map) return json;
+    if (data is TProfile && data is! Map) return data;
 
     // Convert to Map<String, dynamic> for profileExtractor
-    final map = json is Map<String, dynamic>
-        ? json
-        : json is Map
-        ? Map<String, dynamic>.from(json)
+    final map = data is Map<String, dynamic>
+        ? data
+        : data is Map
+        ? Map<String, dynamic>.from(data)
         : null;
     if (map == null) return null;
     return _profileExtractor(map);

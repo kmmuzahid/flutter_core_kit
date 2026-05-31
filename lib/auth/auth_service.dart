@@ -189,7 +189,17 @@ class CkAuthService<TProfile> {
     authState.setAuthenticated();
     await CkAuthStorageKeys.markNotFirstTimeUser();
 
-    await fetchProfile();
+    // Cache profile from authenticate response if present to ensure profile is set
+    final parsedProfile = _profileExtractor.parseProfile(responseData);
+    if (parsedProfile != null) {
+      final fingerprint = jsonEncode(responseData);
+      _profileExtractor.cacheProfile(parsedProfile, fingerprint);
+    }
+
+    // Refresh profile from backend if URL is configured
+    if (config.endpoints.profileGetUrl != null) {
+      await fetchProfile();
+    }
 
     final profile = _profileExtractor.current;
     if (config.onProfileLoaded != null && profile != null) {
@@ -364,10 +374,10 @@ class CkAuthService<TProfile> {
           authState.setAuthenticated();
           await CkAuthStorageKeys.markNotFirstTimeUser();
 
-          final profile = _profileExtractor._parseProfile(data);
+          final profile = _profileExtractor.parseProfile(data);
           if (profile != null) {
             final fingerprint = jsonEncode(data);
-            _profileExtractor._cacheProfile(profile, fingerprint);
+            _profileExtractor.cacheProfile(profile, fingerprint);
             
             if (config.onProfileLoaded != null) {
               await config.onProfileLoaded!(profile);

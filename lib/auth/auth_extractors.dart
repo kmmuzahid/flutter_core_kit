@@ -5,7 +5,7 @@ import 'package:core_kit/auth/otp/otp_config.dart';
 ///
 /// Use [CkAuthExtractors.standard] for typical `{ accessToken, user, ... }` payloads.
 /// Provide [profile] for a custom parse; otherwise [CkProfileExtractor] uses
-/// [profileData] with [CkAuthConfig.profileExtractor].
+/// [CkAuthConfig.profileExtractor] directly on [CkResponse.data].
 class CkAuthExtractors<TProfile> {
   const CkAuthExtractors({
     required this.accessToken,
@@ -18,7 +18,7 @@ class CkAuthExtractors<TProfile> {
   final String? Function(dynamic data) accessToken;
   final String? Function(dynamic data)? refreshToken;
 
-  /// Optional full parse override. When null, [CkProfileExtractor] uses [profileData] + profileExtractor.
+  /// Optional full parse override. When null, [CkProfileExtractor] uses [CkAuthConfig.profileExtractor].
   final TProfile? Function(dynamic data)? profile;
 
   /// Trigger-specific verification token extractors.
@@ -75,11 +75,12 @@ class CkAuthExtractors<TProfile> {
     );
   }
 
-  static Map<CkOtpTrigger, String? Function(dynamic data)> 
+  static Map<CkOtpTrigger, String? Function(dynamic data)>? 
       _buildVerificationTokenExtractors(
-    Map<CkOtpTrigger, String> tokenKeys,
+    Map<CkOtpTrigger, String>? tokenKeys,
     dynamic Function(dynamic data, String key) extractor,
   ) {
+    if (tokenKeys == null) return null;
     return tokenKeys.map(
       (trigger, key) => MapEntry(
         trigger,
