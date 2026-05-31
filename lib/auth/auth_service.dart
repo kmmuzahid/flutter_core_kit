@@ -605,23 +605,45 @@ class CkAuthService<TProfile> {
       isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
     }
 
-    // Schedule navigation on a FUTURE frame.
-    Future.delayed(Duration.zero, () {
+    // Schedule navigation with multiple fallbacks to ensure it runs
+    Future.delayed(const Duration(milliseconds: 100), () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (authenticated) {
-          config.routes!.routeOnSuccess();
-        } else {
-          if (config.routes!.routeToOnboarding != null) {
-            final showOnboarding =
-                !config.routes!.firstTimeOnly || (isFirstTime ?? true);
-            if (showOnboarding) {
-              config.routes!.routeToOnboarding!();
+        try {
+          if (authenticated) {
+            config.routes!.routeOnSuccess();
+          } else {
+            if (config.routes!.routeToOnboarding != null) {
+              final showOnboarding =
+                  !config.routes!.firstTimeOnly || (isFirstTime ?? true);
+              if (showOnboarding) {
+                config.routes!.routeToOnboarding!();
+              } else {
+                config.routes!.routeToLogin();
+              }
             } else {
               config.routes!.routeToLogin();
             }
-          } else {
-            config.routes!.routeToLogin();
           }
+        } catch (e) {
+          // Fallback: try again after a longer delay if first attempt fails
+          Future.delayed(const Duration(milliseconds: 500), () {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              try {
+                if (authenticated) {
+                  config.routes!.routeOnSuccess();
+                } else {
+                  config.routes!.routeToLogin();
+                }
+              } catch (e2) {
+                // Last resort: direct navigation without postFrameCallback
+                if (authenticated) {
+                  config.routes!.routeOnSuccess();
+                } else {
+                  config.routes!.routeToLogin();
+                }
+              }
+            });
+          });
         }
       });
     });

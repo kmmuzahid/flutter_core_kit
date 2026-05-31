@@ -274,8 +274,26 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       stopwatch.stop();
 
       // Trigger automatic navigation after the delay finishes
+      // Ensure this runs even if there are issues with the widget tree
       if (config.authConfig != null && CkAuthService.isInitialized) {
-        CkAuthService.instance.autoNavigate();
+        // Delay slightly to ensure widget tree is ready
+        Future.delayed(const Duration(milliseconds: 50), () {
+          try {
+            CkAuthService.instance.autoNavigate();
+          } catch (e) {
+            // If autoNavigate fails, try again after a longer delay
+            Future.delayed(const Duration(milliseconds: 200), () {
+              try {
+                CkAuthService.instance.autoNavigate();
+              } catch (e2) {
+                // Last resort attempt
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  CkAuthService.instance.autoNavigate();
+                });
+              }
+            });
+          }
+        });
       }
 
       CkScreenUtils.init(context, () => completer.complete());
