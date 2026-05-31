@@ -1218,7 +1218,7 @@ if (granted) {
 ### Sharing
 
 ```dart
-await CkShare.instance.shareContent(
+await CkShare.instance.content(
   title: 'Check this out',
   imageUrl: 'banners/promo.jpg', // relative to imageBaseUrl
   deepLinkUrl: 'https://myapp.com/item/42',

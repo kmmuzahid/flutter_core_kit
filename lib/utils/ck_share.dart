@@ -10,7 +10,7 @@ class CkShare {
   CkShare._();
   static final CkShare instance = CkShare._();
 
-  Future<void> shareByteContent({
+  Future<void> byteContent({
     required String title,
     required ByteData imageUrl,
     required String deepLinkUrl,
@@ -33,7 +33,7 @@ class CkShare {
     }
   }
 
-  Future<void> shareContent({
+  Future<void> content({
     required String title,
     required String imageUrl,
     required String deepLinkUrl,
