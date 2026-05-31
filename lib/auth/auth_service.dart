@@ -152,11 +152,18 @@ class CkAuthService<TProfile> {
     int? statusCode,
   ) {
     final autoOtp = config.otpConfig?.autoTriggers.contains(trigger) ?? false;
-    final vToken = config.extractors.verificationTokens?[trigger]?.call(responseData);
+    final vToken = config.extractors.verificationTokens?[trigger]?.call(
+      responseData,
+    );
 
     if (autoOtp && vToken != null) {
       otpManager.storeVerificationToken(trigger, vToken);
       otpManager.startResendTimer();
+
+      if (config.routes?.roteToOtpVerification != null) {
+        config.routes!.roteToOtpVerification!();
+      }
+
       return CkAuthResult<TProfile>(
         isSuccess: true,
         requiresOtp: true,
@@ -182,20 +189,13 @@ class CkAuthService<TProfile> {
       );
     }
 
-    await tokenManager.saveTokens(
-      accessToken: access,
-      refreshToken: refresh,
-    );
+    await tokenManager.saveTokens(accessToken: access, refreshToken: refresh);
     authState.setAuthenticated();
     await CkAuthStorageKeys.markNotFirstTimeUser();
 
     await fetchProfile();
 
     final profile = _profileExtractor.current;
-    final dynamic onProfileLoaded = (config as dynamic).onProfileLoaded;
-    if (onProfileLoaded != null && profile != null) {
-      await onProfileLoaded(profile);
-    }
 
     autoNavigate();
     return CkAuthResult<TProfile>.success(
@@ -241,7 +241,7 @@ class CkAuthService<TProfile> {
       response.data,
       response.statusCode,
     );
-    
+
     if (authResult.isSuccess) return authResult;
 
     return CkAuthResult<TProfile>.success(
@@ -282,10 +282,7 @@ class CkAuthService<TProfile> {
     );
     if (otpResult != null) return otpResult;
 
-    return await _completeAuthentication(
-      response.data,
-      response.statusCode,
-    );
+    return await _completeAuthentication(response.data, response.statusCode);
   }
 
   /// Forgot password — auto-stores forgetToken
@@ -369,7 +366,7 @@ class CkAuthService<TProfile> {
           if (profile != null) {
             final fingerprint = jsonEncode(data);
             _profileExtractor.cacheProfile(profile, fingerprint);
-            
+
             final dynamic onProfileLoaded = (config as dynamic).onProfileLoaded;
             if (onProfileLoaded != null) {
               await onProfileLoaded(profile);
@@ -505,7 +502,8 @@ class CkAuthService<TProfile> {
             )
             .then((result) {
               if (result.isSuccess && result.data != null) {
-                final dynamic onProfileLoaded = (config as dynamic).onProfileLoaded;
+                final dynamic onProfileLoaded =
+                    (config as dynamic).onProfileLoaded;
                 if (onProfileLoaded != null) {
                   onProfileLoaded(result.data as TProfile);
                 }
