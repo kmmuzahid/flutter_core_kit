@@ -202,7 +202,7 @@ class CkAuthService<TProfile> {
             await config.onProfileLoaded?.call(profile);
           }
 
-          _autoNavigate();
+          autoNavigate();
           return CkAuthResult<TProfile>.success(
             data: profile,
             statusCode: response.statusCode,
@@ -282,7 +282,7 @@ class CkAuthService<TProfile> {
             await config.onProfileLoaded?.call(profile);
           }
 
-          _autoNavigate();
+          autoNavigate();
           return CkAuthResult<TProfile>.success(
             data: profile,
             statusCode: response.statusCode,
@@ -406,7 +406,7 @@ class CkAuthService<TProfile> {
             await config.onProfileLoaded!(profile);
           }
 
-          _autoNavigate();
+          autoNavigate();
         }
       }
       return const CkAuthResult<void>.success();
@@ -532,15 +532,12 @@ class CkAuthService<TProfile> {
             )
             .then((result) {
               if (result.isSuccess && result.data != null) {
-                config.onProfileLoaded?.call(result.data as TProfile);
+                 config.onProfileLoaded?.call(result.data as TProfile);
               }
             });
       }
-
-      _autoNavigate();
     } else {
       authState.setUnauthenticated();
-      _autoNavigate();
     }
   }
 
@@ -598,7 +595,7 @@ class CkAuthService<TProfile> {
     return result;
   }
 
-  void _autoNavigate() async {
+  void autoNavigate() async {
     if (config.routes == null) return;
 
     // Resolve what to navigate to first (may involve async storage reads).
@@ -608,25 +605,25 @@ class CkAuthService<TProfile> {
       isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
     }
 
-    // Defer the actual navigation to the next frame.
-    // This guarantees the widget tree (including GetMaterialApp / Navigator)
-    // is fully mounted before any contextless navigation is attempted.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (authenticated) {
-        config.routes!.routeOnSuccess();
-      } else {
-        if (config.routes!.routeToOnboarding != null) {
-          final showOnboarding =
-              !config.routes!.firstTimeOnly || (isFirstTime ?? true);
-          if (showOnboarding) {
-            config.routes!.routeToOnboarding!();
+    // Schedule navigation on a FUTURE frame.
+    Future.delayed(Duration.zero, () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (authenticated) {
+          config.routes!.routeOnSuccess();
+        } else {
+          if (config.routes!.routeToOnboarding != null) {
+            final showOnboarding =
+                !config.routes!.firstTimeOnly || (isFirstTime ?? true);
+            if (showOnboarding) {
+              config.routes!.routeToOnboarding!();
+            } else {
+              config.routes!.routeToLogin();
+            }
           } else {
             config.routes!.routeToLogin();
           }
-        } else {
-          config.routes!.routeToLogin();
         }
-      }
+      });
     });
   }
 }

@@ -18,7 +18,7 @@ abstract class CkStorage {
 
   /// In-memory cache: key → value.
   /// `null` value means the key was explicitly deleted (tombstone).
-  /// Absent key means never read from disk yet.
+  /// Absent key means it does not exist on disk (pre-populated at startup).
   static final Map<String, String?> _cache = {};
 
   // ─── Initialization ────────────────────────────────────────────────────────
@@ -27,24 +27,28 @@ abstract class CkStorage {
     if (_initialized) return;
     try {
       _secureStorage = const FlutterSecureStorage();
-      // Wrap in a timeout — flutter_secure_storage can hang 10-20s on Android
-      // during first use if the Keystore hasn't warmed up yet (known upstream bug).
-      await Future.wait([
-        _secureStorage!.write(key: '_core_kit_test', value: 'ok'),
-      ]).timeout(
+      // Warm up secure storage and read all keys in a single platform call.
+      // flutter_secure_storage can hang 10-20s on Android during first use
+      // if the Keystore hasn't warmed up yet (known upstream bug).
+      final allElements = await _secureStorage!.readAll().timeout(
         const Duration(seconds: 3),
         onTimeout: () => throw Exception('SecureStorage timeout'),
       );
-      await _secureStorage!.delete(key: '_core_kit_test').timeout(
-        const Duration(seconds: 3),
-        onTimeout: () => throw Exception('SecureStorage timeout'),
-      );
+      _cache.addAll(allElements);
       _useSecure = true;
     } catch (_) {
       _useSecure = false;
       _secureStorage = null;
+      _cache.clear();
       try {
         _fallbackStorage = await SharedPreferences.getInstance();
+        final keys = _fallbackStorage!.getKeys();
+        for (final key in keys) {
+          final val = _fallbackStorage!.get(key);
+          if (val != null) {
+            _cache[key] = val.toString();
+          }
+        }
       } catch (_) {}
     }
     _initialized = true;
@@ -91,17 +95,15 @@ abstract class CkStorage {
 
   /// Reads the value for [key].
   /// Returns from memory cache on every hit — O(1), no I/O.
-  /// On a cache miss, reads from disk and populates the cache for next time.
+  /// Since _cache is pre-populated during initialize(), this is a guaranteed cache hit.
   static Future<String?> read(String key) async {
     await _ensureInitialized();
 
     // Cache hit (including explicitly-deleted tombstone → null).
     if (_cache.containsKey(key)) return _cache[key];
 
-    // Cache miss — read from disk and populate.
-    final value = await _readFromDisk(key);
-    _cache[key] = value; // store null too so we don't hit disk again
-    return value;
+    // If it's not in the cache, it doesn't exist on disk.
+    return null;
   }
 
   static Future<String?> _readFromDisk(String key) async {

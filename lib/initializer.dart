@@ -151,6 +151,9 @@ abstract class CoreKitConfig {
 
   /// New: UI shown before CoreKit is ready
   Widget? get preInitChild => null;
+
+  /// Custom asynchronous initialization tasks run during the splash delay.
+  Future<void> Function()? get onInit => null;
 }
 
 mixin CoreKitConfigDefaults on CoreKitConfig {
@@ -169,7 +172,9 @@ mixin CoreKitConfigDefaults on CoreKitConfig {
   @override
   Size get designSize => const Size(428, 926);
   @override
-  Widget? get preInitChild => Container();
+  Widget? get preInitChild => null;
+  @override
+  Future<void> Function()? get onInit => null;
 }
 
 // ============================================================
@@ -206,6 +211,7 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
 
   Future<void> _initializeCoreKit() async {
     final completer = Completer<void>();
+    final stopwatch = Stopwatch()..start();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final instance = coreKitInstance;
@@ -252,6 +258,26 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
         );
       }
 
+      // Execute developer's custom initialization tasks during the splash delay
+      if (config.onInit != null) {
+        try {
+          await config.onInit!();
+        } catch (_) {}
+      }
+
+      // Enforce default 3 seconds splash delay
+      final elapsedMs = stopwatch.elapsedMilliseconds;
+      final remainingMs = 3000 - elapsedMs;
+      if (remainingMs > 0) {
+        await Future.delayed(Duration(milliseconds: remainingMs));
+      }
+      stopwatch.stop();
+
+      // Trigger automatic navigation after the delay finishes
+      if (config.authConfig != null && CkAuthService.isInitialized) {
+        CkAuthService.instance.autoNavigate();
+      }
+
       CkScreenUtils.init(context, () => completer.complete());
     });
 
@@ -265,7 +291,10 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
   @override
   Widget build(BuildContext context) {
     if (!_initDone) {
-      return Scaffold(body: widget.config.preInitChild ?? Container());
+      if (widget.config.preInitChild != null) {
+        return Scaffold(body: widget.config.preInitChild!);
+      }
+      return widget.child;
     }
     return widget.child;
   }

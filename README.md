@@ -18,17 +18,18 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 2. [Installation](#installation)
 3. [Quick Start](#quick-start)
 4. [Configuration](#configuration)
-5. [Navigation & Global Access](#navigation--global-access)
-6. [UI Components](#ui-components)
-7. [Forms & Validation](#forms--validation)
-8. [Dialogs & Overlays](#dialogs--overlays)
-9. [Responsive Utilities](#responsive-utilities)
-10. [Transport (HTTP)](#transport-http)
-11. [Storage](#storage)
-12. [Authentication Module](#authentication-module)
-13. [Location Pickers](#location-pickers)
-14. [Utilities & Extensions](#utilities--extensions)
-15. [License](#license)
+5. [Splash Screen Routing](#splash-screen-routing)
+6. [Navigation & Global Access](#navigation--global-access)
+7. [UI Components](#ui-components)
+8. [Forms & Validation](#forms--validation)
+9. [Dialogs & Overlays](#dialogs--overlays)
+10. [Responsive Utilities](#responsive-utilities)
+11. [Transport (HTTP)](#transport-http)
+12. [Storage](#storage)
+13. [Authentication Module](#authentication-module)
+14. [Location Pickers](#location-pickers)
+15. [Utilities & Extensions](#utilities--extensions)
+16. [License](#license)
 
 ---
 
@@ -36,12 +37,12 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 
 | Area | Highlights |
 |------|------------|
-| **Bootstrap** | `CoreKit` / `CoreKit.router` / `CoreKit.builder` — initializes Dio, screen scaling, optional auth |
+| **Bootstrap** | `CoreKit` / `CoreKit.router` / `CoreKit.builder` — initializes Dio, screen scaling, optional auth, 3-second splash delay with custom `onInit` |
 | **UI** | Buttons, text fields, dropdowns, images, lists/grids with pagination, tabs, rating, app bar |
 | **Layout** | `.w`, `.h`, `.sp`, `.r` scaling from a design size (default 428×926) |
 | **Transport** | `CkTransport` + `CkResponse`, automatic token refresh, retries |
 | **Storage** | `CkStorage` — secure storage with SharedPreferences fallback |
-| **Auth** | `CkAuthService`, OTP flows, social login hooks, profile caching, declarative auto-navigation |
+| **Auth** | `CkAuthService`, OTP flows, social login hooks, profile caching, declarative auto-navigation, splash screen routing |
 
 ---
 
@@ -79,7 +80,7 @@ flutter pub get
 
 ## Quick Start
 
-`CoreKit` requires a **`GlobalKey<NavigatorState>`** and a **`CoreKitConfig`**. It wraps `MaterialApp`, runs initialization (Dio, screen utils, optional auth), and shows `preInitChild` until ready.
+`CoreKit` requires a **`GlobalKey<NavigatorState>`** and a **`CoreKitConfig`**. It wraps `MaterialApp`, runs initialization (Dio, screen utils, optional auth), enforces a 3-second splash delay for branding, and shows `preInitChild` until ready.
 
 ### Minimal app (Navigator 1.0)
 
@@ -192,6 +193,7 @@ Implement **`CoreKitConfig`** and mix in **`CoreKitConfigDefaults`** for sensibl
 | `permissionHandlerColors` | No | `null` | Permission dialog colors |
 | `passwordObscureIcon` | No | `null` | Show/hide icons on password fields |
 | `preInitChild` | No | `Container()` | Splash while transport/auth initializes |
+| `onInit` | No | `null` | Custom async initialization tasks run during splash delay (e.g., register dependencies) |
 
 ### Full reference: `CkConfigImpl`
 
@@ -266,6 +268,16 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   Widget? get preInitChild => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
+
+  /// Custom initialization tasks run during the 3-second splash delay.
+  /// Use this to register dependencies, initialize analytics, etc.
+  @override
+  Future<void> Function()? get onInit => () async {
+    // Register your app's dependencies
+    await MyDependencyRegistry.init();
+    // Initialize analytics or other services
+    await Analytics.initialize();
+  };
 }
 ```
 
@@ -282,6 +294,90 @@ CoreKit(
 > **Context rule:** `context` inside `CoreKitConfig` is only valid in getters that run after the first frame (`appbarConfig`, `permissionHelperConfig`, `passwordObscureIcon`, `permissionHandlerColors`). Do not use `context` in `imageBaseUrl`, `ckTransportConfig`, or `designSize`.
 
 > **Tokens:** You do not configure `CkTokenProvider` in your app. With `authConfig` set, [CkAuthService](#authentication-module) stores and refreshes tokens. Without auth, CoreKit uses an internal unauthenticated provider automatically.
+
+---
+
+## Splash Screen Routing
+
+CoreKit provides built-in support for splash screen routing with a default **3-second delay**. This ensures your splash screen is visible long enough for branding and allows you to run custom initialization tasks during the delay.
+
+### How It Works
+
+1. **App Launch** → `CoreKitRouterGate` blocks rendering until initialization completes
+2. **Custom Initialization** → If `config.onInit` is provided, it runs during the splash delay (e.g., register other dependencies)
+3. **3-Second Delay** → Enforced minimum splash screen duration for branding/UX
+4. **Auto-Navigation** → After the delay, `CkAuthService.instance.autoNavigate()` routes to the appropriate screen based on auth state
+
+### Using `onInit` for Custom Initialization
+
+The `onInit` callback is perfect for initializing services that don't require navigation context:
+
+```dart
+class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+  @override
+  String get imageBaseUrl => 'https://cdn.example.com/';
+
+  @override
+  CkTransportConfig get ckTransportConfig => CkTransportConfig(
+        baseUrl: 'https://api.example.com',
+        refreshTokenEndpoint: '/auth/refresh',
+      );
+
+  /// Custom initialization tasks run during the 3-second splash delay.
+  @override
+  Future<void> Function()? get onInit => () async {
+    // Register your app's dependencies
+    await MyDependencyRegistry.init();
+    // Initialize analytics or other services
+    await Analytics.initialize();
+    // Load cached data
+    await CacheManager.warmUp();
+  };
+}
+```
+
+### Splash Screen with Auth
+
+When using the authentication module, configure `routeToSplash` in `CkAuthRoutes`:
+
+```dart
+@override
+CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
+  endpoints: const CkAuthEndpoints(/* ... */),
+  profileExtractor: (data) => UserProfile.fromJson(data),
+  routes: CkAuthRoutes(
+    routeToSplash: () {
+      coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const SplashScreen()),
+        (_) => false,
+      );
+    },
+    routeOnSuccess: () {
+      coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (_) => false,
+      );
+    },
+    routeToLogin: () {
+      coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (_) => false,
+      );
+    },
+  ),
+);
+```
+
+### The Flow
+
+1. App starts → `preInitChild` is shown (your splash screen)
+2. CoreKit initializes Dio, screen utils, and auth (if configured)
+3. `onInit` callback runs (if provided) - perfect for dependency registration
+4. **3-second minimum delay** is enforced (if initialization finishes faster, it waits)
+5. `CkAuthService.instance.autoNavigate()` is called automatically
+6. User is routed to the appropriate screen based on auth state
+
+This ensures a smooth, branded splash experience while giving you time to initialize your app's dependencies.
 
 ---
 
@@ -1006,6 +1102,12 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
         ),
         profileExtractor: (data) => UserProfile.fromJson(data),
         routes: CkAuthRoutes(
+          routeToSplash: () {
+            coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const SplashScreen()),
+              (_) => false,
+            );
+          },
           routeOnSuccess: () {
             coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -1049,11 +1151,14 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 ### 2. Declarative Auto-Navigation
 
 You do not need an `AuthGate` widget. When you configure `CkAuthRoutes` in your `CkAuthConfig`, CoreKit handles navigation and flow direction automatically:
-* **Session Restoration**: When the app boots, CoreKit checks if secure tokens exist.
+* **Splash Screen**: On app launch, `routeToSplash` is called first (if provided). CoreKit enforces a 3-second minimum splash delay for branding, during which you can run custom initialization via `config.onInit`.
+* **Session Restoration**: After the splash delay, CoreKit checks if secure tokens exist.
 * **Onboarding Integration**: If the user is unauthenticated and `routeToOnboarding` is provided, they are routed to onboarding.
   * If `firstTimeOnly: true` (default), onboarding is only shown to first-time users. Returning unauthenticated users go directly to the login screen.
   * If `firstTimeOnly: false`, all unauthenticated users are routed to onboarding.
 * **Redirection**: On successful authentication (login, signup, or social login), they are navigated via `routeOnSuccess`. On logout or refresh failure, they are navigated to `routeToLogin` or `routeToOnboarding`.
+
+The auto-navigation is triggered automatically by `CkAuthService.instance.autoNavigate()` after the 3-second splash delay completes. If you need manual control, you can call `autoNavigate()` yourself at any time.
 
 If you prefer to listen to auth state changes manually (e.g. via a Bloc or routing guard), simply omit `routes` (set it to `null` or leave it out). CkAuthConfig's `routes` parameter is completely optional.
 
