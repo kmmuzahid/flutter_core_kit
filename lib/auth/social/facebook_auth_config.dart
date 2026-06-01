@@ -1,5 +1,5 @@
+import 'package:core_kit/auth/ck_auth_extractors.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:core_kit/auth/auth_extractors.dart';
 
 /// Facebook Sign-In configuration
 class CkFacebookAuthConfig {
@@ -8,7 +8,7 @@ class CkFacebookAuthConfig {
   final List<String> permissions; // default: ['email', 'public_profile']
   final Map<String, dynamic> Function(CkFacebookAuthData data) bodyBuilder;
   final CkAuthExtractors? responseExtractors;
-  
+
   const CkFacebookAuthConfig({
     required this.backendUrl,
     this.method = RequestMethod.POST,

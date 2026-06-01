@@ -1,17 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:core_kit/auth/auth_service.dart';
-import 'package:core_kit/auth/auth_result.dart';
-import 'package:core_kit/auth/otp/otp_config.dart';
-import 'package:core_kit/auth/social/social_login_config.dart';
-import 'package:core_kit/auth/social/google_auth_config.dart';
+import 'package:core_kit/auth/ck_auth_config.dart';
+import 'package:core_kit/auth/ck_auth_result.dart';
+import 'package:core_kit/auth/ck_auth_service.dart';
+import 'package:core_kit/auth/logout/logout_handler.dart';
+import 'package:core_kit/auth/otp/otp_flow_manager.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
 import 'package:core_kit/auth/social/facebook_auth_config.dart';
-import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/auth/state/auth_state_controller.dart';
-import 'package:core_kit/auth/otp/otp_flow_manager.dart';
-import 'package:core_kit/auth/logout/logout_handler.dart';
+import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/social_auth_manager.dart';
-import 'package:core_kit/auth/auth_config.dart';
+import 'package:core_kit/auth/social/social_login_config.dart';
+import 'package:core_kit/auth/state/auth_state_controller.dart';
+import 'package:core_kit/auth/token/auth_token_manager.dart';
+import 'package:flutter/material.dart';
+
+Map<String, dynamic> lastSubmitAuthData = {};
 
 /// Static developer-facing gateway for authentication operations.
 /// Eliminates the need to use [CkAuthService.instance] directly.
@@ -37,6 +38,14 @@ class CkAuth {
   static CkSocialAuthManager<dynamic> get socialManager =>
       CkAuthService.instance.socialManager;
 
+  static String? get username {
+    return _findUsernameValue(lastSubmitAuthData);
+  }
+
+  static String? get password {
+    return _findPasswordValue(lastSubmitAuthData);
+  }
+
   /// The active configuration.
   static CkAuthConfig<dynamic> get config => CkAuthService.instance.config;
 
@@ -51,8 +60,8 @@ class CkAuth {
       CkAuthService.instance.profileStream;
 
   /// A simplified reactive StreamBuilder UI helper for the user profile.
-  static Widget profileUi({
-    required Widget Function(BuildContext context, dynamic profile) builder,
+  static Widget profileUi<TProfile>({
+    required Widget Function(BuildContext context, TProfile? profile) builder,
     Widget? loading,
   }) {
     return StreamBuilder<dynamic>(
@@ -95,40 +104,42 @@ class CkAuth {
   static Future<CkAuthResult<dynamic>> signUp({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) => CkAuthService.instance.signUp(body: body, headers: headers);
+  }) {
+    lastSubmitAuthData = body;
+    return CkAuthService.instance.signUp(body: body, headers: headers);
+  }
 
   /// Sign in — auto-saves tokens, auto-fetches profile.
   static Future<CkAuthResult<dynamic>> signIn({
-    required Map<String, dynamic> body,
+    required String username,
+    required String password,
     Map<String, String>? headers,
-  }) => CkAuthService.instance.signIn(body: body, headers: headers);
+  }) {
+    final body = config.loginBodyBuilder(
+      LoginCallback(username: username, password: password),
+    );
+    return CkAuthService.instance.signIn(body: body, headers: headers);
+  }
 
   /// Forgot password — auto-stores forgetToken.
   static Future<CkAuthResult<void>> forgotPassword({
     required Map<String, dynamic> body,
-  }) => CkAuthService.instance.forgotPassword(body: body);
+    Map<String, String>? headers,
+  }) => CkAuthService.instance.forgotPassword(body: body, headers: headers);
 
   /// Verify OTP — uses stored verification token automatically.
-  static Future<CkAuthResult<void>> verifyOtp({
-    required String otp,
-    required CkOtpTrigger trigger,
-    Map<String, dynamic>? additionalBody,
-  }) => CkAuthService.instance.verifyOtp(
-    otp: otp,
-    additionalBody: additionalBody,
-  );
+  static Future<CkAuthResult<void>> verifyOtp({required String otp}) =>
+      CkAuthService.instance.verifyOtp(otp: otp);
 
   /// Resend OTP — auto-restarts timer.
-  static Future<CkAuthResult<void>> resendOtp({
-    required CkOtpTrigger trigger,
-    String? identifier,
-  }) => CkAuthService.instance.resendOtp();
+  static Future<CkAuthResult<void>> resendOtp({String? identifier}) =>
+      CkAuthService.instance.resendOtp();
 
-  /// Change password.
-  static Future<CkAuthResult<void>> changePassword({
+  /// Reset password.
+  static Future<CkAuthResult<void>> updatePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) => CkAuthService.instance.changePassword(body: body, headers: headers);
+  }) => CkAuthService.instance.updatePassword(body: body, headers: headers);
 
   /// Authenticate with Google.
   static Future<CkAuthResult<dynamic>> signInWithGoogle(
@@ -175,5 +186,55 @@ class CkAuth {
       files: files,
       jsonBody: jsonBody,
     );
+  }
+
+  static String? _findUsernameValue(Map<String, dynamic> data) {
+    const priorities = [
+      ['username', 'user_name', 'user'],
+      ['email', 'email_address', 'mail'],
+      ['phone', 'phone_number', 'mobile', 'contact'],
+    ];
+
+    for (final group in priorities) {
+      for (final entry in data.entries) {
+        final key = entry.key.toLowerCase();
+
+        final isMatched = group.any(
+          (keyword) => key.contains(keyword.toLowerCase()),
+        );
+
+        if (isMatched) {
+          final value = entry.value?.toString().trim();
+
+          if (value != null && value.isNotEmpty) {
+            return value;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  static String? _findPasswordValue(Map<String, dynamic> data) {
+    const passwordKeys = ['password', 'pass', 'pwd', 'pin'];
+
+    for (final entry in data.entries) {
+      final key = entry.key.toLowerCase();
+
+      final isMatched = passwordKeys.any(
+        (keyword) => key.contains(keyword.toLowerCase()),
+      );
+
+      if (isMatched) {
+        final value = entry.value?.toString().trim();
+
+        if (value != null && value.isNotEmpty) {
+          return value;
+        }
+      }
+    }
+
+    return null;
   }
 }

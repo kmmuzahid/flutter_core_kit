@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:core_kit/auth/auth_extractors.dart';
-import 'package:core_kit/auth/auth_result.dart';
+import 'package:core_kit/auth/ck_auth_extractors.dart';
+import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/reactive/behavior_stream.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/network/ck_response.dart';
@@ -16,11 +16,9 @@ import 'package:core_kit/storage/ck_storage.dart';
 /// - [restoreProfile] — `jsonDecode` stored payload, then [profileExtractor]
 class CkProfileExtractor<TProfile> {
   CkProfileExtractor({
-    required TProfile Function(Map<String, dynamic> json) profileExtractor,
-    required CkAuthExtractors<TProfile> extractors,
-  }) : _profileExtractor = profileExtractor,
-       _extractors = extractors,
-       _profile = CkBehaviorStream(initialValue: null);
+    required this._profileExtractor,
+    required this._extractors,
+  }) : _profile = CkBehaviorStream(initialValue: null);
 
   final TProfile Function(Map<String, dynamic> json) _profileExtractor;
   final CkAuthExtractors<TProfile> _extractors;
@@ -41,7 +39,7 @@ class CkProfileExtractor<TProfile> {
   /// Caches profile and persists to storage if changed
   void cacheProfile(TProfile profile, String fingerprint) {
     if (fingerprint == _storedPayload && _cachedProfile != null) return;
-    
+
     _storedPayload = fingerprint;
     _cachedProfile = profile;
     _profile.add(profile);
@@ -67,11 +65,7 @@ class CkProfileExtractor<TProfile> {
     final decoded = jsonDecode(cached);
     _storedPayload = cached;
     _cachedProfile = profileExtractor(
-      CkResponse<dynamic>(
-        data: decoded,
-        isSuccess: true,
-        statusCode: null,
-      ),
+      CkResponse<dynamic>(data: decoded, isSuccess: true, statusCode: null),
     );
     _profile.add(_cachedProfile);
   }
@@ -91,8 +85,8 @@ class CkProfileExtractor<TProfile> {
     if (response.isSuccess && response.data != null) {
       final profile = response.data;
       final fingerprint = jsonEncode(extractedProfileData);
-      cacheProfile(profile!, fingerprint);
-      
+      cacheProfile(profile as TProfile, fingerprint);
+
       return CkAuthResult.success(
         data: profile,
         statusCode: response.statusCode,
@@ -100,7 +94,8 @@ class CkProfileExtractor<TProfile> {
       );
     }
     return CkAuthResult.failure(
-      message: response.message ?? 'Profile could not be extracted from response',
+      message:
+          response.message ?? 'Profile could not be extracted from response',
       statusCode: response.statusCode,
       rawResponse: response.raw,
     );
@@ -130,8 +125,8 @@ class CkProfileExtractor<TProfile> {
     if (response.isSuccess && response.data != null) {
       final profile = response.data;
       final fingerprint = jsonEncode(extractedProfileData);
-      cacheProfile(profile!, fingerprint);
-      
+      cacheProfile(profile as TProfile, fingerprint);
+
       return CkAuthResult.success(
         data: profile,
         statusCode: response.statusCode,
@@ -139,7 +134,8 @@ class CkProfileExtractor<TProfile> {
       );
     }
     return CkAuthResult.failure(
-      message: response.message ?? 'Profile could not be extracted from response',
+      message:
+          response.message ?? 'Profile could not be extracted from response',
       statusCode: response.statusCode,
       rawResponse: response.raw,
     );
@@ -152,7 +148,7 @@ class CkProfileExtractor<TProfile> {
     await CkStorage.delete(CkAuthStorageKeys.profileDataKey);
   }
 
-  TProfile? parseProfile(dynamic data) {
+  TProfile? parseProfile(data) {
     if (data == null) return null;
 
     // Use custom profile extractor if provided

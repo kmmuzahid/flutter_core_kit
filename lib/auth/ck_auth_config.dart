@@ -1,8 +1,7 @@
-import 'package:core_kit/auth/auth_endpoints.dart';
-import 'package:core_kit/auth/auth_extractors.dart';
-import 'package:core_kit/auth/auth_routes.dart';
+import 'package:core_kit/auth/ck_auth_endpoints.dart';
+import 'package:core_kit/auth/ck_auth_extractors.dart';
+import 'package:core_kit/auth/ck_auth_flow_handlers.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
-import 'package:core_kit/auth/logout/logout_config.dart';
 import 'package:core_kit/auth/social/social_login_config.dart';
 
 /// Main auth configuration for [CkAuthService].
@@ -20,14 +19,13 @@ class CkAuthConfig<TProfile> {
   // ─── Response Extractors (flexible backend mapping) ───
   final CkAuthExtractors<TProfile> extractors;
 
-  // ─── Routing ───
-  final CkAuthRoutes? routes;
+  Map<String, dynamic> Function(LoginCallback loginCallBack) loginBodyBuilder;
+
+  // ─── Flow Handlers ───
+  final CkAuthFlowHandlers? handlers;
 
   // ─── OTP Configuration (optional — null means no OTP flow) ───
-  final CkOtpConfig? otpConfig;
-
-  // ─── Logout Strategy ───
-  final CkLogoutConfig logoutConfig;
+  final CkOtpConfig otpConfig;
 
   // ─── Social Login (optional — null providers are ignored) ───
   final CkSocialLoginConfig? socialLoginConfig;
@@ -38,13 +36,19 @@ class CkAuthConfig<TProfile> {
 
   CkAuthConfig({
     required this.endpoints,
+    required this.loginBodyBuilder,
     required this.profileExtractor,
     CkAuthExtractors<TProfile>? extractors,
-    this.routes,
-    this.otpConfig,
-    this.logoutConfig = const CkLogoutConfig(),
+    this.handlers,
+    required this.otpConfig,
     this.socialLoginConfig,
     this.onTokenRestored,
     this.customAuthValidator,
   }) : extractors = extractors ?? CkAuthExtractors<TProfile>.standard();
+}
+
+class LoginCallback {
+  final String username;
+  final String password;
+  LoginCallback({required this.username, required this.password});
 }

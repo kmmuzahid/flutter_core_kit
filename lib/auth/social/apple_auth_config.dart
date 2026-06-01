@@ -1,5 +1,5 @@
+import 'package:core_kit/auth/ck_auth_extractors.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:core_kit/auth/auth_extractors.dart';
 
 /// Apple Sign-In configuration
 class CkAppleAuthConfig {
@@ -8,7 +8,7 @@ class CkAppleAuthConfig {
   final List<String> scopes; // default: [email, fullName]
   final Map<String, dynamic> Function(CkAppleAuthData data) bodyBuilder;
   final CkAuthExtractors? responseExtractors;
-  
+
   const CkAppleAuthConfig({
     required this.backendUrl,
     this.method = RequestMethod.POST,

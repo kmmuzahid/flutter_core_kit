@@ -2,8 +2,8 @@ import 'package:core_kit/auth/social/social_login_config.dart';
 import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
 import 'package:core_kit/auth/social/facebook_auth_config.dart';
-import 'package:core_kit/auth/auth_result.dart';
-import 'package:core_kit/auth/auth_extractors.dart';
+import 'package:core_kit/auth/ck_auth_result.dart';
+import 'package:core_kit/auth/ck_auth_extractors.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
@@ -25,18 +25,13 @@ class CkSocialAuthManager<TProfile> {
   final CkAuthExtractors<TProfile> _defaultExtractors;
 
   CkSocialAuthManager({
-    CkSocialLoginConfig? config,
-    required CkAuthTokenManager tokenManager,
-    required CkProfileExtractor<TProfile> profileExtractor,
-    required CkAuthStateController stateController,
-    required CkLogoutHandler logoutHandler,
-    required CkAuthExtractors<TProfile> defaultExtractors,
-  }) : _config = config,
-       _tokenManager = tokenManager,
-       _profileExtractor = profileExtractor,
-       _stateController = stateController,
-       _logoutHandler = logoutHandler,
-       _defaultExtractors = defaultExtractors;
+    this._config,
+    required this._tokenManager,
+    required this._profileExtractor,
+    required this._stateController,
+    required this._logoutHandler,
+    required this._defaultExtractors,
+  });
 
   /// Check if a specific provider is configured
   bool isProviderAvailable(CkSocialProvider provider) {
@@ -58,7 +53,9 @@ class CkSocialAuthManager<TProfile> {
       _config?.availableProviders ?? [];
 
   /// Authenticate Google credentials on backend
-  Future<CkAuthResult<TProfile>> authenticateGoogle(CkGoogleAuthData data) async {
+  Future<CkAuthResult<TProfile>> authenticateGoogle(
+    CkGoogleAuthData data,
+  ) async {
     if (_config?.google == null) {
       return CkAuthResult<TProfile>.failure(
         message: 'Google auth is not configured',
@@ -190,10 +187,7 @@ class CkSocialAuthManager<TProfile> {
       );
     }
 
-    await _tokenManager.saveTokens(
-      accessToken: access,
-      refreshToken: refresh,
-    );
+    await _tokenManager.saveTokens(accessToken: access, refreshToken: refresh);
 
     await _profileExtractor.applyFromResponse(response);
     final profile = _profileExtractor.current;

@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:core_kit/app_bar/ck_app_bar.dart';
+import 'package:core_kit/auth/ck_auth_config.dart';
+import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/ck_transport_config.dart';
-import 'package:core_kit/utils/ck_screen_utils.dart';
 import 'package:core_kit/utils/ck_permission_helper.dart';
+import 'package:core_kit/utils/ck_screen_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:core_kit/auth/auth_config.dart';
-import 'package:core_kit/auth/auth_service.dart';
 
 coreKitInstanceSingleton get coreKitInstance =>
     coreKitInstanceSingleton.instance;
@@ -62,7 +62,6 @@ class CkListLoaderConfig {
     );
   }
 }
-
 
 class coreKitInstanceSingleton {
   coreKitInstanceSingleton._();

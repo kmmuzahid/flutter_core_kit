@@ -1,76 +1,45 @@
-import 'package:core_kit/auth/logout/logout_config.dart';
-import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/auth/state/profile_extractor.dart';
+import 'package:core_kit/auth/ck_auth_flow_handlers.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
-import 'package:core_kit/auth/auth_routes.dart';
-import 'package:core_kit/storage/ck_storage.dart';
+import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
-import 'package:core_kit/initializer.dart';
+import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:flutter/widgets.dart';
 
 class CkLogoutHandler {
-  final CkLogoutConfig _config;
   final CkAuthTokenManager _tokenManager;
   final CkProfileExtractor _profileExtractor;
   final CkOtpFlowManager _otpManager;
   final CkAuthStateController _stateController;
-  final CkAuthRoutes? _routes;
+  final CkAuthFlowHandlers? _handlers;
   final String? _logoutUrl;
   final RequestMethod _logoutMethod;
 
   CkLogoutHandler({
-    required CkLogoutConfig config,
-    required CkAuthTokenManager tokenManager,
-    required CkProfileExtractor profileExtractor,
-    required CkOtpFlowManager otpManager,
-    required CkAuthStateController stateController,
-    CkAuthRoutes? routes,
-    String? logoutUrl,
-    RequestMethod logoutMethod = RequestMethod.POST,
-  })  : _config = config,
-        _tokenManager = tokenManager,
-        _profileExtractor = profileExtractor,
-        _otpManager = otpManager,
-        _stateController = stateController,
-        _routes = routes,
-        _logoutUrl = logoutUrl,
-        _logoutMethod = logoutMethod;
+    required this._tokenManager,
+    required this._profileExtractor,
+    required this._otpManager,
+    required this._stateController,
+    this._handlers,
+    this._logoutUrl,
+    this._logoutMethod = RequestMethod.POST,
+  });
 
-  /// Execute full logout sequence:
-  /// 1. Call API (if configured)
-  /// 2. Clear tokens
-  /// 3. Clear profile
-  /// 4. Clear OTP state
-  /// 5. Set auth status to unauthenticated
-  /// 6. Navigate to login or onboarding (auto-detected)
   Future<void> execute() async {
-    if (_logoutUrl != null) {
-      try {
-        final body = _config.logoutBodyBuilder?.call();
-        final headers = _config.logoutHeadersBuilder?.call();
-        await CkTransport.request(
-          input: RequestInput(
-            endpoint: _logoutUrl!,
-            method: _logoutMethod,
-            jsonBody: body,
-            headers: headers,
-          ),
-          responseBuilder: (data) => data,
-          showMessage: true,
-        );
-      } catch (e) {
-        // Ignore API failures to ensure local session is always cleared
-      }
+    if (_logoutUrl != null && _logoutUrl.isNotEmpty) {
+      await CkTransport.request(
+        input: RequestInput(endpoint: _logoutUrl, method: _logoutMethod),
+        responseBuilder: (data) => data,
+        showMessage: true,
+      );
     }
 
     // Clear local states
     await _tokenManager.clearTokens();
     await _profileExtractor.clearProfile();
     await _otpManager.clearOtpState();
-    
+
     // Set to unauthenticated
     _stateController.setUnauthenticated();
 
@@ -80,17 +49,17 @@ class CkLogoutHandler {
 
   /// Perform automatic navigation based on route configuration
   Future<void> autoNavigate() async {
-    if (_routes == null) return;
+    if (_handlers == null) return;
     final isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
-    if (_routes!.routeToOnboarding != null) {
-      final showOnboarding = !_routes!.firstTimeOnly || isFirstTime;
+    if (_handlers.showOnboarding != null) {
+      final showOnboarding = !_handlers.firstTimeOnly || isFirstTime;
       if (showOnboarding) {
-        _routes!.routeToOnboarding!();
+        _handlers.showOnboarding!();
       } else {
-        _routes!.routeToLogin();
+        _handlers.showLogin();
       }
     } else {
-      _routes!.routeToLogin();
+      _handlers.showLogin();
     }
   }
 }

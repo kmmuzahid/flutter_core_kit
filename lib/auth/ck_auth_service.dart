@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:core_kit/auth/auth_config.dart';
-import 'package:core_kit/auth/auth_extractors.dart';
-import 'package:core_kit/auth/auth_result.dart';
+import 'package:core_kit/auth/ck_auth.dart';
+import 'package:core_kit/auth/ck_auth_config.dart';
+import 'package:core_kit/auth/ck_auth_extractors.dart';
+import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
@@ -16,11 +16,9 @@ import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/network/ck_response.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/storage/ck_storage.dart';
-import 'package:flutter/material.dart';
 
 /// Token layer prepared before [CkTransport.init] (CoreKit internal).
 class CkAuthNetworkBootstrap {
@@ -46,6 +44,15 @@ class CkAuthService<TProfile> {
     return _instance!;
   }
 
+  /// Returns the singleton instance cast to a specific profile type [T].
+  static CkAuthService<T> typedInstance<T>() {
+    assert(
+      _instance != null,
+      'CkAuthService not initialized. Please check if you provided `authConfig` in CoreKitConfig.',
+    );
+    return _instance! as CkAuthService<T>;
+  }
+
   static bool get isInitialized => _instance != null;
 
   // Sub-managers
@@ -60,12 +67,12 @@ class CkAuthService<TProfile> {
   CkAuthService._({
     required this.tokenManager,
     required this.authState,
-    required CkProfileExtractor<TProfile> profileExtractor,
+    required this._profileExtractor,
     required this.otpManager,
     required this.logoutHandler,
     required this.socialManager,
     required this.config,
-  }) : _profileExtractor = profileExtractor;
+  });
 
   /// Prepares secure storage, token cache, and [CkTokenProvider] for Dio.
   /// CoreKit calls this, then [CkTransport.init], then [init].
@@ -96,24 +103,23 @@ class CkAuthService<TProfile> {
     );
 
     final otpManager = CkOtpFlowManager(
-      config: config.otpConfig ?? const CkOtpConfig(),
+      config: config.otpConfig,
       extractors: config.extractors as CkAuthExtractors<dynamic>,
-      sendUrl: config.endpoints.otpSendUrl,
-      verifyUrl: config.endpoints.otpVerifyUrl,
-      sendMethod: config.endpoints.otpSendMethod,
-      verifyMethod: config.endpoints.otpVerifyMethod,
+      sendUrl: config.endpoints.sendOtp,
+      verifyUrl: config.endpoints.verifyOtp,
+      sendMethod: config.endpoints.sendOtpMethod,
+      verifyMethod: config.endpoints.verifyOtpMethod,
     );
 
     await otpManager.restoreTokens();
 
     final logoutHandler = CkLogoutHandler(
-      config: config.logoutConfig,
       tokenManager: tokenManager,
       profileExtractor: profileExtractor,
       otpManager: otpManager,
       stateController: authState,
-      routes: config.routes,
-      logoutUrl: config.endpoints.logoutUrl,
+      handlers: config.handlers,
+      logoutUrl: config.endpoints.logout,
       logoutMethod: config.endpoints.logoutMethod,
     );
 
@@ -148,10 +154,10 @@ class CkAuthService<TProfile> {
   /// Handles OTP flow check and returns OTP result if triggered
   CkAuthResult<TProfile>? _handleOtpFlow(
     CkOtpTrigger trigger,
-    dynamic responseData,
+    responseData,
     int? statusCode,
   ) {
-    final autoOtp = config.otpConfig?.autoTriggers.contains(trigger) ?? false;
+    final autoOtp = config.otpConfig.autoTriggers.contains(trigger) ?? false;
     final vToken = config.extractors.verificationTokens?[trigger]?.call(
       responseData,
     );
@@ -160,8 +166,8 @@ class CkAuthService<TProfile> {
       otpManager.storeVerificationToken(trigger, vToken);
       otpManager.startResendTimer();
 
-      if (config.routes?.roteToOtpVerification != null) {
-        config.routes!.roteToOtpVerification!();
+      if (config.handlers?.showOtpVerification != null) {
+        config.handlers!.showOtpVerification!();
       }
 
       return CkAuthResult<TProfile>(
@@ -177,7 +183,7 @@ class CkAuthService<TProfile> {
 
   /// Completes authentication after successful token extraction
   Future<CkAuthResult<TProfile>> _completeAuthentication(
-    dynamic responseData,
+    responseData,
     int? statusCode,
   ) async {
     final access = config.extractors.accessToken(responseData);
@@ -210,17 +216,9 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
-    final identifier = body['email']?.toString() ??
-                       body['phone']?.toString() ??
-                       body['phone_number']?.toString() ??
-                       body['username']?.toString() ??
-                       body['identifier']?.toString();
-    if (identifier != null) {
-      await otpManager.storeLastIdentifier(identifier);
-    }
     final response = await CkTransport.request(
       input: RequestInput(
-        endpoint: config.endpoints.signupUrl,
+        endpoint: config.endpoints.signup,
         method: config.endpoints.signupMethod,
         jsonBody: body,
         headers: headers,
@@ -263,17 +261,9 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
-    final identifier = body['email']?.toString() ??
-                       body['phone']?.toString() ??
-                       body['phone_number']?.toString() ??
-                       body['username']?.toString() ??
-                       body['identifier']?.toString();
-    if (identifier != null) {
-      await otpManager.storeLastIdentifier(identifier);
-    }
     final response = await CkTransport.request(
       input: RequestInput(
-        endpoint: config.endpoints.signinUrl,
+        endpoint: config.endpoints.signin,
         method: config.endpoints.signinMethod,
         jsonBody: body,
         headers: headers,
@@ -304,25 +294,12 @@ class CkAuthService<TProfile> {
   /// Forgot password — auto-stores forgetToken
   Future<CkAuthResult<void>> forgotPassword({
     required Map<String, dynamic> body,
+    Map<String, String>? headers,
   }) async {
-    final identifier = body['email']?.toString() ??
-                       body['phone']?.toString() ??
-                       body['phone_number']?.toString() ??
-                       body['username']?.toString() ??
-                       body['identifier']?.toString();
-    if (identifier != null) {
-      await otpManager.storeLastIdentifier(identifier);
-    }
-    if (config.endpoints.forgetPasswordUrl == null) {
-      return const CkAuthResult<void>.failure(
-        message: 'Forgot password URL is not configured',
-      );
-    }
-
     final response = await CkTransport.request(
       input: RequestInput(
-        endpoint: config.endpoints.forgetPasswordUrl!,
-        method: config.endpoints.forgetPasswordMethod,
+        endpoint: config.endpoints.forgotPassword,
+        method: config.endpoints.forgotPasswordMethod,
         jsonBody: body,
         requiresToken: false,
       ),
@@ -361,51 +338,22 @@ class CkAuthService<TProfile> {
   }
 
   /// Verify OTP — uses stored verification token automatically
-  Future<CkAuthResult<void>> verifyOtp({
-    required String otp,
-    Map<String, dynamic>? additionalBody,
-  }) async {
-    final activeTrigger = otpManager.lastTrigger;
-    final verifyResult = await otpManager.verifyOtp(
-      otp: otp,
-      additionalBody: additionalBody,
-    );
+  Future<CkAuthResult<void>> verifyOtp({required String otp}) async {
+    final verifyResult = await otpManager.verifyOtp(otp: otp);
 
     if (verifyResult.isSuccess) {
-      final data = verifyResult.rawResponse;
-      final autoLogin = activeTrigger == CkOtpTrigger.signup || activeTrigger == CkOtpTrigger.login;
-
-      if (data != null && autoLogin) {
-        final access = config.extractors.accessToken(data);
-        final refresh = config.extractors.refreshToken?.call(data);
-
-        if (access != null) {
-          await tokenManager.saveTokens(
-            accessToken: access,
-            refreshToken: refresh,
-          );
-          authState.setAuthenticated();
-          await CkAuthStorageKeys.markNotFirstTimeUser();
-
-          final profile = _profileExtractor.parseProfile(data);
-          if (profile != null) {
-            final fingerprint = jsonEncode(data);
-            _profileExtractor.cacheProfile(profile, fingerprint);
-
-            final dynamic onProfileLoaded = (config as dynamic).onProfileLoaded;
-            if (onProfileLoaded != null) {
-              await onProfileLoaded(profile);
-            }
-          } else {
-            await fetchProfile();
-            final fetchedProfile = _profileExtractor.current;
-            final dynamic onProfileLoaded = (config as dynamic).onProfileLoaded;
-            if (onProfileLoaded != null && fetchedProfile != null) {
-              await onProfileLoaded(fetchedProfile);
-            }
-          }
-
-          autoNavigate();
+      if (otpManager.lastTrigger == CkOtpTrigger.signup) {
+        return signIn(
+          body: config.loginBodyBuilder(
+            LoginCallback(
+              username: CkAuth.username ?? '',
+              password: CkAuth.password ?? '',
+            ),
+          ),
+        );
+      } else if (otpManager.lastTrigger == CkOtpTrigger.forgetPassword) {
+        if (config.handlers?.showResetPassword != null) {
+          config.handlers!.showResetPassword!();
         }
       }
       return const CkAuthResult<void>.success();
@@ -420,35 +368,31 @@ class CkAuthService<TProfile> {
   }
 
   /// Send OTP manually — also updates lastTrigger for verify/resend
-  Future<CkAuthResult<void>> sendOtp({
-    required CkOtpTrigger trigger,
-  }) async {
+  Future<CkAuthResult<void>> sendOtp({required CkOtpTrigger trigger}) async {
     return otpManager.sendOtp(trigger: trigger);
   }
 
-  /// Change password
-  Future<CkAuthResult<void>> changePassword({
+  /// Reset password
+  Future<CkAuthResult<void>> updatePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
-    if (config.endpoints.changePasswordUrl == null) {
-      return const CkAuthResult<void>.failure(
-        message: 'Change password URL is not configured',
-      );
-    }
-
     final response = await CkTransport.request(
       input: RequestInput(
-        endpoint: config.endpoints.changePasswordUrl!,
-        method: config.endpoints.changePasswordMethod,
+        endpoint: config.endpoints.resetPassword,
+        method: config.endpoints.resetPasswordMethod,
         jsonBody: body,
         headers: headers,
+        requiresToken: false,
       ),
       responseBuilder: (data) => data,
       showMessage: true,
     );
 
     if (response.isSuccess) {
+      if (config.handlers != null) {
+        config.handlers!.showLogin();
+      }
       return CkAuthResult<void>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
@@ -512,7 +456,7 @@ class CkAuthService<TProfile> {
       await _profileExtractor.restoreProfile();
 
       // Run custom/optional API auth validation before completing routing
-      bool valid = true;
+      var valid = true;
       if (config.customAuthValidator != null) {
         valid = await config.customAuthValidator!();
       }
@@ -523,22 +467,20 @@ class CkAuthService<TProfile> {
       }
 
       // Then fetch fresh profile in background
-      if (config.endpoints.profileGetUrl != null) {
-        _profileExtractor
-            .fetchProfile(
-              config.endpoints.profileGetUrl!,
-              config.endpoints.profileGetMethod,
-            )
-            .then((result) {
-              if (result.isSuccess && result.data != null) {
-                final dynamic onProfileLoaded =
-                    (config as dynamic).onProfileLoaded;
-                if (onProfileLoaded != null) {
-                  onProfileLoaded(result.data as TProfile);
-                }
+      _profileExtractor
+          .fetchProfile(
+            config.endpoints.getProfile,
+            config.endpoints.getProfileMethod,
+          )
+          .then((result) {
+            if (result.isSuccess && result.data != null) {
+              final dynamic onProfileLoaded =
+                  (config as dynamic).onProfileLoaded;
+              if (onProfileLoaded != null) {
+                onProfileLoaded(result.data as TProfile);
               }
-            });
-      }
+            }
+          });
     } else {
       authState.setUnauthenticated();
     }
@@ -552,16 +494,11 @@ class CkAuthService<TProfile> {
   /// Stream of user profile changes.
   Stream<TProfile?> get profileStream => _profileExtractor.profile.stream;
 
-  /// Fetches the profile from the server using the configured [profileGetUrl].
+  /// Fetches the profile from the server using the configured [getProfile] endpoint.
   Future<CkAuthResult<TProfile?>> fetchProfile() async {
-    if (config.endpoints.profileGetUrl == null) {
-      return const CkAuthResult.failure(
-        message: 'Profile GET URL is not configured',
-      );
-    }
     return _profileExtractor.fetchProfile(
-      config.endpoints.profileGetUrl!,
-      config.endpoints.profileGetMethod,
+      config.endpoints.getProfile,
+      config.endpoints.getProfileMethod,
     );
   }
 
@@ -571,14 +508,9 @@ class CkAuthService<TProfile> {
     Map<String, dynamic>? files,
     Map<String, dynamic>? jsonBody,
   }) async {
-    if (config.endpoints.profileUpdateUrl == null) {
-      return const CkAuthResult.failure(
-        message: 'Profile update URL is not configured',
-      );
-    }
     final result = await _profileExtractor.updateProfileRemote(
-      url: config.endpoints.profileUpdateUrl!,
-      method: config.endpoints.profileUpdateMethod,
+      url: config.endpoints.updateProfile,
+      method: config.endpoints.updateProfileMethod,
       formFields: formFields,
       files: files,
       jsonBody: jsonBody,
@@ -598,10 +530,10 @@ class CkAuthService<TProfile> {
     return result;
   }
 
-  void autoNavigate() async {
-    if (config.routes == null) return;
+  Future<void> autoNavigate() async {
+    if (config.handlers == null) return;
 
-    final bool authenticated = authState.isAuthenticated;
+    final authenticated = authState.isAuthenticated;
     bool? isFirstTime;
     if (!authenticated) {
       isFirstTime = await CkAuthStorageKeys.isFirstTimeUser();
@@ -609,18 +541,18 @@ class CkAuthService<TProfile> {
 
     void navigate() {
       if (authenticated) {
-        config.routes!.routeOnSuccess();
+        config.handlers!.onAuthenticated();
       } else {
-        if (config.routes!.routeToOnboarding != null) {
+        if (config.handlers!.showOnboarding != null) {
           final showOnboarding =
-              !config.routes!.firstTimeOnly || (isFirstTime ?? true);
+              !config.handlers!.firstTimeOnly || (isFirstTime ?? true);
           if (showOnboarding) {
-            config.routes!.routeToOnboarding!();
+            config.handlers!.showOnboarding!();
           } else {
-            config.routes!.routeToLogin();
+            config.handlers!.showLogin();
           }
         } else {
-          config.routes!.routeToLogin();
+          config.handlers!.showLogin();
         }
       }
     }

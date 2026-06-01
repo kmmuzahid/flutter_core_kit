@@ -12,7 +12,7 @@ import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/ck_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:core_kit/auth/auth_service.dart';
+import 'package:core_kit/auth/ck_auth_service.dart';
 
 class DioInterceptor extends Interceptor {
   final Dio _dio;
@@ -26,12 +26,10 @@ class DioInterceptor extends Interceptor {
   DateTime? _lastServerShutdown;
 
   DioInterceptor({
-    required Dio dio,
-    required CkTransportConfig config,
-    required CkTokenProvider tokenProvider,
-  }) : _dio = dio,
-       _config = config,
-       _tokenProvider = tokenProvider;
+    required this._dio,
+    required this._config,
+    required this._tokenProvider,
+  });
 
   bool get isServerOff => _isServerOff;
 
@@ -115,7 +113,9 @@ class DioInterceptor extends Interceptor {
           await _tokenProvider.updateTokens(extractedData);
         }
       } else if (response.statusCode == 401) {
-        final extractedMessage = _config.responseExtractor.message(response.data);
+        final extractedMessage = _config.responseExtractor.message(
+          response.data,
+        );
         if (extractedMessage != null && extractedMessage.isNotEmpty) {
           DioUtils.showMessage(extractedMessage, isError: true);
         }
