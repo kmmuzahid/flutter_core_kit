@@ -12,6 +12,7 @@ class CkAuthExtractors<TProfile> {
     this.refreshToken,
     this.profile,
     this.verificationTokens,
+    this.resetPasswordToken,
     this.message,
   });
 
@@ -24,6 +25,9 @@ class CkAuthExtractors<TProfile> {
   /// Trigger-specific verification token extractors.
   final Map<CkOtpTrigger, String? Function(dynamic data)>? verificationTokens;
 
+  /// Extractor for password reset token returned upon successful OTP verification.
+  final String? Function(dynamic data)? resetPasswordToken;
+
   final String? Function(dynamic data)? message;
 
   /// Standard keys on [CkResponse.data] (post-envelope `data` payload).
@@ -32,6 +36,7 @@ class CkAuthExtractors<TProfile> {
     String refreshTokenKey = 'refreshToken',
     String profileKey = 'user',
     String messageKey = 'message',
+    String resetPasswordTokenKey = 'token',
     Map<CkOtpTrigger, String>? verificationTokenKeys = const {
       CkOtpTrigger.signup: 'createUserToken',
       CkOtpTrigger.login: 'loginUserToken',
@@ -41,6 +46,7 @@ class CkAuthExtractors<TProfile> {
     return CkAuthExtractors<TProfile>(
       accessToken: (data) => _extractByKey(data, accessTokenKey)?.toString(),
       refreshToken: (data) => _extractByKey(data, refreshTokenKey)?.toString(),
+      resetPasswordToken: (data) => _extractByKey(data, resetPasswordTokenKey)?.toString(),
       verificationTokens: _buildVerificationTokenExtractors(
         verificationTokenKeys,
         _extractByKey,
@@ -54,6 +60,7 @@ class CkAuthExtractors<TProfile> {
     String? refreshTokenPath,
     String? profilePath,
     String? messagePath,
+    String? resetPasswordTokenPath,
     Map<CkOtpTrigger, String>? verificationTokenPaths = const {
       CkOtpTrigger.signup: 'createUserToken',
       CkOtpTrigger.login: 'loginUserToken',
@@ -64,6 +71,9 @@ class CkAuthExtractors<TProfile> {
       accessToken: (data) => _extractByPath(data, accessTokenPath)?.toString(),
       refreshToken: refreshTokenPath != null
           ? (data) => _extractByPath(data, refreshTokenPath)?.toString()
+          : null,
+      resetPasswordToken: resetPasswordTokenPath != null
+          ? (data) => _extractByPath(data, resetPasswordTokenPath)?.toString()
           : null,
       verificationTokens: _buildVerificationTokenExtractors(
         verificationTokenPaths,

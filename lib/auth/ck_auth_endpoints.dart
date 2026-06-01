@@ -6,6 +6,7 @@ class CkAuthEndpoints {
   final String forgotPassword;
   final String sendOtp;
   final String verifyOtp;
+  final String? verifyForgetOtp;
   final String getProfile;
   final String updateProfile;
   final String logout;
@@ -29,6 +30,7 @@ class CkAuthEndpoints {
     required this.forgotPassword,
     required this.sendOtp,
     required this.verifyOtp,
+    this.verifyForgetOtp,
     required this.getProfile,
     required this.updateProfile,
     required this.logout,

@@ -16,12 +16,17 @@ class CkOtpFlowManager {
   final CkAuthExtractors<dynamic> _extractors;
   final String? _sendUrl;
   final String? _verifyUrl;
+  final String? _verifyForgetUrl;
   final RequestMethod _sendMethod;
   final RequestMethod _verifyMethod;
 
   Timer? _timer;
   int _resendAttempts = 0;
   CkOtpTrigger? lastTrigger;
+  String? _resetPasswordToken;
+
+  /// Retains the password reset token returned by the OTP verification response.
+  String? get resetPasswordToken => _resetPasswordToken;
 
   // Stores verification tokens per flow in-memory
   final Map<CkOtpTrigger, String?> _verificationTokens = {};
@@ -35,6 +40,7 @@ class CkOtpFlowManager {
     required this._extractors,
     this._sendUrl,
     this._verifyUrl,
+    this._verifyForgetUrl,
     this._sendMethod = RequestMethod.POST,
     this._verifyMethod = RequestMethod.POST,
   }) {
@@ -183,7 +189,11 @@ class CkOtpFlowManager {
       );
     }
 
-    if (_verifyUrl == null) {
+    final url = (activeTrigger == CkOtpTrigger.forgetPassword && _verifyForgetUrl != null)
+        ? _verifyForgetUrl
+        : _verifyUrl;
+
+    if (url == null) {
       return const CkAuthResult<void>.failure(
         message: 'OTP verify URL is not configured',
       );
@@ -209,7 +219,7 @@ class CkOtpFlowManager {
 
     final response = await CkTransport.request(
       input: RequestInput(
-        endpoint: _verifyUrl,
+        endpoint: url,
         method: _verifyMethod,
         jsonBody: body,
         headers: headers,
@@ -220,6 +230,9 @@ class CkOtpFlowManager {
     );
 
     if (response.isSuccess) {
+      if (_extractors.resetPasswordToken != null) {
+        _resetPasswordToken = _extractors.resetPasswordToken!(response.data);
+      }
       await storeVerificationToken(activeTrigger, null);
       if (lastTrigger == activeTrigger) {
         lastTrigger = null;
@@ -242,6 +255,7 @@ class CkOtpFlowManager {
   Future<void> clearOtpState() async {
     _timer?.cancel();
     _verificationTokens.clear();
+    _resetPasswordToken = null;
     _resendAttempts = 0;
     resendCountdown.add(0);
     for (final trigger in CkOtpTrigger.values) {

@@ -107,6 +107,7 @@ class CkAuthService<TProfile> {
       extractors: config.extractors as CkAuthExtractors<dynamic>,
       sendUrl: config.endpoints.sendOtp,
       verifyUrl: config.endpoints.verifyOtp,
+      verifyForgetUrl: config.endpoints.verifyForgetOtp,
       sendMethod: config.endpoints.sendOtpMethod,
       verifyMethod: config.endpoints.verifyOtpMethod,
     );
@@ -378,12 +379,22 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) async {
+    final finalHeaders = <String, String>{};
+    if (headers != null) {
+      finalHeaders.addAll(headers);
+    }
+
+    final resetToken = otpManager.resetPasswordToken;
+    if (resetToken != null) {
+      finalHeaders[config.otpConfig.verificationTokenHeaderKey] = resetToken;
+    }
+
     final response = await CkTransport.request(
       input: RequestInput(
         endpoint: config.endpoints.resetPassword,
         method: config.endpoints.resetPasswordMethod,
         jsonBody: body,
-        headers: headers,
+        headers: finalHeaders,
         requiresToken: false,
       ),
       responseBuilder: (data) => data,
