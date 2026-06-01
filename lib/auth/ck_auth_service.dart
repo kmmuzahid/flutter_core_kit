@@ -339,10 +339,11 @@ class CkAuthService<TProfile> {
 
   /// Verify OTP — uses stored verification token automatically
   Future<CkAuthResult<void>> verifyOtp({required String otp}) async {
+    final activeTrigger = otpManager.lastTrigger;
     final verifyResult = await otpManager.verifyOtp(otp: otp);
 
     if (verifyResult.isSuccess) {
-      if (otpManager.lastTrigger == CkOtpTrigger.signup) {
+      if (activeTrigger == CkOtpTrigger.signup) {
         return signIn(
           body: config.loginBodyBuilder(
             LoginCallback(
@@ -351,7 +352,7 @@ class CkAuthService<TProfile> {
             ),
           ),
         );
-      } else if (otpManager.lastTrigger == CkOtpTrigger.forgetPassword) {
+      } else if (activeTrigger == CkOtpTrigger.forgetPassword) {
         if (config.handlers?.showResetPassword != null) {
           config.handlers!.showResetPassword!();
         }
