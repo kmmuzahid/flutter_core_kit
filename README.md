@@ -1148,6 +1148,137 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 }
 ```
 
+#### Real-World Advanced Configuration Example
+
+Here is a complete, advanced real-world implementation example (`CorekitConfigImpl`) demonstrating custom initialization (`onInit`), zero splash delay, custom endpoint method configurations (e.g., `PATCH`), GetX integration for flow navigation handlers, and asynchronous `verifyBodyBuilder` with local storage integration:
+
+```dart
+class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+  @override
+  Size get designSize => const Size(428, 926);
+
+  @override
+  String get imageBaseUrl => ApiEndPoints.imageUrl;
+
+  /// Disable enforced splash delay for faster navigation
+  @override
+  int get splashDelayMs => 0;
+
+  /// Custom initialization tasks run during the splash delay.
+  /// Use this to register dependencies, initialize services, etc.
+  @override
+  Future<void> Function()? get onInit => () async {
+    // Initialize TimerService as a service
+    Get.put(TimerService(), permanent: true);
+    // Initial Bindings
+    AppInitialBindings().dependencies();
+  };
+
+  @override
+  CkTransportConfig get ckTransportConfig => CkTransportConfig(
+    baseUrl: ApiEndPoints.baseUrl,
+    refreshTokenEndpoint: ApiEndPoints.refreshToken,
+    enableDebugLogs: kDebugMode,
+  );
+
+  @override
+  CkAuthConfig<ProfileData>? get authConfig => CkAuthConfig<ProfileData>(
+    endpoints: CkAuthEndpoints(
+      resetPassword: ApiEndPoints.resetPassword,
+      forgotPassword: ApiEndPoints.forgotPassword,
+      signup: ApiEndPoints.createUser,
+      signin: ApiEndPoints.login,
+      sendOtp: ApiEndPoints.resendOtp,
+      verifyOtp: ApiEndPoints.verifyOtp,
+      getProfile: ApiEndPoints.getMyProfile,
+      updateProfile: ApiEndPoints.editMyProfile,
+      verifyForgetOtp: ApiEndPoints.forgotPasswordOtpMatch,
+      logout: "",
+      resetPasswordMethod: RequestMethod.PATCH,
+      verifyForgotOtpMethod: RequestMethod.PATCH,
+      sendOtpMethod: RequestMethod.PATCH,
+    ),
+    loginBodyBuilder: (LoginCallback loginCallBack) {
+      return {
+        'email': loginCallBack.username,
+        'password': loginCallBack.password,
+      };
+    },
+    profileExtractor: (json) => ProfileData.fromJson(json),
+    extractors: CkAuthExtractors<ProfileData>(
+      accessToken: (data) => data['accessToken']?.toString(),
+      refreshToken: (data) => data['refreshToken']?.toString(),
+      resetPasswordToken: (data) => data['forgetOtpMatchToken']?.toString(),
+      profile: (data) {
+        final profile = ProfileData.fromJson(data);
+        return profile;
+      },
+
+      message: (data) => data['message']?.toString(),
+      verificationTokens: {
+        CkOtpTrigger.signup: (data) =>
+            data['createUserToken']?.toString() ?? data['token']?.toString(),
+        CkOtpTrigger.login: (data) => data['loginUserToken']?.toString(),
+        CkOtpTrigger.forgetPassword: (data) => data['forgetToken']?.toString(),
+      },
+    ),
+    otpConfig: CkOtpConfig(
+      autoTriggers: {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword, CkOtpTrigger.login},
+      verificationStrategy: CkOtpVerificationStrategy.tokenBased,
+      verificationTokenHeaderKey: 'token',
+      sendVerificationTokenInHeader: true,
+      verifyBodyBuilder: (ctx) async {
+        if (ctx.trigger == CkOtpTrigger.signup) {
+          final responses = await StorageService.instance
+              .getQuestionnaireResponses();
+
+          final questionOutput = await StorageService.instance
+              .getQuestionnaireOutput();
+          return {
+            "otp": ctx.otp,
+            "questions": responses,
+            "questionOutput": questionOutput,
+          };
+        }
+
+        return {"otp": ctx.otp};
+      },
+      resendBodyBuilder: (ctx) {
+        return {"email": ctx.identifier};
+      },
+    ),
+    handlers: CkAuthFlowHandlers(
+      showResetPassword: () {
+        Get.offNamed(
+          AppRoute.changePasswrodScreen,
+          arguments: {'isForgetPassword': true},
+        );
+      },
+      showOtpVerification: () {
+        Get.toNamed(
+          AppRoute.otpVerificationScreen,
+          arguments: {'screen': "", 'email': ""},
+        );
+      },
+      onAuthenticated: () {
+        final profile = CkAuth.profile as ProfileData?;
+        if (profile?.subscriptionPackageId == null) {
+          Get.offAllNamed(AppRoute.subscriptionscreen);
+        } else {
+          Get.offAllNamed(AppRoute.bottomNav);
+        }
+      },
+      showLogin: () {
+        Get.offAllNamed(AppRoute.loginScreen);
+      },
+      showOnboarding: () {
+        Get.offAllNamed(AppRoute.onboardingscreen);
+      },
+    ),
+  );
+}
+```
+
 ### 2. Declarative Auto-Navigation
 
 You do not need an `AuthGate` widget. When you configure `CkAuthRoutes` in your `CkAuthConfig`, CoreKit handles navigation and flow direction automatically:
@@ -1167,7 +1298,8 @@ If you prefer to listen to auth state changes manually (e.g. via a Bloc or routi
 #### Sign In
 ```dart
  CkAuth.signIn(
-  body: {'email': email, 'password': password},
+  username: email,
+  password: password,
 );
 
 ```
@@ -1195,17 +1327,16 @@ CkAuth.otpCountdownUi(
       return Text('Resend OTP in ${seconds}s');
     }
     return TextButton(
-      onPressed: () => CkAuth.resendOtp(trigger: CkOtpTrigger.signup),
+      onPressed: () => CkAuth.resendOtp(),
       child: const Text('Resend OTP'),
     );
   },
 )
 
-await CkAuth.resendOtp(trigger: CkOtpTrigger.signup);
+await CkAuth.resendOtp();
 
 final verified = await CkAuth.verifyOtp(
   otp: '123456',
-  trigger: CkOtpTrigger.signup,
 );
 ```
 

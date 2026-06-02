@@ -50,5 +50,6 @@ class CkAuthConfig<TProfile> {
 class LoginCallback {
   final String username;
   final String password;
-  LoginCallback({required this.username, required this.password});
+  final CkOtpTrigger? trigger;
+  LoginCallback({required this.username, required this.password, this.trigger});
 }

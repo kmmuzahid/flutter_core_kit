@@ -116,7 +116,11 @@ class CkAuth {
     Map<String, String>? headers,
   }) {
     final body = config.loginBodyBuilder(
-      LoginCallback(username: username, password: password),
+      LoginCallback(
+        username: username,
+        password: password,
+        trigger: otpManager.lastTrigger,
+      ),
     );
     return CkAuthService.instance.signIn(body: body, headers: headers);
   }

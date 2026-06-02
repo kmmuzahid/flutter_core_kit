@@ -443,10 +443,8 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
     isLoading.value = true;
 
     final result = await CkAuth.signIn(
-      body: {
-        'email': emailController.text.trim(),
-        'password': passwordController.text,
-      },
+      username: emailController.text.trim(),
+      password: passwordController.text,
     );
 
     isLoading.value = false;

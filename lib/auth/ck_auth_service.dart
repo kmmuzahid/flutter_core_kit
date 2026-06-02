@@ -110,6 +110,7 @@ class CkAuthService<TProfile> {
       verifyForgetUrl: config.endpoints.verifyForgetOtp,
       sendMethod: config.endpoints.sendOtpMethod,
       verifyMethod: config.endpoints.verifyOtpMethod,
+      verifyForgotMethod: config.endpoints.verifyForgotOtpMethod,
     );
 
     await otpManager.restoreTokens();
@@ -350,6 +351,7 @@ class CkAuthService<TProfile> {
             LoginCallback(
               username: CkAuth.username ?? '',
               password: CkAuth.password ?? '',
+              trigger: activeTrigger,
             ),
           ),
         );

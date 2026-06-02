@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:core_kit/auth/ck_auth.dart';
 import 'package:core_kit/auth/ck_auth_extractors.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
-import 'package:core_kit/auth/ck_auth.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/reactive/behavior_stream.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
@@ -19,6 +19,7 @@ class CkOtpFlowManager {
   final String? _verifyForgetUrl;
   final RequestMethod _sendMethod;
   final RequestMethod _verifyMethod;
+  final RequestMethod _verifyForgotMethod;
 
   Timer? _timer;
   int _resendAttempts = 0;
@@ -43,6 +44,7 @@ class CkOtpFlowManager {
     this._verifyForgetUrl,
     this._sendMethod = RequestMethod.POST,
     this._verifyMethod = RequestMethod.POST,
+    this._verifyForgotMethod = RequestMethod.POST,
   }) {
     resendCountdown = CkBehaviorStream(initialValue: 0);
   }
@@ -139,9 +141,12 @@ class CkOtpFlowManager {
 
     final vToken = getVerificationToken(activeTrigger);
 
-    var body = <String, dynamic>{};
-    body = _config.resendBodyBuilder(
-      ResendOtpCallBack(identifier: CkAuth.username ?? '', token: vToken ?? ''),
+    final body = await _config.resendBodyBuilder(
+      ResendOtpCallBack(
+        identifier: CkAuth.username ?? '',
+        token: vToken ?? '',
+        trigger: activeTrigger,
+      ),
     );
 
     final response = await CkTransport.request(
@@ -189,7 +194,9 @@ class CkOtpFlowManager {
       );
     }
 
-    final url = (activeTrigger == CkOtpTrigger.forgetPassword && _verifyForgetUrl != null)
+    final url =
+        (activeTrigger == CkOtpTrigger.forgetPassword &&
+            _verifyForgetUrl != null)
         ? _verifyForgetUrl
         : _verifyUrl;
 
@@ -201,9 +208,8 @@ class CkOtpFlowManager {
 
     final vToken = getVerificationToken(activeTrigger);
 
-    var body = <String, dynamic>{};
-    body = _config.verifyBodyBuilder(
-      VerifyOtpCallBack(otp: otp, token: vToken ?? ''),
+    final body = await _config.verifyBodyBuilder(
+      VerifyOtpCallBack(otp: otp, token: vToken ?? '', trigger: activeTrigger),
     );
 
     if (additionalBody != null) {
@@ -217,10 +223,16 @@ class CkOtpFlowManager {
       headers[_config.verificationTokenHeaderKey] = vToken;
     }
 
+    final method =
+        (activeTrigger == CkOtpTrigger.forgetPassword &&
+            _verifyForgetUrl != null)
+        ? _verifyForgotMethod
+        : _verifyMethod;
+
     final response = await CkTransport.request(
       input: RequestInput(
         endpoint: url,
-        method: _verifyMethod,
+        method: method,
         jsonBody: body,
         headers: headers,
         requiresToken: false,

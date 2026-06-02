@@ -23,6 +23,7 @@ class CkAuthEndpoints {
   final RequestMethod updateProfileMethod; // default: PATCH
   final RequestMethod logoutMethod; // default: POST
   final RequestMethod resetPasswordMethod; // default: PATCH
+  final RequestMethod verifyForgotOtpMethod;
 
   const CkAuthEndpoints({
     required this.signup,
@@ -44,5 +45,6 @@ class CkAuthEndpoints {
     this.updateProfileMethod = RequestMethod.PATCH,
     this.logoutMethod = RequestMethod.POST,
     this.resetPasswordMethod = RequestMethod.POST,
+    this.verifyForgotOtpMethod = RequestMethod.POST,
   });
 }

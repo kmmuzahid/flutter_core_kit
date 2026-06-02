@@ -1,3 +1,5 @@
+import 'dart:async';
+
 /// OTP configuration — null means no OTP flow
 class CkOtpConfig {
   /// Which flows auto-trigger OTP after the initial API call
@@ -22,10 +24,12 @@ class CkOtpConfig {
   final bool sendVerificationTokenInHeader; // default: true
 
   /// Custom body builder for OTP verify request
-  Map<String, dynamic> Function(VerifyOtpCallBack otpCallBack)
+  final FutureOr<Map<String, dynamic>> Function(VerifyOtpCallBack otpCallBack)
   verifyBodyBuilder;
 
-  Map<String, dynamic> Function(ResendOtpCallBack resendOtpCallBack)
+  final FutureOr<Map<String, dynamic>> Function(
+    ResendOtpCallBack resendOtpCallBack,
+  )
   resendBodyBuilder;
 
   CkOtpConfig({
@@ -58,11 +62,17 @@ enum CkOtpVerificationStrategy {
 class VerifyOtpCallBack {
   final String otp;
   final String token;
-  VerifyOtpCallBack({required this.otp, required this.token});
+  final CkOtpTrigger? trigger;
+  VerifyOtpCallBack({required this.otp, required this.token, this.trigger});
 }
 
 class ResendOtpCallBack {
   final String identifier;
   final String token;
-  ResendOtpCallBack({required this.identifier, required this.token});
+  final CkOtpTrigger? trigger;
+  ResendOtpCallBack({
+    required this.identifier,
+    required this.token,
+    this.trigger,
+  });
 }
