@@ -52,7 +52,7 @@ class CkAuthTokenManager {
 
   /// Creates [CkTokenProvider] for [CkTransport] — internal bridge only.
   /// Developer never sees or creates this.
-  CkTokenProvider createTokenProvider(CkAuthExtractors<dynamic> extractors) =>
+  CkTokenProvider createTokenProvider(CkAuthExtractors extractors) =>
       CkTokenProvider(
         accessToken: () async => _cachedAccessToken ?? '',
         refreshToken: () async => _cachedRefreshToken ?? '',

@@ -1,12 +1,13 @@
 // ignore_for_file: avoid_annotating_with_dynamic
 import 'package:core_kit/auth/otp/otp_config.dart';
 
-/// Maps [CkResponse.data] (dynamic) to tokens, profile JSON, and messages.
+/// Maps [CkResponse.data] (dynamic) to tokens, profile, and messages.
+///
+/// Non-generic — holds extractors for tokens, profile, verification tokens,
+/// and messages. The [profile] callback returns `dynamic` (your profile model).
 ///
 /// Use [CkAuthExtractors.standard] for typical `{ accessToken, user, ... }` payloads.
-/// Provide [profile] for a custom parse; otherwise [CkProfileExtractor] uses
-/// [CkAuthConfig.profileExtractor] directly on [CkResponse.data].
-class CkAuthExtractors<TProfile> {
+class CkAuthExtractors {
   const CkAuthExtractors({
     required this.accessToken,
     this.refreshToken,
@@ -19,8 +20,8 @@ class CkAuthExtractors<TProfile> {
   final String? Function(dynamic data) accessToken;
   final String? Function(dynamic data)? refreshToken;
 
-  /// Optional full parse override. When null, [CkProfileExtractor] uses [CkAuthConfig.profileExtractor].
-  final TProfile? Function(dynamic data)? profile;
+  /// Extracts profile from API response data (dynamic → your profile model).
+  final dynamic Function(dynamic data)? profile;
 
   /// Trigger-specific verification token extractors.
   final Map<CkOtpTrigger, String? Function(dynamic data)>? verificationTokens;
@@ -43,7 +44,7 @@ class CkAuthExtractors<TProfile> {
       CkOtpTrigger.forgetPassword: 'forgetToken',
     },
   }) {
-    return CkAuthExtractors<TProfile>(
+    return CkAuthExtractors(
       accessToken: (data) => _extractByKey(data, accessTokenKey)?.toString(),
       refreshToken: (data) => _extractByKey(data, refreshTokenKey)?.toString(),
       resetPasswordToken: (data) => _extractByKey(data, resetPasswordTokenKey)?.toString(),
@@ -67,7 +68,7 @@ class CkAuthExtractors<TProfile> {
       CkOtpTrigger.forgetPassword: 'forgetToken',
     },
   }) {
-    return CkAuthExtractors<TProfile>(
+    return CkAuthExtractors(
       accessToken: (data) => _extractByPath(data, accessTokenPath)?.toString(),
       refreshToken: refreshTokenPath != null
           ? (data) => _extractByPath(data, refreshTokenPath)?.toString()

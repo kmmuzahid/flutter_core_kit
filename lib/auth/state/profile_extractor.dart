@@ -11,17 +11,16 @@ import 'package:core_kit/storage/ck_storage.dart';
 
 /// Profile cache and [CkBehaviorStream] for [CkAuthService].
 ///
-/// - [profileExtractor] — parse [TProfile] from [CkResponse.data]
+/// Uses [CkAuthExtractors.profile] for API response parsing and cold-start restore.
 /// - [applyFromResponse] — extract, persist `jsonEncode(data)`, skip work if unchanged
-/// - [restoreProfile] — `jsonDecode` stored payload, then [profileExtractor]
+/// - [restoreProfile] — `jsonDecode` stored payload, then parse via extractors
 class CkProfileExtractor<TProfile> {
   CkProfileExtractor({
-    required this._profileExtractor,
-    required this._extractors,
-  }) : _profile = CkBehaviorStream(initialValue: null);
+    required CkAuthExtractors extractors,
+  })  : _extractors = extractors,
+        _profile = CkBehaviorStream(initialValue: null);
 
-  final TProfile Function(Map<String, dynamic> json) _profileExtractor;
-  final CkAuthExtractors<TProfile> _extractors;
+  final CkAuthExtractors _extractors;
   final CkBehaviorStream<TProfile?> _profile;
 
   String? _storedPayload;
@@ -64,9 +63,8 @@ class CkProfileExtractor<TProfile> {
 
     final decoded = jsonDecode(cached);
     _storedPayload = cached;
-    _cachedProfile = profileExtractor(
-      CkResponse<dynamic>(data: decoded, isSuccess: true, statusCode: null),
-    );
+
+    _cachedProfile = parseProfile(decoded);
     _profile.add(_cachedProfile);
   }
 
@@ -148,23 +146,16 @@ class CkProfileExtractor<TProfile> {
     await CkStorage.delete(CkAuthStorageKeys.profileDataKey);
   }
 
-  TProfile? parseProfile(data) {
+  TProfile? parseProfile(dynamic data) {
     if (data == null) return null;
 
     // Use custom profile extractor if provided
     final custom = _extractors.profile;
-    if (custom != null) return custom(data);
+    if (custom != null) return custom(data) as TProfile?;
 
     // If already the correct type (not a Map), return as-is
     if (data is TProfile && data is! Map) return data;
 
-    // Convert to Map<String, dynamic> for profileExtractor
-    final map = data is Map<String, dynamic>
-        ? data
-        : data is Map
-        ? Map<String, dynamic>.from(data)
-        : null;
-    if (map == null) return null;
-    return _profileExtractor(map);
+    return null;
   }
 }

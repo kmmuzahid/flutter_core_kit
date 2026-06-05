@@ -984,6 +984,8 @@ All public auth types use the **`Ck` prefix** (aligned with the rest of CoreKit)
 | `CkAuthRoutes` | Navigation callbacks after login / logout |
 | `CkAuthResult<T>` | Result wrapper for sign-in, OTP, profile calls |
 | `CkAuth` | Static gateway class (sign-in, OTP, profile, social, logout) |
+| `CkAuthLoadingType` | Enum of all auth operations that expose loading state |
+| `CkAuthLoadingController` | Manages per-operation `CkBehaviorStream<bool>` loading streams |
 | `CkOtpConfig` / `CkOtpTrigger` | OTP behaviour and triggers |
 | `CkLogoutConfig` | Logout request configuration |
 | `CkSocialLoginConfig` | Google / Apple / Facebook / custom social |
@@ -1005,18 +1007,18 @@ Transport unwraps `{ success, data, message, meta? }` so **`CkResponse.data`** i
 
 #### Customizing Response Extractors (`CkAuthExtractors`)
 
-If your backend response does not match the standard shape, you can override `extractors` in your `CkAuthConfig`. You can provide custom extractors for core authentication tokens, refresh tokens, profiles, trigger-specific OTP verification tokens, and custom messages.
+`CkAuthExtractors` is non-generic — it holds extractors for tokens, profile, verification tokens, and messages. Profile parsing is handled through:
+- **`profile`** — extracts profile from API response data and cold-start restore (`dynamic → your model`)
 
 Here is a comprehensive example showing where to specify `extractors` and how to provide each of the available callbacks:
 
 ```dart
-extractors: CkAuthExtractors<UserProfile>(
+extractors: CkAuthExtractors(
   // 1. Core Authentication Tokens
   accessToken: (data) => data['token'] as String?,
   refreshToken: (data) => data['refresh_token'] as String?,
 
-  // 2. Profile JSON fragment and custom model parse
-  profileData: (data) => data['user'],
+  // 2. Profile extraction from API response and cold-start restore
   profile: (data) => UserProfile.fromJson(data['user'] as Map<String, dynamic>),
 
   // 3. OTP / Flow Verification Tokens (unified trigger-keyed map)
@@ -1037,7 +1039,7 @@ If your backend keys are standard, you can utilize built-in factory builders ins
 
 * **`CkAuthExtractors.standard()`**: Uses standard keys located directly at the root of `response.data`. Internalizes verification token keys (`'createUserToken'`, `'loginUserToken'`, and `'forgetToken'`) without exposing any parameter configuration for them.
   ```dart
-  extractors: CkAuthExtractors<UserProfile>.standard(
+  extractors: CkAuthExtractors.standard(
     accessTokenKey: 'token',
     refreshTokenKey: 'refresh_token',
     profileKey: 'user',
@@ -1047,7 +1049,7 @@ If your backend keys are standard, you can utilize built-in factory builders ins
 
 * **`CkAuthExtractors.fromPaths()`**: Uses nested dot-notation paths inside the response. Internalizes standard verification token paths automatically without requiring custom parameters.
   ```dart
-  extractors: CkAuthExtractors<UserProfile>.fromPaths(
+  extractors: CkAuthExtractors.fromPaths(
     accessTokenPath: 'auth.tokens.access',
     refreshTokenPath: 'auth.tokens.refresh',
     profilePath: 'nested.profile.data',
@@ -1100,27 +1102,25 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
           profileUpdateUrl: '/auth/profile',
           logoutUrl: '/auth/logout',
         ),
-        profileExtractor: (data) => UserProfile.fromJson(data),
-        routes: CkAuthRoutes(
-          routeToSplash: () {
-            coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const SplashScreen()),
-              (_) => false,
-            );
-          },
-          routeOnSuccess: () {
+        extractors: CkAuthExtractors(
+          accessToken: (data) => data['accessToken']?.toString(),
+          profile: (data) => UserProfile.fromJson(data),
+        ),
+        loginBodyBuilder: (cb) => {'email': cb.username, 'password': cb.password},
+        handlers: CkAuthFlowHandlers(
+          onAuthenticated: () {
             coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const HomeScreen()),
               (_) => false,
             );
           },
-          routeToLogin: () {
+          showLogin: () {
             coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const LoginScreen()),
               (_) => false,
             );
           },
-          routeToOnboarding: () {
+          showOnboarding: () {
             coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const OnboardingScreen()),
               (_) => false,
@@ -1131,9 +1131,6 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
         otpConfig: const CkOtpConfig(
           autoTriggers: {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword},
           resendCooldown: Duration(seconds: 120),
-        ),
-        logoutConfig: const CkLogoutConfig(
-          // Optional request body/headers builders can be specified here
         ),
         socialLoginConfig: CkSocialLoginConfig(
           google: CkGoogleAuthConfig(
@@ -1164,7 +1161,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   @override
   int get splashDelayMs => 0;
 
-  /// Custom initialization tasks run during the splash delay.
+  /// Custom initialization tasks run during the 3-second splash delay.
   /// Use this to register dependencies, initialize services, etc.
   @override
   Future<void> Function()? get onInit => () async {
@@ -1182,7 +1179,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   );
 
   @override
-  CkAuthConfig<ProfileData>? get authConfig => CkAuthConfig<ProfileData>(
+  CkAuthConfig get authConfig => CkAuthConfig(
     endpoints: CkAuthEndpoints(
       resetPassword: ApiEndPoints.resetPassword,
       forgotPassword: ApiEndPoints.forgotPassword,
@@ -1204,8 +1201,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
         'password': loginCallBack.password,
       };
     },
-    profileExtractor: (json) => ProfileData.fromJson(json),
-    extractors: CkAuthExtractors<ProfileData>(
+    extractors: CkAuthExtractors(
       accessToken: (data) => data['accessToken']?.toString(),
       refreshToken: (data) => data['refreshToken']?.toString(),
       resetPasswordToken: (data) => data['forgetOtpMatchToken']?.toString(),
@@ -1213,7 +1209,6 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
         final profile = ProfileData.fromJson(data);
         return profile;
       },
-
       message: (data) => data['message']?.toString(),
       verificationTokens: {
         CkOtpTrigger.signup: (data) =>
@@ -1297,19 +1292,17 @@ If you prefer to listen to auth state changes manually (e.g. via a Bloc or routi
 
 #### Sign In
 ```dart
- CkAuth.signIn(
+CkAuth.signIn(
   username: email,
   password: password,
 );
-
 ```
 
 #### Sign Up
 ```dart
- await CkAuth.signUp(
+await CkAuth.signUp(
   body: {'email': email, 'password': password},
 );
-
 ```
 
 ### 4. OTP
@@ -1321,26 +1314,133 @@ CkAuth.otpManager.resendCountdown.listen((seconds) {
 });
 
 // Or reactively bind OTP countdown updates directly to UI (similar to profileUi)
+// The builder receives only the remaining seconds as an int — no context or snapshot.
 CkAuth.otpCountdownUi(
-  builder: (context, seconds) {
+  builder: (seconds) {
     if (seconds > 0) {
       return Text('Resend OTP in ${seconds}s');
     }
     return TextButton(
-      onPressed: () => CkAuth.resendOtp(),
+      onPressed: () => CkAuth.sendOtp(),
       child: const Text('Resend OTP'),
     );
   },
 )
 
-await CkAuth.resendOtp();
+await CkAuth.sendOtp();
 
 final verified = await CkAuth.verifyOtp(
   otp: '123456',
 );
 ```
 
-### 5. Profile
+### 5. Loading State UI
+
+Every auth operation (sign-in, sign-up, OTP, profile, social, logout, etc.) automatically tracks its loading state. Use `CkAuth.loadingUi` to reactively bind loading state to your widgets — the builder receives only a `bool`.
+
+#### Available loading types (`CkAuthLoadingType`)
+
+| Type | Tracks |
+|------|--------|
+| `signUp` | `CkAuth.signUp()` |
+| `signIn` | `CkAuth.signIn()` |
+| `forgotPassword` | `CkAuth.forgotPassword()` |
+| `verifyOtp` | `CkAuth.verifyOtp()` |
+| `sendOtp` | `CkAuth.sendOtp()` |
+| `updatePassword` | `CkAuth.updatePassword()` |
+| `socialLogin` | `signInWithGoogle()`, `signInWithApple()`, `signInWithFacebook()`, `signInWithCustom()` |
+| `logout` | `CkAuth.logout()` |
+| `fetchProfile` | `CkAuth.fetchProfile()` |
+| `updateProfile` | `CkAuth.updateProfile()` |
+
+#### Basic usage
+
+```dart
+// Wrap a button to show loading state during sign-in
+CkAuth.loadingUi(
+  type: CkAuthLoadingType.signIn,
+  builder: (isLoading) => CkButton(
+    titleText: 'Sign In',
+    isLoading: isLoading,
+    onTap: isLoading
+        ? null
+        : () => CkAuth.signIn(username: email, password: password),
+  ),
+)
+```
+
+#### Sign-up button with loading
+
+```dart
+CkAuth.loadingUi(
+  type: CkAuthLoadingType.signUp,
+  builder: (isLoading) => ElevatedButton(
+    onPressed: isLoading ? null : () => CkAuth.signUp(body: formData),
+    child: isLoading
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Text('Create Account'),
+  ),
+)
+```
+
+#### Verify OTP with loading
+
+```dart
+CkAuth.loadingUi(
+  type: CkAuthLoadingType.verifyOtp,
+  builder: (isLoading) => CkButton(
+    titleText: 'Verify',
+    isLoading: isLoading,
+    onTap: isLoading ? null : () => CkAuth.verifyOtp(otp: otpCode),
+  ),
+)
+```
+
+#### Multiple loading types on the same screen
+
+```dart
+Column(
+  children: [
+    // Sign-in button
+    CkAuth.loadingUi(
+      type: CkAuthLoadingType.signIn,
+      builder: (isLoading) => CkButton(
+        titleText: 'Sign In',
+        isLoading: isLoading,
+        onTap: () => CkAuth.signIn(username: email, password: password),
+      ),
+    ),
+    const SizedBox(height: 16),
+    // Google sign-in button
+    CkAuth.loadingUi(
+      type: CkAuthLoadingType.socialLogin,
+      builder: (isLoading) => CkButton(
+        titleText: 'Continue with Google',
+        isLoading: isLoading,
+        onTap: () => CkAuth.signInWithGoogle(googleData),
+      ),
+    ),
+  ],
+)
+```
+
+#### Programmatic access (without UI)
+
+```dart
+// Check loading state synchronously
+final isSigningIn = CkAuth.loadingController.isLoading(CkAuthLoadingType.signIn);
+
+// Listen to loading state changes
+CkAuth.loadingController.streamOf(CkAuthLoadingType.signIn).listen((isLoading) {
+  debugPrint('Sign-in loading: $isLoading');
+});
+```
+
+### 6. Profile
 
 ```dart
 // Synchronously read the cached active user profile directly
@@ -1363,7 +1463,7 @@ final updated = await CkAuth.updateProfile(
 );
 ```
 
-### 6. Social login (Google example)
+### 7. Social login (Google example)
 
 After your app obtains Google credentials (for example via `google_sign_in`):
 
@@ -1380,7 +1480,7 @@ final result = await CkAuth.signInWithGoogle(
 
 Also available: `signInWithApple`, `signInWithFacebook`, `signInWithCustom`.
 
-### 7. Logout
+### 8. Logout
 
 ```dart
 await CkAuth.logout();
@@ -1394,6 +1494,7 @@ flowchart LR
   CoreKit --> CkAuthService
   CoreKit --> CkTransport
   CkAuthService --> CkAuthTokenManager
+  CkAuthService --> CkAuthLoadingController
   CkAuthService --> CkProfileExtractor
   CkAuthService --> CkOtpFlowManager
   CkAuthService --> CkLogoutHandler

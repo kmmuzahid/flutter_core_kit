@@ -22,7 +22,7 @@ class CkSocialAuthManager<TProfile> {
   final CkProfileExtractor<TProfile> _profileExtractor;
   final CkAuthStateController _stateController;
   final CkLogoutHandler _logoutHandler;
-  final CkAuthExtractors<TProfile> _defaultExtractors;
+  final CkAuthExtractors _defaultExtractors;
 
   CkSocialAuthManager({
     this._config,
@@ -30,8 +30,8 @@ class CkSocialAuthManager<TProfile> {
     required this._profileExtractor,
     required this._stateController,
     required this._logoutHandler,
-    required this._defaultExtractors,
-  });
+    required CkAuthExtractors defaultExtractors,
+  }) : _defaultExtractors = defaultExtractors;
 
   /// Check if a specific provider is configured
   bool isProviderAvailable(CkSocialProvider provider) {
@@ -65,8 +65,7 @@ class CkSocialAuthManager<TProfile> {
     final gConfig = _config!.google!;
     final body = gConfig.bodyBuilder(data);
     final extractors =
-        (gConfig.responseExtractors ?? _defaultExtractors)
-            as CkAuthExtractors<TProfile>;
+        gConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: gConfig.backendUrl,
@@ -87,8 +86,7 @@ class CkSocialAuthManager<TProfile> {
     final aConfig = _config!.apple!;
     final body = aConfig.bodyBuilder(data);
     final extractors =
-        (aConfig.responseExtractors ?? _defaultExtractors)
-            as CkAuthExtractors<TProfile>;
+        aConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: aConfig.backendUrl,
@@ -111,8 +109,7 @@ class CkSocialAuthManager<TProfile> {
     final fConfig = _config!.facebook!;
     final body = fConfig.bodyBuilder(data);
     final extractors =
-        (fConfig.responseExtractors ?? _defaultExtractors)
-            as CkAuthExtractors<TProfile>;
+        fConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: fConfig.backendUrl,
@@ -141,8 +138,7 @@ class CkSocialAuthManager<TProfile> {
 
     final body = cConfig.bodyBuilder(authData);
     final extractors =
-        (cConfig.responseExtractors ?? _defaultExtractors)
-            as CkAuthExtractors<TProfile>;
+        cConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: cConfig.backendUrl,
@@ -157,7 +153,7 @@ class CkSocialAuthManager<TProfile> {
     required String url,
     required RequestMethod method,
     required Map<String, dynamic> body,
-    required CkAuthExtractors<TProfile> extractors,
+    required CkAuthExtractors extractors,
   }) async {
     final response = await CkTransport.request(
       input: RequestInput(

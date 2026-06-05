@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:core_kit/auth/ck_auth.dart';
 import 'package:core_kit/auth/ck_auth_config.dart';
-import 'package:core_kit/auth/ck_auth_extractors.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
@@ -12,6 +11,7 @@ import 'package:core_kit/auth/social/facebook_auth_config.dart';
 import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/social_auth_manager.dart';
 import 'package:core_kit/auth/social/social_login_config.dart';
+import 'package:core_kit/auth/state/auth_loading_controller.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
@@ -63,6 +63,7 @@ class CkAuthService<TProfile> {
   final CkLogoutHandler logoutHandler;
   final CkSocialAuthManager<TProfile> socialManager;
   final CkAuthConfig<TProfile> config;
+  final CkAuthLoadingController loadingController;
 
   CkAuthService._({
     required this.tokenManager,
@@ -72,6 +73,7 @@ class CkAuthService<TProfile> {
     required this.logoutHandler,
     required this.socialManager,
     required this.config,
+    required this.loadingController,
   });
 
   /// Prepares secure storage, token cache, and [CkTokenProvider] for Dio.
@@ -98,13 +100,12 @@ class CkAuthService<TProfile> {
     final authState = CkAuthStateController();
 
     final profileExtractor = CkProfileExtractor<TProfile>(
-      profileExtractor: config.profileExtractor,
       extractors: config.extractors,
     );
 
     final otpManager = CkOtpFlowManager(
       config: config.otpConfig,
-      extractors: config.extractors as CkAuthExtractors<dynamic>,
+      extractors: config.extractors,
       sendUrl: config.endpoints.sendOtp,
       verifyUrl: config.endpoints.verifyOtp,
       verifyForgetUrl: config.endpoints.verifyForgetOtp,
@@ -134,6 +135,8 @@ class CkAuthService<TProfile> {
       defaultExtractors: config.extractors,
     );
 
+    final loadingController = CkAuthLoadingController();
+
     final service = CkAuthService<TProfile>._(
       tokenManager: tokenManager,
       authState: authState,
@@ -142,6 +145,7 @@ class CkAuthService<TProfile> {
       logoutHandler: logoutHandler,
       socialManager: socialManager,
       config: config,
+      loadingController: loadingController,
     );
 
     _instance = service;
@@ -156,10 +160,10 @@ class CkAuthService<TProfile> {
   /// Handles OTP flow check and returns OTP result if triggered
   CkAuthResult<TProfile>? _handleOtpFlow(
     CkOtpTrigger trigger,
-    responseData,
+    dynamic responseData,
     int? statusCode,
   ) {
-    final autoOtp = config.otpConfig.autoTriggers.contains(trigger) ?? false;
+    final autoOtp = config.otpConfig.autoTriggers.contains(trigger);
     final vToken = config.extractors.verificationTokens?[trigger]?.call(
       responseData,
     );
@@ -185,7 +189,7 @@ class CkAuthService<TProfile> {
 
   /// Completes authentication after successful token extraction
   Future<CkAuthResult<TProfile>> _completeAuthentication(
-    responseData,
+    dynamic responseData,
     int? statusCode,
   ) async {
     final access = config.extractors.accessToken(responseData);
@@ -217,236 +221,258 @@ class CkAuthService<TProfile> {
   Future<CkAuthResult<TProfile>> signUp({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) async {
-    final response = await CkTransport.request(
-      input: RequestInput(
-        endpoint: config.endpoints.signup,
-        method: config.endpoints.signupMethod,
-        jsonBody: body,
-        headers: headers,
-        requiresToken: false,
-      ),
-      responseBuilder: (data) => data,
-      showMessage: true,
-    );
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.signUp, () async {
+      final response = await CkTransport.request(
+        input: RequestInput(
+          endpoint: config.endpoints.signup,
+          method: config.endpoints.signupMethod,
+          jsonBody: body,
+          headers: headers,
+          requiresToken: false,
+        ),
+        responseBuilder: (data) => data,
+        showMessage: true,
+      );
 
-    if (!response.isSuccess) {
-      return CkAuthResult<TProfile>.failure(
-        message: response.message,
+      if (!response.isSuccess) {
+        return CkAuthResult<TProfile>.failure(
+          message: response.message,
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
+
+      final otpResult = _handleOtpFlow(
+        CkOtpTrigger.signup,
+        response.data,
+        response.statusCode,
+      );
+      if (otpResult != null) return otpResult;
+
+      final authResult = await _completeAuthentication(
+        response.data,
+        response.statusCode,
+      );
+
+      if (authResult.isSuccess) return authResult;
+
+      return CkAuthResult<TProfile>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    }
-
-    final otpResult = _handleOtpFlow(
-      CkOtpTrigger.signup,
-      response.data,
-      response.statusCode,
-    );
-    if (otpResult != null) return otpResult;
-
-    final authResult = await _completeAuthentication(
-      response.data,
-      response.statusCode,
-    );
-
-    if (authResult.isSuccess) return authResult;
-
-    return CkAuthResult<TProfile>.success(
-      statusCode: response.statusCode,
-      rawResponse: response.data,
-    );
+    });
   }
 
   /// Sign in — auto-saves tokens, auto-fetches profile
   Future<CkAuthResult<TProfile>> signIn({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) async {
-    final response = await CkTransport.request(
-      input: RequestInput(
-        endpoint: config.endpoints.signin,
-        method: config.endpoints.signinMethod,
-        jsonBody: body,
-        headers: headers,
-        requiresToken: false,
-      ),
-      responseBuilder: (data) => data,
-      showMessage: true,
-    );
-
-    if (!response.isSuccess) {
-      return CkAuthResult<TProfile>.failure(
-        message: response.message,
-        statusCode: response.statusCode,
-        rawResponse: response.data,
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.signIn, () async {
+      final response = await CkTransport.request(
+        input: RequestInput(
+          endpoint: config.endpoints.signin,
+          method: config.endpoints.signinMethod,
+          jsonBody: body,
+          headers: headers,
+          requiresToken: false,
+        ),
+        responseBuilder: (data) => data,
+        showMessage: true,
       );
-    }
 
-    final otpResult = _handleOtpFlow(
-      CkOtpTrigger.login,
-      response.data,
-      response.statusCode,
-    );
-    if (otpResult != null) return otpResult;
+      if (!response.isSuccess) {
+        return CkAuthResult<TProfile>.failure(
+          message: response.message,
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
 
-    return await _completeAuthentication(response.data, response.statusCode);
+      final otpResult = _handleOtpFlow(
+        CkOtpTrigger.login,
+        response.data,
+        response.statusCode,
+      );
+      if (otpResult != null) return otpResult;
+
+      return await _completeAuthentication(response.data, response.statusCode);
+    });
   }
 
   /// Forgot password — auto-stores forgetToken
   Future<CkAuthResult<void>> forgotPassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) async {
-    final response = await CkTransport.request(
-      input: RequestInput(
-        endpoint: config.endpoints.forgotPassword,
-        method: config.endpoints.forgotPasswordMethod,
-        jsonBody: body,
-        requiresToken: false,
-      ),
-      responseBuilder: (data) => data,
-      showMessage: true,
-    );
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.forgotPassword, () async {
+      final response = await CkTransport.request(
+        input: RequestInput(
+          endpoint: config.endpoints.forgotPassword,
+          method: config.endpoints.forgotPasswordMethod,
+          jsonBody: body,
+          requiresToken: false,
+        ),
+        responseBuilder: (data) => data,
+        showMessage: true,
+      );
 
-    if (!response.isSuccess) {
-      return CkAuthResult<void>.failure(
-        message: response.message,
+      if (!response.isSuccess) {
+        return CkAuthResult<void>.failure(
+          message: response.message,
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
+
+      final otpResult = _handleOtpFlow(
+        CkOtpTrigger.forgetPassword,
+        response.data,
+        response.statusCode,
+      );
+
+      if (otpResult != null) {
+        return CkAuthResult<void>(
+          isSuccess: true,
+          requiresOtp: otpResult.requiresOtp,
+          otpTrigger: otpResult.otpTrigger,
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
+
+      return CkAuthResult<void>.success(
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    }
-
-    final otpResult = _handleOtpFlow(
-      CkOtpTrigger.forgetPassword,
-      response.data,
-      response.statusCode,
-    );
-
-    if (otpResult != null) {
-      return CkAuthResult<void>(
-        isSuccess: true,
-        requiresOtp: otpResult.requiresOtp,
-        otpTrigger: otpResult.otpTrigger,
-        statusCode: response.statusCode,
-        rawResponse: response.data,
-      );
-    }
-
-    return CkAuthResult<void>.success(
-      statusCode: response.statusCode,
-      rawResponse: response.data,
-    );
+    });
   }
 
   /// Verify OTP — uses stored verification token automatically
-  Future<CkAuthResult<void>> verifyOtp({required String otp}) async {
-    final activeTrigger = otpManager.lastTrigger;
-    final verifyResult = await otpManager.verifyOtp(otp: otp);
+  Future<CkAuthResult<void>> verifyOtp({required String otp}) {
+    return loadingController.wrap(CkAuthLoadingType.verifyOtp, () async {
+      final activeTrigger = otpManager.lastTrigger;
+      final verifyResult = await otpManager.verifyOtp(otp: otp);
 
-    if (verifyResult.isSuccess) {
-      if (activeTrigger == CkOtpTrigger.signup) {
-        return signIn(
-          body: config.loginBodyBuilder(
-            LoginCallback(
-              username: CkAuth.username ?? '',
-              password: CkAuth.password ?? '',
-              trigger: activeTrigger,
+      if (verifyResult.isSuccess) {
+        if (activeTrigger == CkOtpTrigger.signup) {
+          return signIn(
+            body: config.loginBodyBuilder(
+              LoginCallback(
+                username: CkAuth.username ?? '',
+                password: CkAuth.password ?? '',
+                trigger: activeTrigger,
+              ),
             ),
-          ),
-        );
-      } else if (activeTrigger == CkOtpTrigger.forgetPassword) {
-        if (config.handlers?.showResetPassword != null) {
-          config.handlers!.showResetPassword!();
+          );
+        } else if (activeTrigger == CkOtpTrigger.forgetPassword) {
+          if (config.handlers?.showResetPassword != null) {
+            config.handlers!.showResetPassword!();
+          }
         }
+        return const CkAuthResult<void>.success();
       }
-      return const CkAuthResult<void>.success();
-    }
 
-    return verifyResult;
+      return verifyResult;
+    });
   }
 
   /// Resend OTP — auto-restarts timer
-  Future<CkAuthResult<void>> resendOtp() async {
-    return otpManager.sendOtp();
+  Future<CkAuthResult<void>> resendOtp() {
+    return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
+      return otpManager.sendOtp();
+    });
   }
 
   /// Send OTP manually — also updates lastTrigger for verify/resend
-  Future<CkAuthResult<void>> sendOtp({required CkOtpTrigger trigger}) async {
-    return otpManager.sendOtp(trigger: trigger);
+  Future<CkAuthResult<void>> sendOtp({required CkOtpTrigger trigger}) {
+    return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
+      return otpManager.sendOtp(trigger: trigger);
+    });
   }
 
   /// Reset password
   Future<CkAuthResult<void>> updatePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) async {
-    final finalHeaders = <String, String>{};
-    if (headers != null) {
-      finalHeaders.addAll(headers);
-    }
-
-    final resetToken = otpManager.resetPasswordToken;
-    if (resetToken != null) {
-      finalHeaders[config.otpConfig.verificationTokenHeaderKey] = resetToken;
-    }
-
-    final response = await CkTransport.request(
-      input: RequestInput(
-        endpoint: config.endpoints.resetPassword,
-        method: config.endpoints.resetPasswordMethod,
-        jsonBody: body,
-        headers: finalHeaders,
-        requiresToken: false,
-      ),
-      responseBuilder: (data) => data,
-      showMessage: true,
-    );
-
-    if (response.isSuccess) {
-      if (config.handlers != null) {
-        config.handlers!.showLogin();
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.updatePassword, () async {
+      final finalHeaders = <String, String>{};
+      if (headers != null) {
+        finalHeaders.addAll(headers);
       }
-      return CkAuthResult<void>.success(
+
+      final resetToken = otpManager.resetPasswordToken;
+      if (resetToken != null) {
+        finalHeaders[config.otpConfig.verificationTokenHeaderKey] = resetToken;
+      }
+
+      final response = await CkTransport.request(
+        input: RequestInput(
+          endpoint: config.endpoints.resetPassword,
+          method: config.endpoints.resetPasswordMethod,
+          jsonBody: body,
+          headers: finalHeaders,
+          requiresToken: false,
+        ),
+        responseBuilder: (data) => data,
+        showMessage: true,
+      );
+
+      if (response.isSuccess) {
+        if (config.handlers != null) {
+          config.handlers!.showLogin();
+        }
+        return CkAuthResult<void>.success(
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
+      return CkAuthResult<void>.failure(
+        message: response.message,
         statusCode: response.statusCode,
         rawResponse: response.data,
       );
-    }
-    return CkAuthResult<void>.failure(
-      message: response.message,
-      statusCode: response.statusCode,
-      rawResponse: response.data,
-    );
+    });
   }
 
   // ─── Social Login ───
 
   /// Authenticate with Google
-  Future<CkAuthResult<TProfile>> signInWithGoogle(CkGoogleAuthData data) async {
-    return socialManager.authenticateGoogle(data);
+  Future<CkAuthResult<TProfile>> signInWithGoogle(CkGoogleAuthData data) {
+    return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      return socialManager.authenticateGoogle(data);
+    });
   }
 
   /// Authenticate with Apple
-  Future<CkAuthResult<TProfile>> signInWithApple(CkAppleAuthData data) async {
-    return socialManager.authenticateApple(data);
+  Future<CkAuthResult<TProfile>> signInWithApple(CkAppleAuthData data) {
+    return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      return socialManager.authenticateApple(data);
+    });
   }
 
   /// Authenticate with Facebook
   Future<CkAuthResult<TProfile>> signInWithFacebook(
     CkFacebookAuthData data,
-  ) async {
-    return socialManager.authenticateFacebook(data);
+  ) {
+    return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      return socialManager.authenticateFacebook(data);
+    });
   }
 
   /// Authenticate with Custom Social Provider
   Future<CkAuthResult<TProfile>> signInWithCustom({
     required String providerName,
     required Map<String, dynamic> authData,
-  }) async {
-    return socialManager.authenticateCustom(
-      providerName: providerName,
-      authData: authData,
-    );
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      return socialManager.authenticateCustom(
+        providerName: providerName,
+        authData: authData,
+      );
+    });
   }
 
   /// Available social providers
@@ -456,8 +482,10 @@ class CkAuthService<TProfile> {
   // ─── Session ───
 
   /// Logout — follows configured strategy, auto-navigates
-  Future<void> logout() async {
-    await logoutHandler.execute();
+  Future<void> logout() {
+    return loadingController.wrap(CkAuthLoadingType.logout, () async {
+      await logoutHandler.execute();
+    });
   }
 
   /// Restore session — called on app launch (auto-called during init)
@@ -509,11 +537,13 @@ class CkAuthService<TProfile> {
   Stream<TProfile?> get profileStream => _profileExtractor.profile.stream;
 
   /// Fetches the profile from the server using the configured [getProfile] endpoint.
-  Future<CkAuthResult<TProfile?>> fetchProfile() async {
-    return _profileExtractor.fetchProfile(
-      config.endpoints.getProfile,
-      config.endpoints.getProfileMethod,
-    );
+  Future<CkAuthResult<TProfile?>> fetchProfile() {
+    return loadingController.wrap(CkAuthLoadingType.fetchProfile, () async {
+      return _profileExtractor.fetchProfile(
+        config.endpoints.getProfile,
+        config.endpoints.getProfileMethod,
+      );
+    });
   }
 
   /// Updates the profile on the server using the configured [profileUpdateUrl].
@@ -521,27 +551,29 @@ class CkAuthService<TProfile> {
     Map<String, dynamic>? formFields,
     Map<String, dynamic>? files,
     Map<String, dynamic>? jsonBody,
-  }) async {
-    final result = await _profileExtractor.updateProfileRemote(
-      url: config.endpoints.updateProfile,
-      method: config.endpoints.updateProfileMethod,
-      formFields: formFields,
-      files: files,
-      jsonBody: jsonBody,
-    );
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.updateProfile, () async {
+      final result = await _profileExtractor.updateProfileRemote(
+        url: config.endpoints.updateProfile,
+        method: config.endpoints.updateProfileMethod,
+        formFields: formFields,
+        files: files,
+        jsonBody: jsonBody,
+      );
 
-    if (result.isSuccess) {
-      final fetchResult = await fetchProfile();
-      if (fetchResult.isSuccess && fetchResult.data != null) {
-        return CkAuthResult.success(
-          data: fetchResult.data,
-          statusCode: result.statusCode,
-          rawResponse: result.rawResponse,
-        );
+      if (result.isSuccess) {
+        final fetchResult = await fetchProfile();
+        if (fetchResult.isSuccess && fetchResult.data != null) {
+          return CkAuthResult.success(
+            data: fetchResult.data,
+            statusCode: result.statusCode,
+            rawResponse: result.rawResponse,
+          );
+        }
       }
-    }
 
-    return result;
+      return result;
+    });
   }
 
   Future<void> autoNavigate() async {

@@ -13,7 +13,7 @@ import 'package:core_kit/storage/ck_storage.dart';
 /// Manages complete OTP lifecycle with stream-based timer
 class CkOtpFlowManager {
   final CkOtpConfig _config;
-  final CkAuthExtractors<dynamic> _extractors;
+  final CkAuthExtractors _extractors;
   final String? _sendUrl;
   final String? _verifyUrl;
   final String? _verifyForgetUrl;
@@ -37,15 +37,22 @@ class CkOtpFlowManager {
   late final CkBehaviorStream<int> resendCountdown;
 
   CkOtpFlowManager({
-    required this._config,
-    required this._extractors,
-    this._sendUrl,
-    this._verifyUrl,
-    this._verifyForgetUrl,
-    this._sendMethod = RequestMethod.POST,
-    this._verifyMethod = RequestMethod.POST,
-    this._verifyForgotMethod = RequestMethod.POST,
-  }) {
+    required CkOtpConfig config,
+    required CkAuthExtractors extractors,
+    String? sendUrl,
+    String? verifyUrl,
+    String? verifyForgetUrl,
+    RequestMethod sendMethod = RequestMethod.POST,
+    RequestMethod verifyMethod = RequestMethod.POST,
+    RequestMethod verifyForgotMethod = RequestMethod.POST,
+  })  : _config = config,
+        _extractors = extractors,
+        _sendUrl = sendUrl,
+        _verifyUrl = verifyUrl,
+        _verifyForgetUrl = verifyForgetUrl,
+        _sendMethod = sendMethod,
+        _verifyMethod = verifyMethod,
+        _verifyForgotMethod = verifyForgotMethod {
     resendCountdown = CkBehaviorStream(initialValue: 0);
   }
 

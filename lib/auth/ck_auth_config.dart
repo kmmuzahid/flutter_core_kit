@@ -8,16 +8,17 @@ import 'package:core_kit/auth/social/social_login_config.dart';
 ///
 /// Set on [CoreKitConfig.authConfig]. When non-null, CoreKit initializes
 /// [CkAuthService], wires [CkTransport] token refresh, and restores session on launch.
+///
+/// Profile parsing is handled entirely through [extractors] — use
+/// [CkAuthExtractors.profile] for API responses and cold-start restore.
 class CkAuthConfig<TProfile> {
   // ─── Endpoints ───
   final CkAuthEndpoints endpoints;
 
-  // ─── Model Mapping ───
-  /// Maps persisted profile JSON to [TProfile] (cold start / storage restore).
-  final TProfile Function(Map<String, dynamic> json) profileExtractor;
-
   // ─── Response Extractors (flexible backend mapping) ───
-  final CkAuthExtractors<TProfile> extractors;
+  /// Non-generic extractors for tokens, profile, verification tokens, and messages.
+  /// Profile parsing is handled here via [CkAuthExtractors.profile].
+  final CkAuthExtractors extractors;
 
   Map<String, dynamic> Function(LoginCallback loginCallBack) loginBodyBuilder;
 
@@ -37,14 +38,13 @@ class CkAuthConfig<TProfile> {
   CkAuthConfig({
     required this.endpoints,
     required this.loginBodyBuilder,
-    required this.profileExtractor,
-    CkAuthExtractors<TProfile>? extractors,
+    CkAuthExtractors? extractors,
     this.handlers,
     required this.otpConfig,
     this.socialLoginConfig,
     this.onTokenRestored,
     this.customAuthValidator,
-  }) : extractors = extractors ?? CkAuthExtractors<TProfile>.standard();
+  }) : extractors = extractors ?? CkAuthExtractors.standard();
 }
 
 class LoginCallback {

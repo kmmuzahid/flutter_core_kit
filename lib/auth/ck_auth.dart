@@ -8,6 +8,7 @@ import 'package:core_kit/auth/social/facebook_auth_config.dart';
 import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/social_auth_manager.dart';
 import 'package:core_kit/auth/social/social_login_config.dart';
+import 'package:core_kit/auth/state/auth_loading_controller.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,10 @@ class CkAuth {
   /// The social authentication manager.
   static CkSocialAuthManager<dynamic> get socialManager =>
       CkAuthService.instance.socialManager;
+
+  /// The loading state controller for all auth operations.
+  static CkAuthLoadingController get loadingController =>
+      CkAuthService.instance.loadingController;
 
   static String? get username {
     return _findUsernameValue(lastSubmitAuthData);
@@ -82,8 +87,10 @@ class CkAuth {
   }
 
   /// A simplified reactive StreamBuilder UI helper for the OTP resend countdown.
+  ///
+  /// The [builder] receives only the remaining seconds as an [int].
   static Widget otpCountdownUi({
-    required Widget Function(BuildContext context, int seconds) builder,
+    required Widget Function(int seconds) builder,
   }) {
     return StreamBuilder<int>(
       stream: otpManager.resendCountdown.stream,
@@ -92,7 +99,39 @@ class CkAuth {
         if (snapshot.hasError) {
           return const SizedBox.shrink();
         }
-        return builder(context, snapshot.data ?? 0);
+        return builder(snapshot.data ?? 0);
+      },
+    );
+  }
+
+  /// A simplified reactive StreamBuilder UI helper for auth operation loading states.
+  ///
+  /// Pass the [type] of auth operation to observe, and the [builder]
+  /// receives only a [bool] indicating whether that operation is loading.
+  ///
+  /// Example:
+  /// ```dart
+  /// CkAuth.loadingUi(
+  ///   type: CkAuthLoadingType.signIn,
+  ///   builder: (isLoading) => ElevatedButton(
+  ///     onPressed: isLoading ? null : () => CkAuth.signIn(...),
+  ///     child: isLoading ? CircularProgressIndicator() : Text('Sign In'),
+  ///   ),
+  /// )
+  /// ```
+  static Widget loadingUi({
+    required CkAuthLoadingType type,
+    required Widget Function(bool isLoading) builder,
+  }) {
+    final stream = loadingController.streamOf(type);
+    return StreamBuilder<bool>(
+      stream: stream.stream,
+      initialData: stream.value,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return builder(false);
+        }
+        return builder(snapshot.data ?? false);
       },
     );
   }
@@ -136,7 +175,7 @@ class CkAuth {
       CkAuthService.instance.verifyOtp(otp: otp);
 
   /// Resend OTP — auto-restarts timer.
-  static Future<CkAuthResult<void>> resendOtp({String? identifier}) =>
+  static Future<CkAuthResult<void>> sendOtp({String? identifier}) =>
       CkAuthService.instance.resendOtp();
 
   /// Reset password.
