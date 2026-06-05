@@ -50,9 +50,8 @@ class CkAuthConfig<TProfile> {
     this.socialLoginConfig,
     this.onTokenRestored,
     this.customAuthValidator,
-    bool? authEnable,
-  }) : _authEnable = authEnable,
-       extractors = extractors ?? CkAuthExtractors.standard();
+    this._authEnable,
+  }) : extractors = extractors ?? CkAuthExtractors.standard();
 }
 
 class LoginCallback {

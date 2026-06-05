@@ -17,30 +17,30 @@ Map<String, dynamic> lastSubmitAuthData = {};
 
 /// Static developer-facing gateway for authentication operations.
 /// Eliminates the need to use [CkAuthService.instance] directly.
-class CkAuth {
-  CkAuth._();
+class CkAuth<TProfile> {
+  const CkAuth();
 
   /// The token manager for stored auth tokens.
-  static CkAuthTokenManager get tokenManager =>
+  CkAuthTokenManager get tokenManager =>
       CkAuthService.instance.tokenManager;
 
   /// The state controller for reactive auth status.
-  static CkAuthStateController get authState =>
+  CkAuthStateController get authState =>
       CkAuthService.instance.authState;
 
   /// The OTP manager for OTP sending and verification countdowns.
-  static CkOtpFlowManager get otpManager => CkAuthService.instance.otpManager;
+  CkOtpFlowManager get otpManager => CkAuthService.instance.otpManager;
 
   /// The logout handler.
-  static CkLogoutHandler get logoutHandler =>
+  CkLogoutHandler get logoutHandler =>
       CkAuthService.instance.logoutHandler;
 
   /// The social authentication manager.
-  static CkSocialAuthManager<dynamic> get socialManager =>
+  CkSocialAuthManager<dynamic> get socialManager =>
       CkAuthService.instance.socialManager;
 
   /// The loading state controller for all auth operations.
-  static CkAuthLoadingController get loadingController =>
+  CkAuthLoadingController get loadingController =>
       CkAuthService.instance.loadingController;
 
   static String? get username {
@@ -52,24 +52,24 @@ class CkAuth {
   }
 
   /// The active configuration.
-  static CkAuthConfig<dynamic> get config => CkAuthService.instance.config;
+  CkAuthConfig<dynamic> get config => CkAuthService.instance.config;
 
   /// Whether the session is currently authenticated.
-  static bool get isAuthenticated => CkAuthService.instance.isAuthenticated;
+  bool get isAuthenticated => CkAuthService.instance.isAuthenticated;
 
   /// The active user profile. Returns `null` if unauthenticated.
-  static dynamic get profile => CkAuthService.instance.currentProfile;
+  TProfile? get profile => CkAuthService.instance.currentProfile as TProfile?;
 
   /// Stream of user profile changes.
-  static Stream<dynamic> get profileStream =>
-      CkAuthService.instance.profileStream;
+  Stream<TProfile?> get profileStream =>
+      CkAuthService.instance.profileStream.map((p) => p as TProfile?);
 
   /// A simplified reactive StreamBuilder UI helper for the user profile.
-  static Widget profileUi<TProfile>({
+  Widget profileUi({
     required Widget Function(BuildContext context, TProfile? profile) builder,
     Widget? loading,
   }) {
-    return StreamBuilder<dynamic>(
+    return StreamBuilder<TProfile?>(
       stream: profileStream,
       initialData: profile,
       builder: (context, snapshot) {
@@ -89,7 +89,7 @@ class CkAuth {
   /// A simplified reactive StreamBuilder UI helper for the OTP resend countdown.
   ///
   /// The [builder] receives only the remaining seconds as an [int].
-  static Widget otpCountdownUi({
+  Widget otpCountdownUi({
     required Widget Function(int seconds) builder,
   }) {
     return StreamBuilder<int>(
@@ -111,15 +111,15 @@ class CkAuth {
   ///
   /// Example:
   /// ```dart
-  /// CkAuth.loadingUi(
+  /// auth.loadingUi(
   ///   type: CkAuthLoadingType.signIn,
   ///   builder: (isLoading) => ElevatedButton(
-  ///     onPressed: isLoading ? null : () => CkAuth.signIn(...),
+  ///     onPressed: isLoading ? null : () => auth.signIn(...),
   ///     child: isLoading ? CircularProgressIndicator() : Text('Sign In'),
   ///   ),
   /// )
   /// ```
-  static Widget loadingUi({
+  Widget loadingUi({
     required CkAuthLoadingType type,
     required Widget Function(bool isLoading) builder,
   }) {
@@ -137,10 +137,10 @@ class CkAuth {
   }
 
   /// Whether [CkAuthService] is fully initialized.
-  static bool get isInitialized => CkAuthService.isInitialized;
+  bool get isInitialized => CkAuthService.isInitialized;
 
   /// Sign up — returns [CkAuthResult] with OTP info if needed.
-  static Future<CkAuthResult<dynamic>> signUp({
+  Future<CkAuthResult<dynamic>> signUp({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) {
@@ -149,7 +149,7 @@ class CkAuth {
   }
 
   /// Sign in — auto-saves tokens, auto-fetches profile.
-  static Future<CkAuthResult<dynamic>> signIn({
+  Future<CkAuthResult<dynamic>> signIn({
     required String username,
     required String password,
     Map<String, String>? headers,
@@ -165,41 +165,41 @@ class CkAuth {
   }
 
   /// Forgot password — auto-stores forgetToken.
-  static Future<CkAuthResult<void>> forgotPassword({
+  Future<CkAuthResult<void>> forgotPassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) => CkAuthService.instance.forgotPassword(body: body, headers: headers);
 
   /// Verify OTP — uses stored verification token automatically.
-  static Future<CkAuthResult<void>> verifyOtp({required String otp}) =>
+  Future<CkAuthResult<void>> verifyOtp({required String otp}) =>
       CkAuthService.instance.verifyOtp(otp: otp);
 
   /// Resend OTP — auto-restarts timer.
-  static Future<CkAuthResult<void>> sendOtp({String? identifier}) =>
+  Future<CkAuthResult<void>> sendOtp({String? identifier}) =>
       CkAuthService.instance.resendOtp();
 
   /// Reset password.
-  static Future<CkAuthResult<void>> updatePassword({
+  Future<CkAuthResult<void>> updatePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) => CkAuthService.instance.updatePassword(body: body, headers: headers);
 
   /// Authenticate with Google.
-  static Future<CkAuthResult<dynamic>> signInWithGoogle(
+  Future<CkAuthResult<dynamic>> signInWithGoogle(
     CkGoogleAuthData data,
   ) => CkAuthService.instance.signInWithGoogle(data);
 
   /// Authenticate with Apple.
-  static Future<CkAuthResult<dynamic>> signInWithApple(CkAppleAuthData data) =>
+  Future<CkAuthResult<dynamic>> signInWithApple(CkAppleAuthData data) =>
       CkAuthService.instance.signInWithApple(data);
 
   /// Authenticate with Facebook.
-  static Future<CkAuthResult<dynamic>> signInWithFacebook(
+  Future<CkAuthResult<dynamic>> signInWithFacebook(
     CkFacebookAuthData data,
   ) => CkAuthService.instance.signInWithFacebook(data);
 
   /// Authenticate with Custom Social Provider.
-  static Future<CkAuthResult<dynamic>> signInWithCustom({
+  Future<CkAuthResult<dynamic>> signInWithCustom({
     required String providerName,
     required Map<String, dynamic> authData,
   }) => CkAuthService.instance.signInWithCustom(
@@ -208,18 +208,18 @@ class CkAuth {
   );
 
   /// Available social providers.
-  static List<CkSocialProvider> get availableCkSocialProviders =>
+  List<CkSocialProvider> get availableCkSocialProviders =>
       CkAuthService.instance.availableCkSocialProviders;
 
   /// Logout — follows configured strategy, auto-navigates.
-  static Future<void> logout() => CkAuthService.instance.logout();
+  Future<void> logout() => CkAuthService.instance.logout();
 
   /// Fetches the profile from the server.
-  static Future<CkAuthResult<dynamic>> fetchProfile() =>
+  Future<CkAuthResult<dynamic>> fetchProfile() =>
       CkAuthService.instance.fetchProfile();
 
   /// Updates the profile on the server.
-  static Future<CkAuthResult<dynamic>> updateProfile({
+  Future<CkAuthResult<dynamic>> updateProfile({
     Map<String, dynamic>? formFields,
     Map<String, dynamic>? files,
     Map<String, dynamic>? jsonBody,

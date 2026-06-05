@@ -1276,7 +1276,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
         );
       },
       onAuthenticated: () {
-        final profile = CkAuth.profile as ProfileData?;
+        final profile = const CkAuth<ProfileData>().profile;
         if (profile?.subscriptionPackageId == null) {
           Get.offAllNamed(AppRoute.subscriptionscreen);
         } else {
@@ -1463,22 +1463,28 @@ CkAuth.loadingController.streamOf(CkAuthLoadingType.signIn).listen((isLoading) {
 ### 6. Profile
 
 ```dart
-// Synchronously read the cached active user profile directly
-final UserProfile? user = CkAuth.profile;
+// Option A: Declare a global typesafe gateway instance (typically in constants.dart or auth.dart)
+const auth = CkAuth<UserProfile>();
 
-// Reactively bind profile updates to UI with built-in loading states
-CkAuth.profileUi(
+// Synchronously read the cached active user profile directly (fully typesafe!)
+final UserProfile? user = auth.profile;
+
+// Reactively bind profile updates to UI (profile is auto-inferred as UserProfile?)
+auth.profileUi(
   builder: (context, profile) {
     if (profile == null) return const Text('Guest');
     return Text('Hello, ${profile.name}');
   },
 )
 
+// Option B: Instantiate on the fly / inline (extremely lightweight using const)
+final userInline = const CkAuth<UserProfile>().profile;
+
 // Fetch fresh profile from remote (automatically caches and updates the stream/UI)
-final result = await CkAuth.fetchProfile();
+final result = await auth.fetchProfile();
 
 // Update profile on the remote (automatically updates the stream and cache/UI)
-final updated = await CkAuth.updateProfile(
+final updated = await auth.updateProfile(
   jsonBody: {'name': 'New Name'},
 );
 ```

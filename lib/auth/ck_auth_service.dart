@@ -160,7 +160,7 @@ class CkAuthService<TProfile> {
   /// Handles OTP flow check and returns OTP result if triggered
   CkAuthResult<TProfile>? _handleOtpFlow(
     CkOtpTrigger trigger,
-    dynamic responseData,
+    responseData,
     int? statusCode,
   ) {
     final autoOtp = config.otpConfig.autoTriggers.contains(trigger);
@@ -189,7 +189,7 @@ class CkAuthService<TProfile> {
 
   /// Completes authentication after successful token extraction
   Future<CkAuthResult<TProfile>> _completeAuthentication(
-    dynamic responseData,
+    responseData,
     int? statusCode,
   ) async {
     final access = config.extractors.accessToken(responseData);
@@ -224,7 +224,7 @@ class CkAuthService<TProfile> {
   }) {
     return loadingController.wrap(CkAuthLoadingType.signUp, () async {
       if (!config.authEnable) {
-        final activeTrigger = CkOtpTrigger.signup;
+        const activeTrigger = CkOtpTrigger.signup;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
         if (autoOtp) {
           otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
@@ -235,7 +235,9 @@ class CkAuthService<TProfile> {
             requiresOtp: true,
             otpTrigger: activeTrigger,
             statusCode: 200,
-            rawResponse: const {'message': 'Mock sign up successful, requires OTP'},
+            rawResponse: const {
+              'message': 'Mock sign up successful, requires OTP',
+            },
           );
         } else {
           await tokenManager.saveTokens(
@@ -299,7 +301,7 @@ class CkAuthService<TProfile> {
   }) {
     return loadingController.wrap(CkAuthLoadingType.signIn, () async {
       if (!config.authEnable) {
-        final activeTrigger = CkOtpTrigger.login;
+        const activeTrigger = CkOtpTrigger.login;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
         if (autoOtp) {
           otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
@@ -310,7 +312,9 @@ class CkAuthService<TProfile> {
             requiresOtp: true,
             otpTrigger: activeTrigger,
             statusCode: 200,
-            rawResponse: const {'message': 'Mock sign in successful, requires OTP'},
+            rawResponse: const {
+              'message': 'Mock sign in successful, requires OTP',
+            },
           );
         } else {
           await tokenManager.saveTokens(
@@ -364,7 +368,7 @@ class CkAuthService<TProfile> {
   }) {
     return loadingController.wrap(CkAuthLoadingType.forgotPassword, () async {
       if (!config.authEnable) {
-        final activeTrigger = CkOtpTrigger.forgetPassword;
+        const activeTrigger = CkOtpTrigger.forgetPassword;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
         if (autoOtp) {
           otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
@@ -375,7 +379,9 @@ class CkAuthService<TProfile> {
             requiresOtp: true,
             otpTrigger: CkOtpTrigger.forgetPassword,
             statusCode: 200,
-            rawResponse: {'message': 'Mock forgot password success, requires OTP'},
+            rawResponse: {
+              'message': 'Mock forgot password success, requires OTP',
+            },
           );
         } else {
           config.handlers?.showResetPassword?.call();
@@ -597,9 +603,7 @@ class CkAuthService<TProfile> {
   }
 
   /// Authenticate with Facebook
-  Future<CkAuthResult<TProfile>> signInWithFacebook(
-    CkFacebookAuthData data,
-  ) {
+  Future<CkAuthResult<TProfile>> signInWithFacebook(CkFacebookAuthData data) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
       if (!config.authEnable) {
         await tokenManager.saveTokens(
@@ -685,20 +689,10 @@ class CkAuthService<TProfile> {
       }
 
       // Then fetch fresh profile in background
-      _profileExtractor
-          .fetchProfile(
-            config.endpoints.getProfile,
-            config.endpoints.getProfileMethod,
-          )
-          .then((result) {
-            if (result.isSuccess && result.data != null) {
-              final dynamic onProfileLoaded =
-                  (config as dynamic).onProfileLoaded;
-              if (onProfileLoaded != null) {
-                onProfileLoaded(result.data as TProfile);
-              }
-            }
-          });
+      _profileExtractor.fetchProfile(
+        config.endpoints.getProfile,
+        config.endpoints.getProfileMethod,
+      );
     } else {
       authState.setUnauthenticated();
     }
@@ -716,10 +710,7 @@ class CkAuthService<TProfile> {
   Future<CkAuthResult<TProfile?>> fetchProfile() {
     return loadingController.wrap(CkAuthLoadingType.fetchProfile, () async {
       if (!config.authEnable) {
-        return const CkAuthResult.success(
-          data: null,
-          statusCode: 200,
-        );
+        return const CkAuthResult.success(data: null, statusCode: 200);
       }
       return _profileExtractor.fetchProfile(
         config.endpoints.getProfile,
@@ -736,10 +727,7 @@ class CkAuthService<TProfile> {
   }) {
     return loadingController.wrap(CkAuthLoadingType.updateProfile, () async {
       if (!config.authEnable) {
-        return const CkAuthResult.success(
-          data: null,
-          statusCode: 200,
-        );
+        return const CkAuthResult.success(data: null, statusCode: 200);
       }
       final result = await _profileExtractor.updateProfileRemote(
         url: config.endpoints.updateProfile,

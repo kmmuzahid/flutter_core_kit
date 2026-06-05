@@ -386,6 +386,8 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'core/app_route/app_route.dart';
 
+const auth = CkAuth<ProfileData>();
+
 class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   @override
   Size get designSize => const Size(428, 926);
@@ -413,14 +415,14 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
           logoutUrl: '/auth/logout',
         ),
         profileExtractor: (data) => ProfileData.fromJson(data),
-        extractors: CkAuthExtractors<ProfileData>.standard(
+        extractors: CkAuthExtractors.standard(
           accessTokenKey: 'accessToken',
           refreshTokenKey: 'refreshToken',
           profileKey: 'user',
         ),
         routes: CkAuthRoutes(
           routeOnSuccess: () {
-            final profile = CkAuth.profile;
+            final profile = auth.profile;
             if (profile?.subscriptionPackageId == null) {
               Get.offAllNamed(AppRoute.subscriptionscreen);
             } else {
@@ -442,7 +444,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 
     isLoading.value = true;
 
-    final result = await CkAuth.signIn(
+    final result = await auth.signIn(
       username: emailController.text.trim(),
       password: passwordController.text,
     );
@@ -450,7 +452,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
     isLoading.value = false;
 
     if (result.isSuccess) {
-      final profile = CkAuth.profile;
+      final profile = auth.profile;
       Get.find<MyProfileScreenController>().profileData.value = profile;
       
       AppSnackBar.showSuccess(result.message ?? "Login successful");
@@ -468,7 +470,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 
 3. **Rewrite Logout Calls**:
 ```dart
-await CkAuth.logout();
+await auth.logout();
 ```
 
 ---
@@ -477,30 +479,29 @@ await CkAuth.logout();
 
 If using **Option B**, you can completely replace your manual Stream/Timer boilerplate and manual PATCH update calls with CoreKit's pre-wired reactive widgets and automatic update synchronization!
 
-### 3.1 Profile UI Updates (`CkAuth.profileUi`)
-To automatically rebuild profile cards, headers, or settings pages when a profile changes (e.g. on profile update, avatar change), use **`CkAuth.profileUi`** in your screens. It reactively listens to CoreKit's stream under the hood:
+### 3.1 Profile UI Updates (`auth.profileUi`)
+To automatically rebuild profile cards, headers, or settings pages when a profile changes (e.g. on profile update, avatar change), use **`auth.profileUi`** in your screens. It reactively listens to CoreKit's stream under the hood:
 
 ```dart
 // Wrapping headers or widgets requiring user profile details
-CkAuth.profileUi(
+auth.profileUi(
   builder: (context, profile) {
-    final user = profile as ProfileData?;
-    if (user == null) {
+    if (profile == null) {
       return const Text("Welcome, Guest!");
     }
-    return Text("Hello, ${user.fullName}!");
+    return Text("Hello, ${profile.fullName}!");
   },
   // Optional custom loader while fetching profile
   loading: const Center(child: CircularProgressIndicator()), 
 )
 ```
 
-### 3.2 OTP Resend Countdown (`CkAuth.otpCountdownUi`)
-In [otp_verification_screen.dart](file:///c:/Users/kmmuz/Documents/flutter_project/rizaldyrferrer_better_help/lib/screen/auth_screen/otp_verification_screen/otp_verification_screen.dart#L143-L171), replace your manual `Obx` timer rendering with CoreKit's auto-managed **`CkAuth.otpCountdownUi`**. It automatically hooks into `CkAuth.otpManager` and handles resends automatically:
+### 3.2 OTP Resend Countdown (`auth.otpCountdownUi`)
+In [otp_verification_screen.dart](file:///c:/Users/kmmuz/Documents/flutter_project/rizaldyrferrer_better_help/lib/screen/auth_screen/otp_verification_screen/otp_verification_screen.dart#L143-L171), replace your manual `Obx` timer rendering with CoreKit's auto-managed **`auth.otpCountdownUi`**. It automatically hooks into `auth.otpManager` and handles resends automatically:
 
 ```dart
 Center(
-  child: CkAuth.otpCountdownUi(
+  child: auth.otpCountdownUi(
     builder: (context, seconds) {
       if (seconds > 0) {
         return AppText(
@@ -536,12 +537,12 @@ Center(
 )
 ```
 
-### 3.3 Profile Updates (`CkAuth.updateProfile`)
-Instead of manually making `Dio` PATCH requests and writing token save codes to update profile pictures or user details, use **`CkAuth.updateProfile`**. 
+### 3.3 Profile Updates (`auth.updateProfile`)
+Instead of manually making `Dio` PATCH requests and writing token save codes to update profile pictures or user details, use **`auth.updateProfile`**. 
 
-CoreKit will hit the endpoint, save the responses, and **instantly push the new profile data reactively to all `CkAuth.profileUi` widgets** across the app in real time!
+CoreKit will hit the endpoint, save the responses, and **instantly push the new profile data reactively to all `auth.profileUi` widgets** across the app in real time!
 
-Inside `ProfileRepository` in [profile_repository.dart](file:///c:/Users/kmmuz/Documents/flutter_project/rizaldyrferrer_better_help/lib/service/repository/profile_repositroy/profile_repository.dart#L24-L39), refactor `updateMyProfile` to use `CkAuth.updateProfile`:
+Inside `ProfileRepository` in [profile_repository.dart](file:///c:/Users/kmmuz/Documents/flutter_project/rizaldyrferrer_better_help/lib/service/repository/profile_repositroy/profile_repository.dart#L24-L39), refactor `updateMyProfile` to use `auth.updateProfile`:
 
 ```dart
   /// Update user profile using CkAuth
@@ -551,7 +552,7 @@ Inside `ProfileRepository` in [profile_repository.dart](file:///c:/Users/kmmuz/D
     String? address,
     XFile? profile,
   }) async {
-    return await CkAuth.updateProfile(
+    return await auth.updateProfile(
       formFields: {
         'fullName': fullName,
         'phone': phone,
