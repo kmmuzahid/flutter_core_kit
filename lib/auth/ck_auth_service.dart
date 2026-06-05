@@ -223,6 +223,34 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.signUp, () async {
+      if (!config.authEnable) {
+        final activeTrigger = CkOtpTrigger.signup;
+        final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
+        if (autoOtp) {
+          otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
+          otpManager.startResendTimer();
+          config.handlers?.showOtpVerification?.call();
+          return CkAuthResult<TProfile>(
+            isSuccess: true,
+            requiresOtp: true,
+            otpTrigger: activeTrigger,
+            statusCode: 200,
+            rawResponse: const {'message': 'Mock sign up successful, requires OTP'},
+          );
+        } else {
+          await tokenManager.saveTokens(
+            accessToken: 'mock_access_token',
+            refreshToken: 'mock_refresh_token',
+          );
+          authState.setAuthenticated();
+          await CkAuthStorageKeys.markNotFirstTimeUser();
+          autoNavigate();
+          return CkAuthResult<TProfile>.success(
+            statusCode: 200,
+            rawResponse: const {'message': 'Mock sign up successful'},
+          );
+        }
+      }
       final response = await CkTransport.request(
         input: RequestInput(
           endpoint: config.endpoints.signup,
@@ -270,6 +298,34 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.signIn, () async {
+      if (!config.authEnable) {
+        final activeTrigger = CkOtpTrigger.login;
+        final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
+        if (autoOtp) {
+          otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
+          otpManager.startResendTimer();
+          config.handlers?.showOtpVerification?.call();
+          return CkAuthResult<TProfile>(
+            isSuccess: true,
+            requiresOtp: true,
+            otpTrigger: activeTrigger,
+            statusCode: 200,
+            rawResponse: const {'message': 'Mock sign in successful, requires OTP'},
+          );
+        } else {
+          await tokenManager.saveTokens(
+            accessToken: 'mock_access_token',
+            refreshToken: 'mock_refresh_token',
+          );
+          authState.setAuthenticated();
+          await CkAuthStorageKeys.markNotFirstTimeUser();
+          autoNavigate();
+          return CkAuthResult<TProfile>.success(
+            statusCode: 200,
+            rawResponse: const {'message': 'Mock sign in successful'},
+          );
+        }
+      }
       final response = await CkTransport.request(
         input: RequestInput(
           endpoint: config.endpoints.signin,
@@ -307,6 +363,28 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.forgotPassword, () async {
+      if (!config.authEnable) {
+        final activeTrigger = CkOtpTrigger.forgetPassword;
+        final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
+        if (autoOtp) {
+          otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
+          otpManager.startResendTimer();
+          config.handlers?.showOtpVerification?.call();
+          return const CkAuthResult<void>(
+            isSuccess: true,
+            requiresOtp: true,
+            otpTrigger: CkOtpTrigger.forgetPassword,
+            statusCode: 200,
+            rawResponse: {'message': 'Mock forgot password success, requires OTP'},
+          );
+        } else {
+          config.handlers?.showResetPassword?.call();
+          return const CkAuthResult<void>.success(
+            statusCode: 200,
+            rawResponse: {'message': 'Mock forgot password success'},
+          );
+        }
+      }
       final response = await CkTransport.request(
         input: RequestInput(
           endpoint: config.endpoints.forgotPassword,
@@ -352,6 +430,24 @@ class CkAuthService<TProfile> {
   /// Verify OTP — uses stored verification token automatically
   Future<CkAuthResult<void>> verifyOtp({required String otp}) {
     return loadingController.wrap(CkAuthLoadingType.verifyOtp, () async {
+      if (!config.authEnable) {
+        final activeTrigger = otpManager.lastTrigger;
+        if (activeTrigger == CkOtpTrigger.signup) {
+          await tokenManager.saveTokens(
+            accessToken: 'mock_access_token',
+            refreshToken: 'mock_refresh_token',
+          );
+          authState.setAuthenticated();
+          await CkAuthStorageKeys.markNotFirstTimeUser();
+          autoNavigate();
+        } else if (activeTrigger == CkOtpTrigger.forgetPassword) {
+          config.handlers?.showResetPassword?.call();
+        }
+        return const CkAuthResult<void>.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock OTP verification successful'},
+        );
+      }
       final activeTrigger = otpManager.lastTrigger;
       final verifyResult = await otpManager.verifyOtp(otp: otp);
 
@@ -381,6 +477,13 @@ class CkAuthService<TProfile> {
   /// Resend OTP — auto-restarts timer
   Future<CkAuthResult<void>> resendOtp() {
     return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
+      if (!config.authEnable) {
+        otpManager.startResendTimer();
+        return const CkAuthResult<void>.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock OTP resend successful'},
+        );
+      }
       return otpManager.sendOtp();
     });
   }
@@ -388,6 +491,13 @@ class CkAuthService<TProfile> {
   /// Send OTP manually — also updates lastTrigger for verify/resend
   Future<CkAuthResult<void>> sendOtp({required CkOtpTrigger trigger}) {
     return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
+      if (!config.authEnable) {
+        otpManager.startResendTimer();
+        return const CkAuthResult<void>.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock OTP send successful'},
+        );
+      }
       return otpManager.sendOtp(trigger: trigger);
     });
   }
@@ -398,6 +508,13 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.updatePassword, () async {
+      if (!config.authEnable) {
+        config.handlers?.showLogin();
+        return const CkAuthResult<void>.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock password update successful'},
+        );
+      }
       final finalHeaders = <String, String>{};
       if (headers != null) {
         finalHeaders.addAll(headers);
@@ -442,6 +559,19 @@ class CkAuthService<TProfile> {
   /// Authenticate with Google
   Future<CkAuthResult<TProfile>> signInWithGoogle(CkGoogleAuthData data) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      if (!config.authEnable) {
+        await tokenManager.saveTokens(
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        );
+        authState.setAuthenticated();
+        await CkAuthStorageKeys.markNotFirstTimeUser();
+        autoNavigate();
+        return const CkAuthResult.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock Google sign in successful'},
+        );
+      }
       return socialManager.authenticateGoogle(data);
     });
   }
@@ -449,6 +579,19 @@ class CkAuthService<TProfile> {
   /// Authenticate with Apple
   Future<CkAuthResult<TProfile>> signInWithApple(CkAppleAuthData data) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      if (!config.authEnable) {
+        await tokenManager.saveTokens(
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        );
+        authState.setAuthenticated();
+        await CkAuthStorageKeys.markNotFirstTimeUser();
+        autoNavigate();
+        return const CkAuthResult.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock Apple sign in successful'},
+        );
+      }
       return socialManager.authenticateApple(data);
     });
   }
@@ -458,6 +601,19 @@ class CkAuthService<TProfile> {
     CkFacebookAuthData data,
   ) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      if (!config.authEnable) {
+        await tokenManager.saveTokens(
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        );
+        authState.setAuthenticated();
+        await CkAuthStorageKeys.markNotFirstTimeUser();
+        autoNavigate();
+        return const CkAuthResult.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock Facebook sign in successful'},
+        );
+      }
       return socialManager.authenticateFacebook(data);
     });
   }
@@ -468,6 +624,19 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> authData,
   }) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
+      if (!config.authEnable) {
+        await tokenManager.saveTokens(
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        );
+        authState.setAuthenticated();
+        await CkAuthStorageKeys.markNotFirstTimeUser();
+        autoNavigate();
+        return const CkAuthResult.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock Custom sign in successful'},
+        );
+      }
       return socialManager.authenticateCustom(
         providerName: providerName,
         authData: authData,
@@ -484,6 +653,13 @@ class CkAuthService<TProfile> {
   /// Logout — follows configured strategy, auto-navigates
   Future<void> logout() {
     return loadingController.wrap(CkAuthLoadingType.logout, () async {
+      if (!config.authEnable) {
+        await tokenManager.clearTokens();
+        await _profileExtractor.clearProfile();
+        authState.setUnauthenticated();
+        config.handlers?.showLogin();
+        return;
+      }
       await logoutHandler.execute();
     });
   }
@@ -539,6 +715,12 @@ class CkAuthService<TProfile> {
   /// Fetches the profile from the server using the configured [getProfile] endpoint.
   Future<CkAuthResult<TProfile?>> fetchProfile() {
     return loadingController.wrap(CkAuthLoadingType.fetchProfile, () async {
+      if (!config.authEnable) {
+        return const CkAuthResult.success(
+          data: null,
+          statusCode: 200,
+        );
+      }
       return _profileExtractor.fetchProfile(
         config.endpoints.getProfile,
         config.endpoints.getProfileMethod,
@@ -553,6 +735,12 @@ class CkAuthService<TProfile> {
     Map<String, dynamic>? jsonBody,
   }) {
     return loadingController.wrap(CkAuthLoadingType.updateProfile, () async {
+      if (!config.authEnable) {
+        return const CkAuthResult.success(
+          data: null,
+          statusCode: 200,
+        );
+      }
       final result = await _profileExtractor.updateProfileRemote(
         url: config.endpoints.updateProfile,
         method: config.endpoints.updateProfileMethod,

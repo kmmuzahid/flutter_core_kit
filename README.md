@@ -344,7 +344,10 @@ When using the authentication module, configure `routeToSplash` in `CkAuthRoutes
 @override
 CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
   endpoints: const CkAuthEndpoints(/* ... */),
-  profileExtractor: (data) => UserProfile.fromJson(data),
+  extractors: CkAuthExtractors(
+    accessToken: (data) => data['token'] as String?,
+    profile: (data) => UserProfile.fromJson(data['user'] as Map<String, dynamic>),
+  ),
   routes: CkAuthRoutes(
     routeToSplash: () {
       coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
@@ -1056,6 +1059,21 @@ If your backend keys are standard, you can utilize built-in factory builders ins
     messagePath: 'status.message',
   ),
   ```
+### Bypassing Authentication API Calls (`authEnable`)
+
+If you want to design and test your UI without making actual HTTP request calls, you can configure `authEnable: false` in `CkAuthConfig`.
+
+```dart
+CkAuthConfig(
+  authEnable: false, // Default is true. When false, network requests are bypassed.
+  // ...
+)
+```
+
+When `authEnable` is set to `false`:
+- Auth operations (e.g. `signIn`, `signUp`, `socialLogin`, `verifyOtp`) instantly complete and mock a successful response.
+- Secure tokens are stubbed with dummy mock tokens locally so the app behaves as if authenticated.
+- Navigation transitions and state flow (like redirection to OTP or onboarding) still execute normally so you can test all user flow states without any working backend.
 
 
 ### 1. Profile model & auth override
@@ -1092,6 +1110,7 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   /// When set, CoreKit initializes [CkAuthService] and manages tokens internally.
   @override
   CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
+        authEnable: true, // Set to false to bypass actual backend API calls during UI design
         endpoints: const CkAuthEndpoints(
           signupUrl: '/auth/signup',
           signinUrl: '/auth/login',
@@ -1180,6 +1199,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 
   @override
   CkAuthConfig get authConfig => CkAuthConfig(
+    authEnable: true, // When false, bypasses network calls and stubs mock session
     endpoints: CkAuthEndpoints(
       resetPassword: ApiEndPoints.resetPassword,
       forgotPassword: ApiEndPoints.forgotPassword,
