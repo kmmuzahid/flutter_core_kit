@@ -1310,9 +1310,15 @@ If you prefer to listen to auth state changes manually (e.g. via a Bloc or routi
 
 ### 3. Sign in / sign up
 
+To perform auth operations, declare a global instance of `CkAuth` typed to your profile model (typically in `constants.dart` or `auth.dart`):
+
+```dart
+const auth = CkAuth<UserProfile>();
+```
+
 #### Sign In
 ```dart
-CkAuth.signIn(
+auth.signIn(
   username: email,
   password: password,
 );
@@ -1320,7 +1326,7 @@ CkAuth.signIn(
 
 #### Sign Up
 ```dart
-await CkAuth.signUp(
+await auth.signUp(
   body: {'email': email, 'password': password},
 );
 ```
@@ -1329,62 +1335,62 @@ await CkAuth.signUp(
 
 ```dart
 // Countdown stream (seconds remaining; 0 = can resend)
-CkAuth.otpManager.resendCountdown.listen((seconds) {
+auth.otpManager.resendCountdown.listen((seconds) {
   setState(() => _seconds = seconds);
 });
 
 // Or reactively bind OTP countdown updates directly to UI (similar to profileUi)
 // The builder receives only the remaining seconds as an int — no context or snapshot.
-CkAuth.otpCountdownUi(
+auth.otpCountdownUi(
   builder: (seconds) {
     if (seconds > 0) {
       return Text('Resend OTP in ${seconds}s');
     }
     return TextButton(
-      onPressed: () => CkAuth.sendOtp(),
+      onPressed: () => auth.sendOtp(),
       child: const Text('Resend OTP'),
     );
   },
 )
 
-await CkAuth.sendOtp();
+await auth.sendOtp();
 
-final verified = await CkAuth.verifyOtp(
+final verified = await auth.verifyOtp(
   otp: '123456',
 );
 ```
 
 ### 5. Loading State UI
 
-Every auth operation (sign-in, sign-up, OTP, profile, social, logout, etc.) automatically tracks its loading state. Use `CkAuth.loadingUi` to reactively bind loading state to your widgets — the builder receives only a `bool`.
+Every auth operation (sign-in, sign-up, OTP, profile, social, logout, etc.) automatically tracks its loading state. Use `auth.loadingUi` to reactively bind loading state to your widgets — the builder receives only a `bool`.
 
 #### Available loading types (`CkAuthLoadingType`)
 
 | Type | Tracks |
 |------|--------|
-| `signUp` | `CkAuth.signUp()` |
-| `signIn` | `CkAuth.signIn()` |
-| `forgotPassword` | `CkAuth.forgotPassword()` |
-| `verifyOtp` | `CkAuth.verifyOtp()` |
-| `sendOtp` | `CkAuth.sendOtp()` |
-| `updatePassword` | `CkAuth.updatePassword()` |
-| `socialLogin` | `signInWithGoogle()`, `signInWithApple()`, `signInWithFacebook()`, `signInWithCustom()` |
-| `logout` | `CkAuth.logout()` |
-| `fetchProfile` | `CkAuth.fetchProfile()` |
-| `updateProfile` | `CkAuth.updateProfile()` |
+| `signUp` | `auth.signUp()` |
+| `signIn` | `auth.signIn()` |
+| `forgotPassword` | `auth.forgotPassword()` |
+| `verifyOtp` | `auth.verifyOtp()` |
+| `sendOtp` | `auth.sendOtp()` |
+| `updatePassword` | `auth.updatePassword()` |
+| `socialLogin` | `auth.signInWithGoogle()`, `auth.signInWithApple()`, `auth.signInWithFacebook()`, `auth.signInWithCustom()` |
+| `logout` | `auth.logout()` |
+| `fetchProfile` | `auth.fetchProfile()` |
+| `updateProfile` | `auth.updateProfile()` |
 
 #### Basic usage
 
 ```dart
 // Wrap a button to show loading state during sign-in
-CkAuth.loadingUi(
+auth.loadingUi(
   type: CkAuthLoadingType.signIn,
   builder: (isLoading) => CkButton(
     titleText: 'Sign In',
     isLoading: isLoading,
     onTap: isLoading
         ? null
-        : () => CkAuth.signIn(username: email, password: password),
+        : () => auth.signIn(username: email, password: password),
   ),
 )
 ```
@@ -1392,10 +1398,10 @@ CkAuth.loadingUi(
 #### Sign-up button with loading
 
 ```dart
-CkAuth.loadingUi(
+auth.loadingUi(
   type: CkAuthLoadingType.signUp,
   builder: (isLoading) => ElevatedButton(
-    onPressed: isLoading ? null : () => CkAuth.signUp(body: formData),
+    onPressed: isLoading ? null : () => auth.signUp(body: formData),
     child: isLoading
         ? const SizedBox(
             width: 20,
@@ -1410,12 +1416,12 @@ CkAuth.loadingUi(
 #### Verify OTP with loading
 
 ```dart
-CkAuth.loadingUi(
+auth.loadingUi(
   type: CkAuthLoadingType.verifyOtp,
   builder: (isLoading) => CkButton(
     titleText: 'Verify',
     isLoading: isLoading,
-    onTap: isLoading ? null : () => CkAuth.verifyOtp(otp: otpCode),
+    onTap: isLoading ? null : () => auth.verifyOtp(otp: otpCode),
   ),
 )
 ```
@@ -1426,22 +1432,22 @@ CkAuth.loadingUi(
 Column(
   children: [
     // Sign-in button
-    CkAuth.loadingUi(
+    auth.loadingUi(
       type: CkAuthLoadingType.signIn,
       builder: (isLoading) => CkButton(
         titleText: 'Sign In',
         isLoading: isLoading,
-        onTap: () => CkAuth.signIn(username: email, password: password),
+        onTap: () => auth.signIn(username: email, password: password),
       ),
     ),
     const SizedBox(height: 16),
     // Google sign-in button
-    CkAuth.loadingUi(
+    auth.loadingUi(
       type: CkAuthLoadingType.socialLogin,
       builder: (isLoading) => CkButton(
         titleText: 'Continue with Google',
         isLoading: isLoading,
-        onTap: () => CkAuth.signInWithGoogle(googleData),
+        onTap: () => auth.signInWithGoogle(googleData),
       ),
     ),
   ],
@@ -1452,10 +1458,10 @@ Column(
 
 ```dart
 // Check loading state synchronously
-final isSigningIn = CkAuth.loadingController.isLoading(CkAuthLoadingType.signIn);
+final isSigningIn = auth.loadingController.isLoading(CkAuthLoadingType.signIn);
 
 // Listen to loading state changes
-CkAuth.loadingController.streamOf(CkAuthLoadingType.signIn).listen((isLoading) {
+auth.loadingController.streamOf(CkAuthLoadingType.signIn).listen((isLoading) {
   debugPrint('Sign-in loading: $isLoading');
 });
 ```
@@ -1463,7 +1469,7 @@ CkAuth.loadingController.streamOf(CkAuthLoadingType.signIn).listen((isLoading) {
 ### 6. Profile
 
 ```dart
-// Option A: Declare a global typesafe gateway instance (typically in constants.dart or auth.dart)
+// Declare a global typesafe gateway instance (typically in constants.dart or auth.dart)
 const auth = CkAuth<UserProfile>();
 
 // Synchronously read the cached active user profile directly (fully typesafe!)
@@ -1494,7 +1500,7 @@ final updated = await auth.updateProfile(
 After your app obtains Google credentials (for example via `google_sign_in`):
 
 ```dart
-final result = await CkAuth.signInWithGoogle(
+final result = await auth.signInWithGoogle(
   CkGoogleAuthData(
     idToken: idToken,
     accessToken: accessToken,
@@ -1509,7 +1515,7 @@ Also available: `signInWithApple`, `signInWithFacebook`, `signInWithCustom`.
 ### 8. Logout
 
 ```dart
-await CkAuth.logout();
+await auth.logout();
 // Clears tokens/profile and auto-navigates (calls routeToLogin or routeToOnboarding)
 ```
 
