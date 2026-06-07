@@ -3,6 +3,7 @@ import 'package:core_kit/utils/ck_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class CkGridConfig {
   final double maxCrossAxisExtent;
@@ -68,6 +69,7 @@ class CkGridView extends StatefulWidget {
     this.onReorder,
     this.listLoaderConfig,
     this.backgroundColor = Colors.transparent,
+    this.shimmerItem,
   });
 
   final int itemCount;
@@ -95,6 +97,10 @@ class CkGridView extends StatefulWidget {
 
   /// Background color for the header delegate. Defaults to transparent.
   final Color backgroundColor;
+
+  /// Widget used as the shimmer placeholder for each grid cell.
+  /// Shown as [limit] repeated skeleton tiles when [isLoading] is true and [itemCount] is 0.
+  final Widget? shimmerItem;
 
   @override
   State<CkGridView> createState() => _CkGridViewState();
@@ -264,7 +270,9 @@ class _CkGridViewState extends State<CkGridView> {
 
         SliverPadding(
           padding: widget.padding ?? EdgeInsets.zero,
-          sliver: widget.itemCount == 0 && !widget.isLoading
+          sliver: widget.isLoading && widget.itemCount == 0 && widget.shimmerItem != null
+              ? _buildShimmerSliver()
+              : widget.itemCount == 0 && !widget.isLoading
               ? SliverToBoxAdapter(child: _empty())
               : widget.onReorder != null
               ? ReorderableBuilder.builder(
@@ -358,6 +366,31 @@ class _CkGridViewState extends State<CkGridView> {
 
         SliverToBoxAdapter(child: _buildFooter()),
       ],
+    );
+  }
+
+  Widget _buildShimmerSliver() {
+    return SliverSkeletonizer(
+      enabled: true,
+      child: SliverGrid(
+        gridDelegate: gridConfig.itemInRow > 0
+            ? SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: gridConfig.itemInRow,
+                childAspectRatio: gridConfig.aspectRatio,
+                mainAxisSpacing: gridConfig.mainAxisSpacing,
+                crossAxisSpacing: gridConfig.crossAxisSpacing,
+              )
+            : SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: gridConfig.maxCrossAxisExtent,
+                childAspectRatio: gridConfig.aspectRatio,
+                mainAxisSpacing: gridConfig.mainAxisSpacing,
+                crossAxisSpacing: gridConfig.crossAxisSpacing,
+              ),
+        delegate: SliverChildBuilderDelegate(
+          (ctx, i) => widget.shimmerItem!,
+          childCount: widget.limit,
+        ),
+      ),
     );
   }
 

@@ -47,6 +47,7 @@ class CkTabConfig<T> {
     this.listLoaderConfig,
     this.backgroundColor,
     this.physics,
+    this.shimmerItem,
   });
 
   final Widget? seperator;
@@ -71,6 +72,9 @@ class CkTabConfig<T> {
 
   /// Per-tab scroll physics.
   final ScrollPhysics? physics;
+
+  /// Per-tab shimmer placeholder widget. Overrides the parent [CkTabListView.shimmerItem].
+  final Widget? shimmerItem;
 }
 
 // ignore: must_be_immutable
@@ -95,6 +99,7 @@ class CkTabListView<T> extends StatefulWidget {
     this.listLoaderConfig,
     this.backgroundColor = Colors.transparent,
     this.physics,
+    this.shimmerItem,
     super.key,
   }) : assert(tabs.isNotEmpty, 'tabs must not be empty');
 
@@ -117,6 +122,10 @@ class CkTabListView<T> extends StatefulWidget {
 
   /// Custom scroll physics passed to child loaders.
   final ScrollPhysics? physics;
+
+  /// Shimmer placeholder widget shared across all tabs.
+  /// Per-tab [CkTabConfig.shimmerItem] takes priority when set.
+  final Widget? shimmerItem;
 
   /// One config entry per tab — data/state only.
   List<CkTabConfig<T>> tabs;
@@ -294,6 +303,7 @@ class _CkTabListViewState<T> extends State<CkTabListView<T>>
       listLoaderConfig: cfg.listLoaderConfig ?? widget.listLoaderConfig,
       backgroundColor: cfg.backgroundColor ?? widget.backgroundColor,
       physics: cfg.physics ?? widget.physics,
+      shimmerItem: cfg.shimmerItem ?? widget.shimmerItem,
     );
   }
 
@@ -353,6 +363,7 @@ class _CkTabListViewState<T> extends State<CkTabListView<T>>
       listLoaderConfig: cfg.listLoaderConfig ?? widget.listLoaderConfig,
       backgroundColor: cfg.backgroundColor ?? widget.backgroundColor,
       physics: cfg.physics ?? widget.physics,
+      shimmerItem: cfg.shimmerItem ?? widget.shimmerItem,
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:core_kit/core_kit.dart';
 import 'package:core_kit/utils/ck_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class CkListView extends StatefulWidget {
   const CkListView({
@@ -26,6 +27,7 @@ class CkListView extends StatefulWidget {
     this.listLoaderConfig,
     this.backgroundColor = Colors.transparent,
     this.physics,
+    this.shimmerItem,
   });
 
   final Widget? seperator;
@@ -54,6 +56,10 @@ class CkListView extends StatefulWidget {
 
   /// Custom scroll physics. Defaults to AlwaysScrollableScrollPhysics.
   final ScrollPhysics? physics;
+
+  /// Widget used as the shimmer placeholder for each item.
+  /// Shown as [limit] repeated skeleton tiles when [isLoading] is true and [itemCount] is 0.
+  final Widget? shimmerItem;
 
   @override
   State<CkListView> createState() => _CkListViewState();
@@ -141,7 +147,9 @@ class _CkListViewState extends State<CkListView> {
 
   @override
   Widget build(BuildContext context) {
-    final sliverContent = widget.itemCount == 0 && !widget.isLoading
+    final sliverContent = widget.isLoading && widget.itemCount == 0 && widget.shimmerItem != null
+        ? _buildShimmerSliver()
+        : widget.itemCount == 0 && !widget.isLoading
         ? SliverToBoxAdapter(child: _empty())
         : widget.onReorder != null
         ? SliverReorderableList(
@@ -200,7 +208,8 @@ class _CkListViewState extends State<CkListView> {
     final listSlivers = [
       if (widget.initalLoader != null &&
           widget.isLoading &&
-          widget.itemCount == 0)
+          widget.itemCount == 0 &&
+          widget.shimmerItem == null)
         SliverToBoxAdapter(child: widget.initalLoader!)
       else ...[
         if (!widget.isReverse && widget.topWidget != null)
@@ -290,6 +299,24 @@ class _CkListViewState extends State<CkListView> {
                 )
               : _buildScrollView(appBarSliver, listSlivers),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerSliver() {
+    final count = widget.seperator != null
+        ? widget.limit * 2 - 1
+        : widget.limit;
+    return SliverSkeletonizer(
+      enabled: true,
+      child: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (ctx, i) {
+            if (widget.seperator != null && i.isOdd) return widget.seperator!;
+            return widget.shimmerItem!;
+          },
+          childCount: count,
+        ),
       ),
     );
   }
