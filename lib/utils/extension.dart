@@ -41,7 +41,7 @@ extension EnumDisplayName on Enum {
     final raw = name;
     final spaced = raw.replaceAllMapped(
       RegExp(r'([A-Z])'),
-      (match) => '${match.group(0)}',
+      (match) => ' ${match.group(0)}',
     );
 
     return spaced[0].toUpperCase() + spaced.substring(1);

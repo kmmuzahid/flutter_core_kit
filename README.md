@@ -338,32 +338,48 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 
 ### Splash Screen with Auth
 
-When using the authentication module, configure `routeToSplash` in `CkAuthRoutes`:
+When using the authentication module, configure navigation callbacks in `CkAuthFlowHandlers`:
 
 ```dart
 @override
 CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
-  endpoints: const CkAuthEndpoints(/* ... */),
+  endpoints: const CkAuthEndpoints(
+    signup: '/auth/signup',
+    signin: '/auth/login',
+    forgotPassword: '/auth/forgot-password',
+    sendOtp: '/auth/otp/send',
+    verifyOtp: '/auth/otp/verify',
+    getProfile: '/auth/profile',
+    updateProfile: '/auth/profile',
+    logout: '/auth/logout',
+    resetPassword: '/auth/reset-password',
+  ),
+  loginBodyBuilder: (cb) => {'email': cb.username, 'password': cb.password},
+  otpConfig: CkOtpConfig(
+    autoTriggers: {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword},
+    verifyBodyBuilder: (ctx) async => {'otp': ctx.otp},
+    resendBodyBuilder: (ctx) => {'email': ctx.identifier},
+  ),
   extractors: CkAuthExtractors(
     accessToken: (data) => data['token'] as String?,
     profile: (data) => UserProfile.fromJson(data['user'] as Map<String, dynamic>),
   ),
-  routes: CkAuthRoutes(
-    routeToSplash: () {
-      coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SplashScreen()),
-        (_) => false,
-      );
-    },
-    routeOnSuccess: () {
+  handlers: CkAuthFlowHandlers(
+    onAuthenticated: () {
       coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
         (_) => false,
       );
     },
-    routeToLogin: () {
+    showLogin: () {
       coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (_) => false,
+      );
+    },
+    showOnboarding: () {
+      coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
         (_) => false,
       );
     },
@@ -954,6 +970,41 @@ responseExtractor: CkResponseExtractor(
 
 `GET`, `POST`, `PUT`, `DELETE`, `PATCH`
 
+### `RequestInput` fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `endpoint` | `String` | Required. Path relative to `baseUrl`. |
+| `method` | `RequestMethod` | Required. |
+| `pathParams` | `List<String>?` | Appended to the endpoint path. |
+| `queryParams` | `Map<String, dynamic>?` | URL query string. |
+| `headers` | `Map<String, String>?` | Per-request headers merged with global ones. |
+| `jsonBody` | `Map<String, dynamic>?` | JSON encoded body. |
+| `formFields` | `Map<String, dynamic>?` | Multipart form fields. |
+| `files` | `Map<String, dynamic>?` | File uploads (XFile values). |
+| `listBody` | `List<Map<String, dynamic>>?` | JSON array body. |
+| `requiresToken` | `bool` | Default `true`. Set `false` for public endpoints. |
+| `cancelToken` | `CancelToken?` | Dio cancel token for request cancellation. |
+| `onSendProgress` | `Function(int, int)?` | Upload progress callback. |
+| `onReceiveProgress` | `Function(int, int)?` | Download progress callback. |
+
+### `CkTransportConfig` fields
+
+| Field | Default | Notes |
+|-------|---------|-------|
+| `baseUrl` | required | API base URL |
+| `refreshTokenEndpoint` | required | Path for token refresh |
+| `connectTimeout` | 15s | |
+| `receiveTimeout` | 15s | |
+| `sendTimeout` | 15s | |
+| `tokenHeaderKey` | `'Authorization'` | Header name for access token |
+| `refreshTokenHeaderKey` | `'refreshToken'` | Header name for refresh token |
+| `isBearerToken` | `true` | Prepends `'Bearer '` to the token value |
+| `refreshTokenRequestMethod` | `POST` | |
+| `enableDebugLogs` | `false` | Logs Dio requests/responses |
+| `onLogout` | `null` | Called when refresh fails — clear session, navigate to login |
+| `responseExtractor` | — | Custom `CkResponseExtractor` if your API shape differs |
+
 ---
 
 ## Storage
@@ -962,10 +1013,16 @@ responseExtractor: CkResponseExtractor(
 
 ```dart
 await CkStorage.write('theme', 'dark');
-final theme = await CkStorage.read('theme');
+final theme = await CkStorage.read('theme');    // returns null if key absent
 await CkStorage.delete('theme');
 await CkStorage.deleteAll();
 ```
+
+**Storage internals (zero-latency reads):**
+- On first init, all keys are loaded into an in-memory cache in a single platform call.
+- `read` returns from cache — O(1), no I/O.
+- `write` / `delete` update the cache synchronously, then persist to disk in the background.
+- If `FlutterSecureStorage` times out (known Android Keystore warm-up bug), it automatically falls back to `SharedPreferences`.
 
 `CkStorage.initialize()` is called automatically when the auth module starts; you may call it early if needed.
 
@@ -981,22 +1038,49 @@ All public auth types use the **`Ck` prefix** (aligned with the rest of CoreKit)
 
 | Type | Role |
 |------|------|
-| `CkAuthConfig<T>` | Auth module configuration (endpoints, extractors, routes) |
-| `CkAuthEndpoints` | Sign-in, sign-up, OTP, profile, logout URLs |
-| `CkAuthExtractors<T>` | Maps `CkResponse.data` → tokens, profile JSON, messages |
-| `CkAuthRoutes` | Navigation callbacks after login / logout |
+| `CkAuthConfig<T>` | Auth module configuration (endpoints, extractors, handlers) |
+| `CkAuthEndpoints` | Sign-in, sign-up, OTP, profile, logout URL strings + method overrides |
+| `CkAuthExtractors` | Maps `CkResponse.data` → tokens, profile, verification tokens, messages |
+| `CkAuthFlowHandlers` | Navigation callbacks triggered automatically by CoreKit |
 | `CkAuthResult<T>` | Result wrapper for sign-in, OTP, profile calls |
 | `CkAuth` | Static gateway class (sign-in, OTP, profile, social, logout) |
 | `CkAuthLoadingType` | Enum of all auth operations that expose loading state |
 | `CkAuthLoadingController` | Manages per-operation `CkBehaviorStream<bool>` loading streams |
 | `CkOtpConfig` / `CkOtpTrigger` | OTP behaviour and triggers |
-| `CkLogoutConfig` | Logout request configuration |
 | `CkSocialLoginConfig` | Google / Apple / Facebook / custom social |
 | `CkGoogleAuthConfig` / `CkGoogleAuthData` | Google backend + credential payload |
 | `CkAppleAuthConfig` / `CkAppleAuthData` | Apple backend + credential payload |
 | `CkFacebookAuthConfig` / `CkFacebookAuthData` | Facebook backend + credential payload |
 | `CkCustomSocialAuthConfig` | Custom provider URL + body builder |
 | `CkBehaviorStream<T>` | Replay-latest stream (profile, auth status, OTP timer) |
+
+### `CkAuthFlowHandlers` callbacks
+
+| Callback | Required | When called |
+|----------|----------|-------------|
+| `onAuthenticated` | **Yes** | After successful login / signup / social / token restore |
+| `showLogin` | **Yes** | When unauthenticated and onboarding is skipped / done |
+| `showOnboarding` | No | First time (or always if `firstTimeOnly: false`) unauthenticated users |
+| `showOtpVerification` | No | After sign-up / forgot-password when OTP is auto-triggered |
+| `showResetPassword` | No | After OTP verification for forget-password flow |
+| `firstTimeOnly` | — | `true` (default) = onboarding only for new users |
+
+### `CkAuthEndpoints` parameters
+
+| Parameter | Default method | Notes |
+|-----------|---------------|-------|
+| `signup` | `POST` | |
+| `signin` | `POST` | |
+| `forgotPassword` | `POST` | |
+| `sendOtp` | `POST` | |
+| `verifyOtp` | `POST` | |
+| `verifyForgetOtp` | `POST` | Optional separate endpoint for forget-password OTP |
+| `getProfile` | `GET` | |
+| `updateProfile` | `PATCH` | |
+| `logout` | `POST` | |
+| `resetPassword` | `POST` | Override via `resetPasswordMethod` |
+
+Each endpoint also has a corresponding `*Method` override (e.g. `sendOtpMethod: RequestMethod.PATCH`).
 
 ### Extractors & profile (`CkResponse.data`)
 
@@ -1112,14 +1196,15 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
         authEnable: true, // Set to false to bypass actual backend API calls during UI design
         endpoints: const CkAuthEndpoints(
-          signupUrl: '/auth/signup',
-          signinUrl: '/auth/login',
-          forgetPasswordUrl: '/auth/forgot-password',
-          otpSendUrl: '/auth/otp/send',
-          otpVerifyUrl: '/auth/otp/verify',
-          profileGetUrl: '/auth/profile',
-          profileUpdateUrl: '/auth/profile',
-          logoutUrl: '/auth/logout',
+          signup: '/auth/signup',
+          signin: '/auth/login',
+          forgotPassword: '/auth/forgot-password',
+          sendOtp: '/auth/otp/send',
+          verifyOtp: '/auth/otp/verify',
+          getProfile: '/auth/profile',
+          updateProfile: '/auth/profile',
+          logout: '/auth/logout',
+          resetPassword: '/auth/reset-password',
         ),
         extractors: CkAuthExtractors(
           accessToken: (data) => data['accessToken']?.toString(),
@@ -1147,9 +1232,11 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
           },
           // firstTimeOnly: true, // Optional: default is true (onboarding for first-timers only)
         ),
-        otpConfig: const CkOtpConfig(
+        otpConfig: CkOtpConfig(
           autoTriggers: {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword},
-          resendCooldown: Duration(seconds: 120),
+          resendCooldown: const Duration(seconds: 120),
+          verifyBodyBuilder: (ctx) async => {'otp': ctx.otp},
+          resendBodyBuilder: (ctx) => {'email': ctx.identifier},
         ),
         socialLoginConfig: CkSocialLoginConfig(
           google: CkGoogleAuthConfig(
@@ -1296,17 +1383,17 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 
 ### 2. Declarative Auto-Navigation
 
-You do not need an `AuthGate` widget. When you configure `CkAuthRoutes` in your `CkAuthConfig`, CoreKit handles navigation and flow direction automatically:
-* **Splash Screen**: On app launch, `routeToSplash` is called first (if provided). CoreKit enforces a 3-second minimum splash delay for branding, during which you can run custom initialization via `config.onInit`.
+You do not need an `AuthGate` widget. When you configure `handlers` in your `CkAuthConfig`, CoreKit handles navigation and flow direction automatically:
+* **Splash Screen**: On app launch, `preInitChild` is shown. CoreKit enforces a 3-second minimum splash delay for branding, during which you can run custom initialization via `config.onInit`.
 * **Session Restoration**: After the splash delay, CoreKit checks if secure tokens exist.
-* **Onboarding Integration**: If the user is unauthenticated and `routeToOnboarding` is provided, they are routed to onboarding.
+* **Onboarding Integration**: If the user is unauthenticated and `showOnboarding` is provided, they are routed to onboarding.
   * If `firstTimeOnly: true` (default), onboarding is only shown to first-time users. Returning unauthenticated users go directly to the login screen.
   * If `firstTimeOnly: false`, all unauthenticated users are routed to onboarding.
-* **Redirection**: On successful authentication (login, signup, or social login), they are navigated via `routeOnSuccess`. On logout or refresh failure, they are navigated to `routeToLogin` or `routeToOnboarding`.
+* **Redirection**: On successful authentication (login, signup, or social login), `onAuthenticated` is called. On logout or refresh failure, `showLogin` or `showOnboarding` is called.
 
-The auto-navigation is triggered automatically by `CkAuthService.instance.autoNavigate()` after the 3-second splash delay completes. If you need manual control, you can call `autoNavigate()` yourself at any time.
+The auto-navigation is triggered automatically by `CkAuthService.instance.autoNavigate()` after the splash delay completes. If you need manual control, you can call `autoNavigate()` yourself at any time.
 
-If you prefer to listen to auth state changes manually (e.g. via a Bloc or routing guard), simply omit `routes` (set it to `null` or leave it out). CkAuthConfig's `routes` parameter is completely optional.
+If you prefer to listen to auth state changes manually (e.g. via a Bloc or routing guard), simply omit `handlers` (set it to `null` or leave it out). `CkAuthConfig`'s `handlers` parameter is completely optional.
 
 ### 3. Sign in / sign up
 
@@ -1328,6 +1415,20 @@ auth.signIn(
 ```dart
 await auth.signUp(
   body: {'email': email, 'password': password},
+);
+```
+
+#### Forgot Password
+```dart
+await auth.forgotPassword(
+  body: {'email': email},
+);
+```
+
+#### Reset Password
+```dart
+await auth.updatePassword(
+  body: {'password': newPassword, 'confirmPassword': newPassword},
 );
 ```
 
@@ -1516,7 +1617,7 @@ Also available: `signInWithApple`, `signInWithFacebook`, `signInWithCustom`.
 
 ```dart
 await auth.logout();
-// Clears tokens/profile and auto-navigates (calls routeToLogin or routeToOnboarding)
+// Clears tokens/profile and auto-navigates (calls showLogin or showOnboarding)
 ```
 
 ### Auth architecture (overview)
@@ -1638,9 +1739,61 @@ void dispose() {
 ### String / date extensions (`extension.dart`)
 
 ```dart
-'hello world'.capitalize;           // Hello World
-'flutter'.capitalizeFirst;          // Flutter
-DateTime.now().subtract(Duration(hours: 2)).ago;  // 2h ago
+// String casing
+'hello world'.capitalize;             // Hello World
+'flutter'.capitalizeFirst;            // Flutter
+'hello world'.capitalizeEachWord();   // Hello World (alias)
+'someEnumValue'.toDateTime;           // DateTime? (parses ISO string)
+
+// Enum display name
+SomeEnum.myValue.displayName;         // "My Value" (camelCase → spaced title)
+
+// DateTime
+DateTime.now().subtract(Duration(hours: 2)).ago;  // "2h ago"
+DateTime.now().time;     // "2:30 PM"
+DateTime.now().date;     // "07-06-2026"
+DateTime.now().dayName;  // "Sat"
+
+// TimeOfDay ↔ String
+TimeOfDay.now().toHHmm();             // "14:30" — 24-hour, zero-padded
+TimeOfDay.now().to12HourString();     // "2:30 PM"
+'14:30'.toTimeOfDay24();              // TimeOfDay(hour: 14, minute: 30)
+'2:30 PM'.toTimeOfDay12();            // TimeOfDay(hour: 14, minute: 30)
+'14:30'.toTimeOfDayAuto();            // Smart detection (tries 24h first)
+'2:30 PM'.tryToTimeOfDay(context);    // TimeOfDay? — safe nullable version
+```
+
+### Widget extensions (`extension.dart`)
+
+```dart
+// Sizing helpers
+20.height   // SizedBox(height: 20.h)
+16.width    // SizedBox(width: 16.w)
+
+// Alignment
+Text('Hello').start    // Align(alignment: Alignment.centerLeft, ...)
+Text('Hello').end      // Align(alignment: Alignment.centerRight, ...)
+Text('Hello').center   // Align(child: ...)
+
+// Padding
+Text('Hello').paddingAll(12)
+Text('Hello').paddingSymmetric(horizontal: 16, vertical: 8)
+Text('Hello').paddingOnly(left: 12, top: 4)
+Text('Hello').paddingZero
+
+// Margin
+Text('Hello').marginAll(12)
+Text('Hello').marginSymmetric(horizontal: 16, vertical: 8)
+Text('Hello').marginOnly(left: 12, top: 4)
+Text('Hello').marginZero
+
+// CustomScrollView helpers
+SomeWidget().sliverBox  // SliverToBoxAdapter(child: ...)
+
+// Global error boundary
+() async {
+  await doSomething();
+}.tryCatch();  // Logs stack trace via CkLogger on error, never throws
 ```
 
 ### `CkUtils`
