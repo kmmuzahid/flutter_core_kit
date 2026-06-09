@@ -455,6 +455,7 @@ class CkAuthService<TProfile> {
         );
       }
       final activeTrigger = otpManager.lastTrigger;
+
       final verifyResult = await otpManager.verifyOtp(otp: otp);
 
       if (verifyResult.isSuccess) {
