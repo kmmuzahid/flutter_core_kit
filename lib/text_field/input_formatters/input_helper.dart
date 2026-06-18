@@ -1,3 +1,4 @@
+import 'package:core_kit/text_field/input_formatters/capitalization_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/date_input_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
 import 'package:core_kit/text_field/ck_validation_type.dart';
@@ -64,6 +65,7 @@ class InputHelper {
           FilteringTextInputFormatter.allow(
             RegExp(r'[a-zA-Z0-9]'),
           ), // Allow only alphanumeric characters
+          SentenceCapitalizationFormatter(), // Capitalize first letter
         ];
 
       case CkValidationType.validateUsername:
@@ -98,10 +100,17 @@ class InputHelper {
               r"[a-zA-Z'\- ]",
             ), // Allow letters, apostrophes, hyphens, and spaces
           ),
+          WordCapitalizationFormatter(), // Capitalize first letter of every word
         ];
       case CkValidationType.validateNID:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits for NID
+        ];
+
+      case CkValidationType.validateRequired:
+      case CkValidationType.notRequired:
+        return [
+          SentenceCapitalizationFormatter(), // Capitalize first letter of each sentence
         ];
 
       default:
