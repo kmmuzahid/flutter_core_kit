@@ -38,6 +38,8 @@ export 'package:core_kit/button/ck_selectable_button.dart';
 export 'package:core_kit/city_state/ck_city_dropdown.dart';
 export 'package:core_kit/city_state/ck_country_picker.dart';
 export 'package:core_kit/city_state/ck_state_dropdown.dart';
+// comment
+export 'package:core_kit/comment/ck_comment_sheet.dart';
 // container
 export 'package:core_kit/container/ck_dotted_border.dart';
 //dailoge

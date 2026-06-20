@@ -506,37 +506,41 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
             );
 
             if (widget.footer != null) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: widget.backgroundColor,
-                  borderRadius: BorderRadius.circular(widget.borderRadius.r),
-                  border: Border.all(
-                    color: _focusNode.hasFocus
-                        ? (theme
-                                  .inputDecorationTheme
-                                  .focusedBorder
-                                  ?.borderSide
-                                  .color ??
-                              coreKitInstance.primaryColor)
-                        : (widget.isReadOnly
-                              ? (widget.borderColor ??
-                                    theme
-                                        .inputDecorationTheme
-                                        .disabledBorder
-                                        ?.borderSide
-                                        .color ??
-                                    coreKitInstance.outlineColor)
-                              : (widget.borderColor ??
-                                    theme
-                                        .inputDecorationTheme
-                                        .enabledBorder
-                                        ?.borderSide
-                                        .color ??
-                                    coreKitInstance.outlineColor)),
-                    width: widget.borderWidth.w,
-                  ),
+              final decoration = BoxDecoration(
+                color: widget.backgroundColor,
+                borderRadius: BorderRadius.circular(widget.borderRadius.r),
+                border: Border.all(
+                  color: _focusNode.hasFocus
+                      ? (theme
+                                .inputDecorationTheme
+                                .focusedBorder
+                                ?.borderSide
+                                .color ??
+                            coreKitInstance.primaryColor)
+                      : (widget.isReadOnly
+                            ? (widget.borderColor ??
+                                  theme
+                                      .inputDecorationTheme
+                                      .disabledBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.outlineColor)
+                            : (widget.borderColor ??
+                                  theme
+                                      .inputDecorationTheme
+                                      .enabledBorder
+                                      ?.borderSide
+                                      .color ??
+                                  coreKitInstance.outlineColor)),
+                  width: widget.borderWidth.w,
                 ),
-                child: content,
+              );
+              return Container(
+                decoration: decoration,
+                child: ClipRRect(
+                  borderRadius: decoration.borderRadius as BorderRadius,
+                  child: content,
+                ),
               );
             }
             return content;
