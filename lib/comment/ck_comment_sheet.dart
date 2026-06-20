@@ -225,8 +225,8 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   @override
   void didUpdateWidget(covariant CkCommentSheet<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final bool justShown = widget.showComposer && !oldWidget.showComposer;
-    final bool replyTargetChanged =
+    final justShown = widget.showComposer && !oldWidget.showComposer;
+    final replyTargetChanged =
         widget.replyTarget != null &&
         widget.replyTarget != oldWidget.replyTarget;
     if (justShown || replyTargetChanged) {
@@ -243,7 +243,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   }
 
   void _handleSend() {
-    final String text = _composerController.text.trim();
+    final text = _composerController.text.trim();
     widget.onSend?.call(text, widget.replyTarget);
     _composerController.clear();
     _composerFocusNode?.unfocus();
@@ -254,7 +254,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
 
   double _connectorAreaWidth(int depth) {
     double width = 0;
-    for (int i = 0; i < depth; i++) {
+    for (var i = 0; i < depth; i++) {
       width += _avatarSize(i) + widget.gap;
     }
     return width;
@@ -264,7 +264,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
       _connectorAreaWidth(depth) + _avatarSize(depth) / 2;
 
   void _expandReplies(T item, int depth) {
-    final String id = widget.idOf(item);
+    final id = widget.idOf(item);
     setState(() {
       if (depth == 0 &&
           widget.exclusiveReplyExpansion &&
@@ -282,7 +282,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   }
 
   void _showMoreReplies(T item, int depth, int visibleClamped) {
-    final String id = widget.idOf(item);
+    final id = widget.idOf(item);
     setState(() {
       if (visibleClamped == 0 &&
           depth == 0 &&
@@ -303,7 +303,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   }
 
   void _hideReplies(T item) {
-    final String id = widget.idOf(item);
+    final id = widget.idOf(item);
     setState(() {
       _visibleReplyCount[id] = 0;
       for (final child in widget.repliesOf(item)) {
@@ -371,18 +371,18 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   }
 
   Widget _buildComposer(BuildContext context) {
-    final double height = !_isComposerFocused
+    final height = !_isComposerFocused
         ? widget.composerMinHeight
         : (_isComposerMaximized
               ? MediaQuery.of(context).size.height *
                     widget.composerMaximizedHeightFraction
               : widget.composerFocusedHeight);
 
-    final Widget sendButton =
+    final sendButton =
         widget.sendButtonBuilder?.call(_handleSend) ??
         IconButton(onPressed: _handleSend, icon: const Icon(Icons.send));
 
-    final Widget toolbar =
+    final toolbar =
         widget.composerFooterBuilder?.call(context, _composerController) ??
         const SizedBox.shrink();
 
@@ -433,7 +433,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
       ),
     );
 
-    final Widget box =
+    final box =
         widget.composerContainerBuilder?.call(
           context,
           textField,
@@ -467,15 +467,15 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
 
   /// Wraps [composerRow] with the reply-target's avatar, when replying.
   Widget _wrapWithReplyAvatar(Widget composerRow) {
-    if (widget.replyTarget == null) return composerRow;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        widget.avatarBuilder(widget.replyTarget as T, 0),
-        SizedBox(width: widget.gap * 1.5),
-        Expanded(child: composerRow),
-      ],
-    );
+    return composerRow;
+    // return Row(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: [
+    //     widget.avatarBuilder(widget.replyTarget as T, 0),
+    //     SizedBox(width: widget.gap * 1.5),
+    //     Expanded(child: composerRow),
+    //   ],
+    // );
   }
 
   Widget _buildSubtree(
@@ -485,12 +485,12 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
     required bool isLastChild,
     required List<double> ancestorLineXs,
   }) {
-    final List<T> replies = widget.repliesOf(item);
-    final bool hasReplies = replies.isNotEmpty;
-    final String id = widget.idOf(item);
-    final int visible = _visibleReplyCount[id] ?? 0;
+    final replies = widget.repliesOf(item);
+    final hasReplies = replies.isNotEmpty;
+    final id = widget.idOf(item);
+    final visible = _visibleReplyCount[id] ?? 0;
 
-    final Widget node = _buildNode(
+    final node = _buildNode(
       context,
       item,
       depth,
@@ -501,13 +501,13 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
 
     if (!hasReplies) return node;
 
-    final double parentCenterX = _avatarCenterX(depth);
-    final List<double> childAncestorLineXs = [...ancestorLineXs, parentCenterX];
-    final int visibleClamped = visible.clamp(0, replies.length);
-    final int remaining = replies.length - visibleClamped;
+    final parentCenterX = _avatarCenterX(depth);
+    final childAncestorLineXs = <double>[...ancestorLineXs, parentCenterX];
+    final visibleClamped = visible.clamp(0, replies.length);
+    final remaining = replies.length - visibleClamped;
 
-    final List<Widget> repliesWidgets = [];
-    for (int i = 0; i < visibleClamped; i++) {
+    final repliesWidgets = <Widget>[];
+    for (var i = 0; i < visibleClamped; i++) {
       repliesWidgets.add(
         _buildSubtree(
           context,
@@ -534,7 +534,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
       ),
     );
 
-    final Widget toggleRow = _buildToggleRow(
+    final toggleRow = _buildToggleRow(
       context,
       depth: depth + 1,
       ancestorLineXs: childAncestorLineXs,
@@ -566,8 +566,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
     required String label,
     required VoidCallback onTap,
   }) {
-    final Color accent =
-        widget.accentColor ?? Theme.of(context).colorScheme.primary;
+    final accent = widget.accentColor ?? Theme.of(context).colorScheme.primary;
     return GestureDetector(
       onTap: onTap,
       child: Row(
@@ -598,10 +597,9 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
     required bool hasSpineBelow,
     required List<double> ancestorLineXs,
   }) {
-    final double avatarSize = _avatarSize(depth);
-    final Widget avatar = widget.avatarBuilder(item, depth);
-    final Color lineColor =
-        widget.dividerColor ?? Theme.of(context).dividerColor;
+    final avatarSize = _avatarSize(depth);
+    final avatar = widget.avatarBuilder(item, depth);
+    final lineColor = widget.dividerColor ?? Theme.of(context).dividerColor;
 
     if (depth == 0) {
       return IntrinsicHeight(
@@ -633,9 +631,9 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
     }
 
     const double topPad = 8;
-    final double avatarCenterY = topPad + avatarSize / 2;
-    final double parentLineX = ancestorLineXs.last;
-    final List<double> straightAncestors = ancestorLineXs.sublist(
+    final avatarCenterY = topPad + avatarSize / 2;
+    final parentLineX = ancestorLineXs.last;
+    final straightAncestors = ancestorLineXs.sublist(
       0,
       ancestorLineXs.length - 1,
     );
@@ -677,7 +675,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
           SizedBox(width: widget.gap),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(top: topPad),
+              padding: const EdgeInsets.only(top: topPad),
               child: _buildContentColumn(context, item, depth),
             ),
           ),
@@ -692,14 +690,13 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
     required List<double> ancestorLineXs,
     required Widget child,
   }) {
-    const double lineCenterY = 12.0;
-    final double parentLineX = ancestorLineXs.last;
-    final List<double> straightAncestors = ancestorLineXs.sublist(
+    const lineCenterY = 12.0;
+    final parentLineX = ancestorLineXs.last;
+    final straightAncestors = ancestorLineXs.sublist(
       0,
       ancestorLineXs.length - 1,
     );
-    final Color lineColor =
-        widget.dividerColor ?? Theme.of(context).dividerColor;
+    final lineColor = widget.dividerColor ?? Theme.of(context).dividerColor;
 
     return IntrinsicHeight(
       child: Row(
@@ -729,8 +726,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   }
 
   Widget _buildContentColumn(BuildContext context, T item, int depth) {
-    final Color lineColor =
-        widget.dividerColor ?? Theme.of(context).dividerColor;
+    final lineColor = widget.dividerColor ?? Theme.of(context).dividerColor;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -801,7 +797,7 @@ class _CkReplyConnectorPainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
-    const double radius = 14.0;
+    const radius = 14.0;
 
     for (final x in straightAncestorLineXs) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
