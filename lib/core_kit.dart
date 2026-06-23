@@ -77,6 +77,7 @@ export 'package:core_kit/screenshot/ck_screenshot_preview.dart';
 export 'package:core_kit/snackbar/ck_snackbar.dart';
 // spotlight
 export 'package:core_kit/spotlight/ck_spotlight.dart';
+export 'package:core_kit/storage/ck_device_id.dart';
 export 'package:core_kit/storage/ck_storage.dart';
 // commonTabBar
 export 'package:core_kit/tab_bar/ck_tab_bar.dart';

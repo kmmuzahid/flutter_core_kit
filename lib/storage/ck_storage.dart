@@ -21,6 +21,13 @@ abstract class CkStorage {
   /// Absent key means it does not exist on disk (pre-populated at startup).
   static final Map<String, String?> _cache = {};
 
+  /// Keys that must survive [deleteAll] (e.g. the persistent device id).
+  /// Use [protectKey] to register a key as exempt from a full wipe.
+  static final Set<String> _protectedKeys = {};
+
+  /// Marks [key] as protected so it is preserved across [deleteAll].
+  static void protectKey(String key) => _protectedKeys.add(key);
+
   // ─── Initialization ────────────────────────────────────────────────────────
 
   static Future<void> initialize() async {
@@ -160,18 +167,30 @@ abstract class CkStorage {
 
   // ─── Delete All ────────────────────────────────────────────────────────────
 
-  /// Clears ALL stored keys and values from both memory cache and disk.
+  /// Clears ALL stored keys and values from both memory cache and disk,
+  /// EXCEPT keys registered via [protectKey] (e.g. the persistent device id),
+  /// whose values are preserved.
   static Future<void> deleteAll() async {
     await _ensureInitialized();
 
-    // Wipe memory cache immediately.
-    _cache.clear();
+    // Snapshot protected entries before wiping so they can be restored.
+    final preserved = <String, String>{};
+    for (final key in _protectedKeys) {
+      final value = _cache[key];
+      if (value != null) preserved[key] = value;
+    }
 
-    // Wipe disk in background.
-    _deleteAllFromDisk();
+    // Wipe memory cache immediately, then re-seed the protected entries.
+    _cache.clear();
+    _cache.addAll(preserved);
+
+    // Wipe disk in background, then re-persist the protected entries.
+    _deleteAllFromDisk(preserved);
   }
 
-  static Future<void> _deleteAllFromDisk() async {
+  static Future<void> _deleteAllFromDisk(
+    Map<String, String> preserved,
+  ) async {
     try {
       if (_useSecure) {
         _secureStorage ??= const FlutterSecureStorage();
@@ -186,6 +205,11 @@ abstract class CkStorage {
         await _fallbackStorage!.clear();
         _useSecure = false;
       } catch (_) {}
+    }
+
+    // Restore protected keys on disk after the wipe.
+    for (final entry in preserved.entries) {
+      await _writeToDisk(entry.key, entry.value);
     }
   }
 }

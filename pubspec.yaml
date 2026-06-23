@@ -30,7 +30,9 @@ dependencies:
   
   flutter_secure_storage: any
   shared_preferences: any
-  
+  android_id: any
+  uuid: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
