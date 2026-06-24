@@ -5,10 +5,12 @@ import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/ck_transport_config.dart';
+import 'package:core_kit/storage/ck_storage.dart';
 import 'package:core_kit/utils/ck_permission_helper.dart';
 import 'package:core_kit/utils/ck_screen_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 coreKitInstanceSingleton get coreKitInstance =>
     coreKitInstanceSingleton.instance;
@@ -242,6 +244,20 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       }
       if (config.listLoaderConfig != null) {
         instance.listLoaderConfig = config.listLoaderConfig!;
+      }
+
+      // ── First-install wipe ────────────────────────────────────────────
+      // On a fresh install, clear any stale secure-storage data left over
+      // from a previous installation. CkStorage.deleteAll() already
+      // preserves keys registered via protectKey (e.g. the device id).
+      // We use SharedPreferences for the flag itself because CkStorage
+      // (secure storage) is the thing being wiped.
+      await CkStorage.initialize();
+      final prefs = await SharedPreferences.getInstance();
+      final hasBeenInstalled = prefs.getBool('ck_app_installed') ?? false;
+      if (!hasBeenInstalled) {
+        await CkStorage.deleteAll();
+        await prefs.setBool('ck_app_installed', true);
       }
 
       if (config.authConfig != null) {
