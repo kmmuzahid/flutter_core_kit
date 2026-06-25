@@ -191,25 +191,40 @@ abstract class CkStorage {
   static Future<void> _deleteAllFromDisk(
     Map<String, String> preserved,
   ) async {
+    // Delete keys individually instead of using a blanket deleteAll().
+    // This prevents wiping Keychain items written by other storage instances
+    // (e.g. CkDeviceId's dedicated FlutterSecureStorage instance) and avoids
+    // the race condition where a crash between deleteAll() and the restore
+    // loop would permanently lose protected keys.
+    final keysToDelete =
+        _cache.keys.where((k) => !_protectedKeys.contains(k)).toList();
+
     try {
       if (_useSecure) {
         _secureStorage ??= const FlutterSecureStorage();
-        await _secureStorage!.deleteAll();
+        for (final key in keysToDelete) {
+          try {
+            await _secureStorage!.delete(key: key);
+          } catch (_) {}
+        }
       } else {
         _fallbackStorage ??= await SharedPreferences.getInstance();
-        await _fallbackStorage!.clear();
+        for (final key in keysToDelete) {
+          try {
+            await _fallbackStorage!.remove(key);
+          } catch (_) {}
+        }
       }
     } catch (_) {
       try {
         _fallbackStorage ??= await SharedPreferences.getInstance();
-        await _fallbackStorage!.clear();
+        for (final key in keysToDelete) {
+          try {
+            await _fallbackStorage!.remove(key);
+          } catch (_) {}
+        }
         _useSecure = false;
       } catch (_) {}
-    }
-
-    // Restore protected keys on disk after the wipe.
-    for (final entry in preserved.entries) {
-      await _writeToDisk(entry.key, entry.value);
     }
   }
 }
