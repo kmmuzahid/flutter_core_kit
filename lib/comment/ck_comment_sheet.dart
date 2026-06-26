@@ -408,16 +408,22 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
           ],
         ),
         suffixIcon: _isComposerFocused
-            ? GestureDetector(
-                onTap: () => setState(
-                  () => _isComposerMaximized = !_isComposerMaximized,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Icon(
-                    _isComposerMaximized
-                        ? Icons.fullscreen_exit
-                        : Icons.fullscreen,
+            ? SizedBox(
+                width: 32,
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    onTap: () => setState(
+                      () => _isComposerMaximized = !_isComposerMaximized,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Icon(
+                        _isComposerMaximized
+                            ? Icons.fullscreen_exit
+                            : Icons.fullscreen,
+                      ),
+                    ),
                   ),
                 ),
               )
