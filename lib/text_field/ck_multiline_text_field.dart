@@ -234,6 +234,13 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
           child: () {
             final textFormField = TextFormField(
               onTapOutside: (event) {
+                final renderBox = context.findRenderObject() as RenderBox?;
+                if (renderBox != null) {
+                  final localPosition = renderBox.globalToLocal(event.position);
+                  if (renderBox.paintBounds.contains(localPosition)) {
+                    return;
+                  }
+                }
                 _focusNode.unfocus();
               },
               textAlignVertical: TextAlignVertical.top,
@@ -378,26 +385,28 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                           FontStyle.italic,
                       textColor: hintColor(),
                     ),
-                prefixIcon: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    widget.prefixText?.isNotEmpty == true
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 10, right: 5),
-                            child: CkText(
-                              text: widget.prefixText!,
-                              textColor: _iconColor(),
-                            ),
-                          )
-                        : Padding(
-                            padding: EdgeInsets.only(
-                              left: 10.w,
-                              right: widget.contentPadding != null ? 0 : 16,
-                            ),
-                            child: widget.prefixIcon,
-                          ),
-                  ],
-                ),
+                prefixIcon: (widget.prefixText?.isNotEmpty == true || widget.prefixIcon != null)
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          widget.prefixText?.isNotEmpty == true
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 10, right: 5),
+                                  child: CkText(
+                                    text: widget.prefixText!,
+                                    textColor: _iconColor(),
+                                  ),
+                                )
+                              : Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 10.w,
+                                    right: widget.contentPadding != null ? 0 : 16,
+                                  ),
+                                  child: widget.prefixIcon,
+                                ),
+                        ],
+                      )
+                    : null,
                 suffixIconConstraints: BoxConstraints(
                   maxWidth:
                       (widget.suffixIcon == null &&
@@ -411,25 +420,29 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                       ? (widget.contentPadding != null ? 0 : 16)
                       : double.infinity,
                 ),
-                suffixIcon: widget.showActionButton
-                    ? GestureDetector(
-                        onTap: () {
-                          _onSave(_controller.text.trim());
-                        },
-                        child:
-                            widget.actionButtonIcon ?? const Icon(Icons.search),
-                      )
-                    : widget.validationType == CkValidationType.validatePassword
-                    ? (_obscureText
-                          ? _buildPasswordSuffixIcon()
-                          : _buildPasswordSuffixIcon())
-                    : Padding(
-                        padding: EdgeInsets.only(
-                          right: 10,
-                          left: widget.contentPadding != null ? 0 : 16,
-                        ),
-                        child: widget.suffixIcon,
-                      ),
+                suffixIcon: (widget.showActionButton ||
+                        widget.validationType == CkValidationType.validatePassword ||
+                        widget.suffixIcon != null)
+                    ? (widget.showActionButton
+                        ? GestureDetector(
+                            onTap: () {
+                              _onSave(_controller.text.trim());
+                            },
+                            child:
+                                widget.actionButtonIcon ?? const Icon(Icons.search),
+                          )
+                        : widget.validationType == CkValidationType.validatePassword
+                        ? (_obscureText
+                              ? _buildPasswordSuffixIcon()
+                              : _buildPasswordSuffixIcon())
+                        : Padding(
+                            padding: EdgeInsets.only(
+                              right: 10,
+                              left: widget.contentPadding != null ? 0 : 16,
+                            ),
+                            child: widget.suffixIcon,
+                          ))
+                    : null,
                 prefixIconColor: _iconColor(),
                 suffixIconColor: _iconColor(),
                 border: widget.footer != null ? InputBorder.none : null,

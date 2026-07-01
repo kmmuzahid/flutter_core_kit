@@ -287,8 +287,17 @@ class _CkTextFieldState extends State<CkTextField> {
       textAlign: widget.textAlign,
       controller: _controller,
       focusNode: _focusNode,
-      onTapOutside: (event) => _focusNode.unfocus(),
       enableInteractiveSelection: !widget.isReadOnly,
+      onTapOutside: (event) {
+        final renderBox = context.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final localPosition = renderBox.globalToLocal(event.position);
+          if (renderBox.paintBounds.contains(localPosition)) {
+            return;
+          }
+        }
+        _focusNode.unfocus();
+      },
       obscureText: _obscureText,
       onTapUpOutside: (event) {
         _onSave(_controller.text);
