@@ -96,3 +96,18 @@ class WordCapitalizationFormatter extends TextInputFormatter {
     return buffer.toString();
   }
 }
+
+/// Formats text to be lowercase.
+class LowercaseFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toLowerCase(),
+      selection: newValue.selection,
+    );
+  }
+}
+

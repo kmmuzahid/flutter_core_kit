@@ -23,5 +23,7 @@ enum CkValidationType {
   validateNID,
   notRequired,
   validateYear,
+  validateWebURL,
 }
+
 

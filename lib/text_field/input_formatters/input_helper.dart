@@ -113,6 +113,14 @@ class InputHelper {
           SentenceCapitalizationFormatter(), // Capitalize first letter of each sentence
         ];
 
+      case CkValidationType.validateWebURL:
+        return [
+          FilteringTextInputFormatter.deny(
+            RegExp(r'\s'),
+          ), // Deny spaces for web URL
+          LowercaseFormatter(), // Force small letters
+        ];
+
       default:
         return [];
     }
@@ -188,6 +196,8 @@ class InputHelper {
         return TextInputType.text;
       case CkValidationType.validateYear:
         return TextInputType.number;
+      case CkValidationType.validateWebURL:
+        return TextInputType.url;
     }
   }
 
@@ -273,6 +283,8 @@ class InputHelper {
         return null;
       case CkValidationType.validateYear:
         return _validateYear(value);
+      case CkValidationType.validateWebURL:
+        return _validateWebURL(value);
     }
   }
 
@@ -285,6 +297,19 @@ class InputHelper {
       return CkString.yearInvalid;
     }
     return null; // Return null if year is valid
+  }
+
+  static String? _validateWebURL(String? value) {
+    if (value == null || value.isEmpty) {
+      return CkString.requiredField;
+    }
+    final urlRegex = RegExp(
+      r'^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,6}(\/[^\s]*)?$',
+    );
+    if (!urlRegex.hasMatch(value)) {
+      return CkString.invalidURL;
+    }
+    return null;
   }
 
   static String? _validateNID(String? value) {
