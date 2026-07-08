@@ -16,14 +16,17 @@ class CkShare {
     required String deepLinkUrl,
   }) async {
     try {
+      final sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
       final tempDir = await getTemporaryDirectory();
-      final file = File('${tempDir.path}/shared_image.jpg');
+      final file = File('${tempDir.path}/$sanitizedTitle.jpg');
       await file.writeAsBytes(imageUrl.buffer.asUint8List());
       final xFile = XFile(file.path);
       final params = ShareParams(
         text: '$title\n$deepLinkUrl',
         files: [xFile],
         title: title,
+        subject: title,
+        fileNameOverrides: ['$sanitizedTitle.jpg'],
         previewThumbnail: xFile,
       );
       await SharePlus.instance.share(params);
@@ -46,14 +49,17 @@ class CkShare {
         return;
       }
 
+      final sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
       final tempDir = await getTemporaryDirectory();
-      final file = File('${tempDir.path}/shared_image.jpg');
+      final file = File('${tempDir.path}/$sanitizedTitle.jpg');
       await file.writeAsBytes(response.bodyBytes);
       final xFile = XFile(file.path);
       final params = ShareParams(
         text: '$title\n$deepLinkUrl',
         files: [xFile],
         title: title,
+        subject: title,
+        fileNameOverrides: ['$sanitizedTitle.jpg'],
         previewThumbnail: xFile,
       );
       await SharePlus.instance.share(params);
