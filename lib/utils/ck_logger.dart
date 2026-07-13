@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
@@ -6,6 +7,16 @@ class CkLogger {
 
   static bool enableLogs = kDebugMode; // Only log in debug mode
   static final DateFormat _timeFormatter = DateFormat('HH:mm:ss');
+
+  // Auto-detect ANSI color support (only enabled on desktop platforms where it is native)
+  static bool enableColors = () {
+    try {
+      if (kIsWeb) return false;
+      return (Platform.isMacOS || Platform.isWindows || Platform.isLinux) && stdout.supportsAnsiEscapes;
+    } catch (_) {
+      return false;
+    }
+  }();
 
   // ANSI color codes
   static const _reset = '\x1B[0m';
@@ -26,9 +37,21 @@ class CkLogger {
 
     final now = DateTime.now();
     final time = _timeFormatter.format(now);
-    final coloredTime = '$_gray[$time]$_reset';
 
-    final coloredTag = tag != null ? '$_yellow[$tag]$_reset ' : '';
+    final reset = enableColors ? _reset : '';
+    final bold = enableColors ? _bold : '';
+    final gray = enableColors ? _gray : '';
+    final red = enableColors ? _red : '';
+    final brightRed = enableColors ? _brightRed : '';
+    final yellow = enableColors ? _yellow : '';
+    final green = enableColors ? _green : '';
+    final blue = enableColors ? _blue : '';
+    final cyan = enableColors ? _cyan : '';
+    final magenta = enableColors ? _magenta : '';
+
+    final coloredTime = '$gray[$time]$reset';
+
+    final coloredTag = tag != null ? '$yellow[$tag]$reset ' : '';
 
     late String levelEmoji;
     late String levelColor;
@@ -36,39 +59,39 @@ class CkLogger {
     switch (level) {
       case 'INFO':
         levelEmoji = 'ℹ️ℹ️';
-        levelColor = _blue;
+        levelColor = blue;
         break;
       case 'WARN':
         levelEmoji = '⚠️⚠️';
-        levelColor = _yellow;
+        levelColor = yellow;
         break;
       case 'ERROR':
         levelEmoji = '❌❌';
-        levelColor = _red;
+        levelColor = red;
         break;
       case 'DEBUG':
         levelEmoji = '🐞🐞';
-        levelColor = _green;
+        levelColor = green;
         break;
       case 'API DEBUG':
         levelEmoji = '🌐📡';
-        levelColor = _cyan;
+        levelColor = cyan;
         break;
       case 'API ERROR':
         levelEmoji = '🚨🛑';
-        levelColor = _brightRed;
+        levelColor = brightRed;
         break;
       case 'MOCK':
         levelEmoji = '🎭🧪';
-        levelColor = _magenta;
+        levelColor = magenta;
         break;
       default:
         levelEmoji = '';
-        levelColor = _reset;
+        levelColor = reset;
     }
 
-    final levelText = '$levelEmoji $_bold$levelColor$level$_reset';
-    final coloredMessage = '$levelColor$message$_reset';
+    final levelText = '$levelEmoji $bold$levelColor$level$reset';
+    final coloredMessage = '$levelColor$message$reset';
 
     final formatted = '$coloredTime [$levelText] $coloredTag$coloredMessage';
 
