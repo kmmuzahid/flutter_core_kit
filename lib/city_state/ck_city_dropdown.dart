@@ -99,7 +99,7 @@ class CkCityDropDown extends StatelessWidget {
       borderRadius: borderRadius,
       menuMaxHeight: menuMaxHeight,
       borderColor: borderColor,
-      initalValue: initalCity != null
+      initalValue: (initalCity != null && city.isNotEmpty)
           ? city.firstWhere(
               (element) =>
                   element.key.trim().toLowerCase() ==

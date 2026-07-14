@@ -1,6 +1,4 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/text/ck_text.dart';
-import 'package:core_kit/text_field/ck_text_field.dart';
 import 'package:flutter/material.dart';
 
 class CkDropDownNameBuilderProperty<T> {
@@ -136,7 +134,7 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
       _items = widget.items;
       changed = true;
     }
-    if (widget.initalValue != oldWidget.initalValue) {
+    if (!_itemsEqual(widget.initalValue, oldWidget.initalValue)) {
       _selectedItem = _getInitialSelection();
       changed = true;
     }
@@ -301,7 +299,8 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
       constraints: BoxConstraints(
         minWidth: widget.menuWidth ?? renderBox.size.width,
         maxWidth: widget.menuWidth ?? renderBox.size.width,
-        maxHeight: widget.menuMaxHeight ?? (MediaQuery.of(context).size.height * 0.5),
+        maxHeight:
+            widget.menuMaxHeight ?? (MediaQuery.of(context).size.height * 0.5),
       ),
       shape: widget.menuBorderColor != null || widget.borderRadius != null
           ? RoundedRectangleBorder(
@@ -494,7 +493,9 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
     );
   }
 
-  bool _itemsEqual(T a, T b) {
+  bool _itemsEqual(T? a, T? b) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
     if (a is MapEntry && b is MapEntry) {
       return a.key == b.key && a.value == b.value;
     }
@@ -554,7 +555,3 @@ class _BorderLoaderPainter extends CustomPainter {
         oldDelegate.inputBorder != inputBorder;
   }
 }
-
-
-
-
