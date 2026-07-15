@@ -40,6 +40,7 @@ class CkDropDown<T> extends StatefulWidget {
     this.prefix,
     this.initalValue,
     this.enableInitalSelection = true,
+    this.disabled = false,
     super.key,
     this.fontStyle,
     this.contentPadding,
@@ -61,6 +62,11 @@ class CkDropDown<T> extends StatefulWidget {
   });
 
   final Widget? footer;
+
+  /// When [disabled] is `true` the picker cannot be opened and the widget
+  /// is rendered with reduced opacity to signal the non-interactive state.
+  /// The initial value is still displayed normally.
+  final bool disabled;
 
   final String hint;
   final List<T> items;
@@ -129,7 +135,7 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
   @override
   void didUpdateWidget(covariant CkDropDown<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    bool changed = false;
+    var changed = false;
     if (widget.items != oldWidget.items) {
       _items = widget.items;
       changed = true;
@@ -209,7 +215,7 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
       },
       builder: (FormFieldState<T> state) {
         return GestureDetector(
-          onTap: () => _showPopupMenu(context, state),
+          onTap: widget.disabled ? null : () => _showPopupMenu(context, state),
           child: InputDecorator(
             decoration: _buildInputDecoration(
               context,
@@ -404,19 +410,21 @@ class _CkDropDownState<T> extends State<CkDropDown<T>>
             );
             return DropdownMenuItem<T>(value: item, child: name);
           }).toList(),
-          onChanged: (T? newValue) {
-            if (newValue == null) return;
+          onChanged: widget.disabled
+              ? null
+              : (T? newValue) {
+                  if (newValue == null) return;
 
-            final matchingItem = widget.items.firstWhere(
-              (item) => _itemsEqual(item, newValue),
-              orElse: () => newValue,
-            );
+                  final matchingItem = widget.items.firstWhere(
+                    (item) => _itemsEqual(item, newValue),
+                    orElse: () => newValue,
+                  );
 
-            setState(() {
-              _selectedItem = matchingItem;
-            });
-            widget.onChanged(matchingItem);
-          },
+                  setState(() {
+                    _selectedItem = matchingItem;
+                  });
+                  widget.onChanged(matchingItem);
+                },
         ),
         if (widget.isLoading)
           Positioned.fill(

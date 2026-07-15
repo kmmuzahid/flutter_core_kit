@@ -53,6 +53,7 @@ class CkCountryPicker extends StatelessWidget {
     this.isLoading = false,
     this.borderRadius = 8,
     this.enableInitalSelection = false,
+    this.disabled = false,
     this.contentPadding,
     this.suffixIcon,
     this.nameBuilder,
@@ -88,6 +89,11 @@ class CkCountryPicker extends StatelessWidget {
   final bool isLoading;
   final double borderRadius;
   final bool enableInitalSelection;
+
+  /// When [disabled] is `true` the picker cannot be opened.
+  /// Only the initial value will be visible; the user cannot change it.
+  final bool disabled;
+
   final EdgeInsets? contentPadding;
   final Widget? suffixIcon;
 
@@ -125,6 +131,7 @@ class CkCountryPicker extends StatelessWidget {
       borderColor: borderColor,
       initalValue: initialValue,
       enableInitalSelection: enableInitalSelection,
+      disabled: disabled,
       isRequired: isRequired,
       onChanged: onChanged,
       selectedItemBuilder: (value) {
