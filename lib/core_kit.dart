@@ -88,6 +88,7 @@ export 'package:core_kit/text/ck_text.dart';
 export 'package:core_kit/text_field/ck_date_input_text_field.dart';
 export 'package:core_kit/text_field/ck_multiline_text_field.dart';
 export 'package:core_kit/text_field/ck_phone_number_text_field.dart';
+export 'package:core_kit/text_field/ck_search.dart';
 export 'package:core_kit/text_field/ck_text_field.dart';
 export 'package:core_kit/text_field/ck_validation_type.dart';
 export 'package:core_kit/utils/ck_debouncer.dart';
