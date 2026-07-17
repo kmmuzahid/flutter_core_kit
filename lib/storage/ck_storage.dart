@@ -113,26 +113,26 @@ abstract class CkStorage {
     return null;
   }
 
-  static Future<String?> _readFromDisk(String key) async {
-    try {
-      if (_useSecure) {
-        _secureStorage ??= const FlutterSecureStorage();
-        return await _secureStorage!.read(key: key);
-      } else {
-        _fallbackStorage ??= await SharedPreferences.getInstance();
-        return _fallbackStorage!.getString(key);
-      }
-    } catch (_) {
-      try {
-        _fallbackStorage ??= await SharedPreferences.getInstance();
-        final val = _fallbackStorage!.getString(key);
-        _useSecure = false;
-        return val;
-      } catch (_) {
-        return null;
-      }
-    }
-  }
+  // static Future<String?> _readFromDisk(String key) async {
+  //   try {
+  //     if (_useSecure) {
+  //       _secureStorage ??= const FlutterSecureStorage();
+  //       return await _secureStorage!.read(key: key);
+  //     } else {
+  //       _fallbackStorage ??= await SharedPreferences.getInstance();
+  //       return _fallbackStorage!.getString(key);
+  //     }
+  //   } catch (_) {
+  //     try {
+  //       _fallbackStorage ??= await SharedPreferences.getInstance();
+  //       final val = _fallbackStorage!.getString(key);
+  //       _useSecure = false;
+  //       return val;
+  //     } catch (_) {
+  //       return null;
+  //     }
+  //   }
+  // }
 
   // ─── Delete ────────────────────────────────────────────────────────────────
 
@@ -188,16 +188,15 @@ abstract class CkStorage {
     _deleteAllFromDisk(preserved);
   }
 
-  static Future<void> _deleteAllFromDisk(
-    Map<String, String> preserved,
-  ) async {
+  static Future<void> _deleteAllFromDisk(Map<String, String> preserved) async {
     // Delete keys individually instead of using a blanket deleteAll().
     // This prevents wiping Keychain items written by other storage instances
     // (e.g. CkDeviceId's dedicated FlutterSecureStorage instance) and avoids
     // the race condition where a crash between deleteAll() and the restore
     // loop would permanently lose protected keys.
-    final keysToDelete =
-        _cache.keys.where((k) => !_protectedKeys.contains(k)).toList();
+    final keysToDelete = _cache.keys
+        .where((k) => !_protectedKeys.contains(k))
+        .toList();
 
     try {
       if (_useSecure) {

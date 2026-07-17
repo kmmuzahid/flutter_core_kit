@@ -1,3 +1,3 @@
-## 0.0.1
+## 1.0.0+27
 
-* TODO: Describe initial release.
+* Initial release of CoreKit containing production-oriented UI widgets, responsive layout helpers, Dio-based networking with token refresh, secure storage, and authentication modules.
