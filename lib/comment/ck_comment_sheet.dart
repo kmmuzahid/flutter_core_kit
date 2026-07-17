@@ -396,6 +396,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
         hintText: widget.composerHintText,
         backgroundColor: widget.composerBackgroundColor ?? Colors.transparent,
         borderColor: Colors.transparent,
+        enableMaximize: false,
         height: height,
         footer: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
