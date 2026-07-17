@@ -474,7 +474,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                         padding: EdgeInsets.only(
                           top: 10.h,
                           right: 10.w,
-                          left: widget.contentPadding != null ? 0 : 16.w,
+                          left: 0,
                         ),
                         child: GestureDetector(
                           onTap: () {
