@@ -468,31 +468,28 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                 ),
                 suffixIcon: () {
                   if (widget.enableMaximize && _isFocused) {
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        right: 10.w,
-                        left: widget.contentPadding != null ? 0 : 16.w,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          10.height,
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isMaximized = !_isMaximized;
-                              });
-                            },
-                            child: Icon(
-                              _isMaximized
-                                  ? Icons.fullscreen_exit
-                                  : Icons.fullscreen,
-                              color: coreKitInstance.primaryColor,
-                              size: 24.sp,
-                            ),
+                    return Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: 10.h,
+                          right: 10.w,
+                          left: widget.contentPadding != null ? 0 : 16.w,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isMaximized = !_isMaximized;
+                            });
+                          },
+                          child: Icon(
+                            _isMaximized
+                                ? Icons.fullscreen_exit
+                                : Icons.fullscreen,
+                            color: coreKitInstance.primaryColor,
+                            size: 24.sp,
                           ),
-                        ],
+                        ),
                       ),
                     );
                   }
