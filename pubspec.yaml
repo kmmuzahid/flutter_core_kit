@@ -1,7 +1,7 @@
 name: core_kit
-description: "A new Flutter package project."
+description: "A Flutter package bundling production-ready UI widgets, responsive layout helpers, Dio-based networking with token refresh, secure storage, and authentication modules."
 version: 1.0.0+27
-homepage:
+homepage: https://github.com/kmmuzahid/flutter_core_kit.git
 
 environment:
   sdk: ^3.12.2
