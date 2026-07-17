@@ -454,7 +454,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                     : null,
                 suffixIconConstraints: BoxConstraints(
                   maxWidth: (widget.enableMaximize && _isFocused)
-                      ? 48.w
+                      ? 34.w
                       : (widget.suffixIcon == null &&
                           widget.validationType !=
                               CkValidationType.validatePassword)
