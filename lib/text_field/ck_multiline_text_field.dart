@@ -521,9 +521,27 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                 }(),
                 prefixIconColor: _iconColor(),
                 suffixIconColor: _iconColor(),
-                border: widget.footer != null ? InputBorder.none : null,
-                enabledBorder: widget.footer != null ? InputBorder.none : null,
-                disabledBorder: widget.footer != null ? InputBorder.none : null,
+                border: widget.footer != null
+                    ? InputBorder.none
+                    : _buildBorder(
+                        color: widget.borderColor ??
+                            theme.inputDecorationTheme.border?.borderSide.color ??
+                            coreKitInstance.outlineColor,
+                      ),
+                enabledBorder: widget.footer != null
+                    ? InputBorder.none
+                    : _buildBorder(
+                        color: widget.borderColor ??
+                            theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
+                            coreKitInstance.outlineColor,
+                      ),
+                disabledBorder: widget.footer != null
+                    ? InputBorder.none
+                    : _buildBorder(
+                        color: widget.borderColor ??
+                            theme.inputDecorationTheme.disabledBorder?.borderSide.color ??
+                            coreKitInstance.outlineColor,
+                      ),
                 focusedBorder: widget.footer != null
                     ? InputBorder.none
                     : _buildBorder(
@@ -535,12 +553,13 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                                       ?.borderSide
                                       .color ??
                                   coreKitInstance.outlineColor)
-                            : theme
+                            : (widget.borderColor ??
+                                  theme
                                       .inputDecorationTheme
                                       .focusedBorder
                                       ?.borderSide
                                       .color ??
-                                  coreKitInstance.primaryColor,
+                                  coreKitInstance.primaryColor),
                         width: widget.borderWidth.w,
                       ),
                 errorBorder: widget.footer != null
