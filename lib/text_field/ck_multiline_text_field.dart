@@ -151,7 +151,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
             context,
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeOut,
-            alignment: 0.5,
+            alignment: 1.0,
           );
         }
       });
