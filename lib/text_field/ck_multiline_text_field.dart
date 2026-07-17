@@ -364,7 +364,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
               onFieldSubmitted: (v) {
                 _onSave(v.trim());
               },
-              onTap: widget.onTap,
+              onTap: () {
+                _ensureVisible();
+                widget.onTap?.call();
+              },
               validator:
                   widget.validation ??
                   (value) {
