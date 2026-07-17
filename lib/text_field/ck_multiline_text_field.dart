@@ -119,7 +119,33 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
 
     _focusNode.addListener(() {
       widget.onFocusChanged?.call(_focusNode);
+      if (_focusNode.hasFocus) {
+        _ensureVisible();
+      }
       setState(() {});
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant CkMultilineTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.height != oldWidget.height) {
+      _ensureVisible();
+    }
+  }
+
+  void _ensureVisible() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          Scrollable.ensureVisible(
+            context,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            alignment: 1.0,
+          );
+        }
+      });
     });
   }
 
