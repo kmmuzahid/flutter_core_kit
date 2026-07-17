@@ -47,6 +47,8 @@ class CkMultilineTextField extends StatefulWidget {
     this.fontSize,
     this.contentPadding,
     this.expand = true,
+    this.enableMaximize = true,
+    this.maximizedHeight,
   });
 
   final bool expand;
@@ -91,6 +93,8 @@ class CkMultilineTextField extends StatefulWidget {
   final EdgeInsetsGeometry? contentPadding;
 
   final String? Function(String? value)? validation;
+  final bool enableMaximize;
+  final double? maximizedHeight;
 
   @override
   State<CkMultilineTextField> createState() =>
@@ -104,6 +108,8 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
   int wordCount = 0;
   int lengthCount = 0;
   late ThemeData theme;
+  bool _isMaximized = false;
+  bool _isFocused = false;
 
   @override
   void initState() {
@@ -119,8 +125,11 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
 
     _focusNode.addListener(() {
       widget.onFocusChanged?.call(_focusNode);
+      _isFocused = _focusNode.hasFocus;
       if (_focusNode.hasFocus) {
         _ensureVisible();
+      } else {
+        _isMaximized = false;
       }
       setState(() {});
     });
@@ -247,15 +256,25 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final double calculatedHeight;
+    if (widget.enableMaximize && _isMaximized) {
+      final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+      calculatedHeight = widget.maximizedHeight ??
+          (MediaQuery.of(context).size.height - bottomInset - 220.h)
+              .clamp(150.0.h, 300.0.h);
+    } else {
+      calculatedHeight = widget.height;
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: widget.height,
+            maxHeight: calculatedHeight,
             minHeight: widget.expand
-                ? widget.height
-                : (widget.minHeight ?? widget.height),
+                ? calculatedHeight
+                : (widget.minHeight ?? calculatedHeight),
           ),
           child: () {
             final textFormField = TextFormField(
@@ -437,7 +456,8 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                   maxWidth:
                       (widget.suffixIcon == null &&
                           widget.validationType !=
-                              CkValidationType.validatePassword)
+                              CkValidationType.validatePassword &&
+                          !(widget.enableMaximize && _isFocused))
                       ? (widget.contentPadding != null ? 0 : 16)
                       : double.infinity,
                 ),
@@ -446,29 +466,61 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                       ? (widget.contentPadding != null ? 0 : 16)
                       : double.infinity,
                 ),
-                suffixIcon: (widget.showActionButton ||
-                        widget.validationType == CkValidationType.validatePassword ||
-                        widget.suffixIcon != null)
-                    ? (widget.showActionButton
-                        ? GestureDetector(
+                suffixIcon: () {
+                  if (widget.enableMaximize && _isFocused) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: 10.w,
+                        left: widget.contentPadding != null ? 0 : 16.w,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          10.height,
+                          GestureDetector(
                             onTap: () {
-                              _onSave(_controller.text.trim());
+                              setState(() {
+                                _isMaximized = !_isMaximized;
+                              });
                             },
-                            child:
-                                widget.actionButtonIcon ?? const Icon(Icons.search),
-                          )
-                        : widget.validationType == CkValidationType.validatePassword
-                        ? (_obscureText
-                              ? _buildPasswordSuffixIcon()
-                              : _buildPasswordSuffixIcon())
-                        : Padding(
-                            padding: EdgeInsets.only(
-                              right: 10,
-                              left: widget.contentPadding != null ? 0 : 16,
+                            child: Icon(
+                              _isMaximized
+                                  ? Icons.fullscreen_exit
+                                  : Icons.fullscreen,
+                              color: coreKitInstance.primaryColor,
+                              size: 24.sp,
                             ),
-                            child: widget.suffixIcon,
-                          ))
-                    : null,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return (widget.showActionButton ||
+                          widget.validationType == CkValidationType.validatePassword ||
+                          widget.suffixIcon != null)
+                      ? (widget.showActionButton
+                          ? GestureDetector(
+                              onTap: () {
+                                _onSave(_controller.text.trim());
+                              },
+                              child:
+                                  widget.actionButtonIcon ?? const Icon(Icons.search),
+                            )
+                          : widget.validationType == CkValidationType.validatePassword
+                          ? (_obscureText
+                                ? _buildPasswordSuffixIcon()
+                                : _buildPasswordSuffixIcon())
+                          : Padding(
+                              padding: EdgeInsets.only(
+                                right: 10,
+                                left: widget.contentPadding != null ? 0 : 16,
+                              ),
+                              child: widget.suffixIcon,
+                            ))
+                      : null;
+                }(),
                 prefixIconColor: _iconColor(),
                 suffixIconColor: _iconColor(),
                 border: widget.footer != null ? InputBorder.none : null,
