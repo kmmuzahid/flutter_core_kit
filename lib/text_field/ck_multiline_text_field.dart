@@ -481,6 +481,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                             setState(() {
                               _isMaximized = !_isMaximized;
                             });
+                            _ensureVisible();
                           },
                           child: Icon(
                             _isMaximized
