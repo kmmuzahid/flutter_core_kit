@@ -12,10 +12,12 @@ platforms:
   macos:
   windows:
   linux:
+  web:
 
 dependencies:
   flutter:
     sdk: flutter
+  universal_io: ^2.2.2
   intl: ^0.20.2
   flutter_html: ^3.0.0 
 

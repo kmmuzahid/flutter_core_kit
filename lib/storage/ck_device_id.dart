@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:android_id/android_id.dart';
 import 'package:core_kit/storage/ck_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_io/io.dart';
 import 'package:uuid/uuid.dart';
 
 /// A stable per-device identifier that survives app uninstall/reinstall.

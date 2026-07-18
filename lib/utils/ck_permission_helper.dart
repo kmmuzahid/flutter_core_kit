@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/material.dart';
+import 'package:universal_io/io.dart';
 
 /// A helper class for handling permission requests.
 class CkPermissionHelper {
