@@ -1,3 +1,7 @@
+## 1.0.3
+
+* **License Update**: Changed package license to MIT.
+
 ## 1.0.2
 
 * **Web & Multi-Platform Support**: Replaced native `dart:io` imports with `universal_io` to ensure seamless compatibility across all platforms, including Flutter Web.
