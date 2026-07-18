@@ -152,7 +152,7 @@ class _CkListViewState extends State<CkListView> {
         ? SliverToBoxAdapter(child: _empty())
         : widget.onReorder != null
         ? SliverReorderableList(
-            onReorder: widget.onReorder!,
+            onReorderItem: widget.onReorder!,
             itemCount: widget.itemCount,
             itemBuilder: (context, index) {
               final actualIndex = widget.isReverse

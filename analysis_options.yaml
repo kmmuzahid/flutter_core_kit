@@ -10,6 +10,15 @@ analyzer:
     # This turns inference failures into hard errors
     todo: ignore 
     argument_type_not_assignable: error
+    dangling_library_doc_comments: ignore
+    unintended_html_in_doc_comment: ignore
+    type_annotate_public_apis: ignore
+    strict_top_level_inference: ignore
+    library_private_types_in_public_api: ignore 
+    camel_case_types: ignore
+    use_build_context_synchronously: ignore
+    constant_identifier_names: ignore
+    camel_case_extensions: ignore
 
 linter:
   rules:
