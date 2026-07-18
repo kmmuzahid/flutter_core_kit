@@ -1,3 +1,7 @@
+## 1.0.4
+
+* **Warning fixed**: Fixed linting warnings in `ck_auth_service.dart` and `request_builder.dart`.
+
 ## 1.0.3
 
 * **License Update**: Changed package license to MIT.

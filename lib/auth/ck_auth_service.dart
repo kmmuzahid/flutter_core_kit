@@ -189,6 +189,7 @@ class CkAuthService<TProfile> {
 
   /// Completes authentication after successful token extraction
   Future<CkAuthResult<TProfile>> _completeAuthentication(
+    // ignore: strict_top_level_inference
     responseData,
     int? statusCode,
   ) async {
