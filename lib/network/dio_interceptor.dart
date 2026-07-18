@@ -6,13 +6,13 @@
 
 import 'dart:async';
 
+import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/ck_transport_config.dart';
 import 'package:core_kit/network/dio_utils.dart';
 import 'package:core_kit/utils/ck_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:core_kit/auth/ck_auth_service.dart';
 
 class DioInterceptor extends Interceptor {
   final Dio _dio;

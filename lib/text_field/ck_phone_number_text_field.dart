@@ -6,7 +6,6 @@
 import 'dart:async';
 
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/text_field/ck_validation_type.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;

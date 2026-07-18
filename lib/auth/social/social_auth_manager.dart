@@ -1,15 +1,14 @@
-import 'package:core_kit/auth/social/social_login_config.dart';
-import 'package:core_kit/auth/social/google_auth_config.dart';
+import 'package:core_kit/auth/ck_auth_extractors.dart';
+import 'package:core_kit/auth/ck_auth_result.dart';
+import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
 import 'package:core_kit/auth/social/facebook_auth_config.dart';
-import 'package:core_kit/auth/ck_auth_result.dart';
-import 'package:core_kit/auth/ck_auth_extractors.dart';
-import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/auth/state/profile_extractor.dart';
+import 'package:core_kit/auth/social/google_auth_config.dart';
+import 'package:core_kit/auth/social/social_login_config.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
-import 'package:core_kit/auth/logout/logout_handler.dart';
-import 'package:core_kit/storage/ck_storage.dart';
+import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
+import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 
@@ -30,8 +29,8 @@ class CkSocialAuthManager<TProfile> {
     required this._profileExtractor,
     required this._stateController,
     required this._logoutHandler,
-    required CkAuthExtractors defaultExtractors,
-  }) : _defaultExtractors = defaultExtractors;
+    required this._defaultExtractors,
+  });
 
   /// Check if a specific provider is configured
   bool isProviderAvailable(CkSocialProvider provider) {

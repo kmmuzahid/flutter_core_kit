@@ -32,8 +32,8 @@ class CkResponse<T> {
     bool? isSuccess,
     bool? isRequesting,
     String? error,
-    dynamic meta,
-    dynamic raw,
+    meta,
+    raw,
     CancelToken? cancelToken,
     int? responseCode,
   }) {

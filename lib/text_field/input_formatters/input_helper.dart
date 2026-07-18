@@ -1,7 +1,7 @@
+import 'package:core_kit/text_field/ck_validation_type.dart';
 import 'package:core_kit/text_field/input_formatters/capitalization_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/date_input_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
-import 'package:core_kit/text_field/ck_validation_type.dart';
 import 'package:core_kit/utils/ck_string.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';

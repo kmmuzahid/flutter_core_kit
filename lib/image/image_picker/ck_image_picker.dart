@@ -1,6 +1,4 @@
 import 'package:core_kit/core_kit.dart';
-import 'package:core_kit/image/ck_image.dart';
-import 'package:core_kit/utils/ck_permission_handler.dart';
 import 'package:flutter/material.dart';
 
 class CkImagePicker extends StatefulWidget {

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/utils/ck_logger.dart';
 import 'package:flutter/material.dart';
 
 /// A helper class for handling permission requests.

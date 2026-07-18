@@ -1,6 +1,4 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:core_kit/text_field/ck_validation_type.dart';
-import 'package:core_kit/text/ck_text.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

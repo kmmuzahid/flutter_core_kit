@@ -122,9 +122,9 @@ class DioRequestBuilder {
 
     final needsMultipart = hasFiles || hasFields;
 
-    int totalBytes = 0;
+    var totalBytes = 0;
 
-    Future<dynamic> processValue(dynamic value) async {
+    Future<dynamic> processValue(value) async {
       if (value is XFile) {
         totalBytes += await value.length();
         return await value.toMultipart();
@@ -176,7 +176,7 @@ class DioRequestBuilder {
       contentType = 'application/json';
     }
 
-    Duration? dynamicTimeout = input.timeout;
+    var dynamicTimeout = input.timeout;
     if (totalBytes > 0) {
       // 15 seconds base + 1 second per 100KB
       final calculatedSeconds = 15 + (totalBytes / 102400).ceil();

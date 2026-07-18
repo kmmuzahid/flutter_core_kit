@@ -15,9 +15,8 @@ import 'package:core_kit/storage/ck_storage.dart';
 /// - [applyFromResponse] — extract, persist `jsonEncode(data)`, skip work if unchanged
 /// - [restoreProfile] — `jsonDecode` stored payload, then parse via extractors
 class CkProfileExtractor<TProfile> {
-  CkProfileExtractor({required CkAuthExtractors extractors})
-    : _extractors = extractors,
-      _profile = CkBehaviorStream(initialValue: null);
+  CkProfileExtractor({required this._extractors})
+    : _profile = CkBehaviorStream(initialValue: null);
 
   final CkAuthExtractors _extractors;
   final CkBehaviorStream<TProfile?> _profile;
@@ -145,7 +144,7 @@ class CkProfileExtractor<TProfile> {
     await CkStorage.delete(CkAuthStorageKeys.profileDataKey);
   }
 
-  TProfile? parseProfile(dynamic data) {
+  TProfile? parseProfile(data) {
     if (data == null) return null;
 
     // Use custom profile extractor if provided

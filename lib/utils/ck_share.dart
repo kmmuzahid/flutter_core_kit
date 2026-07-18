@@ -32,7 +32,7 @@ class CkShare {
       await SharePlus.instance.share(params);
       file.delete();
     } catch (e) {
-      print('Error sharing: $e');
+      ckError('Error sharing: $e');
     }
   }
 
@@ -65,7 +65,7 @@ class CkShare {
       await SharePlus.instance.share(params);
       file.delete();
     } catch (e) {
-      print('Error sharing: $e');
+      ckError('Error sharing: $e');
     }
   }
 }

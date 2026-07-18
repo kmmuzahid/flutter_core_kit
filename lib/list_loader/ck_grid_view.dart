@@ -1,5 +1,4 @@
 import 'package:core_kit/core_kit.dart';
-import 'package:core_kit/utils/ck_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
@@ -263,7 +262,7 @@ class _CkGridViewState extends State<CkGridView> {
           widget.physics ??
           const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       slivers: [
-        if (appBarSliver != null) appBarSliver,
+        ?appBarSliver,
 
         if (widget.topWidget != null)
           SliverToBoxAdapter(child: widget.topWidget),

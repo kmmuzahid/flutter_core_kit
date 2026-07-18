@@ -1,7 +1,7 @@
-import 'package:core_kit/auth/social/google_auth_config.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
-import 'package:core_kit/auth/social/facebook_auth_config.dart';
 import 'package:core_kit/auth/social/custom_social_auth_config.dart';
+import 'package:core_kit/auth/social/facebook_auth_config.dart';
+import 'package:core_kit/auth/social/google_auth_config.dart';
 
 /// Social login configuration — entirely optional.
 /// Only providers with non-null configs are available.

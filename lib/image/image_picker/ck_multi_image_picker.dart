@@ -51,7 +51,7 @@ class _CkMultiImagePickerField
   List<String> _initialSources = [];
 
   /// Only gallery picks — this is what [onSaved] / validation receive.
-  List<XFile> _picked = [];
+  final List<XFile> _picked = [];
 
   @override
   void initState() {

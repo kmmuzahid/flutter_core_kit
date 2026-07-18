@@ -230,7 +230,7 @@ class CkText extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (preffix != null) preffix!,
+        ?preffix,
         if (preffix != null) textSpacing.width,
         Flexible(
           child: gradient != null
@@ -244,7 +244,7 @@ class CkText extends StatelessWidget {
               : buildText(),
         ),
         if (suffix != null) textSpacing.width,
-        if (suffix != null) suffix!,
+        ?suffix,
       ],
     );
   }

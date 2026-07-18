@@ -291,14 +291,16 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     if (decoration is BoxDecoration) {
       if (decoration.color != null) return _textFromColor(decoration.color!);
-      if (decoration.gradient != null)
+      if (decoration.gradient != null) {
         return _textFromGradient(decoration.gradient!);
+      }
     }
 
     if (decoration is ShapeDecoration) {
       if (decoration.color != null) return _textFromColor(decoration.color!);
-      if (decoration.gradient != null)
+      if (decoration.gradient != null) {
         return _textFromGradient(decoration.gradient!);
+      }
     }
 
     if (decoration is FlutterLogoDecoration) {

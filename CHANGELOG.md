@@ -1,3 +1,3 @@
-## 1.0.0+27
+## 1.0.1-beta.1+1
 
-* Initial release of CoreKit containing production-oriented UI widgets, responsive layout helpers, Dio-based networking with token refresh, secure storage, and authentication modules.
+* some dependency has been updated.
