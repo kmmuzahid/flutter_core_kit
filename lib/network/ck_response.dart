@@ -1,5 +1,22 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:dio/dio.dart';
+
+/// A generic typed response wrapper returned by [CkTransport.request].
+///
+/// Wraps both success and failure states, giving you [data], [isSuccess],
+/// [message], and the optional [meta] block in a single object.
+///
+/// Example:
+/// ```dart
+/// final res = await CkTransport.request<User>(
+///   input: RequestInput(endpoint: '/me', method: RequestMethod.GET),
+///   responseBuilder: (json) => User.fromJson(json),
+/// );
+/// if (res.isSuccess) {
+///   print(res.data?.name);
+/// } else {
+///   print(res.message);
+/// }
+/// ```
 
 class CkResponse<T> {
   CkResponse({
@@ -13,18 +30,28 @@ class CkResponse<T> {
     this.cancelToken,
   });
 
+  /// The parsed response data. May be `null` on failure.
   final T data;
 
   /// Full decoded HTTP body before [CkResponseExtractor] `data` extraction.
   final dynamic raw;
+
+  /// Whether this response is currently awaiting a network response.
   final bool isRequesting;
+
+  /// `true` when the server returned a successful status.
   final bool isSuccess;
+
+  /// Human-readable message from the server (e.g. validation error text).
   final String? message;
 
   /// Optional API `meta` block (dynamic). `null` when not returned.
   final dynamic meta;
 
+  /// A [CancelToken] that can be used to abort the in-flight request.
   final CancelToken? cancelToken;
+
+  /// HTTP status code returned by the server, e.g. `200`, `401`, `500`.
   final int? statusCode;
 
   CkResponse<T> copyWith({

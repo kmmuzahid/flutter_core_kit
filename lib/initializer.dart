@@ -20,6 +20,9 @@ typedef NavigationBack = void Function();
 typedef CorkitInitBuilder =
     Widget Function(BuildContext context, Widget? child);
 
+/// Configures the password visibility toggle icons shown in text fields.
+///
+/// Pass a custom instance via [CoreKitConfig.passwordObscureIcon].
 class PasswordObscureIcon {
   final Widget show;
   final Widget hide;
@@ -102,6 +105,7 @@ class coreKitInstanceSingleton {
   Color get surfaceBG => theme.colorScheme.surface;
 }
 
+/// Colours used by the permission request UI overlay.
 class PermissionHadlerColors {
   final Color errorColor;
   final Color actionColor;
@@ -118,6 +122,23 @@ class PermissionHadlerColors {
 // CoreKitConfig — abstract config with context injection
 // ============================================================
 
+/// Abstract configuration class that every app must extend to initialise CoreKit.
+///
+/// Override the required getters ([imageBaseUrl], [ckTransportConfig], [designSize])
+/// and optionally override [authConfig], [appbarConfig], [onInit] and others.
+///
+/// Example:
+/// ```dart
+/// class AppConfig extends CoreKitConfig with CoreKitConfigDefaults {
+///   @override
+///   String get imageBaseUrl => 'https://cdn.example.com/';
+///   @override
+///   CkTransportConfig get ckTransportConfig => CkTransportConfig(
+///     baseUrl: 'https://api.example.com',
+///     refreshTokenEndpoint: '/auth/refresh',
+///   );
+/// }
+/// ```
 abstract class CoreKitConfig {
   BuildContext? _context;
   @protected
@@ -323,6 +344,28 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
 } // CoreKit — main widget
 // ============================================================
 
+/// The root widget for a CoreKit-powered Flutter app (standard navigator).
+///
+/// Drop-in replacement for [MaterialApp] that additionally bootstraps
+/// [CkTransport], [CkStorage], [CkAuthService] and responsive-screen scaling.
+///
+/// Use [CoreKit.router] when using a declarative routing package (go_router, etc.).
+/// Use [CoreKit.builder] when wrapping an existing [MaterialApp.router].
+///
+/// Example:
+/// ```dart
+/// void main() => runApp(MyApp());
+///
+/// class MyApp extends StatelessWidget {
+///   final _nav = GlobalKey<NavigatorState>();
+///   @override
+///   Widget build(BuildContext context) => CoreKit(
+///     navigatorKey: _nav,
+///     config: AppConfig(),
+///     home: const HomeScreen(),
+///   );
+/// }
+/// ```
 class CoreKit extends StatefulWidget {
   final CoreKitConfig config;
   final GlobalKey<NavigatorState> navigatorKey;

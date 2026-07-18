@@ -1,6 +1,19 @@
 import 'package:core_kit/network/ck_response_extractor.dart';
 import 'package:core_kit/network/request_input.dart';
 
+/// Configuration for [CkTransport] — the HTTP client used by core_kit.
+///
+/// Provide this via [CoreKitConfig.ckTransportConfig]. Configures the base URL,
+/// timeouts, token header names, refresh-token endpoint and debug logging.
+///
+/// Example:
+/// ```dart
+/// CkTransportConfig(
+///   baseUrl: 'https://api.example.com',
+///   refreshTokenEndpoint: '/auth/refresh',
+///   enableDebugLogs: true,
+/// )
+/// ```
 class CkTransportConfig {
   final String baseUrl;
   final String refreshTokenEndpoint;

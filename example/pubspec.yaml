@@ -1,0 +1,18 @@
+name: core_kit_example
+description: Demonstrates the features of the core_kit Flutter package.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core_kit:
+    path: ../
+
+flutter:
+  uses-material-design: true
