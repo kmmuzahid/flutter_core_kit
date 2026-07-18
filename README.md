@@ -46,6 +46,24 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 
 ---
 
+## Design Guidelines: Flutter Native Experience with CK
+
+**CoreKit** UI components are built to act exactly like standard Flutter widgets, but with built-in styling, validation, and optimizations to save you time. Simply use the `Ck` prefix (e.g. `CkText`, `CkButton`, `CkTextField`, `CkImage`).
+
+### ⚠️ CRITICAL RULE: Responsive Scaling (`.w`, `.h`, `.sp`, `.r`)
+All `Ck` widgets handle their own internal scaling automatically. **Never pass scaled values (like `16.w` or `14.sp`) into `Ck` widget parameters.** 
+
+Only use `.w`, `.h`, `.sp`, and `.r` when configuring Flutter's native layout widgets (like `SizedBox`, `Padding`, `Container`, or `TextStyle`).
+
+| Do ✅ | Don't ❌ |
+|---|---|
+| `CkText(text: 'Hello', fontSize: 16)` | `CkText(text: 'Hello', fontSize: 16.sp)` |
+| `CkImage(src: '...', height: 120)` | `CkImage(src: '...', height: 120.h)` |
+| `SizedBox(height: 20.h)` | `SizedBox(height: 20)` |
+| `Padding(padding: EdgeInsets.all(16.w))` | `Padding(padding: EdgeInsets.all(16))` |
+
+---
+
 ## Installation
 
 ### 1. Latest release tag
