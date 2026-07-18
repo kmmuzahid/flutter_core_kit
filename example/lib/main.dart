@@ -136,7 +136,7 @@ class _HomePage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(title),
+        title: CkText(text: title, textAlign: TextAlign.left),
         trailing: const Icon(Icons.arrow_forward_ios, size: 14),
         onTap: () => Navigator.push(
           context,
@@ -499,7 +499,10 @@ class _StoragePageState extends State<_StoragePage> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.blue.shade200),
                 ),
-                child: Text('Stored value: $_readValue'),
+                child: CkText(
+                  text: 'Stored value: $_readValue',
+                  textAlign: TextAlign.left,
+                ),
               ),
             ],
           ],
@@ -568,22 +571,28 @@ class _ListPageState extends State<_ListPage> {
         isLoadDone: _loadDone,
         onRefresh: () => _fetch(1),
         onLoadMore: (page) => _fetch(page),
-        emptyWidget: const Center(child: Text('No posts')),
+        emptyWidget: const Center(
+          child: CkText(text: 'No posts'),
+        ),
         itemBuilder: (context, index) {
           final post = _items[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: ListTile(
-              leading: CircleAvatar(child: Text('${post['id']}')),
-              title: Text(
-                post['title'] ?? '',
+              leading: CircleAvatar(
+                child: CkText(text: '${post['id']}'),
+              ),
+              title: CkText(
+                text: post['title'] ?? '',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.left,
               ),
-              subtitle: Text(
-                post['body'] ?? '',
+              subtitle: CkText(
+                text: post['body'] ?? '',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.left,
               ),
             ),
           );
