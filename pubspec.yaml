@@ -13,7 +13,7 @@ dependencies:
   flutter_html: ^3.0.0 # flutter_auto_size_text:
 
   skeletonizer: ^2.1.3
-  file_picker: ^11.0.2
+  file_picker: ^12.0.0-beta.7
   flutter_country_state: ^1.0.2
   flutter_svg: ^2.3.0
   cached_network_image: ^3.4.1
