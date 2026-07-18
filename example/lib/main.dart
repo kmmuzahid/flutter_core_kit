@@ -75,7 +75,7 @@ class _HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('CoreKit Demo'), centerTitle: true),
+      appBar: const CkAppBar(title: 'CoreKit Demo'),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -155,7 +155,7 @@ class _TextButtonPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('CkText & CkButton')),
+      appBar: const CkAppBar(title: 'CkText & CkButton'),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -230,7 +230,7 @@ class _FormPageState extends State<_FormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('CkTextField & Form')),
+      appBar: const CkAppBar(title: 'CkTextField & Form'),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -285,22 +285,22 @@ class _ImagePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('CkImage')),
+      appBar: const CkAppBar(title: 'CkImage'),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text('Network URL (absolute)'),
+          const CkText(text: 'Network URL (absolute)', textAlign: TextAlign.left),
           const SizedBox(height: 8),
-          CkImage(
+          const CkImage(
             src: 'https://picsum.photos/seed/a/600/300',
             width: double.infinity,
             height: 160,
             borderRadius: 12,
           ),
           const SizedBox(height: 16),
-          const Text('Grayscale'),
+          const CkText(text: 'Grayscale', textAlign: TextAlign.left),
           const SizedBox(height: 8),
-          CkImage(
+          const CkImage(
             src: 'https://picsum.photos/seed/b/600/300',
             width: double.infinity,
             height: 160,
@@ -308,7 +308,7 @@ class _ImagePage extends StatelessWidget {
             enableGrayscale: true,
           ),
           const SizedBox(height: 16),
-          const Text('Fixed size with border'),
+          const CkText(text: 'Fixed size with border', textAlign: TextAlign.left),
           const SizedBox(height: 8),
           Center(
             child: CkImage(
@@ -385,7 +385,7 @@ class _TransportPageState extends State<_TransportPage> {
   Widget build(BuildContext context) {
     final res = _response;
     return Scaffold(
-      appBar: AppBar(title: const Text('CkTransport (HTTP)')),
+      appBar: const CkAppBar(title: 'CkTransport (HTTP)'),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -419,16 +419,18 @@ class _TransportPageState extends State<_TransportPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Status ${res.statusCode} · '
-                      '${res.isSuccess ? "✅ isSuccess" : "❌ failed"}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    CkText(
+                      text: 'Status ${res.statusCode} · '
+                          '${res.isSuccess ? "✅ isSuccess" : "❌ failed"}',
+                      fontWeight: FontWeight.bold,
+                      textAlign: TextAlign.left,
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      res.data?.toString() ?? res.message ?? '—',
+                    CkText(
+                      text: res.data?.toString() ?? res.message ?? '—',
                       maxLines: 8,
                       overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.left,
                     ),
                   ],
                 ),
@@ -473,7 +475,7 @@ class _StoragePageState extends State<_StoragePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('CkStorage')),
+      appBar: const CkAppBar(title: 'CkStorage'),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -559,7 +561,7 @@ class _ListPageState extends State<_ListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('CkListView (pagination)')),
+      appBar: const CkAppBar(title: 'CkListView (pagination)'),
       body: CkListView(
         itemCount: _items.length,
         isLoading: _loading,
@@ -599,16 +601,17 @@ class _ResponsivePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Responsive layout')),
+      appBar: const CkAppBar(title: 'Responsive layout'),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Widths / heights / font-sizes below scale automatically '
-              'relative to the design size (428 × 926).',
-              style: TextStyle(color: Colors.grey),
+            const CkText(
+              text: 'Widths / heights / font-sizes below scale automatically '
+                  'relative to the design size (428 × 926).',
+              textColor: Colors.grey,
+              textAlign: TextAlign.left,
             ),
             const SizedBox(height: 20),
             Container(
@@ -616,9 +619,10 @@ class _ResponsivePage extends StatelessWidget {
               height: 60.h,
               color: const Color(0xFF6750A4),
               alignment: Alignment.center,
-              child: Text(
-                '200.w × 60.h',
-                style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              child: const CkText(
+                text: '200.w × 60.h',
+                textColor: Colors.white,
+                fontSize: 14,
               ),
             ),
             20.height, // SizedBox(height: 20.h)
@@ -627,20 +631,23 @@ class _ResponsivePage extends StatelessWidget {
               height: 60.h,
               color: const Color(0xFF03DAC6),
               alignment: Alignment.center,
-              child: Text(
-                '300.w × 60.h',
-                style: TextStyle(fontSize: 16.sp),
+              child: const CkText(
+                text: '300.w × 60.h',
+                fontSize: 16,
               ),
             ),
             20.height,
-            Text(
-              'Font at 24.sp',
-              style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+            const CkText(
+              text: 'Font at 24.sp',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              textAlign: TextAlign.left,
             ),
             12.height,
-            Text(
-              'Font at 14.sp',
-              style: TextStyle(fontSize: 14.sp),
+            const CkText(
+              text: 'Font at 14.sp',
+              fontSize: 14,
+              textAlign: TextAlign.left,
             ),
           ],
         ),
