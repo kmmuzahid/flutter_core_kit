@@ -77,7 +77,7 @@ class _HomePage extends StatelessWidget {
     return Scaffold(
       appBar: const CkAppBar(title: 'CoreKit Demo'),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         children: [
           _tile(
             context,
@@ -133,11 +133,11 @@ class _HomePage extends StatelessWidget {
     required Widget page,
   }) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
+      margin: EdgeInsets.symmetric(vertical: 6.h),
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
         title: CkText(text: title, textAlign: TextAlign.left),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+        trailing: Icon(Icons.arrow_forward_ios, size: 14.sp),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => page),
@@ -157,24 +157,24 @@ class _TextButtonPage extends StatelessWidget {
     return Scaffold(
       appBar: const CkAppBar(title: 'CkText & CkButton'),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const CkText(text: 'Body text using CkText'),
-            const SizedBox(height: 8),
+            8.height,
             const CkText(
               text: 'Bold headline',
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 8),
+            8.height,
             const CkText(
               text: 'Coloured text',
               fontSize: 16,
               textColor: Color(0xFF6750A4),
             ),
-            const SizedBox(height: 20),
+            20.height,
             CkButton(
               titleText: 'Success snackbar',
               onTap: () => CkSnackBar(
@@ -182,7 +182,7 @@ class _TextButtonPage extends StatelessWidget {
                 type: CkSnackBarType.success,
               ),
             ),
-            const SizedBox(height: 12),
+            12.height,
             CkButton(
               titleText: 'Error snackbar',
               buttonColor: Colors.red,
@@ -191,13 +191,13 @@ class _TextButtonPage extends StatelessWidget {
                 type: CkSnackBarType.error,
               ),
             ),
-            const SizedBox(height: 12),
+            12.height,
             CkButton(
               titleText: 'Loading state',
               isLoading: true,
               onTap: () {},
             ),
-            const SizedBox(height: 12),
+            12.height,
             CkButton(
               titleText: 'Gradient button',
               gradient: const LinearGradient(
@@ -232,7 +232,7 @@ class _FormPageState extends State<_FormPage> {
     return Scaffold(
       appBar: const CkAppBar(title: 'CkTextField & Form'),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Form(
           key: _formKey,
           child: Column(
@@ -244,14 +244,14 @@ class _FormPageState extends State<_FormPage> {
                 hintText: 'user@example.com',
                 onSaved: (v, _) => _email = v,
               ),
-              const SizedBox(height: 12),
+              12.height,
               CkTextField(
                 validationType: CkValidationType.validatePassword,
                 labelText: 'Password',
                 hintText: '••••••••',
                 onSaved: (v, _) => _password = v,
               ),
-              const SizedBox(height: 20),
+              20.height,
               CkButton(
                 titleText: 'Submit',
                 onTap: () {
@@ -287,19 +287,19 @@ class _ImagePage extends StatelessWidget {
     return Scaffold(
       appBar: const CkAppBar(title: 'CkImage'),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         children: [
           const CkText(text: 'Network URL (absolute)', textAlign: TextAlign.left),
-          const SizedBox(height: 8),
+          8.height,
           const CkImage(
             src: 'https://picsum.photos/seed/a/600/300',
             width: double.infinity,
             height: 160,
             borderRadius: 12,
           ),
-          const SizedBox(height: 16),
+          16.height,
           const CkText(text: 'Grayscale', textAlign: TextAlign.left),
-          const SizedBox(height: 8),
+          8.height,
           const CkImage(
             src: 'https://picsum.photos/seed/b/600/300',
             width: double.infinity,
@@ -307,9 +307,9 @@ class _ImagePage extends StatelessWidget {
             borderRadius: 12,
             enableGrayscale: true,
           ),
-          const SizedBox(height: 16),
+          16.height,
           const CkText(text: 'Fixed size with border', textAlign: TextAlign.left),
-          const SizedBox(height: 8),
+          8.height,
           Center(
             child: CkImage(
               src: 'https://picsum.photos/seed/c/200/200',
@@ -387,7 +387,7 @@ class _TransportPageState extends State<_TransportPage> {
     return Scaffold(
       appBar: const CkAppBar(title: 'CkTransport (HTTP)'),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -396,7 +396,7 @@ class _TransportPageState extends State<_TransportPage> {
               isLoading: _loading,
               onTap: _fetchGet,
             ),
-            const SizedBox(height: 12),
+            12.height,
             CkButton(
               titleText: 'POST /posts',
               isLoading: _loading,
@@ -404,14 +404,14 @@ class _TransportPageState extends State<_TransportPage> {
               onTap: _fetchPost,
             ),
             if (res != null) ...[
-              const SizedBox(height: 20),
+              20.height,
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
                   color: res.isSuccess
                       ? Colors.green.shade50
                       : Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
                     color: res.isSuccess ? Colors.green : Colors.red,
                   ),
@@ -425,7 +425,7 @@ class _TransportPageState extends State<_TransportPage> {
                       fontWeight: FontWeight.bold,
                       textAlign: TextAlign.left,
                     ),
-                    const SizedBox(height: 6),
+                    6.height,
                     CkText(
                       text: res.data?.toString() ?? res.message ?? '—',
                       maxLines: 8,
@@ -477,26 +477,26 @@ class _StoragePageState extends State<_StoragePage> {
     return Scaffold(
       appBar: const CkAppBar(title: 'CkStorage'),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             CkButton(titleText: 'write("demo_key", …)', onTap: _write),
-            const SizedBox(height: 12),
+            12.height,
             CkButton(titleText: 'read("demo_key")', onTap: _read),
-            const SizedBox(height: 12),
+            12.height,
             CkButton(
               titleText: 'delete("demo_key")',
               buttonColor: Colors.red,
               onTap: _delete,
             ),
             if (_readValue != null) ...[
-              const SizedBox(height: 20),
+              20.height,
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
                   color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(color: Colors.blue.shade200),
                 ),
                 child: CkText(
@@ -577,7 +577,7 @@ class _ListPageState extends State<_ListPage> {
         itemBuilder: (context, index) {
           final post = _items[index];
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
             child: ListTile(
               leading: CircleAvatar(
                 child: CkText(text: '${post['id']}'),
@@ -612,7 +612,7 @@ class _ResponsivePage extends StatelessWidget {
     return Scaffold(
       appBar: const CkAppBar(title: 'Responsive layout'),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -622,7 +622,7 @@ class _ResponsivePage extends StatelessWidget {
               textColor: Colors.grey,
               textAlign: TextAlign.left,
             ),
-            const SizedBox(height: 20),
+            20.height,
             Container(
               width: 200.w,
               height: 60.h,
@@ -634,7 +634,7 @@ class _ResponsivePage extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
-            20.height, // SizedBox(height: 20.h)
+            20.height,
             Container(
               width: 300.w,
               height: 60.h,
