@@ -66,31 +66,34 @@ Only use `.w`, `.h`, `.sp`, and `.r` when configuring Flutter's native layout wi
 
 ## Installation
 
-### 1. Latest release tag
+### 1. From pub.dev (Recommended)
 
-[![Latest Version](https://img.shields.io/github/v/tag/kmmuzahid/flutter_core_kit?label=Latest%20Version&color=blue&sort=semver)](https://github.com/kmmuzahid/flutter_core_kit/releases)
+Add `core_kit` to your `pubspec.yaml` dependencies:
 
-```bash
-# macOS / Linux / Git Bash
-git ls-remote --tags --refs --sort='v:refname' https://github.com/kmmuzahid/flutter_core_kit.git | tail -n1 | awk -F/ '{print $3}'
-
-# Windows (PowerShell)
-(git ls-remote --tags --refs --sort='v:refname' https://github.com/kmmuzahid/flutter_core_kit.git | Select-Object -Last 1) -split '/' | Select-Object -Last 1
+```yaml
+dependencies:
+  core_kit: ^1.0.1
 ```
 
-### 2. `pubspec.yaml`
+Or run:
+
+```bash
+flutter pub add core_kit
+```
+
+### 2. Direct from GitHub (Alternative)
+
+If you need the latest unreleased changes, add the Git dependency:
 
 ```yaml
 dependencies:
   core_kit:
     git:
       url: https://github.com/kmmuzahid/flutter_core_kit.git
-      ref: <LATEST_VERSION_TAG>  # e.g. 0.0.1
+      ref: 1.0.1 # Replace with the latest tag or branch
 ```
 
-```bash
-flutter pub get
-```
+Run `flutter pub get` to download.
 
 **Requirements:** Dart SDK `^3.12.0`, Flutter SDK compatible with your app.
 
