@@ -96,6 +96,12 @@ class CkCommentSheet<T> extends StatefulWidget {
     this.composerBackgroundColor,
     this.composerOnChanged,
     this.composerContainerBuilder,
+    this.composerMaxLength,
+    this.composerMaxWords,
+    this.composerMinLength = 0,
+    this.composerMinWords = 0,
+    this.composerCounterTextStyle,
+    this.composerLimitHintBuilder,
   });
 
   /// The top-level items (e.g. comments on a post).
@@ -206,6 +212,24 @@ class CkCommentSheet<T> extends StatefulWidget {
   /// card if not provided.
   final Widget Function(BuildContext context, Widget textField, bool isFocused)?
   composerContainerBuilder;
+
+  /// Maximum characters allowed in the composer text field.
+  final int? composerMaxLength;
+
+  /// Maximum words allowed in the composer text field.
+  final int? composerMaxWords;
+
+  /// Minimum characters required in the composer text field.
+  final int composerMinLength;
+
+  /// Minimum words required in the composer text field.
+  final int composerMinWords;
+
+  /// Text style for the word/character count indicators.
+  final TextStyle? composerCounterTextStyle;
+
+  /// Custom builder for limit hints.
+  final CkMultilineHintLimitBuilder? composerLimitHintBuilder;
 
   static double _defaultAvatarSizeForDepth(int depth) => depth == 0 ? 32 : 24;
 
@@ -398,6 +422,12 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
         borderColor: Colors.transparent,
         enableMaximize: false,
         height: height,
+        maxLength: widget.composerMaxLength,
+        maxWords: widget.composerMaxWords,
+        minLength: widget.composerMinLength,
+        minWords: widget.composerMinWords,
+        counterTextStyle: widget.composerCounterTextStyle,
+        multilineLimitHintBuilder: widget.composerLimitHintBuilder,
         footer: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
