@@ -395,12 +395,21 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   }
 
   Widget _buildComposer(BuildContext context) {
-    final height = !_isComposerFocused
+    final hasCounter =
+        widget.composerMaxLength != null ||
+        widget.composerMaxWords != null ||
+        widget.composerMinLength > 0 ||
+        widget.composerMinWords > 0;
+
+    final baseHeight = !_isComposerFocused
         ? widget.composerMinHeight
         : (_isComposerMaximized
               ? MediaQuery.of(context).size.height *
                     widget.composerMaximizedHeightFraction
               : widget.composerFocusedHeight);
+
+    final containerHeight =
+        baseHeight + (hasCounter ? (_isComposerFocused ? 34 : 25.0) : 0.0);
 
     final sendButton =
         widget.sendButtonBuilder?.call(_handleSend) ??
@@ -413,7 +422,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
     final Widget textField = AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      height: height,
+      height: containerHeight,
       child: CkMultilineTextField(
         controller: _composerController,
         validationType: CkValidationType.notRequired,
@@ -421,7 +430,7 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
         backgroundColor: widget.composerBackgroundColor ?? Colors.transparent,
         borderColor: Colors.transparent,
         enableMaximize: false,
-        height: height,
+        height: baseHeight,
         maxLength: widget.composerMaxLength,
         maxWords: widget.composerMaxWords,
         minLength: widget.composerMinLength,
