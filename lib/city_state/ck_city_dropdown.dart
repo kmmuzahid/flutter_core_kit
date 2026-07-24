@@ -11,6 +11,21 @@ import 'package:core_kit/text_field/ck_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
 
+/// A dropdown widget for selecting cities of a country and state.
+///
+/// [selectedState] accepts either full state name (e.g. `'California'`)
+/// or state abbreviation (e.g. `'CA'`).
+///
+/// Example:
+/// ```dart
+/// CkCityDropDown(
+///   selectedCountry: 'United States',
+///   selectedState: 'CA', // Accepts state abbreviation ('CA') or full name ('California')
+///   onChange: (city) {
+///     print(city);
+///   },
+/// )
+/// ```
 class CkCityDropDown extends StatelessWidget {
   const CkCityDropDown({
     required this.onChange,

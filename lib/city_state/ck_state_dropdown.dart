@@ -36,6 +36,30 @@ class CkStateDropDownItemProperty
       (abbreviation != null && abbreviation!.isNotEmpty) ? abbreviation! : stateName;
 }
 
+/// A dropdown widget for selecting states/provinces of a country.
+///
+/// Automatically provides full state name (`property.stateName`) and abbreviation (`property.abbreviation`)
+/// to callbacks and builders via [CkStateDropDownItemProperty].
+///
+/// Supports passing either full state name or state abbreviation in [initialState].
+///
+/// Example:
+/// ```dart
+/// CkStateDropDown(
+///   countryName: 'United States',
+///   initialState: 'CA', // Accepts state name ('California') or abbreviation ('CA')
+///   onChanged: (property) {
+///     print(property?.stateName);    // California
+///     print(property?.abbreviation); // CA
+///   },
+///   selectedItemBuilder: (property) => CkText(
+///     text: property.stateName,
+///   ),
+///   nameBuilder: (property) => CkText(
+///     text: '${property.stateName}${property.abbreviation != null ? " (${property.abbreviation})" : ""}',
+///   ),
+/// )
+/// ```
 class CkStateDropDown extends StatelessWidget {
   const CkStateDropDown({
     super.key,

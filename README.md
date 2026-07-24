@@ -1662,36 +1662,45 @@ Country / state / city widgets use bundled data from `flutter_country_state` —
 
 ```dart
 MapEntry<String, String>? _country;
-String? _stateName;
+CkStateDropDownItemProperty? _selectedState;
 String? _city;
 
 CkCountryPicker(
   hint: 'Country',
   onChanged: (entry) => setState(() {
     _country = entry;
-    _stateName = null;
+    _selectedState = null;
     _city = null;
   }),
 )
 
 CkStateDropDown(
   countryName: _country?.value ?? '',
+  initialState: _selectedState?.abbreviation ?? _selectedState?.stateName, // Accepts state name or abbreviation
   hint: 'State',
-  onChanged: (entry) => setState(() {
-    _stateName = entry?.value;
+  onChanged: (property) => setState(() {
+    _selectedState = property; // Contains property.stateName and property.abbreviation
     _city = null;
   }),
+  selectedItemBuilder: (property) => CkText(
+    text: property.stateName,
+  ),
+  nameBuilder: (property) => CkText(
+    text: '${property.stateName}${property.abbreviation != null ? ' (${property.abbreviation})' : ''}',
+  ),
 )
 
 CkCityDropDown(
   selectedCountry: _country?.value ?? '',
-  selectedState: _stateName ?? '',
+  selectedState: _selectedState?.abbreviation ?? _selectedState?.stateName ?? '', // Accepts state abbreviation or name
   hint: 'City',
   onChange: (city) => setState(() => _city = city),
 )
 ```
 
-`CkCountryPicker` / state dropdown callbacks receive `MapEntry<String, String>?` (code → display name).
+* `CkCountryPicker` receives `MapEntry<String, String>?` (country name → country code).
+* `CkStateDropDown` receives `CkStateDropDownItemProperty?` containing `stateName` (e.g. `'California'`) and `abbreviation` (e.g. `'CA'`).
+* `CkCityDropDown` accepts either state abbreviation or full state name in `selectedState`.
 
 ---
 
