@@ -77,7 +77,7 @@ class coreKitInstanceSingleton {
   late GlobalKey<NavigatorState> navigatorKey;
   late String imageBaseUrl;
   late Size designSize;
-  late CkAppBarConfig appbarConfig;
+  CkAppBarConfig appbarConfig = CkAppBarConfig();
   CkListLoaderConfig listLoaderConfig = const CkListLoaderConfig();
   late CkTransportConfig ckTransportConfig;
 
@@ -241,6 +241,26 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
     final completer = Completer<void>();
     final stopwatch = Stopwatch()..start();
 
+    // ── Synchronous pre-frame init ────────────────────────────────────────
+    // appbarConfig and listLoaderConfig do not need a BuildContext, so we
+    // apply them immediately — before addPostFrameCallback fires — so that
+    // any screen rendered on the very first frame (e.g. the splash screen)
+    // already sees the app's overridden config instead of the bare default.
+    {
+      final instance = coreKitInstance;
+      final config = widget.config;
+
+      instance.appbarConfig = config.appbarConfig ?? CkAppBarConfig();
+      if (instance.appbarConfig.onBack == null) {
+        instance.appbarConfig = instance.appbarConfig.copyWith(
+          onBack: () => instance.navigatorKey.currentState?.pop(),
+        );
+      }
+      if (config.listLoaderConfig != null) {
+        instance.listLoaderConfig = config.listLoaderConfig!;
+      }
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final instance = coreKitInstance;
       final config = widget.config;
@@ -255,16 +275,6 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       }
       if (config.passwordObscureIcon != null) {
         instance.passWordObscureIcon = config.passwordObscureIcon!;
-      }
-
-      instance.appbarConfig = config.appbarConfig ?? CkAppBarConfig();
-      if (instance.appbarConfig.onBack == null) {
-        instance.appbarConfig = instance.appbarConfig.copyWith(
-          onBack: () => instance.navigatorKey.currentState?.pop(),
-        );
-      }
-      if (config.listLoaderConfig != null) {
-        instance.listLoaderConfig = config.listLoaderConfig!;
       }
 
       // ── First-install wipe ────────────────────────────────────────────

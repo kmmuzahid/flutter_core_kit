@@ -33,7 +33,7 @@ class CkAppBarConfig {
     this.iconColor,
     this.titleColor,
     this.actions,
-    this.titleAlignment,
+    this.titleAlignment = .center,
     this.leadingAlignment,
     this.actionAlignment,
     this.titleSpacing = 0,
@@ -80,7 +80,6 @@ class CkAppBarConfig {
     );
   }
 }
-
 
 class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CkAppBar({
@@ -324,4 +323,3 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
     return avg > 0.5 ? Colors.black : Colors.white;
   }
 }
-
