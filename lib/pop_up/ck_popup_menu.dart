@@ -124,20 +124,16 @@ class CkPopupMenu<T> extends StatefulWidget {
           : null,
       items: [
         for (int i = 0; i < items.length; i++) ...[
-          PopupMenuItem<T>(
+          _CkPopupMenuItem<T>(
             value: items[i],
             padding: itemPadding,
             height: itemHeight ?? 0,
-            child: Container(
-              constraints: menuWidth != null
-                  ? BoxConstraints(minWidth: menuWidth)
-                  : null,
-              alignment: menuItemAlignment,
-              child: itemBuilder(
-                CkPopupMenuProperty(
-                  item: items[i],
-                  isSelected: initialItem == items[i],
-                ),
+            alignment: menuItemAlignment,
+            menuWidth: menuWidth,
+            child: itemBuilder(
+              CkPopupMenuProperty(
+                item: items[i],
+                isSelected: initialItem == items[i],
               ),
             ),
           ),
@@ -215,6 +211,50 @@ class _SelectablePopupMenuState<T> extends State<CkPopupMenu<T>> {
       onTap: () => showPopupMenu(context, _triggerKey),
       child: widget.triggerBuilder(
         CkPopupMenuTriggerProperty(value: selectedItem, isOpen: isOpen),
+      ),
+    );
+  }
+}
+
+class _CkPopupMenuItem<T> extends PopupMenuEntry<T> {
+  const _CkPopupMenuItem({
+    required this.value,
+    required this.child,
+    this.padding,
+    this.height = 0,
+    this.alignment,
+    this.menuWidth,
+  });
+
+  final T value;
+  @override
+  final double height;
+  final EdgeInsets? padding;
+  final AlignmentGeometry? alignment;
+  final double? menuWidth;
+  final Widget child;
+
+  @override
+  bool represents(T? value) => this.value == value;
+
+  @override
+  State<_CkPopupMenuItem<T>> createState() => _CkPopupMenuItemState<T>();
+}
+
+class _CkPopupMenuItemState<T> extends State<_CkPopupMenuItem<T>> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).pop(widget.value),
+      child: Container(
+        height: widget.height > 0 ? widget.height : null,
+        padding: widget.padding,
+        constraints: widget.menuWidth != null
+            ? BoxConstraints(minWidth: widget.menuWidth!)
+            : null,
+        alignment: widget.alignment,
+        child: widget.child,
       ),
     );
   }
