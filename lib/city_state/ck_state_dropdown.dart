@@ -3,11 +3,38 @@
  * @Date: 2026-01-05 14:19:18
  * @Email: km.muzahid@gmail.com
  */
+import 'package:core_kit/city_state/state_data.dart';
 import 'package:core_kit/dropdown/ck_drop_down.dart';
 import 'package:core_kit/text/ck_text.dart';
 import 'package:core_kit/text_field/ck_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_country_state/complied_cities.dart';
+
+class CkStateDropDownItemProperty
+    extends CkDropDownNameBuilderProperty<String> {
+  final String stateName;
+  final String? abbreviation;
+
+  CkStateDropDownItemProperty({
+    required this.stateName,
+    this.abbreviation,
+    required super.isSelected,
+  }) : super(
+          item: (abbreviation != null && abbreviation.isNotEmpty)
+              ? abbreviation
+              : stateName,
+        );
+
+  /// Full state name (e.g. `'California'`)
+  String get name => stateName;
+
+  /// Full state name (for key compatibility)
+  String get key => stateName;
+
+  /// Returns abbreviation if non-null and not empty, otherwise state name.
+  String get value =>
+      (abbreviation != null && abbreviation!.isNotEmpty) ? abbreviation! : stateName;
+}
 
 class CkStateDropDown extends StatelessWidget {
   const CkStateDropDown({
@@ -17,6 +44,7 @@ class CkStateDropDown extends StatelessWidget {
     required this.countryName,
     required this.onChanged,
     this.initialValue,
+    this.initialState,
     this.isRequired = false,
     this.fontStyle = FontStyle.normal,
     this.backgroundColor,
@@ -28,6 +56,8 @@ class CkStateDropDown extends StatelessWidget {
     this.contentPadding,
     this.suffixIcon,
     this.nameBuilder,
+    this.customAbbreviationMap,
+    this.showAbbreviationInMenu = false,
 
     this.menuWidth,
     this.isSeparated = false,
@@ -42,16 +72,29 @@ class CkStateDropDown extends StatelessWidget {
     this.dropDownType = CkDropDownType.menu,
     this.menuMaxHeight,
   });
-  final dynamic Function(CkDropDownNameBuilderProperty<String> property)?
-  nameBuilder;
+
+  final dynamic Function(CkStateDropDownItemProperty property)? nameBuilder;
 
   final String countryName;
   final Widget? prefix;
   final String hint;
-  final void Function(MapEntry<String, String>?) onChanged;
+
+  /// Callback when state selection changes.
+  final void Function(CkStateDropDownItemProperty?) onChanged;
   final MapEntry<String, String>? initialValue;
+
+  /// Optional initial state specified as state name or abbreviation (e.g. `'California'` or `'CA'`).
+  /// Takes precedence over [initialValue] when provided.
+  final String? initialState;
+
   final bool isRequired;
   final FontStyle fontStyle;
+
+  /// Optional custom mapping for state abbreviations (e.g. `{'California': 'CA'}`).
+  final Map<String, String>? customAbbreviationMap;
+
+  /// Whether to show the abbreviation in the menu items (e.g. "California (CA)").
+  final bool showAbbreviationInMenu;
 
   final Color? borderColor;
   final Color? backgroundColor;
@@ -62,7 +105,8 @@ class CkStateDropDown extends StatelessWidget {
   final EdgeInsets? contentPadding;
   final Widget? suffixIcon;
 
-  final Widget Function(String value)? selectedItemBuilder;
+  final Widget Function(CkStateDropDownItemProperty property)?
+  selectedItemBuilder;
   final TextStyle? hintStyle;
   final CkBorderType borderType;
   final double borderWidth;
@@ -75,11 +119,52 @@ class CkStateDropDown extends StatelessWidget {
   final Color? menuBorderColor;
   final double? menuMaxHeight;
 
+  /// Helper to get the abbreviation for a given state name and country.
+  static String? getStateAbbreviation(
+    String country,
+    String stateName, [
+    Map<String, String>? customMap,
+  ]) {
+    if (customMap != null) {
+      for (final entry in customMap.entries) {
+        if (entry.key.trim().toLowerCase() == stateName.trim().toLowerCase()) {
+          return entry.value;
+        }
+      }
+    }
+    return StateAbbreviations.getAbbreviation(country, stateName);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final state =
-        getStates(country: countryName).map((e) => MapEntry(e, e)).toList()
-          ..sort((a, b) => a.key.compareTo(b.key));
+    final state = getStates(country: countryName).map((e) {
+      final abbr = getStateAbbreviation(countryName, e, customAbbreviationMap);
+      return MapEntry(e, abbr ?? e);
+    }).toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    final searchKey = initialState ?? initialValue?.key;
+    final searchValue = initialState ?? initialValue?.value;
+
+    MapEntry<String, String>? resolvedInitialValue;
+    if ((searchKey != null || searchValue != null) && state.isNotEmpty) {
+      final sKey = (searchKey ?? '').trim().toLowerCase();
+      final sVal = (searchValue ?? '').trim().toLowerCase();
+
+      try {
+        resolvedInitialValue = state.firstWhere(
+          (element) {
+            final eKey = element.key.trim().toLowerCase();
+            final eVal = element.value.trim().toLowerCase();
+            return (sKey.isNotEmpty && (eKey == sKey || eVal == sKey)) ||
+                (sVal.isNotEmpty && (eKey == sVal || eVal == sVal));
+          },
+          orElse: () => initialValue ?? MapEntry(searchKey ?? '', searchValue ?? ''),
+        );
+      } catch (_) {
+        resolvedInitialValue = initialValue;
+      }
+    }
 
     return CkDropDown<MapEntry<String, String>>(
       key: const Key('Location_united_states'),
@@ -95,15 +180,41 @@ class CkStateDropDown extends StatelessWidget {
       items: state,
       textStyle: textStyle,
       borderColor: borderColor,
-      initalValue: initialValue,
+      initalValue: resolvedInitialValue,
       enableInitalSelection: enableInitalSelection,
       isRequired: isRequired,
-      onChanged: onChanged,
-      selectedItemBuilder: (value) {
-        if (selectedItemBuilder != null) {
-          return selectedItemBuilder!(value.value);
+      onChanged: (entry) {
+        if (entry == null) {
+          onChanged(null);
+          return;
         }
-        return CkText(text: value.value);
+        final stateName = entry.key;
+        final abbr = entry.value != entry.key
+            ? entry.value
+            : getStateAbbreviation(countryName, stateName, customAbbreviationMap);
+        onChanged(
+          CkStateDropDownItemProperty(
+            stateName: stateName,
+            abbreviation: abbr,
+            isSelected: true,
+          ),
+        );
+      },
+      selectedItemBuilder: (value) {
+        final stateName = value.key;
+        final abbr = value.value != value.key
+            ? value.value
+            : getStateAbbreviation(countryName, stateName, customAbbreviationMap);
+        final prop = CkStateDropDownItemProperty(
+          stateName: stateName,
+          abbreviation: abbr,
+          isSelected: true,
+        );
+
+        if (selectedItemBuilder != null) {
+          return selectedItemBuilder!(prop);
+        }
+        return CkText(text: stateName);
       },
       dropDownType: dropDownType,
       menuWidth: menuWidth,
@@ -113,15 +224,24 @@ class CkStateDropDown extends StatelessWidget {
       menuElevation: menuElevation,
       menuBorderColor: menuBorderColor,
       nameBuilder: (states) {
+        final stateName = states.item.key;
+        final abbr = states.item.value != states.item.key
+            ? states.item.value
+            : getStateAbbreviation(countryName, stateName, customAbbreviationMap);
+        final displayText = (showAbbreviationInMenu && abbr != null && abbr != stateName)
+            ? '$stateName ($abbr)'
+            : stateName;
+
+        final prop = CkStateDropDownItemProperty(
+          stateName: stateName,
+          abbreviation: abbr,
+          isSelected: states.isSelected,
+        );
+
         if (nameBuilder != null) {
-          return nameBuilder?.call(
-            CkDropDownNameBuilderProperty(
-              item: states.item.value,
-              isSelected: states.isSelected,
-            ),
-          );
+          return nameBuilder?.call(prop);
         }
-        return CkText(text: states.item.value);
+        return CkText(text: displayText);
       },
     );
   }

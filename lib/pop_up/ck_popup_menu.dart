@@ -65,8 +65,7 @@ class CkPopupMenu<T> extends StatefulWidget {
   final void Function(T selectedItem) onItemSelected;
   final T? initialItem;
   final Widget Function(CkPopupMenuProperty<T> property) itemBuilder;
-  final Widget Function(CkPopupMenuTriggerProperty<T> property)
-  triggerBuilder;
+  final Widget Function(CkPopupMenuTriggerProperty<T> property) triggerBuilder;
 
   final AlignmentGeometry? menuItemAlignment;
   final PopupMenuDivider? separator;
@@ -201,7 +200,6 @@ class _SelectablePopupMenuState<T> extends State<CkPopupMenu<T>> {
     }
   }
 
-
   final GlobalKey _triggerKey = GlobalKey();
 
   @override
@@ -249,7 +247,7 @@ class _CkPopupMenuItemState<T> extends State<_CkPopupMenuItem<T>> {
       onTap: () => Navigator.of(context).pop(widget.value),
       child: Container(
         height: widget.height > 0 ? widget.height : null,
-        padding: widget.padding,
+        padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10.w),
         constraints: widget.menuWidth != null
             ? BoxConstraints(minWidth: widget.menuWidth!)
             : null,
@@ -259,6 +257,3 @@ class _CkPopupMenuItemState<T> extends State<_CkPopupMenuItem<T>> {
     );
   }
 }
-
-
-

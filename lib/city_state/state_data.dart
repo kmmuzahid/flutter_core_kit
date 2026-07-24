@@ -9,6 +9,111 @@ class CountryWidget {
   static List<String> countryItems = [];
 }
 
+/// Helper for state/province abbreviations
+class StateAbbreviations {
+  static const Map<String, String> usStates = {
+    'Alabama': 'AL',
+    'Alaska': 'AK',
+    'Arizona': 'AZ',
+    'Arkansas': 'AR',
+    'California': 'CA',
+    'Colorado': 'CO',
+    'Connecticut': 'CT',
+    'Delaware': 'DE',
+    'Florida': 'FL',
+    'Georgia': 'GA',
+    'Hawaii': 'HI',
+    'Idaho': 'ID',
+    'Illinois': 'IL',
+    'Indiana': 'IN',
+    'Iowa': 'IA',
+    'Kansas': 'KS',
+    'Kentucky': 'KY',
+    'Louisiana': 'LA',
+    'Maine': 'ME',
+    'Maryland': 'MD',
+    'Massachusetts': 'MA',
+    'Michigan': 'MI',
+    'Minnesota': 'MN',
+    'Mississippi': 'MS',
+    'Missouri': 'MO',
+    'Montana': 'MT',
+    'Nebraska': 'NE',
+    'Nevada': 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    'Ohio': 'OH',
+    'Oklahoma': 'OK',
+    'Oregon': 'OR',
+    'Pennsylvania': 'PA',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    'Tennessee': 'TN',
+    'Texas': 'TX',
+    'Utah': 'UT',
+    'Vermont': 'VT',
+    'Virginia': 'VA',
+    'Washington': 'WA',
+    'West Virginia': 'WV',
+    'Wisconsin': 'WI',
+    'Wyoming': 'WY',
+    'District of Columbia': 'DC',
+  };
+
+  static const Map<String, String> canadaProvinces = {
+    'Alberta': 'AB',
+    'British Columbia': 'BC',
+    'Manitoba': 'MB',
+    'New Brunswick': 'NB',
+    'Newfoundland and Labrador': 'NL',
+    'Nova Scotia': 'NS',
+    'Ontario': 'ON',
+    'Prince Edward Island': 'PE',
+    'Quebec': 'QC',
+    'Saskatchewan': 'SK',
+    'Northwest Territories': 'NT',
+    'Nunavut': 'NU',
+    'Yukon': 'YT',
+  };
+
+  static const Map<String, String> australiaStates = {
+    'New South Wales': 'NSW',
+    'Victoria': 'VIC',
+    'Queensland': 'QLD',
+    'Western Australia': 'WA',
+    'South Australia': 'SA',
+    'Tasmania': 'TAS',
+  };
+
+  static String? getAbbreviation(String country, String state) {
+    final c = country.trim().toLowerCase();
+    final s = state.trim().toLowerCase();
+
+    Map<String, String>? targetMap;
+    if (c == 'united states' || c == 'us' || c == 'usa' || c == 'united states of america') {
+      targetMap = usStates;
+    } else if (c == 'canada') {
+      targetMap = canadaProvinces;
+    } else if (c == 'australia') {
+      targetMap = australiaStates;
+    }
+
+    if (targetMap != null) {
+      for (final entry in targetMap.entries) {
+        if (entry.key.toLowerCase() == s || entry.value.toLowerCase() == s) {
+          return entry.value;
+        }
+      }
+    }
+    return null;
+  }
+}
+
 class Afghanistan {
   static List<String> states = <String>[
     "Badghis",

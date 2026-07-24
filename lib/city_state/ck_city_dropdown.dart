@@ -4,6 +4,7 @@
  * @Email: km.muzahid@gmail.com
  */
 
+import 'package:core_kit/city_state/ck_state_dropdown.dart';
 import 'package:core_kit/dropdown/ck_drop_down.dart';
 import 'package:core_kit/text/ck_text.dart';
 import 'package:core_kit/text_field/ck_text_field.dart';
@@ -32,6 +33,7 @@ class CkCityDropDown extends StatelessWidget {
     this.menuBackgroundColor,
     this.nameBuilder,
 
+    this.customAbbreviationMap,
     this.menuWidth,
     this.isSeparated = false,
     this.menuItemAlignment,
@@ -62,6 +64,7 @@ class CkCityDropDown extends StatelessWidget {
   final EdgeInsets? contentPadding;
   final Widget? suffixIcon;
   final Color? menuBackgroundColor;
+  final Map<String, String>? customAbbreviationMap;
   final dynamic Function(CkDropDownNameBuilderProperty<String> property)?
   nameBuilder;
 
@@ -159,7 +162,10 @@ class CkCityDropDown extends StatelessWidget {
       for (final stateData in selectedCountryData) {
         for (final stateEntry in stateData.entries) {
           final stateName = stateEntry.key;
-          if (stateName.trim().toLowerCase() == state.trim().toLowerCase()) {
+          final stateAbbr = CkStateDropDown.getStateAbbreviation(country, stateName, customAbbreviationMap);
+          final searchState = state.trim().toLowerCase();
+          if (stateName.trim().toLowerCase() == searchState ||
+              (stateAbbr != null && stateAbbr.trim().toLowerCase() == searchState)) {
             return stateEntry.value;
           }
         }
