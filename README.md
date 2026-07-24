@@ -2,6 +2,23 @@
 
 [![Version](https://img.shields.io/github/v/tag/kmmuzahid/flutter_core_kit?label=version)](https://github.com/kmmuzahid/flutter_core_kit/releases)
 
+> [!TIP]
+> **🚀 Get Started Instantly with the Pre-configured Template!**
+>
+> Skip the boilerplate setup! Start building immediately by cloning the official template repository:
+> **[Cubit Template (GitHub)](https://github.com/kmmuzahid/template_cubit.git)**
+>
+> This template comes ready-to-go, fully pre-configured with:
+> - **AutoRoute** (declarative, type-safe navigation)
+> - **Cubit/Bloc** (scalable, clean state management)
+> - **CoreKit** (production-ready UI components, responsive layout helpers, and authentication)
+>
+> ```bash
+> git clone https://github.com/kmmuzahid/template_cubit.git
+> cd template_cubit
+> fvm flutter pub get
+> ```
+
 **CoreKit** (`core_kit`) is a Flutter package that bundles production-oriented UI widgets, responsive layout helpers, Dio-based networking with token refresh, secure storage, and an optional authentication module. Import everything from a single entry point:
 
 ```dart
