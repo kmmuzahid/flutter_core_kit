@@ -105,4 +105,3 @@ export 'package:flutter_secure_storage/flutter_secure_storage.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:image_picker/image_picker.dart';
 export 'package:permission_handler/permission_handler.dart';
-export 'package:intl_phone_field_v2/phone_number.dart';
