@@ -224,13 +224,15 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.signUp, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         const activeTrigger = CkOtpTrigger.signup;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
-        if (autoOtp) {
+        // Only trigger OTP flow if the handler is actually configured,
+        // otherwise skip directly to authenticated (full mock, no silent no-op).
+        if (autoOtp && config.handlers?.showOtpVerification != null) {
           otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
           otpManager.startResendTimer();
-          config.handlers?.showOtpVerification?.call();
+          config.handlers!.showOtpVerification!();
           return CkAuthResult<TProfile>(
             isSuccess: true,
             requiresOtp: true,
@@ -301,13 +303,15 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.signIn, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         const activeTrigger = CkOtpTrigger.login;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
-        if (autoOtp) {
+        // Only trigger OTP flow if the handler is actually configured,
+        // otherwise skip directly to authenticated (full mock, no silent no-op).
+        if (autoOtp && config.handlers?.showOtpVerification != null) {
           otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
           otpManager.startResendTimer();
-          config.handlers?.showOtpVerification?.call();
+          config.handlers!.showOtpVerification!();
           return CkAuthResult<TProfile>(
             isSuccess: true,
             requiresOtp: true,
@@ -368,7 +372,7 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.forgotPassword, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         const activeTrigger = CkOtpTrigger.forgetPassword;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
         if (autoOtp) {
@@ -437,7 +441,7 @@ class CkAuthService<TProfile> {
   /// Verify OTP — uses stored verification token automatically
   Future<CkAuthResult<void>> verifyOtp({required String otp}) {
     return loadingController.wrap(CkAuthLoadingType.verifyOtp, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         final activeTrigger = otpManager.lastTrigger;
         if (activeTrigger == CkOtpTrigger.signup) {
           await tokenManager.saveTokens(
@@ -485,7 +489,7 @@ class CkAuthService<TProfile> {
   /// Resend OTP — auto-restarts timer
   Future<CkAuthResult<void>> resendOtp() {
     return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         otpManager.startResendTimer();
         return const CkAuthResult<void>.success(
           statusCode: 200,
@@ -499,7 +503,7 @@ class CkAuthService<TProfile> {
   /// Send OTP manually — also updates lastTrigger for verify/resend
   Future<CkAuthResult<void>> sendOtp({required CkOtpTrigger trigger}) {
     return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         otpManager.startResendTimer();
         return const CkAuthResult<void>.success(
           statusCode: 200,
@@ -516,7 +520,7 @@ class CkAuthService<TProfile> {
     Map<String, String>? headers,
   }) {
     return loadingController.wrap(CkAuthLoadingType.updatePassword, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         config.handlers?.showLogin();
         return const CkAuthResult<void>.success(
           statusCode: 200,
@@ -567,7 +571,7 @@ class CkAuthService<TProfile> {
   /// Authenticate with Google
   Future<CkAuthResult<TProfile>> signInWithGoogle(CkGoogleAuthData data) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         await tokenManager.saveTokens(
           accessToken: 'mock_access_token',
           refreshToken: 'mock_refresh_token',
@@ -587,7 +591,7 @@ class CkAuthService<TProfile> {
   /// Authenticate with Apple
   Future<CkAuthResult<TProfile>> signInWithApple(CkAppleAuthData data) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         await tokenManager.saveTokens(
           accessToken: 'mock_access_token',
           refreshToken: 'mock_refresh_token',
@@ -607,7 +611,7 @@ class CkAuthService<TProfile> {
   /// Authenticate with Facebook
   Future<CkAuthResult<TProfile>> signInWithFacebook(CkFacebookAuthData data) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         await tokenManager.saveTokens(
           accessToken: 'mock_access_token',
           refreshToken: 'mock_refresh_token',
@@ -630,7 +634,7 @@ class CkAuthService<TProfile> {
     required Map<String, dynamic> authData,
   }) {
     return loadingController.wrap(CkAuthLoadingType.socialLogin, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         await tokenManager.saveTokens(
           accessToken: 'mock_access_token',
           refreshToken: 'mock_refresh_token',
@@ -659,7 +663,7 @@ class CkAuthService<TProfile> {
   /// Logout — follows configured strategy, auto-navigates
   Future<void> logout() {
     return loadingController.wrap(CkAuthLoadingType.logout, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         await tokenManager.clearTokens();
         await _profileExtractor.clearProfile();
         authState.setUnauthenticated();
@@ -674,6 +678,10 @@ class CkAuthService<TProfile> {
   Future<void> restoreSession() async {
     if (tokenManager.hasTokens) {
       authState.setAuthenticated();
+
+      // When mocking, skip real profile fetch (endpoints may be blank)
+      if (config.mockAuth) return;
+
       await config.onTokenRestored?.call();
 
       // Restore cached profile immediately (no blank screen)
@@ -711,7 +719,7 @@ class CkAuthService<TProfile> {
   /// Fetches the profile from the server using the configured [getProfile] endpoint.
   Future<CkAuthResult<TProfile?>> fetchProfile() {
     return loadingController.wrap(CkAuthLoadingType.fetchProfile, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         return const CkAuthResult.success(data: null, statusCode: 200);
       }
       return _profileExtractor.fetchProfile(
@@ -728,7 +736,7 @@ class CkAuthService<TProfile> {
     Map<String, dynamic>? jsonBody,
   }) {
     return loadingController.wrap(CkAuthLoadingType.updateProfile, () async {
-      if (!config.authEnable) {
+      if (config.mockAuth) {
         return const CkAuthResult.success(data: null, statusCode: 200);
       }
       final result = await _profileExtractor.updateProfileRemote(

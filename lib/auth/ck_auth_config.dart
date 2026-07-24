@@ -35,11 +35,11 @@ class CkAuthConfig<TProfile> {
   final Future<void> Function()? onTokenRestored;
   final Future<bool> Function()? customAuthValidator;
 
-  final bool? _authEnable;
+  final bool? _mockAuth;
 
-  /// Whether to enable auth API calls. If false, network requests are bypassed
-  /// to simplify UI testing and layout designing.
-  bool get authEnable => _authEnable ?? true;
+  /// When true, all auth API calls are bypassed and mocked internally.
+  /// Use this to design and test UI flows without a real backend.
+  bool get mockAuth => _mockAuth ?? false;
 
   CkAuthConfig({
     required this.endpoints,
@@ -50,8 +50,9 @@ class CkAuthConfig<TProfile> {
     this.socialLoginConfig,
     this.onTokenRestored,
     this.customAuthValidator,
-    this._authEnable,
-  }) : extractors = extractors ?? CkAuthExtractors.standard();
+    bool? mockAuth,
+  }) : _mockAuth = mockAuth,
+       extractors = extractors ?? CkAuthExtractors.standard();
 }
 
 class LoginCallback {
