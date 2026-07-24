@@ -44,6 +44,7 @@ class CkTextField extends StatefulWidget {
     this.onFocusChanged,
     this.textStyle,
     this.footer,
+    this.isRequired,
   });
 
   final Widget? footer;
@@ -78,6 +79,7 @@ class CkTextField extends StatefulWidget {
   final TextStyle? hintStyle;
   final double? fontSize;
   final TextStyle? textStyle;
+  final bool? isRequired;
 
   final String? Function(String? value)? validation;
   final CkBorderType borderType;
@@ -354,11 +356,20 @@ class _CkTextFieldState extends State<CkTextField> {
           widget.validation ??
           (value) {
             final newValue = _cleanText(value?.trim() ?? '');
+            if (widget.isRequired == false && newValue.isEmpty) {
+              return null;
+            }
             var error = InputHelper.validate(
               widget.validationType,
               newValue,
               originalPassword: widget.originalPassword?.call(),
             );
+            if (widget.isRequired == true && newValue.isEmpty && error == null) {
+              error = InputHelper.validate(
+                CkValidationType.validateRequired,
+                newValue,
+              );
+            }
             if (widget.maxWords != null &&
                 newValue.isNotEmpty &&
                 wordCount > widget.maxWords!) {
