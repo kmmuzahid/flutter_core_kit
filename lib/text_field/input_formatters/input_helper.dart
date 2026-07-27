@@ -566,7 +566,7 @@ class InputHelper {
     if (value == null || value.isEmpty) {
       return CkString.requiredField;
     }
-    final usernameRegex = RegExp(r'^[a-zA-Z0-9_]{3,15}$');
+    final usernameRegex = RegExp(r'^[a-zA-Z0-9_]{2,15}$');
     final emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );

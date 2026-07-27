@@ -69,7 +69,7 @@ class CkString {
 
   // ===== Username or Email =====
   static const String usernameOrEmailError =
-      'Please enter a valid username or email address';
+      'Please enter a valid username (min 2 characters) or email address';
 
   // ===== Time =====
   static const String invalidTime = 'Please enter a valid time (HH:mm)';
