@@ -67,6 +67,10 @@ class CkString {
   static const String usernameError =
       'Username must be 3–15 characters and contain only letters, numbers, or underscores';
 
+  // ===== Username or Email =====
+  static const String usernameOrEmailError =
+      'Please enter a valid username or email address';
+
   // ===== Time =====
   static const String invalidTime = 'Please enter a valid time (HH:mm)';
 

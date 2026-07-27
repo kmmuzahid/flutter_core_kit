@@ -75,6 +75,13 @@ class InputHelper {
           ), // Allow alphanumeric and underscores
         ];
 
+      case CkValidationType.validateUsernameOrEmail:
+        return [
+          FilteringTextInputFormatter.deny(
+            RegExp(r'\s'),
+          ), // Deny spaces (valid for both username and email)
+        ];
+
       case CkValidationType.validateOTP:
         return [
           FilteringTextInputFormatter.digitsOnly, // Allow only digits
@@ -176,6 +183,9 @@ class InputHelper {
       case CkValidationType.validateUsername:
         return TextInputType.text;
 
+      case CkValidationType.validateUsernameOrEmail:
+        return TextInputType.emailAddress;
+
       case CkValidationType.validateTime:
         return TextInputType.datetime;
 
@@ -263,6 +273,9 @@ class InputHelper {
 
       case CkValidationType.validateUsername:
         return _validateUsername(value);
+
+      case CkValidationType.validateUsernameOrEmail:
+        return _validateUsernameOrEmail(value);
 
       case CkValidationType.validateTime:
         return _validateTime(value);
@@ -544,6 +557,21 @@ class InputHelper {
     final regex = RegExp(r'^[a-zA-Z0-9_]{3,15}$');
     if (!regex.hasMatch(value)) {
       return CkString.usernameError;
+    }
+    return null;
+  }
+
+  // Username or Email validation
+  static String? _validateUsernameOrEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return CkString.requiredField;
+    }
+    final usernameRegex = RegExp(r'^[a-zA-Z0-9_]{3,15}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    if (!usernameRegex.hasMatch(value) && !emailRegex.hasMatch(value)) {
+      return CkString.usernameOrEmailError;
     }
     return null;
   }

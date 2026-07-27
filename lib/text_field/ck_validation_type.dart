@@ -15,6 +15,7 @@ enum CkValidationType {
   validateDateRange,
   validateAlphaNumeric,
   validateUsername,
+  validateUsernameOrEmail,
   validateTime,
   validateOTP,
   validateCurrency,
