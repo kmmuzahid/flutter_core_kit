@@ -352,12 +352,13 @@ class _CkTextFieldState extends State<CkTextField> {
       ],
       onFieldSubmitted: (v) => _onSave(v.trim()),
       onTap: widget.onTap,
-      validator:
-          widget.validation ??
-          (value) {
+      validator: (value) {
             final newValue = _cleanText(value?.trim() ?? '');
             if (widget.isRequired == false && newValue.isEmpty) {
               return null;
+            }
+            if (widget.validation != null) {
+              return widget.validation!(value);
             }
             var error = InputHelper.validate(
               widget.validationType,
