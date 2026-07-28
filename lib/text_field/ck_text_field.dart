@@ -279,11 +279,15 @@ class _CkTextFieldState extends State<CkTextField> {
   TextFormField _buildTextField() {
     return TextFormField(
       cursorColor: _focusNode.hasFocus
-          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+                Colors.red),
       cursorErrorColor: _focusNode.hasFocus
-          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? Colors.red),
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+                Colors.red),
       textAlign: widget.textAlign,
       controller: _controller,
       focusNode: _focusNode,
@@ -353,33 +357,33 @@ class _CkTextFieldState extends State<CkTextField> {
       onFieldSubmitted: (v) => _onSave(v.trim()),
       onTap: widget.onTap,
       validator: (value) {
-            final newValue = _cleanText(value?.trim() ?? '');
-            if (widget.isRequired == false && newValue.isEmpty) {
-              return null;
-            }
-            if (widget.validation != null) {
-              return widget.validation!(value);
-            }
-            var error = InputHelper.validate(
-              widget.validationType,
-              newValue,
-              originalPassword: widget.originalPassword?.call(),
-            );
-            if (widget.isRequired == true && newValue.isEmpty && error == null) {
-              error = InputHelper.validate(
-                CkValidationType.validateRequired,
-                newValue,
-              );
-            }
-            if (widget.maxWords != null &&
-                newValue.isNotEmpty &&
-                wordCount > widget.maxWords!) {
-              error = 'Maximum ${widget.maxWords} words allowed';
-            }
-            return widget.showValidationMessage
-                ? error
-                : (error != null ? '' : null);
-          },
+        final newValue = _cleanText(value?.trim() ?? '');
+        if (widget.isRequired == false && newValue.isEmpty) {
+          return null;
+        }
+        if (widget.validation != null) {
+          return widget.validation!(value);
+        }
+        var error = InputHelper.validate(
+          widget.validationType,
+          newValue,
+          originalPassword: widget.originalPassword?.call(),
+        );
+        if (widget.isRequired == true && newValue.isEmpty && error == null) {
+          error = InputHelper.validate(
+            CkValidationType.validateRequired,
+            newValue,
+          );
+        }
+        if (widget.maxWords != null &&
+            newValue.isNotEmpty &&
+            wordCount > widget.maxWords!) {
+          error = 'Maximum ${widget.maxWords} words allowed';
+        }
+        return widget.showValidationMessage
+            ? error
+            : (error != null ? '' : null);
+      },
       style: _getStyle(
         fontWeight: FontWeight.w500,
         fontSize:
@@ -462,34 +466,48 @@ class _CkTextFieldState extends State<CkTextField> {
 
         prefixIconColor: _iconColor(),
         suffixIconColor: _iconColor(),
-        focusedBorder: widget.footer != null ? InputBorder.none : _buildBorder(
-          color: widget.isReadOnly
-              ? (widget.borderColor ??
+        focusedBorder: widget.footer != null
+            ? InputBorder.none
+            : _buildBorder(
+                color: widget.isReadOnly
+                    ? (widget.borderColor ??
+                          theme
+                              .inputDecorationTheme
+                              .disabledBorder
+                              ?.borderSide
+                              .color ??
+                          coreKitInstance.outlineColor)
+                    : theme
+                              .inputDecorationTheme
+                              .focusedBorder
+                              ?.borderSide
+                              .color ??
+                          coreKitInstance.primaryColor,
+                width: widget.borderWidth.w,
+              ),
+
+        enabledBorder: widget.footer != null
+            ? InputBorder.none
+            : _buildBorder(
+                color:
+                    widget.borderColor ??
                     theme
                         .inputDecorationTheme
-                        .disabledBorder
+                        .enabledBorder
                         ?.borderSide
                         .color ??
-                    coreKitInstance.outlineColor)
-              : theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
-                    coreKitInstance.primaryColor,
-          width: widget.borderWidth.w,
-        ),
+                    coreKitInstance.outlineColor,
+                width: widget.borderWidth.w,
+              ),
 
-        enabledBorder: widget.footer != null ? InputBorder.none : _buildBorder(
-          color:
-              widget.borderColor ??
-              theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
-              coreKitInstance.outlineColor,
-          width: widget.borderWidth.w,
-        ),
-
-        errorBorder: widget.footer != null ? InputBorder.none : _buildBorder(
-          color:
-              theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-              Colors.red,
-          width: widget.borderWidth.w,
-        ),
+        errorBorder: widget.footer != null
+            ? InputBorder.none
+            : _buildBorder(
+                color:
+                    theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+                    Colors.red,
+                width: widget.borderWidth.w,
+              ),
 
         contentPadding: EdgeInsets.symmetric(
           horizontal: widget.paddingHorizontal.w,
@@ -553,5 +571,3 @@ class _CkTextFieldState extends State<CkTextField> {
     );
   }
 }
-
-

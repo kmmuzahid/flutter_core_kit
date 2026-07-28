@@ -1,4 +1,5 @@
 import 'package:core_kit/core_kit_internal.dart';
+import 'package:core_kit/text_field/input_formatters/capitalization_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -95,8 +96,7 @@ class CkMultilineTextField extends StatefulWidget {
   final double? maximizedHeight;
 
   @override
-  State<CkMultilineTextField> createState() =>
-      _CkMultilineTextFieldState();
+  State<CkMultilineTextField> createState() => _CkMultilineTextFieldState();
 }
 
 class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
@@ -257,9 +257,12 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
     final double calculatedHeight;
     if (widget.enableMaximize && _isMaximized) {
       final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-      calculatedHeight = widget.maximizedHeight ??
-          (MediaQuery.of(context).size.height - bottomInset - 220.h)
-              .clamp(150.0.h, 300.0.h);
+      calculatedHeight =
+          widget.maximizedHeight ??
+          (MediaQuery.of(context).size.height - bottomInset - 220.h).clamp(
+            150.0.h,
+            300.0.h,
+          );
     } else {
       calculatedHeight = widget.height;
     }
@@ -310,6 +313,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
               scrollPhysics: const BouncingScrollPhysics(),
               inputFormatters: [
                 ...InputHelper.getInputFormatters(widget.validationType),
+                UrlLowercaseFormatter(),
                 if (widget.maxWords != null || widget.maxLength != null)
                   TextInputFormatter.withFunction((oldValue, newValue) {
                     final cleanedText = _cleanText(newValue.text);
@@ -391,7 +395,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
 
                       if (widget.maxWords != null) {
                         if (wordCount - 1 > widget.maxWords!) {
-                           error = 'Maximum ${widget.maxWords} words allowed';
+                          error = 'Maximum ${widget.maxWords} words allowed';
                         }
                       }
                     }
@@ -431,13 +435,18 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                           FontStyle.italic,
                       textColor: hintColor(),
                     ),
-                prefixIcon: (widget.prefixText?.isNotEmpty == true || widget.prefixIcon != null)
+                prefixIcon:
+                    (widget.prefixText?.isNotEmpty == true ||
+                        widget.prefixIcon != null)
                     ? Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           widget.prefixText?.isNotEmpty == true
                               ? Padding(
-                                  padding: const EdgeInsets.only(left: 10, right: 5),
+                                  padding: const EdgeInsets.only(
+                                    left: 10,
+                                    right: 5,
+                                  ),
                                   child: CkText(
                                     text: widget.prefixText!,
                                     textColor: _iconColor(),
@@ -446,7 +455,9 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                               : Padding(
                                   padding: EdgeInsets.only(
                                     left: 10.w,
-                                    right: widget.contentPadding != null ? 0 : 16,
+                                    right: widget.contentPadding != null
+                                        ? 0
+                                        : 16,
                                   ),
                                   child: widget.prefixIcon,
                                 ),
@@ -457,10 +468,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                   maxWidth: (widget.enableMaximize && _isFocused)
                       ? 34.w
                       : (widget.suffixIcon == null &&
-                          widget.validationType !=
-                              CkValidationType.validatePassword)
-                          ? (widget.contentPadding != null ? 0 : 16)
-                          : double.infinity,
+                            widget.validationType !=
+                                CkValidationType.validatePassword)
+                      ? (widget.contentPadding != null ? 0 : 16)
+                      : double.infinity,
                 ),
                 prefixIconConstraints: BoxConstraints(
                   maxWidth: widget.prefixIcon == null
@@ -497,27 +508,30 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                   }
 
                   return (widget.showActionButton ||
-                          widget.validationType == CkValidationType.validatePassword ||
+                          widget.validationType ==
+                              CkValidationType.validatePassword ||
                           widget.suffixIcon != null)
                       ? (widget.showActionButton
-                          ? GestureDetector(
-                              onTap: () {
-                                _onSave(_controller.text.trim());
-                              },
-                              child:
-                                  widget.actionButtonIcon ?? const Icon(Icons.search),
-                            )
-                          : widget.validationType == CkValidationType.validatePassword
-                          ? (_obscureText
-                                ? _buildPasswordSuffixIcon()
-                                : _buildPasswordSuffixIcon())
-                          : Padding(
-                              padding: EdgeInsets.only(
-                                right: 10,
-                                left: widget.contentPadding != null ? 0 : 16,
-                              ),
-                              child: widget.suffixIcon,
-                            ))
+                            ? GestureDetector(
+                                onTap: () {
+                                  _onSave(_controller.text.trim());
+                                },
+                                child:
+                                    widget.actionButtonIcon ??
+                                    const Icon(Icons.search),
+                              )
+                            : widget.validationType ==
+                                  CkValidationType.validatePassword
+                            ? (_obscureText
+                                  ? _buildPasswordSuffixIcon()
+                                  : _buildPasswordSuffixIcon())
+                            : Padding(
+                                padding: EdgeInsets.only(
+                                  right: 10,
+                                  left: widget.contentPadding != null ? 0 : 16,
+                                ),
+                                child: widget.suffixIcon,
+                              ))
                       : null;
                 }(),
                 prefixIconColor: _iconColor(),
@@ -526,8 +540,13 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                 enabledBorder: widget.footer != null
                     ? InputBorder.none
                     : _buildBorder(
-                        color: widget.borderColor ??
-                            theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
+                        color:
+                            widget.borderColor ??
+                            theme
+                                .inputDecorationTheme
+                                .enabledBorder
+                                ?.borderSide
+                                .color ??
                             coreKitInstance.outlineColor,
                         width: widget.borderWidth.w,
                       ),
@@ -543,7 +562,11 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                                       ?.borderSide
                                       .color ??
                                   coreKitInstance.outlineColor)
-                            : theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                            : theme
+                                      .inputDecorationTheme
+                                      .focusedBorder
+                                      ?.borderSide
+                                      .color ??
                                   coreKitInstance.primaryColor,
                         width: widget.borderWidth.w,
                       ),
@@ -715,5 +738,3 @@ class CkMultilineHintLimitBuilder {
     required this.maximumHint,
   });
 }
-
-

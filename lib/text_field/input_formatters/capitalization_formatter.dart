@@ -111,3 +111,33 @@ class LowercaseFormatter extends TextInputFormatter {
   }
 }
 
+/// Formats any URL detected within the text to be lowercase, leaving other text unchanged.
+class UrlLowercaseFormatter extends TextInputFormatter {
+  static final RegExp _urlRegex = RegExp(
+    r'(https?://[^\s]+|www\.[^\s]+|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(?:/[^\s]*)?)',
+    caseSensitive: false,
+  );
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) return newValue;
+
+    final formattedText = newValue.text.replaceAllMapped(
+      _urlRegex,
+      (match) => match.group(0)!.toLowerCase(),
+    );
+
+    if (formattedText == newValue.text) {
+      return newValue;
+    }
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: newValue.selection,
+    );
+  }
+}
+
