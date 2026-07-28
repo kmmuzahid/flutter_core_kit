@@ -1,3 +1,9 @@
+## 1.0.6+1
+
+* **New Validation Type (`usernameAndEmailValidation`)**: Added `CkValidationType.usernameAndEmailValidation` to `CkTextField`, allowing a single field to accept either a valid username or a valid email address.
+* **Documentation — Mock Auth**: Corrected the auth mock docs to use `mockAuth: true` (replacing the stale `authEnable: false` references).
+* **Documentation — Template Setup**: Expanded the template quick-start steps to include `fvm dart run build_runner build` (required for AutoRoute code generation) and `fvm flutter run`, with a clear explanation of when to re-run `build_runner`.
+
 ## 1.0.6
 
 * **CkAppBar Initialization Fix**: Resolved a `LateInitializationError: Field 'appbarConfig' has not been initialized` crash that occurred when rendering `CkAppBar` on initial routes (such as a Splash Screen) before `CoreKitRouterGate` completed its asynchronous initialization. `appbarConfig` now defaults to a safe instance of `CkAppBarConfig()`.

@@ -9,15 +9,34 @@
 > **[Cubit Template (GitHub)](https://github.com/kmmuzahid/template_cubit.git)**
 >
 > This template comes ready-to-go, fully pre-configured with:
-> - **AutoRoute** (declarative, type-safe navigation)
+> - **AutoRoute** (declarative, type-safe navigation with code generation)
 > - **Cubit/Bloc** (scalable, clean state management)
 > - **CoreKit** (production-ready UI components, responsive layout helpers, and authentication)
 >
+> **Setup steps:**
+>
 > ```bash
+> # 1. Clone the template
 > git clone https://github.com/kmmuzahid/template_cubit.git
 > cd template_cubit
+>
+> # 2. Install dependencies
 > fvm flutter pub get
+>
+> # 3. Generate AutoRoute navigation code (required — do this once, and again after adding new routes)
+> fvm dart run build_runner build
+>
+> # 4. Run the app
+> fvm flutter run
 > ```
+>
+> > **⚠️ Step 3 is required.** The template uses **AutoRoute** for navigation, which relies on code generation. Without running `build_runner build`, the app will not compile.
+> >
+> > Re-run `build_runner build` whenever you add or modify route definitions.
+> > Use `build_runner watch` during active development to auto-regenerate on file save:
+> > ```bash
+> > fvm dart run build_runner watch
+> > ```
 
 **CoreKit** (`core_kit`) is a Flutter package that bundles production-oriented UI widgets, responsive layout helpers, Dio-based networking with token refresh, secure storage, and an optional authentication module. Import everything from a single entry point:
 
@@ -563,6 +582,7 @@ CkDateInputTextField(
 | `validateNumber` | Numeric |
 | `notRequired` | Optional field |
 | `validateOTP` | 6-digit OTP |
+| `validateUsernameOrEmail` | Accepts either a valid username or a valid email address |
 | … | See `ck_validation_type.dart` for full list |
 
 Validation messages live in `CkString` (for example `CkString.invalidEmail`).
@@ -1181,18 +1201,18 @@ If your backend keys are standard, you can utilize built-in factory builders ins
     messagePath: 'status.message',
   ),
   ```
-### Bypassing Authentication API Calls (`authEnable`)
+### Mock Auth (Bypassing Authentication API Calls)
 
-If you want to design and test your UI without making actual HTTP request calls, you can configure `authEnable: false` in `CkAuthConfig`.
+If you want to design and test your UI without making actual HTTP request calls, you can set `mockAuth: true` in `CkAuthConfig`.
 
 ```dart
 CkAuthConfig(
-  authEnable: false, // Default is true. When false, network requests are bypassed.
+  mockAuth: true, // Default is false. When true, all network requests are bypassed.
   // ...
 )
 ```
 
-When `authEnable` is set to `false`:
+When `mockAuth` is set to `true`:
 - Auth operations (e.g. `signIn`, `signUp`, `socialLogin`, `verifyOtp`) instantly complete and mock a successful response.
 - Secure tokens are stubbed with dummy mock tokens locally so the app behaves as if authenticated.
 - Navigation transitions and state flow (like redirection to OTP or onboarding) still execute normally so you can test all user flow states without any working backend.
@@ -1232,7 +1252,7 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
   /// When set, CoreKit initializes [CkAuthService] and manages tokens internally.
   @override
   CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
-        authEnable: true, // Set to false to bypass actual backend API calls during UI design
+        mockAuth: false, // Set to true to bypass actual backend API calls during UI design
         endpoints: const CkAuthEndpoints(
           signup: '/auth/signup',
           signin: '/auth/login',
@@ -1324,7 +1344,7 @@ class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 
   @override
   CkAuthConfig get authConfig => CkAuthConfig(
-    authEnable: true, // When false, bypasses network calls and stubs mock session
+    mockAuth: false, // When true, bypasses network calls and stubs mock session
     endpoints: CkAuthEndpoints(
       resetPassword: ApiEndPoints.resetPassword,
       forgotPassword: ApiEndPoints.forgotPassword,
