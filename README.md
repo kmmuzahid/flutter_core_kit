@@ -246,6 +246,8 @@ Implement **`CoreKitConfig`** and mix in **`CoreKitConfigDefaults`** for sensibl
 | `authConfig` | No | `null` | Enables `CkAuthService` — tokens are handled internally (see [Authentication](#authentication-module)) |
 | `appbarConfig` | No | `null` | Global `CkAppBar` back button & actions |
 | `listLoaderConfig` | No | `null` | Default pagination loader / end-of-list UI |
+| `inputConfig` | No | `null` | Global design defaults for all `CkTextField` and `CkMultilineTextField` (border, colors, text style, capitalization) |
+| `snackBarConfig` | No | `null` | Global style defaults for `CkSnackBar` (border radius, colors, text style, padding, margin, icons) |
 | `permissionHelperConfig` | No | `null` | Permission dialog copy |
 | `permissionHandlerColors` | No | `null` | Permission dialog colors |
 | `passwordObscureIcon` | No | `null` | Show/hide icons on password fields |
@@ -299,6 +301,39 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
           padding: EdgeInsets.all(20),
           child: Center(child: Text('No more data')),
         ),
+      );
+
+  /// Global design defaults shared by all CkTextField / CkMultilineTextField.
+  /// Per-widget values always take priority.
+  @override
+  CkInputConfig? get inputConfig => const CkInputConfig(
+        borderRadius: 12,
+        borderWidth: 1.2,
+        // borderColor: Colors.grey,
+        // backgroundColor: Colors.white,
+        // hintStyle: TextStyle(...),
+        // textStyle: TextStyle(...),
+        // fontSize: 16,
+        // textAlign: TextAlign.left,
+        // enableCapitalization: true,
+      );
+
+  /// Global style overrides for CkSnackBar.
+  @override
+  CkSnackBarConfig? get snackBarConfig => const CkSnackBarConfig(
+        // position: CkSnackBarPosition.top,
+        // borderRadius: 12,
+        // backgroundColor: Colors.white,
+        // margin: EdgeInsets.all(16),
+        // padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+        // textStyle: TextStyle(...),
+        // borderWidthLeft: 10,
+        // borderWidthOthers: 1,
+        // iconSize: 24,
+        // successColor: Colors.green,
+        // errorColor: Colors.red,
+        // warningColor: Colors.orange,
+        // infoColor: Colors.blue,
       );
 
   @override
@@ -548,6 +583,14 @@ CkTextField(
   onSaved: (value, controller) => _email = value,
 )
 
+// Disable auto-capitalization on a specific field
+CkTextField(
+  validationType: CkValidationType.validateRequired,
+  hintText: 'Username',
+  enableCapitalization: false,
+  onSaved: (value, controller) => _username = value,
+)
+
 CkMultilineTextField(
   hintText: 'Description',
   maxLines: 5,
@@ -570,6 +613,12 @@ CkDateInputTextField(
   onDateSelected: (date) => _birthDate = date,
 )
 ```
+
+> **URL auto-lowercase**: Any URL typed or pasted in `CkTextField` or `CkMultilineTextField` is automatically lowercased. The rest of the text is unchanged.
+
+> **`enableCapitalization`** *(default `true`)*: Set to `false` on any field to disable automatic sentence capitalization.
+
+> **Global defaults**: Use `inputConfig` in your `CorekitConfigImpl` to set border, colors, text style, and capitalization for all fields at once. Per-field values always win.
 
 | `CkValidationType` | Purpose |
 |--------------------|---------|
@@ -904,9 +953,14 @@ showModalBottomSheet(
     child: const YourSheetContent(),
   ),
 );
+```
 
+```dart
 CkSnackBar('Saved', type: CkSnackBarType.success);
 CkSnackBar('Failed', type: CkSnackBarType.error);
+```
+
+> **Global overrides**: Style screen position (top/bottom), margins, border radius, background color, shadow effects, padding, and semantic colors/icons using `snackBarConfig` in `CorekitConfigImpl`. Per-type semantic overrides (e.g. `successColor`, `errorIcon`) apply instantly to the custom snackbar layout.
 
 // Shows immediately when constructed
 CkAlert(

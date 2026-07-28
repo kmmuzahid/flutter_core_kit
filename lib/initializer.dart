@@ -5,7 +5,9 @@ import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/ck_transport_config.dart';
+import 'package:core_kit/snackbar/ck_snackbar_config.dart';
 import 'package:core_kit/storage/ck_storage.dart';
+import 'package:core_kit/text_field/ck_input_config.dart';
 import 'package:core_kit/utils/ck_permission_helper.dart';
 import 'package:core_kit/utils/ck_screen_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -79,6 +81,8 @@ class coreKitInstanceSingleton {
   late Size designSize;
   CkAppBarConfig appbarConfig = CkAppBarConfig();
   CkListLoaderConfig listLoaderConfig = const CkListLoaderConfig();
+  CkInputConfig inputConfig = const CkInputConfig();
+  CkSnackBarConfig snackBarConfig = const CkSnackBarConfig();
   late CkTransportConfig ckTransportConfig;
 
   CkPermissionHelperConfig permissionHelperConfig =
@@ -167,6 +171,8 @@ abstract class CoreKitConfig {
   CkAuthConfig? get authConfig => null;
   CkAppBarConfig? get appbarConfig => null;
   CkListLoaderConfig? get listLoaderConfig => null;
+  CkInputConfig? get inputConfig => null;
+  CkSnackBarConfig? get snackBarConfig => null;
   CkPermissionHelperConfig? get permissionHelperConfig => null;
   PermissionHadlerColors? get permissionHandlerColors => null;
   PasswordObscureIcon? get passwordObscureIcon => null;
@@ -189,6 +195,10 @@ mixin CoreKitConfigDefaults on CoreKitConfig {
   CkAppBarConfig? get appbarConfig => null;
   @override
   CkListLoaderConfig? get listLoaderConfig => null;
+  @override
+  CkInputConfig? get inputConfig => null;
+  @override
+  CkSnackBarConfig? get snackBarConfig => null;
   @override
   CkPermissionHelperConfig? get permissionHelperConfig => null;
   @override
@@ -258,6 +268,12 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
       }
       if (config.listLoaderConfig != null) {
         instance.listLoaderConfig = config.listLoaderConfig!;
+      }
+      if (config.inputConfig != null) {
+        instance.inputConfig = config.inputConfig!;
+      }
+      if (config.snackBarConfig != null) {
+        instance.snackBarConfig = config.snackBarConfig!;
       }
     }
 

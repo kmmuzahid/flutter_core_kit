@@ -1,3 +1,10 @@
+## 1.0.6+3
+
+* **Global Input Configuration (`CkInputConfig`)**: Added support for configuring app-wide text field style defaults (borders, background colors, sizing, text styles, alignments, and capitalization defaults) from one place.
+* **Global SnackBar Configuration (`CkSnackBarConfig`)**: Added support for configuring global `CkSnackBar` overrides (including top/bottom positions, margins, padding, border radii, shadows, semantic colors, and custom icons).
+* **URL Auto-Lowercase**: URLs typed or pasted inside text fields are automatically converted to lowercase while preserving the surrounding text.
+* **Capitalization Toggle (`enableCapitalization`)**: Added a parameter to disable automatic sentence capitalization on specific text fields.
+
 ## 1.0.6+2
 
 * **CkAppBar Title Alignment Fix**: Fixed an issue where global app bar title alignment configured via `CoreKitConfig` was not being applied.

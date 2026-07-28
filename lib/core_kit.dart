@@ -75,6 +75,7 @@ export 'package:core_kit/rating/ck_rating_bar.dart';
 export 'package:core_kit/screenshot/ck_screenshot_preview.dart';
 //snackbar
 export 'package:core_kit/snackbar/ck_snackbar.dart';
+export 'package:core_kit/snackbar/ck_snackbar_config.dart';
 // spotlight
 export 'package:core_kit/spotlight/ck_spotlight.dart';
 export 'package:core_kit/storage/ck_device_id.dart';
@@ -86,6 +87,7 @@ export 'package:core_kit/text/ck_rich_text.dart';
 export 'package:core_kit/text/ck_text.dart';
 // text_field
 export 'package:core_kit/text_field/ck_date_input_text_field.dart';
+export 'package:core_kit/text_field/ck_input_config.dart';
 export 'package:core_kit/text_field/ck_multiline_text_field.dart';
 export 'package:core_kit/text_field/ck_phone_number_text_field.dart';
 export 'package:core_kit/text_field/ck_search.dart';

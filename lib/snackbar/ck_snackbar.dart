@@ -1,4 +1,5 @@
 import 'package:core_kit/initializer.dart';
+import 'package:core_kit/snackbar/ck_snackbar_config.dart';
 import 'package:flutter/material.dart';
 
 enum CkSnackBarType { success, error, warning, info }
@@ -84,8 +85,9 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
       duration: const Duration(milliseconds: 300),
     );
 
+    final position = coreKitInstance.snackBarConfig.position ?? CkSnackBarPosition.bottom;
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
+      begin: position == CkSnackBarPosition.top ? const Offset(0, -1) : const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
@@ -128,75 +130,81 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
             colorScheme,
           );
 
+          final config = coreKitInstance.snackBarConfig;
+          final position = config.position ?? CkSnackBarPosition.bottom;
+          final borderRadius = config.borderRadius ?? 12;
+          final margin = config.margin ?? snackBarTheme.insetPadding ?? const EdgeInsets.all(16);
+          final padding = config.padding ?? snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(
+            horizontal: 5,
+            vertical: 10,
+          );
+          final backgroundColor = config.backgroundColor ?? snackBarTheme.backgroundColor ?? colorScheme.surface;
+          final boxShadow = config.boxShadow ?? [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 10,
+              spreadRadius: 1,
+              offset: const Offset(0, 4),
+            ),
+          ];
+          final borderWidthLeft = config.borderWidthLeft ?? 10;
+          final borderWidthOthers = config.borderWidthOthers ?? 1;
+          final iconSize = config.iconSize ?? 24;
+          final textStyle = config.textStyle ?? snackBarTheme.contentTextStyle ?? TextStyle(
+            color: colorScheme.onSurface.withValues(alpha: 0.85),
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          );
+
           return IgnorePointer(
             ignoring: true,
             child: Material(
               color: Colors.transparent,
-              child: Align(
-                heightFactor: 1,
-                alignment: Alignment.bottomCenter,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: IgnorePointer(
-                    ignoring: false,
-                    child: Dismissible(
-                      key: UniqueKey(),
-                      direction: DismissDirection.down,
-                      onDismissed: (_) => _dismiss(),
-                      child: Container(
-                        padding: EdgeInsets.zero,
-                        margin:
-                            snackBarTheme.insetPadding ??
-                            const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color:
-                              snackBarTheme.backgroundColor ??
-                              colorScheme.surface,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
+              child: SafeArea(
+                top: position == CkSnackBarPosition.top,
+                bottom: position == CkSnackBarPosition.bottom,
+                child: Align(
+                  heightFactor: 1,
+                  alignment: position == CkSnackBarPosition.top ? Alignment.topCenter : Alignment.bottomCenter,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: IgnorePointer(
+                      ignoring: false,
+                      child: Dismissible(
+                        key: UniqueKey(),
+                        direction: position == CkSnackBarPosition.top ? DismissDirection.up : DismissDirection.down,
+                        onDismissed: (_) => _dismiss(),
                         child: Container(
-                          padding:
-                              snackBarTheme.insetPadding ??
-                              const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 10,
-                              ),
+                          padding: EdgeInsets.zero,
+                          margin: margin,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border(
-                              left: BorderSide(color: accentColor, width: 10),
-                              right: BorderSide(color: accentColor, width: 1),
-                              top: BorderSide(color: accentColor, width: 1),
-                              bottom: BorderSide(color: accentColor, width: 1),
-                            ),
+                            borderRadius: BorderRadius.circular(borderRadius),
+                            color: backgroundColor,
+                            boxShadow: boxShadow,
                           ),
-                          child: Row(
-                            children: [
-                              Icon(iconData, color: accentColor, size: 24),
-                              const SizedBox(width: 5),
-                              Expanded(
-                                child: Text(
-                                  widget.text,
-                                  style:
-                                      snackBarTheme.contentTextStyle ??
-                                      TextStyle(
-                                        color: colorScheme.onSurface.withValues(
-                                          alpha: 0.85,
-                                        ),
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14,
-                                      ),
-                                ),
+                          child: Container(
+                            padding: padding,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(borderRadius),
+                              border: Border(
+                                left: BorderSide(color: accentColor, width: borderWidthLeft),
+                                right: BorderSide(color: accentColor, width: borderWidthOthers),
+                                top: BorderSide(color: accentColor, width: borderWidthOthers),
+                                bottom: BorderSide(color: accentColor, width: borderWidthOthers),
                               ),
-                            ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(iconData, color: accentColor, size: iconSize),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    widget.text,
+                                    style: textStyle,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -216,14 +224,27 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
   CkSnackBarType type,
   ColorScheme colorScheme,
 ) {
+  final config = coreKitInstance.snackBarConfig;
   switch (type) {
     case CkSnackBarType.success:
-      return (const Color(0xFF10B981), Icons.check_circle_outline_rounded);
+      return (
+        config.successColor ?? const Color(0xFF10B981),
+        config.successIcon ?? Icons.check_circle_outline_rounded,
+      );
     case CkSnackBarType.error:
-      return (colorScheme.error, Icons.error_outline_rounded);
+      return (
+        config.errorColor ?? colorScheme.error,
+        config.errorIcon ?? Icons.error_outline_rounded,
+      );
     case CkSnackBarType.warning:
-      return (colorScheme.tertiary, Icons.info_outline_rounded);
+      return (
+        config.warningColor ?? colorScheme.tertiary,
+        config.warningIcon ?? Icons.info_outline_rounded,
+      );
     case CkSnackBarType.info:
-      return (colorScheme.primary, Icons.info_outline_rounded);
+      return (
+        config.infoColor ?? colorScheme.primary,
+        config.infoIcon ?? Icons.info_outline_rounded,
+      );
   }
 }
