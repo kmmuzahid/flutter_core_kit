@@ -1,3 +1,7 @@
+## 1.0.6+2
+
+* **CkAppBar Title Alignment Fix**: Fixed an issue where global app bar title alignment configured via `CoreKitConfig` was not being applied.
+
 ## 1.0.6+1
 
 * **New Validation Type (`usernameAndEmailValidation`)**: Added `CkValidationType.usernameAndEmailValidation` to `CkTextField`, allowing a single field to accept either a valid username or a valid email address.

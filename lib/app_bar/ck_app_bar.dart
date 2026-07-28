@@ -7,7 +7,7 @@ class CkAppBarConfig {
   final Function()? onBack;
   Function()? get getBack => onBack;
 
-  final Icon backIcon;
+  final Icon? backIcon;
   final Widget? backButton;
   final BoxDecoration Function()? decoration;
   final Color? backgroundColor;
@@ -18,14 +18,14 @@ class CkAppBarConfig {
   final AlignmentGeometry? titleAlignment;
   final AlignmentGeometry? leadingAlignment;
   final AlignmentGeometry? actionAlignment;
-  final double titleSpacing;
-  final EdgeInsets leadingPadding;
-  final EdgeInsets actionsPadding;
+  final double? titleSpacing;
+  final EdgeInsets? leadingPadding;
+  final EdgeInsets? actionsPadding;
   final Widget Function(String title)? titleBuilder;
 
   CkAppBarConfig({
     this.onBack,
-    this.backIcon = const Icon(Icons.arrow_back_ios, size: 25),
+    this.backIcon,
     this.backButton,
     this.decoration,
     this.backgroundColor,
@@ -33,13 +33,13 @@ class CkAppBarConfig {
     this.iconColor,
     this.titleColor,
     this.actions,
-    this.titleAlignment = .center,
+    this.titleAlignment,
     this.leadingAlignment,
     this.actionAlignment,
-    this.titleSpacing = 0,
+    this.titleSpacing,
     this.titleBuilder,
-    this.leadingPadding = const EdgeInsets.only(left: 16.0, right: 8.0),
-    this.actionsPadding = const EdgeInsets.only(right: 16.0, left: 8.0),
+    this.leadingPadding,
+    this.actionsPadding,
   });
 
   CkAppBarConfig copyWith({
@@ -139,8 +139,9 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
     final contrastColor = resolveTextColorFromDecoration(finalDecoration);
     final leadingButton = _buildLeadingButton(config, contrastColor);
 
+    final effectiveTitleAlignment = config.titleAlignment ?? Alignment.center;
     final isCenter =
-        config.titleAlignment == Alignment.center ||
+        effectiveTitleAlignment == Alignment.center ||
         config.leadingAlignment == Alignment.bottomCenter ||
         config.actionAlignment == Alignment.topCenter;
 
@@ -175,6 +176,11 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget leadingButton,
     Color contrastColor,
   ) {
+    final titleSpacing = config.titleSpacing ?? 0;
+    final actionsPadding =
+        config.actionsPadding ??
+        const EdgeInsets.only(right: 16.0, left: 8.0);
+
     return Stack(
       children: [
         if (!hideBack)
@@ -186,7 +192,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
           alignment: config.titleAlignment ?? Alignment.center,
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: config.titleSpacing > 0 ? config.titleSpacing.w : 0,
+              horizontal: titleSpacing > 0 ? titleSpacing.w : 0,
             ),
             child: _titleBuilder(config, contrastColor),
           ),
@@ -195,7 +201,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
           Align(
             alignment: config.actionAlignment ?? Alignment.centerRight,
             child: Padding(
-              padding: config.actionsPadding,
+              padding: actionsPadding,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: config.actions!,
@@ -211,6 +217,11 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget leadingButton,
     Color contrastColor,
   ) {
+    final titleSpacing = config.titleSpacing ?? 0;
+    final actionsPadding =
+        config.actionsPadding ??
+        const EdgeInsets.only(right: 16.0, left: 8.0);
+
     return Row(
       children: [
         if (!hideBack)
@@ -218,10 +229,10 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
             alignment: config.leadingAlignment ?? Alignment.centerLeft,
             child: leadingButton,
           ),
-        if (config.titleSpacing > 0) SizedBox(width: config.titleSpacing.w),
+        if (titleSpacing > 0) SizedBox(width: titleSpacing.w),
         Expanded(
           child: Align(
-            alignment: config.titleAlignment ?? Alignment.center,
+            alignment: config.titleAlignment ?? Alignment.centerLeft,
             child: _titleBuilder(config, contrastColor),
           ),
         ),
@@ -229,7 +240,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
           Align(
             alignment: config.actionAlignment ?? Alignment.centerRight,
             child: Padding(
-              padding: config.actionsPadding,
+              padding: actionsPadding,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: config.actions!,
@@ -261,12 +272,17 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildLeadingButton(CkAppBarConfig config, Color contrastColor) {
     if (hideBack) return const SizedBox.shrink();
 
+    final icon = config.backIcon ?? const Icon(Icons.arrow_back_ios, size: 25);
+    final leadingPadding =
+        config.leadingPadding ??
+        const EdgeInsets.only(left: 16.0, right: 8.0);
+
     final buttonContent =
         leading ??
         config.backButton ??
         Icon(
-          config.backIcon.icon,
-          size: config.backIcon.size ?? 25.w,
+          icon.icon,
+          size: icon.size ?? 25.w,
           color: config.iconColor?.call() ?? contrastColor,
         );
 
@@ -279,7 +295,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
       child: Container(
         color: Colors.transparent,
-        padding: config.leadingPadding,
+        padding: leadingPadding,
         child: buttonContent,
       ),
     );
