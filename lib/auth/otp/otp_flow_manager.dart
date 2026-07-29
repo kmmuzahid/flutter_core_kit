@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:core_kit/auth/ck_auth.dart';
 import 'package:core_kit/auth/ck_auth_extractors.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
@@ -24,10 +23,15 @@ class CkOtpFlowManager {
   Timer? _timer;
   int _resendAttempts = 0;
   CkOtpTrigger? lastTrigger;
+  String lastRecipient = '';
   String? _resetPasswordToken;
 
   /// Retains the password reset token returned by the OTP verification response.
   String? get resetPasswordToken => _resetPasswordToken;
+
+  /// Returns the verification token for the currently active OTP trigger.
+  String? get lastVerificationToken =>
+      lastTrigger != null ? getVerificationToken(lastTrigger!) : null;
 
   // Stores verification tokens per flow in-memory
   final Map<CkOtpTrigger, String?> _verificationTokens = {};
@@ -114,12 +118,20 @@ class CkOtpFlowManager {
   }
 
   /// Send/Resend OTP via API
-  Future<CkAuthResult<void>> sendOtp({CkOtpTrigger? trigger}) async {
+  Future<CkAuthResult<void>> sendOtp({
+    CkOtpTrigger? trigger,
+    String? recipient,
+  }) async {
     final activeTrigger = trigger ?? lastTrigger;
     if (activeTrigger == null) {
       return const CkAuthResult<void>.failure(
-        message: 'No active OTP trigger found',
+        message:
+            'No active OTP trigger found, try like sendOtp(CkOtpTrigger.login)',
       );
+    }
+
+    if (recipient != null && recipient.isNotEmpty) {
+      lastRecipient = recipient;
     }
 
     if (trigger != null) {
@@ -143,7 +155,7 @@ class CkOtpFlowManager {
 
     final body = await _config.resendBodyBuilder(
       ResendOtpCallBack(
-        identifier: CkAuth.username ?? '',
+        recipient: lastRecipient,
         token: vToken ?? '',
         trigger: activeTrigger,
       ),

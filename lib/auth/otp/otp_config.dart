@@ -23,6 +23,9 @@ class CkOtpConfig {
   /// Whether to send verification token in header (true) or body (false)
   final bool sendVerificationTokenInHeader; // default: true
 
+  /// HTTP status code returned by the server when OTP is required / not verified (default: 403).
+  final int? otpNotVerifiedStatusCode;
+
   /// Custom body builder for OTP verify request
   final FutureOr<Map<String, dynamic>> Function(VerifyOtpCallBack otpCallBack)
   verifyBodyBuilder;
@@ -40,6 +43,7 @@ class CkOtpConfig {
     this.otpLength = 6,
     this.verificationTokenHeaderKey = 'token',
     this.sendVerificationTokenInHeader = true,
+    this.otpNotVerifiedStatusCode = 403,
     required this.verifyBodyBuilder,
     required this.resendBodyBuilder,
   });
@@ -62,17 +66,22 @@ enum CkOtpVerificationStrategy {
 class VerifyOtpCallBack {
   final String otp;
   final String token;
-  final CkOtpTrigger? trigger;
-  VerifyOtpCallBack({required this.otp, required this.token, this.trigger});
+  final CkOtpTrigger trigger;
+  VerifyOtpCallBack({
+    required this.otp,
+    required this.token,
+    required this.trigger,
+  });
 }
 
 class ResendOtpCallBack {
-  final String identifier;
+  final String recipient;
   final String token;
-  final CkOtpTrigger? trigger;
+  final CkOtpTrigger trigger;
+
   ResendOtpCallBack({
-    required this.identifier,
+    required this.recipient,
     required this.token,
-    this.trigger,
+    required this.trigger,
   });
 }

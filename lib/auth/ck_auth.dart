@@ -2,6 +2,7 @@ import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/auth/logout/logout_handler.dart';
+import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
 import 'package:core_kit/auth/social/apple_auth_config.dart';
 import 'package:core_kit/auth/social/facebook_auth_config.dart';
@@ -21,19 +22,16 @@ class CkAuth<TProfile> {
   const CkAuth();
 
   /// The token manager for stored auth tokens.
-  CkAuthTokenManager get tokenManager =>
-      CkAuthService.instance.tokenManager;
+  CkAuthTokenManager get tokenManager => CkAuthService.instance.tokenManager;
 
   /// The state controller for reactive auth status.
-  CkAuthStateController get authState =>
-      CkAuthService.instance.authState;
+  CkAuthStateController get authState => CkAuthService.instance.authState;
 
   /// The OTP manager for OTP sending and verification countdowns.
   CkOtpFlowManager get otpManager => CkAuthService.instance.otpManager;
 
   /// The logout handler.
-  CkLogoutHandler get logoutHandler =>
-      CkAuthService.instance.logoutHandler;
+  CkLogoutHandler get logoutHandler => CkAuthService.instance.logoutHandler;
 
   /// The social authentication manager.
   CkSocialAuthManager<dynamic> get socialManager =>
@@ -89,9 +87,7 @@ class CkAuth<TProfile> {
   /// A simplified reactive StreamBuilder UI helper for the OTP resend countdown.
   ///
   /// The [builder] receives only the remaining seconds as an [int].
-  Widget otpCountdownUi({
-    required Widget Function(int seconds) builder,
-  }) {
+  Widget otpCountdownUi({required Widget Function(int seconds) builder}) {
     return StreamBuilder<int>(
       stream: otpManager.resendCountdown.stream,
       initialData: otpManager.resendCountdown.value,
@@ -141,27 +137,51 @@ class CkAuth<TProfile> {
 
   /// Sign up — returns [CkAuthResult] with OTP info if needed.
   Future<CkAuthResult<dynamic>> signUp({
-    required Map<String, dynamic> body,
+    Map<String, dynamic>? body,
+    List<String>? pathParams,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? formFields,
+    List<Map<String, dynamic>>? listBody,
+    Map<String, dynamic>? files,
     Map<String, String>? headers,
+    LoginCallback? loginCallback,
   }) {
-    lastSubmitAuthData = body;
-    return CkAuthService.instance.signUp(body: body, headers: headers);
+    lastSubmitAuthData = body ?? formFields ?? {};
+    return CkAuthService.instance.signUp(
+      body: body,
+      pathParams: pathParams,
+      queryParams: queryParams,
+      formFields: formFields,
+      listBody: listBody,
+      files: files,
+      headers: headers,
+      loginCallback: loginCallback,
+    );
   }
 
   /// Sign in — auto-saves tokens, auto-fetches profile.
   Future<CkAuthResult<dynamic>> signIn({
-    required String username,
-    required String password,
+    /// account: email, phone number, username, etc.
+    String? account,
+    @Deprecated('Use account instead. Will be removed in v2.0.0.')
+    String? username,
+    String? password,
+    Map<String, dynamic>? args,
     Map<String, String>? headers,
   }) {
-    final body = config.loginBodyBuilder(
-      LoginCallback(
-        username: username,
-        password: password,
-        trigger: otpManager.lastTrigger,
-      ),
+    assert(
+      account != null || username != null,
+      'Provide either account or username.',
     );
-    return CkAuthService.instance.signIn(body: body, headers: headers);
+    final resolvedId = account ?? username!;
+    final callback = LoginCallback(
+      account: resolvedId,
+      password: password,
+      args: args,
+      trigger: otpManager.lastTrigger,
+    );
+    final request = config.resolveLoginRequest(callback, headers: headers);
+    return CkAuthService.instance.signIn(request: request);
   }
 
   /// Forgot password — auto-stores forgetToken.
@@ -174,9 +194,24 @@ class CkAuth<TProfile> {
   Future<CkAuthResult<void>> verifyOtp({required String otp}) =>
       CkAuthService.instance.verifyOtp(otp: otp);
 
-  /// Resend OTP — auto-restarts timer.
-  Future<CkAuthResult<void>> sendOtp({String? identifier}) =>
-      CkAuthService.instance.resendOtp();
+  /// Send OTP manually — sets trigger and recipient, calls API, auto-navigates on success.
+  ///
+  /// For backward compatibility, calling [sendOtp] without parameters delegates to [resendOtp].
+  Future<CkAuthResult<void>> sendOtp({
+    CkOtpTrigger? trigger,
+    String? recipient,
+  }) {
+    if (trigger == null && recipient == null) {
+      return resendOtp();
+    }
+    return CkAuthService.instance.sendOtp(
+      trigger: trigger ?? otpManager.lastTrigger ?? CkOtpTrigger.signup,
+      recipient: recipient ?? otpManager.lastRecipient,
+    );
+  }
+
+  /// Resend OTP — auto-restarts timer, reuses stored recipient.
+  Future<CkAuthResult<void>> resendOtp() => CkAuthService.instance.resendOtp();
 
   /// Reset password.
   Future<CkAuthResult<void>> updatePassword({
@@ -185,18 +220,16 @@ class CkAuth<TProfile> {
   }) => CkAuthService.instance.updatePassword(body: body, headers: headers);
 
   /// Authenticate with Google.
-  Future<CkAuthResult<dynamic>> signInWithGoogle(
-    CkGoogleAuthData data,
-  ) => CkAuthService.instance.signInWithGoogle(data);
+  Future<CkAuthResult<dynamic>> signInWithGoogle(CkGoogleAuthData data) =>
+      CkAuthService.instance.signInWithGoogle(data);
 
   /// Authenticate with Apple.
   Future<CkAuthResult<dynamic>> signInWithApple(CkAppleAuthData data) =>
       CkAuthService.instance.signInWithApple(data);
 
   /// Authenticate with Facebook.
-  Future<CkAuthResult<dynamic>> signInWithFacebook(
-    CkFacebookAuthData data,
-  ) => CkAuthService.instance.signInWithFacebook(data);
+  Future<CkAuthResult<dynamic>> signInWithFacebook(CkFacebookAuthData data) =>
+      CkAuthService.instance.signInWithFacebook(data);
 
   /// Authenticate with Custom Social Provider.
   Future<CkAuthResult<dynamic>> signInWithCustom({

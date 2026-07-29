@@ -1502,11 +1502,13 @@ class CorekitConfigImpl extends CoreKitConfig {
       verifyForgotOtpMethod: RequestMethod.PATCH,
       sendOtpMethod: RequestMethod.PATCH,
     ),
-    loginBodyBuilder: (LoginCallback loginCallBack) {
-      return {
-        'email': loginCallBack.username,
-        'password': loginCallBack.password,
-      };
+    loginRequestBuilder: (LoginCallback loginCallBack) {
+      return CkLoginRequest(
+        body: {
+          'email': loginCallBack.account,
+          'password': loginCallBack.password,
+        },
+      );
     },
     extractors: CkAuthExtractors(
       accessToken: (data) => data['accessToken']?.toString(),
@@ -1529,6 +1531,7 @@ class CorekitConfigImpl extends CoreKitConfig {
       verificationStrategy: CkOtpVerificationStrategy.tokenBased,
       verificationTokenHeaderKey: 'token',
       sendVerificationTokenInHeader: true,
+      otpNotVerifiedStatusCode: 403,
       verifyBodyBuilder: (ctx) async {
         if (ctx.trigger == CkOtpTrigger.signup) {
           final responses = await StorageService.instance
@@ -1546,7 +1549,7 @@ class CorekitConfigImpl extends CoreKitConfig {
         return {"otp": ctx.otp};
       },
       resendBodyBuilder: (ctx) {
-        return {"email": ctx.identifier};
+        return {"email": ctx.recipient};
       },
     ),
     handlers: CkAuthFlowHandlers(
@@ -1606,7 +1609,7 @@ const auth = CkAuth<UserProfile>();
 #### Sign In
 ```dart
 auth.signIn(
-  username: email,
+  account: email,
   password: password,
 );
 ```
@@ -1615,6 +1618,7 @@ auth.signIn(
 ```dart
 await auth.signUp(
   body: {'email': email, 'password': password},
+  loginCallback: LoginCallback(account: email, password: password),
 );
 ```
 
@@ -1648,13 +1652,16 @@ auth.otpCountdownUi(
       return Text('Resend OTP in ${seconds}s');
     }
     return TextButton(
-      onPressed: () => auth.sendOtp(),
+      onPressed: () => auth.resendOtp(),
       child: const Text('Resend OTP'),
     );
   },
-)
+);
 
-await auth.sendOtp();
+await auth.sendOtp(
+  trigger: CkOtpTrigger.signup,
+  recipient: email,
+);
 
 final verified = await auth.verifyOtp(
   otp: '123456',

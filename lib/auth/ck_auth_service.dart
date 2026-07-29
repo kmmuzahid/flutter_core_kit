@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:core_kit/auth/ck_auth.dart';
 import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/logout/logout_handler.dart';
@@ -158,33 +157,51 @@ class CkAuthService<TProfile> {
   // ─── Auth Actions ───
 
   /// Handles OTP flow check and returns OTP result if triggered
+  /// Handles OTP flow check and returns OTP result if triggered
   CkAuthResult<TProfile>? _handleOtpFlow(
     CkOtpTrigger trigger,
     responseData,
     int? statusCode,
   ) {
     final autoOtp = config.otpConfig.autoTriggers.contains(trigger);
+    if (!autoOtp) return null;
+
     final vToken = config.extractors.verificationTokens?[trigger]?.call(
       responseData,
     );
 
-    if (autoOtp && vToken != null) {
-      otpManager.storeVerificationToken(trigger, vToken);
-      otpManager.startResendTimer();
+    final expectedStatusCode = config.otpConfig.otpNotVerifiedStatusCode;
+    final isStatusCodeMatch =
+        statusCode != null &&
+        expectedStatusCode != null &&
+        statusCode == expectedStatusCode;
 
-      if (config.handlers?.showOtpVerification != null) {
-        config.handlers!.showOtpVerification!();
+    // For login: OTP screen is ONLY triggered if status code matches otpNotVerifiedStatusCode
+    if (trigger == CkOtpTrigger.login) {
+      if (!isStatusCodeMatch) {
+        return null;
       }
-
-      return CkAuthResult<TProfile>(
-        isSuccess: true,
-        requiresOtp: true,
-        otpTrigger: trigger,
-        statusCode: statusCode,
-        rawResponse: responseData,
-      );
+    } else {
+      // For signup & forgetPassword: triggers if vToken is present OR status code matches
+      if (vToken == null && !isStatusCodeMatch) {
+        return null;
+      }
     }
-    return null;
+
+    otpManager.storeVerificationToken(trigger, vToken);
+    otpManager.startResendTimer();
+
+    if (config.handlers?.showOtpVerification != null) {
+      config.handlers!.showOtpVerification!();
+    }
+
+    return CkAuthResult<TProfile>(
+      isSuccess: true,
+      requiresOtp: true,
+      otpTrigger: trigger,
+      statusCode: statusCode,
+      rawResponse: responseData,
+    );
   }
 
   /// Completes authentication after successful token extraction
@@ -218,18 +235,138 @@ class CkAuthService<TProfile> {
     );
   }
 
+  LoginCallback? _pendingLoginCallback;
+  bool _preSignupOtpVerified = false;
+
+  /// Internal sign-in core method without duplicate loading wrapper
+  Future<CkAuthResult<TProfile>> _performSignIn({
+    required CkLoginRequest request,
+  }) async {
+    if (config.mockAuth) {
+      const activeTrigger = CkOtpTrigger.login;
+      final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
+      if (autoOtp && config.handlers?.showOtpVerification != null) {
+        otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
+        otpManager.startResendTimer();
+        config.handlers!.showOtpVerification!();
+        return CkAuthResult<TProfile>(
+          isSuccess: true,
+          requiresOtp: true,
+          otpTrigger: activeTrigger,
+          statusCode: 200,
+          rawResponse: const {
+            'message': 'Mock sign in successful, requires OTP',
+          },
+        );
+      } else {
+        await tokenManager.saveTokens(
+          accessToken: 'mock_access_token',
+          refreshToken: 'mock_refresh_token',
+        );
+        authState.setAuthenticated();
+        await CkAuthStorageKeys.markNotFirstTimeUser();
+        autoNavigate();
+        return CkAuthResult<TProfile>.success(
+          statusCode: 200,
+          rawResponse: const {'message': 'Mock sign in successful'},
+        );
+      }
+    }
+    final response = await CkTransport.request(
+      input: RequestInput(
+        endpoint: config.endpoints.signin,
+        method: config.endpoints.signinMethod,
+        jsonBody: request.body,
+        pathParams: request.pathParams,
+        queryParams: request.queryParams,
+        formFields: request.formFields,
+        listBody: request.listBody,
+        files: request.files,
+        headers: request.headers,
+        requiresToken: false,
+      ),
+      responseBuilder: (data) => data,
+      showMessage: true,
+    );
+
+    final otpResult = _handleOtpFlow(
+      CkOtpTrigger.login,
+      response.data,
+      response.statusCode,
+    );
+    if (otpResult != null) return otpResult;
+
+    if (!response.isSuccess) {
+      return CkAuthResult<TProfile>.failure(
+        message: response.message,
+        statusCode: response.statusCode,
+        rawResponse: response.data,
+      );
+    }
+
+    return await _completeAuthentication(response.data, response.statusCode);
+  }
+
+  /// Unified post-signup auth resolver
+  Future<CkAuthResult<TProfile>> _resolvePostSignupAuth({
+    // ignore: avoid_annotating_with_dynamic
+    required dynamic responseData,
+    required int? statusCode,
+  }) async {
+    // 1. Check if tokens exist in response
+    final access = config.extractors.accessToken(responseData);
+    if (access != null) {
+      return _completeAuthentication(responseData, statusCode);
+    }
+
+    // 2. Check if caller provided LoginCallback for auto-login
+    final callback = _pendingLoginCallback;
+    if (callback != null) {
+      _pendingLoginCallback = null; // consume — one-shot
+      final request = config.resolveLoginRequest(callback);
+      return _performSignIn(request: request);
+    }
+
+    // 3. Plain success fallback
+    if (_pendingLoginCallback == null) {
+      _preSignupOtpVerified = true;
+    }
+    return CkAuthResult<TProfile>.success(
+      statusCode: statusCode,
+      rawResponse: responseData,
+    );
+  }
+
   /// Sign up — returns CkAuthResult with OTP info if needed
   Future<CkAuthResult<TProfile>> signUp({
-    required Map<String, dynamic> body,
+    Map<String, dynamic>? body,
+    List<String>? pathParams,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? formFields,
+    List<Map<String, dynamic>>? listBody,
+    Map<String, dynamic>? files,
     Map<String, String>? headers,
+    LoginCallback? loginCallback,
   }) {
+    _pendingLoginCallback = loginCallback;
     return loadingController.wrap(CkAuthLoadingType.signUp, () async {
+      final builtHeaders = {
+        ...?config.signupHeadersBuilder?.call(
+          otpManager.lastVerificationToken,
+        ),
+        ...?headers,
+      };
+
       if (config.mockAuth) {
         const activeTrigger = CkOtpTrigger.signup;
         final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
-        // Only trigger OTP flow if the handler is actually configured,
-        // otherwise skip directly to authenticated (full mock, no silent no-op).
-        if (autoOtp && config.handlers?.showOtpVerification != null) {
+        if (_preSignupOtpVerified) {
+          _preSignupOtpVerified = false;
+          return _resolvePostSignupAuth(
+            responseData: const {'message': 'Mock sign up successful'},
+            statusCode: 200,
+          );
+        } else if (autoOtp && config.handlers?.showOtpVerification != null) {
           otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
           otpManager.startResendTimer();
           config.handlers!.showOtpVerification!();
@@ -243,16 +380,9 @@ class CkAuthService<TProfile> {
             },
           );
         } else {
-          await tokenManager.saveTokens(
-            accessToken: 'mock_access_token',
-            refreshToken: 'mock_refresh_token',
-          );
-          authState.setAuthenticated();
-          await CkAuthStorageKeys.markNotFirstTimeUser();
-          autoNavigate();
-          return CkAuthResult<TProfile>.success(
+          return _resolvePostSignupAuth(
+            responseData: const {'message': 'Mock sign up successful'},
             statusCode: 200,
-            rawResponse: const {'message': 'Mock sign up successful'},
           );
         }
       }
@@ -261,14 +391,31 @@ class CkAuthService<TProfile> {
           endpoint: config.endpoints.signup,
           method: config.endpoints.signupMethod,
           jsonBody: body,
-          headers: headers,
+          pathParams: pathParams,
+          queryParams: queryParams,
+          formFields: formFields,
+          listBody: listBody,
+          files: files,
+          headers: builtHeaders.isNotEmpty ? builtHeaders : null,
           requiresToken: false,
         ),
         responseBuilder: (data) => data,
         showMessage: true,
       );
 
+      if (_preSignupOtpVerified) {
+        _preSignupOtpVerified = false;
+      } else {
+        final otpResult = _handleOtpFlow(
+          CkOtpTrigger.signup,
+          response.data,
+          response.statusCode,
+        );
+        if (otpResult != null) return otpResult;
+      }
+
       if (!response.isSuccess) {
+        _pendingLoginCallback = null;
         return CkAuthResult<TProfile>.failure(
           message: response.message,
           statusCode: response.statusCode,
@@ -276,93 +423,17 @@ class CkAuthService<TProfile> {
         );
       }
 
-      final otpResult = _handleOtpFlow(
-        CkOtpTrigger.signup,
-        response.data,
-        response.statusCode,
-      );
-      if (otpResult != null) return otpResult;
-
-      final authResult = await _completeAuthentication(
-        response.data,
-        response.statusCode,
-      );
-
-      if (authResult.isSuccess) return authResult;
-
-      return CkAuthResult<TProfile>.success(
+      return _resolvePostSignupAuth(
+        responseData: response.data,
         statusCode: response.statusCode,
-        rawResponse: response.data,
       );
     });
   }
 
   /// Sign in — auto-saves tokens, auto-fetches profile
-  Future<CkAuthResult<TProfile>> signIn({
-    required Map<String, dynamic> body,
-    Map<String, String>? headers,
-  }) {
+  Future<CkAuthResult<TProfile>> signIn({required CkLoginRequest request}) {
     return loadingController.wrap(CkAuthLoadingType.signIn, () async {
-      if (config.mockAuth) {
-        const activeTrigger = CkOtpTrigger.login;
-        final autoOtp = config.otpConfig.autoTriggers.contains(activeTrigger);
-        // Only trigger OTP flow if the handler is actually configured,
-        // otherwise skip directly to authenticated (full mock, no silent no-op).
-        if (autoOtp && config.handlers?.showOtpVerification != null) {
-          otpManager.storeVerificationToken(activeTrigger, 'mock_otp_token');
-          otpManager.startResendTimer();
-          config.handlers!.showOtpVerification!();
-          return CkAuthResult<TProfile>(
-            isSuccess: true,
-            requiresOtp: true,
-            otpTrigger: activeTrigger,
-            statusCode: 200,
-            rawResponse: const {
-              'message': 'Mock sign in successful, requires OTP',
-            },
-          );
-        } else {
-          await tokenManager.saveTokens(
-            accessToken: 'mock_access_token',
-            refreshToken: 'mock_refresh_token',
-          );
-          authState.setAuthenticated();
-          await CkAuthStorageKeys.markNotFirstTimeUser();
-          autoNavigate();
-          return CkAuthResult<TProfile>.success(
-            statusCode: 200,
-            rawResponse: const {'message': 'Mock sign in successful'},
-          );
-        }
-      }
-      final response = await CkTransport.request(
-        input: RequestInput(
-          endpoint: config.endpoints.signin,
-          method: config.endpoints.signinMethod,
-          jsonBody: body,
-          headers: headers,
-          requiresToken: false,
-        ),
-        responseBuilder: (data) => data,
-        showMessage: true,
-      );
-
-      if (!response.isSuccess) {
-        return CkAuthResult<TProfile>.failure(
-          message: response.message,
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-
-      final otpResult = _handleOtpFlow(
-        CkOtpTrigger.login,
-        response.data,
-        response.statusCode,
-      );
-      if (otpResult != null) return otpResult;
-
-      return await _completeAuthentication(response.data, response.statusCode);
+      return _performSignIn(request: request);
     });
   }
 
@@ -407,14 +478,6 @@ class CkAuthService<TProfile> {
         showMessage: true,
       );
 
-      if (!response.isSuccess) {
-        return CkAuthResult<void>.failure(
-          message: response.message,
-          statusCode: response.statusCode,
-          rawResponse: response.data,
-        );
-      }
-
       final otpResult = _handleOtpFlow(
         CkOtpTrigger.forgetPassword,
         response.data,
@@ -426,6 +489,14 @@ class CkAuthService<TProfile> {
           isSuccess: true,
           requiresOtp: otpResult.requiresOtp,
           otpTrigger: otpResult.otpTrigger,
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
+
+      if (!response.isSuccess) {
+        return CkAuthResult<void>.failure(
+          message: response.message,
           statusCode: response.statusCode,
           rawResponse: response.data,
         );
@@ -444,13 +515,16 @@ class CkAuthService<TProfile> {
       if (config.mockAuth) {
         final activeTrigger = otpManager.lastTrigger;
         if (activeTrigger == CkOtpTrigger.signup) {
-          await tokenManager.saveTokens(
-            accessToken: 'mock_access_token',
-            refreshToken: 'mock_refresh_token',
+          final res = await _resolvePostSignupAuth(
+            responseData: const {'message': 'Mock OTP verification successful'},
+            statusCode: 200,
           );
-          authState.setAuthenticated();
-          await CkAuthStorageKeys.markNotFirstTimeUser();
-          autoNavigate();
+          return CkAuthResult<void>(
+            isSuccess: res.isSuccess,
+            message: res.message,
+            statusCode: res.statusCode,
+            rawResponse: res.rawResponse,
+          );
         } else if (activeTrigger == CkOtpTrigger.forgetPassword) {
           config.handlers?.showResetPassword?.call();
         }
@@ -465,14 +539,15 @@ class CkAuthService<TProfile> {
 
       if (verifyResult.isSuccess) {
         if (activeTrigger == CkOtpTrigger.signup) {
-          return signIn(
-            body: config.loginBodyBuilder(
-              LoginCallback(
-                username: CkAuth.username ?? '',
-                password: CkAuth.password ?? '',
-                trigger: activeTrigger,
-              ),
-            ),
+          final res = await _resolvePostSignupAuth(
+            responseData: verifyResult.rawResponse,
+            statusCode: verifyResult.statusCode,
+          );
+          return CkAuthResult<void>(
+            isSuccess: res.isSuccess,
+            message: res.message,
+            statusCode: res.statusCode,
+            rawResponse: res.rawResponse,
           );
         } else if (activeTrigger == CkOtpTrigger.forgetPassword) {
           if (config.handlers?.showResetPassword != null) {
@@ -501,16 +576,41 @@ class CkAuthService<TProfile> {
   }
 
   /// Send OTP manually — also updates lastTrigger for verify/resend
-  Future<CkAuthResult<void>> sendOtp({required CkOtpTrigger trigger}) {
+  Future<CkAuthResult<void>> sendOtp({
+    required CkOtpTrigger trigger,
+    required String recipient,
+  }) {
     return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
       if (config.mockAuth) {
         otpManager.startResendTimer();
-        return const CkAuthResult<void>.success(
+        if (config.handlers?.showOtpVerification != null) {
+          config.handlers!.showOtpVerification!();
+        }
+        return CkAuthResult<void>(
+          isSuccess: true,
+          requiresOtp: true,
+          otpTrigger: trigger,
           statusCode: 200,
-          rawResponse: {'message': 'Mock OTP send successful'},
+          rawResponse: const {'message': 'Mock OTP send successful'},
         );
       }
-      return otpManager.sendOtp(trigger: trigger);
+      final result = await otpManager.sendOtp(
+        trigger: trigger,
+        recipient: recipient,
+      );
+      if (result.isSuccess) {
+        if (config.handlers?.showOtpVerification != null) {
+          config.handlers!.showOtpVerification!();
+        }
+        return CkAuthResult<void>(
+          isSuccess: true,
+          requiresOtp: true,
+          otpTrigger: trigger,
+          statusCode: result.statusCode,
+          rawResponse: result.rawResponse,
+        );
+      }
+      return result;
     });
   }
 
