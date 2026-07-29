@@ -128,12 +128,12 @@ class PermissionHadlerColors {
 
 /// Abstract configuration class that every app must extend to initialise CoreKit.
 ///
-/// Override the required getters ([imageBaseUrl], [ckTransportConfig], [designSize])
-/// and optionally override [authConfig], [appbarConfig], [onInit] and others.
+/// Override the required getters ([imageBaseUrl] and [ckTransportConfig])
+/// and optionally override other properties.
 ///
 /// Example:
 /// ```dart
-/// class AppConfig extends CoreKitConfig with CoreKitConfigDefaults {
+/// class AppConfig extends CoreKitConfig {
 ///   @override
 ///   String get imageBaseUrl => 'https://cdn.example.com/';
 ///   @override
@@ -143,6 +143,21 @@ class PermissionHadlerColors {
 ///   );
 /// }
 /// ```
+///
+/// ### Default Values
+/// [CoreKitConfig] provides the following default values for optional getters:
+/// - [designSize] = `Size(428, 926)`
+/// - [authConfig] = `null`
+/// - [appbarConfig] = `null`
+/// - [listLoaderConfig] = `null`
+/// - [inputConfig] = `null`
+/// - [snackBarConfig] = `null`
+/// - [permissionHelperConfig] = `null`
+/// - [permissionHandlerColors] = `null`
+/// - [passwordObscureIcon] = `null`
+/// - [preInitChild] = `null`
+/// - [onInit] = `null`
+/// - [splashDelayMs] = `3000` (3 seconds)
 abstract class CoreKitConfig {
   BuildContext? _context;
   @protected
@@ -164,9 +179,9 @@ abstract class CoreKitConfig {
   @internal
   void attachContext(BuildContext ctx) => _context = ctx;
 
+  Size get designSize => const Size(428, 926);
   String get imageBaseUrl;
   CkTransportConfig get ckTransportConfig;
-  Size get designSize;
 
   CkAuthConfig? get authConfig => null;
   CkAppBarConfig? get appbarConfig => null;
@@ -188,6 +203,7 @@ abstract class CoreKitConfig {
   int get splashDelayMs => 3000;
 }
 
+@Deprecated('Inheriting directly from CoreKitConfig is recommended, as CoreKitConfig now provides concrete default implementations.')
 mixin CoreKitConfigDefaults on CoreKitConfig {
   @override
   CkAuthConfig? get authConfig => null;

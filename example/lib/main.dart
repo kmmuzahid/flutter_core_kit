@@ -23,7 +23,7 @@ void main() => runApp(const CoreKitExampleApp());
 // ── Config ─────────────────────────────────────────────────────────────────
 
 /// Minimal [CoreKitConfig] implementation using JSONPlaceholder as demo API.
-class AppConfig extends CoreKitConfig with CoreKitConfigDefaults {
+class AppConfig extends CoreKitConfig {
   @override
   String get imageBaseUrl => 'https://picsum.photos/';
 

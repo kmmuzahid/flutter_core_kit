@@ -1,6 +1,14 @@
 # CoreKit
 
-[![Version](https://img.shields.io/github/v/tag/kmmuzahid/flutter_core_kit?label=version)](https://github.com/kmmuzahid/flutter_core_kit/releases)
+[![Pub Version](https://img.shields.io/pub/v/core_kit?color=blue&label=pub)](https://pub.dev/packages/core_kit)
+[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+> [!IMPORTANT]
+> **✨ It's like magic!** CoreKit drastically reduces boilerplate and saves you hours of development time. It provides a production-ready package bundling:
+> - **Zero-Boilerplate Networking & Auth:** Pre-configured Dio client with automatic JWT token refresh, social auth hooks, and ready-to-go OTP flows.
+> - **Self-Scaling UI Components:** 35+ fully responsive custom widgets (including text fields, appbars, paginated lists/grids, and star ratings) that match your layout design size automatically.
+> - **State & Storage Helpers:** Secure local key-value storage out of the box with automatic state-based loading indicators and dialog overlays.
 
 > [!TIP]
 > **🚀 Get Started Instantly with the Pre-configured Template!**
@@ -38,6 +46,18 @@
 > > fvm dart run build_runner watch
 > > ```
 
+## Visual Preview
+
+<p align="center">
+  <img src="docs_files/comment.png" height="280" alt="Comments Feature Preview" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs_files/auth.png" height="280" alt="Authentication Module Preview" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs_files/tab_list.png" height="280" alt="Tabbed List Layouts Preview" />
+</p>
+
+---
+
 **CoreKit** (`core_kit`) is a Flutter package that bundles production-oriented UI widgets, responsive layout helpers, Dio-based networking with token refresh, secure storage, and an optional authentication module. Import everything from a single entry point:
 
 ```dart
@@ -50,22 +70,23 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 
 ## Table of Contents
 
-1. [Features](#features)
-2. [Installation](#installation)
-3. [Quick Start](#quick-start)
-4. [Configuration](#configuration)
-5. [Splash Screen Routing](#splash-screen-routing)
-6. [Navigation & Global Access](#navigation--global-access)
-7. [UI Components](#ui-components)
-8. [Forms & Validation](#forms--validation)
-9. [Dialogs & Overlays](#dialogs--overlays)
-10. [Responsive Utilities](#responsive-utilities)
-11. [Transport (HTTP)](#transport-http)
-12. [Storage](#storage)
-13. [Authentication Module](#authentication-module)
-14. [Location Pickers](#location-pickers)
-15. [Utilities & Extensions](#utilities--extensions)
-16. [License](#license)
+1. [Visual Preview](#visual-preview)
+2. [Features](#features)
+3. [Installation](#installation)
+4. [Quick Start](#quick-start)
+5. [Configuration](#configuration)
+6. [Splash Screen Routing](#splash-screen-routing)
+7. [Navigation & Global Access](#navigation--global-access)
+8. [UI Components](#ui-components)
+9. [Forms & Validation](#forms--validation)
+10. [Dialogs & Overlays](#dialogs--overlays)
+11. [Responsive Utilities](#responsive-utilities)
+12. [Transport (HTTP)](#transport-http)
+13. [Storage](#storage)
+14. [Authentication Module](#authentication-module)
+15. [Location Pickers](#location-pickers)
+16. [Utilities & Extensions](#utilities--extensions)
+17. [License](#license)
 
 ---
 
@@ -163,7 +184,7 @@ void main() {
 }
 
 /// Minimal config — only required overrides. See [Configuration](#configuration) for every option.
-class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+class CkConfigImpl extends CoreKitConfig {
   @override
   String get imageBaseUrl => 'https://cdn.example.com/';
 
@@ -234,11 +255,11 @@ CoreKit.builder(
 
 ## Configuration
 
-Implement **`CoreKitConfig`** and mix in **`CoreKitConfigDefaults`** for sensible defaults on optional members. Pass your implementation to `CoreKit` as `config: CkConfigImpl()`.
+Implement **`CoreKitConfig`** (which provides sensible defaults on optional members). Pass your implementation to `CoreKit` as `config: CkConfigImpl()`.
 
 ### `CoreKitConfig` members
 
-| Override | Required | Default (with `CoreKitConfigDefaults`) | Purpose |
+| Override | Required | Default | Purpose |
 |----------|----------|----------------------------------------|---------|
 | `imageBaseUrl` | **Yes** | — | Base URL for `CkImage` relative paths |
 | `ckTransportConfig` | **Yes** | — | API base URL, timeouts, token refresh |
@@ -259,7 +280,7 @@ Implement **`CoreKitConfig`** and mix in **`CoreKitConfigDefaults`** for sensibl
 Copy this class into your app and adjust values. Every override is listed so you can see what CoreKit reads at startup.
 
 ```dart
-class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+class CkConfigImpl extends CoreKitConfig {
   // ─── Required ───────────────────────────────────────────────
 
   @override
@@ -383,8 +404,10 @@ CoreKit(
 );
 ```
 
+> [!IMPORTANT]
 > **Context rule:** `context` inside `CoreKitConfig` is only valid in getters that run after the first frame (`appbarConfig`, `permissionHelperConfig`, `passwordObscureIcon`, `permissionHandlerColors`). Do not use `context` in `imageBaseUrl`, `ckTransportConfig`, or `designSize`.
 
+> [!NOTE]
 > **Tokens:** You do not configure `CkTokenProvider` in your app. With `authConfig` set, [CkAuthService](#authentication-module) stores and refreshes tokens. Without auth, CoreKit uses an internal unauthenticated provider automatically.
 
 ---
@@ -405,7 +428,7 @@ CoreKit provides built-in support for splash screen routing with a default **3-s
 The `onInit` callback is perfect for initializing services that don't require navigation context:
 
 ```dart
-class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+class CkConfigImpl extends CoreKitConfig {
   @override
   String get imageBaseUrl => 'https://cdn.example.com/';
 
@@ -513,6 +536,52 @@ final base = coreKitInstance.imageBaseUrl;
 
 ## UI Components
 
+### List of All Widgets
+
+CoreKit provides the following comprehensive set of custom widgets, prefixed with `Ck` for easy autocomplete:
+
+| Widget Name | Category | Description |
+| :--- | :--- | :--- |
+| `CkAppBar` | Navigation | Custom app bar with global back navigation & actions |
+| `CkButton` | Button | Standard elevated/gradient button with optional loading state |
+| `CkSelectableButton` | Button | Toggleable button for selecting options/configurations |
+| `CkRadioGroup` | Button | Radio selection group with custom item builder |
+| `CkRadioGroupFormField` | Button | Form-integrated version of radio group selection |
+| `CkMultipleSelector` | Button | Select multiple options with check/active states |
+| `CkTextField` | Inputs | Text input field with built-in validation types and formatting |
+| `CkMultilineTextField` | Inputs | Multi-line text field with character, word, and line restrictions |
+| `CkPhoneNumberTextField` | Inputs | Custom field with country code prefix & phone validation |
+| `CkDateInputTextField` | Inputs | Date picker text field with standard format validation |
+| `CkSearch` | Inputs | Search field with debounced search callback and clear action |
+| `CkDropDown` | Inputs | Styled custom dropdown picker for choosing an option |
+| `CkCountryPicker` | Location Pickers | Dropdown selector for picking countries |
+| `CkStateDropDown` | Location Pickers | Dropdown selector for choosing a state/province/territory |
+| `CkCityDropDown` | Location Pickers | Dropdown selector for cities, filtered dynamically by state |
+| `CkImage` | Media | Renders network, asset, file, or SVG images with caching |
+| `CkImagePicker` | Media | Single image picker widget with source selection |
+| `CkMultiImagePicker` | Media | Grid image picker widget for selecting multiple images |
+| `CkListView` | List & Paginated | Paginated list view loader supporting pull-to-refresh & infinite scroll |
+| `CkGridView` | List & Paginated | Paginated grid view loader supporting pull-to-refresh & infinite scroll |
+| `CkTabListView` | List & Paginated | Tabbed layout where each tab hosts a paginated list |
+| `CkText` | Typography | Standard text component with default styling and margins |
+| `CkRichText` | Typography | Styled rich text supporting clickable segments |
+| `CkTabBar` | Navigation | Custom horizontal tab bar |
+| `CkForm` | Form | Form wrapper for validation management |
+| `CkFormBuilder` | Form | Form builder supporting automated form layout |
+| `CkDottedBorder` | Style / Containers | Renders a custom dotted/dashed border around widgets |
+| `CkLoader` | Loading | Global indicator shown during async loading states |
+| `CkRatingBar` | Feedback | Interactive/read-only star rating indicator |
+| `CkSpotlight` | Feedback | Feature spotlight tour helper overlaying highlight regions |
+| `CkDialog` | Overlays & Dialogs | Standard base overlay dialog builder |
+| `CkAlert` | Overlays & Dialogs | Interactive alert dialog with buttons for callbacks |
+| `CkPopupMenu` | Overlays & Dialogs | Styled context popup menu options |
+| `CkDraggableBottomSheet` | Overlays & Dialogs | Bottom sheet overlay that can be dragged up or down |
+| `CkCommentSheet` | Overlays & Dialogs | Pre-built comments section layout inside a bottom sheet |
+| `CkScreenshotPreview` | Overlays & Dialogs | Interactive preview overlay for capturing screenshots |
+| `CkSnackBar` | Overlays & Dialogs | Custom overlay banner showing feedback notices |
+
+---
+
 ### Text
 
 ```dart
@@ -614,10 +683,11 @@ CkDateInputTextField(
 )
 ```
 
+> [!NOTE]
 > **URL auto-lowercase**: Any URL typed or pasted in `CkTextField` or `CkMultilineTextField` is automatically lowercased. The rest of the text is unchanged.
-
+>
 > **`enableCapitalization`** *(default `true`)*: Set to `false` on any field to disable automatic sentence capitalization.
-
+>
 > **Global defaults**: Use `inputConfig` in your `CorekitConfigImpl` to set border, colors, text style, and capitalization for all fields at once. Per-field values always win.
 
 | `CkValidationType` | Purpose |
@@ -960,6 +1030,7 @@ CkSnackBar('Saved', type: CkSnackBarType.success);
 CkSnackBar('Failed', type: CkSnackBarType.error);
 ```
 
+> [!TIP]
 > **Global overrides**: Style screen position (top/bottom), margins, border radius, background color, shadow effects, padding, and semantic colors/icons using `snackBarConfig` in `CorekitConfigImpl`. Per-type semantic overrides (e.g. `successColor`, `errorIcon`) apply instantly to the custom snackbar layout.
 
 // Shows immediately when constructed
@@ -977,6 +1048,23 @@ CkPopupMenu<String>(
   onItemSelected: (item) => handle(item),
   itemBuilder: (p) => Text(p.item ?? ''),
   triggerBuilder: (p) => Icon(Icons.more_vert, color: p.isOpen ? Colors.blue : null),
+)
+```
+
+### Comments Sheet (`CkCommentSheet`)
+
+`CkCommentSheet` is a generic, recursively-nested comments and replies widget with built-in expand/collapse states, connector lines, reply action hooks, and an expandable text composer. It supports infinite reply depth.
+
+```dart
+CkCommentSheet<CommentNode>(
+  items: commentsList,
+  idOf: (node) => node.id,
+  repliesOf: (node) => node.replies,
+  avatarBuilder: (node, depth) => CircleAvatar(child: Text(node.author[0])),
+  itemBuilder: (context, node, depth) => Text(node.content),
+  replyActionBuilder: (node, depth, expand) => IconButton(icon: Icon(Icons.reply), onPressed: expand),
+  reactionBuilder: (node) => Icon(Icons.favorite_border),
+  onSend: (text, replyTo) => print('Send: $text to: ${replyTo?.id}'),
 )
 ```
 
@@ -1293,7 +1381,7 @@ class UserProfile {
   Map<String, dynamic> toJson() => {'id': id, 'email': email, 'name': name};
 }
 
-class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+class CkConfigImpl extends CoreKitConfig {
   @override
   String get imageBaseUrl => 'https://cdn.example.com/';
 
@@ -1368,7 +1456,7 @@ class CkConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
 Here is a complete, advanced real-world implementation example (`CorekitConfigImpl`) demonstrating custom initialization (`onInit`), zero splash delay, custom endpoint method configurations (e.g., `PATCH`), GetX integration for flow navigation handlers, and asynchronous `verifyBodyBuilder` with local storage integration:
 
 ```dart
-class CorekitConfigImpl extends CoreKitConfig with CoreKitConfigDefaults {
+class CorekitConfigImpl extends CoreKitConfig {
   @override
   Size get designSize => const Size(428, 926);
 
