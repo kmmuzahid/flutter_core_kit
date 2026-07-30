@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> [!IMPORTANT]
+> [!NOTE]
 > **✨ It's like magic!** CoreKit drastically reduces boilerplate and saves you hours of development time. It provides a production-ready package bundling:
 > - **Zero-Boilerplate Networking & Auth:** Pre-configured Dio client with automatic JWT token refresh, social auth hooks, and ready-to-go OTP flows.
 > - **Self-Scaling UI Components:** 35+ fully responsive custom widgets (including text fields, appbars, paginated lists/grids, and star ratings) that match your layout design size automatically.
@@ -48,13 +48,16 @@
 
 ## Visual Preview
 
-<p align="center">
-  <img src="docs_files/comment.png" height="280" alt="Comments Feature Preview" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs_files/auth.png" height="280" alt="Authentication Module Preview" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs_files/tab_list.png" height="280" alt="Tabbed List Layouts Preview" />
-</p>
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="docs_files/corekit_features_unified.png" height="280" alt="CoreKit Features" /></td>
+      <td><img src="docs_files/comment.png" height="280" alt="Comments Feature Preview" /></td>
+      <td><img src="docs_files/auth.png" height="280" alt="Authentication Module Preview" /></td>
+      <td><img src="docs_files/tab_list.png" height="280" alt="Tabbed List Layouts Preview" /></td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -469,11 +472,13 @@ CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
     logout: '/auth/logout',
     resetPassword: '/auth/reset-password',
   ),
-  loginBodyBuilder: (cb) => {'email': cb.username, 'password': cb.password},
+  loginRequestBuilder: (cb) => CkLoginRequest(
+    body: {'email': cb.account, 'password': cb.password},
+  ),
   otpConfig: CkOtpConfig(
     autoTriggers: {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword},
-    verifyBodyBuilder: (ctx) async => {'otp': ctx.otp},
-    resendBodyBuilder: (ctx) => {'email': ctx.identifier},
+    verifyBodyBuilder: (ctx) async => {'otp': ctx.otp, 'token': ctx.token},
+    resendBodyBuilder: (ctx) => {'email': ctx.recipient},
   ),
   extractors: CkAuthExtractors(
     accessToken: (data) => data['token'] as String?,
@@ -686,7 +691,9 @@ CkDateInputTextField(
 > [!NOTE]
 > **URL auto-lowercase**: Any URL typed or pasted in `CkTextField` or `CkMultilineTextField` is automatically lowercased. The rest of the text is unchanged.
 >
-> **`enableCapitalization`** *(default `true`)*: Set to `false` on any field to disable automatic sentence capitalization.
+> **Smart Capitalization**: Auto-capitalization is automatically disabled for non-textual input fields such as emails, passwords, usernames, and URLs (e.g. `CkValidationType.validateEmail`, `CkValidationType.validatePassword`, `CkValidationType.validateURL`, etc.).
+>
+> **`enableCapitalization`** *(default `true`)*: Set to `false` on any field to manually disable automatic sentence capitalization.
 >
 > **Global defaults**: Use `inputConfig` in your `CorekitConfigImpl` to set border, colors, text style, and capitalization for all fields at once. Per-field values always win.
 
@@ -1360,6 +1367,41 @@ When `mockAuth` is set to `true`:
 - Navigation transitions and state flow (like redirection to OTP or onboarding) still execute normally so you can test all user flow states without any working backend.
 
 
+### Core Authentication & OTP Flows
+
+CoreKit handles four standard authentication and verification patterns out of the box.
+
+#### 1. Pre-Signup OTP Flow (Verification Before Account Creation)
+If your app verifies the user's email/phone *before* showing the registration form:
+1. Call `auth.sendOtp(trigger: CkOtpTrigger.signup, recipient: email)`. This shows the OTP verification screen configured in `handlers.showOtpVerification`.
+2. Once the user inputs the OTP and calls `auth.verifyOtp()`, CoreKit validates it and sets an internal `_preSignupOtpVerified` flag to `true`.
+3. When the user completes the registration form and you call `auth.signUp()`, CoreKit sees the flag is set and bypasses the OTP trigger. It completes the registration and automatically consumes (resets) the flag to ensure it behaves as a one-shot bypass.
+
+#### 2. Post-Signup OTP Flow & Auto-Login
+If your app triggers OTP *after* the signup request is sent to the server:
+1. Include a `LoginCallback` containing the user's credentials when calling `signUp()`:
+   ```dart
+   await auth.signUp(
+     body: signUpData,
+     loginCallback: LoginCallback(account: email, password: password),
+   );
+   ```
+2. If `CkOtpTrigger.signup` is set in `autoTriggers`, CoreKit triggers the OTP screen and caches the `LoginCallback` internally.
+3. Once the user successfully verifies their OTP, CoreKit automatically consumes the cached callback and executes a background sign-in, seamlessly routing the user to the authenticated screen.
+
+#### 3. Status-Code Gated Login OTP
+To prevent showing OTP screens on normal login failures (like wrong passwords), CoreKit uses status-code gating:
+* **Normal Login (Success)**: Returns HTTP 200, saves tokens, and authenticates the user directly.
+* **Wrong Password (Failure)**: Returns HTTP 401 (or other failure codes), which returns a validation error to the UI and does **not** trigger OTP.
+* **OTP Required (Gate)**: Returns HTTP 403 (configurable via `otpNotVerifiedStatusCode`). Only when this specific code is returned does CoreKit redirect the user to the OTP verification screen.
+
+#### 4. Forgot Password Flow
+Resetting forgotten passwords works in three distinct steps:
+1. **Request Reset**: Calling `auth.forgotPassword()` triggers `showOtpVerification` and caches the verification token internally.
+2. **Verify OTP**: The user inputs the OTP, and `auth.verifyOtp()` matches the code. Upon success, CoreKit routes the user to `showResetPassword`.
+3. **Update Password**: In the reset screen, calling `auth.updatePassword()` sends the new password along with the cached token to update the credentials, then navigates back to `showLogin`.
+
+
 ### 1. Profile model & auth override
 
 Add this to your `CkConfigImpl` (keep the other overrides from [Configuration](#configuration)):
@@ -1410,7 +1452,9 @@ class CkConfigImpl extends CoreKitConfig {
           accessToken: (data) => data['accessToken']?.toString(),
           profile: (data) => UserProfile.fromJson(data),
         ),
-        loginBodyBuilder: (cb) => {'email': cb.username, 'password': cb.password},
+        loginRequestBuilder: (cb) => CkLoginRequest(
+          body: {'email': cb.account, 'password': cb.password},
+        ),
         handlers: CkAuthFlowHandlers(
           onAuthenticated: () {
             coreKitInstance.navigatorKey.currentState?.pushAndRemoveUntil(
@@ -1435,8 +1479,8 @@ class CkConfigImpl extends CoreKitConfig {
         otpConfig: CkOtpConfig(
           autoTriggers: {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword},
           resendCooldown: const Duration(seconds: 120),
-          verifyBodyBuilder: (ctx) async => {'otp': ctx.otp},
-          resendBodyBuilder: (ctx) => {'email': ctx.identifier},
+          verifyBodyBuilder: (ctx) async => {'otp': ctx.otp, 'token': ctx.token},
+          resendBodyBuilder: (ctx) => {'email': ctx.recipient},
         ),
         socialLoginConfig: CkSocialLoginConfig(
           google: CkGoogleAuthConfig(
@@ -1698,7 +1742,7 @@ auth.loadingUi(
     isLoading: isLoading,
     onTap: isLoading
         ? null
-        : () => auth.signIn(username: email, password: password),
+        : () => auth.signIn(account: email, password: password),
   ),
 )
 ```
@@ -1745,7 +1789,7 @@ Column(
       builder: (isLoading) => CkButton(
         titleText: 'Sign In',
         isLoading: isLoading,
-        onTap: () => auth.signIn(username: email, password: password),
+        onTap: () => auth.signIn(account: email, password: password),
       ),
     ),
     const SizedBox(height: 16),

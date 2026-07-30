@@ -1,6 +1,17 @@
+## 1.0.7
+
+* **Comprehensive Auth System Test Suite**: Created a robust, VM-friendly test plan and suite containing 164 unit, service, integration, edge-case, and backward-compatibility tests to validate the full authentication and OTP flow logic.
+* **OTP & Mock Auth Bugfixes**:
+  * Fixed a mock `sendOtp()` bug where active triggers and recipients were not stored, preventing subsequent verification checks.
+  * Resolved an issue where the `_preSignupOtpVerified` flag was infinitely re-asserted in unified post-signup auth checks, ensuring it behaves correctly as a one-shot bypass.
+  * Added test-only helpers and factories (`resetForTests()`, `seedForTests()`, and `initForTests()`) to fully isolate auth tests from disk and network dependencies.
+* **Smart Text Field Capitalization**:
+  * Added a validation-type check (`InputHelper.shouldCapitalize`) to disable text capitalization on input fields where it is undesirable (e.g., email address, passwords, URLs, usernames).
+
 ## 1.0.6+4
 
 * **Deprecated `CoreKitConfigDefaults`**: Deprecated the `CoreKitConfigDefaults` mixin and updated all code implementations, comments, and documentation examples. Developers should inherit directly from `CoreKitConfig` instead, as it now provides concrete default implementations for all optional properties. 
+
 
 ## 1.0.6+3
 
