@@ -316,7 +316,9 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                         coreKitInstance.primaryColor)
                   : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
                         Colors.red),
-              textCapitalization: (widget.enableCapitalization && (coreKitInstance.inputConfig.enableCapitalization ?? true))
+              textCapitalization: (widget.enableCapitalization &&
+                      (coreKitInstance.inputConfig.enableCapitalization ?? true) &&
+                      InputHelper.shouldCapitalize(widget.validationType))
                   ? TextCapitalization.sentences
                   : TextCapitalization.none,
               scrollPhysics: const BouncingScrollPhysics(),

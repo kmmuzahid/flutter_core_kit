@@ -7,6 +7,21 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class InputHelper {
+  static bool shouldCapitalize(CkValidationType type) {
+    switch (type) {
+      case CkValidationType.validateRequired:
+      case CkValidationType.validateMinLength:
+      case CkValidationType.validateMaxLength:
+      case CkValidationType.validateCustomPattern:
+      case CkValidationType.validateAlphaNumeric:
+      case CkValidationType.validateFullName:
+      case CkValidationType.notRequired:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   static List<TextInputFormatter> getInputFormatters(CkValidationType type) {
     switch (type) {
       case CkValidationType.validateDate:

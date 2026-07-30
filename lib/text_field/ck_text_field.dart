@@ -314,7 +314,9 @@ class _CkTextFieldState extends State<CkTextField> {
       readOnly: widget.isReadOnly,
       onChanged: widget.onChanged,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      textCapitalization: (widget.enableCapitalization && (coreKitInstance.inputConfig.enableCapitalization ?? true))
+      textCapitalization: (widget.enableCapitalization &&
+              (coreKitInstance.inputConfig.enableCapitalization ?? true) &&
+              InputHelper.shouldCapitalize(widget.validationType))
           ? TextCapitalization.sentences
           : TextCapitalization.none,
       keyboardType: InputHelper.getKeyboardType(widget.validationType),
