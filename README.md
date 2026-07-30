@@ -51,10 +51,10 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="docs_files/corekit_features_unified.png" height="280" alt="CoreKit Features" /></td>
-      <td><img src="docs_files/comment.png" height="280" alt="Comments Feature Preview" /></td>
-      <td><img src="docs_files/auth.png" height="280" alt="Authentication Module Preview" /></td>
-      <td><img src="docs_files/tab_list.png" height="280" alt="Tabbed List Layouts Preview" /></td>
+      <td><img src="https://raw.githubusercontent.com/kmmuzahid/flutter_core_kit/main/docs_files/corekit_features_unified.png" height="280" alt="CoreKit Features" /></td>
+      <td><img src="https://raw.githubusercontent.com/kmmuzahid/flutter_core_kit/main/docs_files/comment.png" height="280" alt="Comments Feature Preview" /></td>
+      <td><img src="https://raw.githubusercontent.com/kmmuzahid/flutter_core_kit/main/docs_files/auth.png" height="280" alt="Authentication Module Preview" /></td>
+      <td><img src="https://raw.githubusercontent.com/kmmuzahid/flutter_core_kit/main/docs_files/tab_list.png" height="280" alt="Tabbed List Layouts Preview" /></td>
     </tr>
   </table>
 </div>

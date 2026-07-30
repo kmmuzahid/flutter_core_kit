@@ -1,3 +1,7 @@
+## 1.0.7+1
+
+* **Documentation Update**: Added the latest demo screenshots and a new preview video to the `README.md`.
+
 ## 1.0.7
 
 * **Comprehensive Auth System Test Suite**: Created a robust, VM-friendly test plan and suite containing 164 unit, service, integration, edge-case, and backward-compatibility tests to validate the full authentication and OTP flow logic.
