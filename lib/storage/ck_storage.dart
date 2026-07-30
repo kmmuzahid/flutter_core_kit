@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 /// Secure storage with guaranteed fallback + zero-latency in-memory cache.
 ///
@@ -27,6 +29,23 @@ abstract class CkStorage {
 
   /// Marks [key] as protected so it is preserved across [deleteAll].
   static void protectKey(String key) => _protectedKeys.add(key);
+
+  // ─── Test Hooks ────────────────────────────────────────────────────────────
+
+  /// Resets internal state for unit testing (bypasses platform plugins).
+  /// Call this in [setUp] to get a clean slate without disk I/O.
+  @visibleForTesting
+  static void resetForTests() {
+    _cache.clear();
+    _initialized = true; // skip initialize() so no platform plugin is touched
+    _useSecure = false;
+  }
+
+  /// Seeds a key/value directly into the in-memory cache for test setup.
+  @visibleForTesting
+  static void seedForTests(String key, String value) {
+    _cache[key] = value;
+  }
 
   // ─── Initialization ────────────────────────────────────────────────────────
 

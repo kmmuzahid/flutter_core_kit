@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
+
 import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
@@ -154,7 +157,61 @@ class CkAuthService<TProfile> {
     return service;
   }
 
+  /// Test-only factory: creates a fully wired service without calling restoreSession
+  /// or touching any platform channels. Resets the singleton.
+  @visibleForTesting
+  static Future<CkAuthService<TProfile>> initForTests<TProfile>({
+    required CkAuthConfig<TProfile> config,
+    required CkAuthTokenManager tokenManager,
+  }) async {
+    final authState = CkAuthStateController();
+    final profileExtractor = CkProfileExtractor<TProfile>(
+      extractors: config.extractors,
+    );
+    final otpManager = CkOtpFlowManager(
+      config: config.otpConfig,
+      extractors: config.extractors,
+      sendUrl: config.endpoints.sendOtp,
+      verifyUrl: config.endpoints.verifyOtp,
+      verifyForgetUrl: config.endpoints.verifyForgetOtp,
+      sendMethod: config.endpoints.sendOtpMethod,
+      verifyMethod: config.endpoints.verifyOtpMethod,
+      verifyForgotMethod: config.endpoints.verifyForgotOtpMethod,
+    );
+    final logoutHandler = CkLogoutHandler(
+      tokenManager: tokenManager,
+      profileExtractor: profileExtractor,
+      otpManager: otpManager,
+      stateController: authState,
+      handlers: config.handlers,
+      logoutUrl: config.endpoints.logout,
+      logoutMethod: config.endpoints.logoutMethod,
+    );
+    final socialManager = CkSocialAuthManager<TProfile>(
+      config: config.socialLoginConfig,
+      tokenManager: tokenManager,
+      profileExtractor: profileExtractor,
+      stateController: authState,
+      logoutHandler: logoutHandler,
+      defaultExtractors: config.extractors,
+    );
+    final loadingController = CkAuthLoadingController();
+    final service = CkAuthService<TProfile>._(
+      tokenManager: tokenManager,
+      authState: authState,
+      profileExtractor: profileExtractor,
+      otpManager: otpManager,
+      logoutHandler: logoutHandler,
+      socialManager: socialManager,
+      config: config,
+      loadingController: loadingController,
+    );
+    _instance = service;
+    return service;
+  }
+
   // ─── Auth Actions ───
+
 
   /// Handles OTP flow check and returns OTP result if triggered
   /// Handles OTP flow check and returns OTP result if triggered
@@ -309,9 +366,9 @@ class CkAuthService<TProfile> {
 
   /// Unified post-signup auth resolver
   Future<CkAuthResult<TProfile>> _resolvePostSignupAuth({
-    // ignore: avoid_annotating_with_dynamic
     required dynamic responseData,
     required int? statusCode,
+    bool calledFromVerifyOtp = false,
   }) async {
     // 1. Check if tokens exist in response
     final access = config.extractors.accessToken(responseData);
@@ -328,7 +385,9 @@ class CkAuthService<TProfile> {
     }
 
     // 3. Plain success fallback
-    if (_pendingLoginCallback == null) {
+    // Only set _preSignupOtpVerified when called from verifyOtp,
+    // so that the subsequent signUp() call can skip the OTP step.
+    if (calledFromVerifyOtp) {
       _preSignupOtpVerified = true;
     }
     return CkAuthResult<TProfile>.success(
@@ -515,6 +574,7 @@ class CkAuthService<TProfile> {
       if (config.mockAuth) {
         final activeTrigger = otpManager.lastTrigger;
         if (activeTrigger == CkOtpTrigger.signup) {
+          _preSignupOtpVerified = true; // allow next signUp to bypass OTP
           final res = await _resolvePostSignupAuth(
             responseData: const {'message': 'Mock OTP verification successful'},
             statusCode: 200,
@@ -542,6 +602,7 @@ class CkAuthService<TProfile> {
           final res = await _resolvePostSignupAuth(
             responseData: verifyResult.rawResponse,
             statusCode: verifyResult.statusCode,
+            calledFromVerifyOtp: true,
           );
           return CkAuthResult<void>(
             isSuccess: res.isSuccess,
@@ -582,6 +643,9 @@ class CkAuthService<TProfile> {
   }) {
     return loadingController.wrap(CkAuthLoadingType.sendOtp, () async {
       if (config.mockAuth) {
+        otpManager.lastTrigger = trigger;
+        otpManager.lastRecipient = recipient;
+        await otpManager.storeVerificationToken(trigger, 'mock_otp_token');
         otpManager.startResendTimer();
         if (config.handlers?.showOtpVerification != null) {
           config.handlers!.showOtpVerification!();
