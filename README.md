@@ -75,21 +75,23 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 
 1. [Visual Preview](#visual-preview)
 2. [Features](#features)
-3. [Installation](#installation)
-4. [Quick Start](#quick-start)
-5. [Configuration](#configuration)
-6. [Splash Screen Routing](#splash-screen-routing)
-7. [Navigation & Global Access](#navigation--global-access)
-8. [UI Components](#ui-components)
-9. [Forms & Validation](#forms--validation)
-10. [Dialogs & Overlays](#dialogs--overlays)
-11. [Responsive Utilities](#responsive-utilities)
-12. [Transport (HTTP)](#transport-http)
-13. [Storage](#storage)
-14. [Authentication Module](#authentication-module)
-15. [Location Pickers](#location-pickers)
-16. [Utilities & Extensions](#utilities--extensions)
-17. [License](#license)
+3. [UI Component List](#ui-component-list)
+4. [Design Guidelines](#design-guidelines-flutter-native-experience-with-ck)
+5. [Installation](#installation)
+6. [Quick Start](#quick-start)
+7. [Configuration](#configuration)
+8. [Splash Screen Routing](#splash-screen-routing)
+9. [Navigation & Global Access](#navigation--global-access)
+10. [UI Components](#ui-components)
+11. [Forms & Validation](#forms--validation)
+12. [Dialogs & Overlays](#dialogs--overlays)
+13. [Responsive Utilities](#responsive-utilities)
+14. [Transport (HTTP)](#transport-http)
+15. [Storage](#storage)
+16. [Authentication Module](#authentication-module)
+17. [Location Pickers](#location-pickers)
+18. [Utilities & Extensions](#utilities--extensions)
+19. [License](#license)
 
 ---
 
@@ -103,6 +105,52 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 | **Transport** | `CkTransport` + `CkResponse`, automatic token refresh, retries |
 | **Storage** | `CkStorage` — secure storage with SharedPreferences fallback |
 | **Auth** | `CkAuthService`, OTP flows, social login hooks, profile caching, declarative auto-navigation, splash screen routing |
+
+---
+
+## UI Component List
+
+CoreKit provides a comprehensive set of custom widgets, prefixed with `Ck` for easy autocomplete. They are designed to streamline your Flutter development:
+
+| Widget Name | Category | Description |
+| :--- | :--- | :--- |
+| 🧭 **`CkAppBar`** | ![Navigation](https://img.shields.io/badge/-Navigation-indigo?style=flat-square) | Custom app bar with global back navigation & actions |
+| 🔘 **`CkButton`** | ![Button](https://img.shields.io/badge/-Button-orange?style=flat-square) | Standard elevated/gradient button with optional loading state |
+| 🔘 **`CkSelectableButton`** | ![Button](https://img.shields.io/badge/-Button-orange?style=flat-square) | Toggleable button for selecting options/configurations |
+| 🔘 **`CkRadioGroup`** | ![Button](https://img.shields.io/badge/-Button-orange?style=flat-square) | Radio selection group with custom item builder |
+| 🔘 **`CkRadioGroupFormField`** | ![Button](https://img.shields.io/badge/-Button-orange?style=flat-square) | Form-integrated version of radio group selection |
+| 🔘 **`CkMultipleSelector`** | ![Button](https://img.shields.io/badge/-Button-orange?style=flat-square) | Select multiple options with check/active states |
+| ⌨️ **`CkTextField`** | ![Inputs](https://img.shields.io/badge/-Inputs-green?style=flat-square) | Text input field with built-in validation types and formatting |
+| ⌨️ **`CkMultilineTextField`** | ![Inputs](https://img.shields.io/badge/-Inputs-green?style=flat-square) | Multi-line text field with character, word, and line restrictions |
+| ⌨️ **`CkPhoneNumberTextField`** | ![Inputs](https://img.shields.io/badge/-Inputs-green?style=flat-square) | Custom field with country code prefix & phone validation |
+| ⌨️ **`CkDateInputTextField`** | ![Inputs](https://img.shields.io/badge/-Inputs-green?style=flat-square) | Date picker text field with standard format validation |
+| ⌨️ **`CkSearch`** | ![Inputs](https://img.shields.io/badge/-Inputs-green?style=flat-square) | Search field with debounced search callback and clear action |
+| ⌨️ **`CkDropDown`** | ![Inputs](https://img.shields.io/badge/-Inputs-green?style=flat-square) | Styled custom dropdown picker for choosing an option |
+| 📍 **`CkCountryPicker`** | ![Location Pickers](https://img.shields.io/badge/-Location%20Pickers-purple?style=flat-square) | Dropdown selector for picking countries |
+| 📍 **`CkStateDropDown`** | ![Location Pickers](https://img.shields.io/badge/-Location%20Pickers-purple?style=flat-square) | Dropdown selector for choosing a state/province/territory |
+| 📍 **`CkCityDropDown`** | ![Location Pickers](https://img.shields.io/badge/-Location%20Pickers-purple?style=flat-square) | Dropdown selector for cities, filtered dynamically by state |
+| 🖼️ **`CkImage`** | ![Media](https://img.shields.io/badge/-Media-red?style=flat-square) | Renders network, asset, file, or SVG images with caching |
+| 🖼️ **`CkImagePicker`** | ![Media](https://img.shields.io/badge/-Media-red?style=flat-square) | Single image picker widget with source selection |
+| 🖼️ **`CkMultiImagePicker`** | ![Media](https://img.shields.io/badge/-Media-red?style=flat-square) | Grid image picker widget for selecting multiple images |
+| 📜 **`CkListView`** | ![List & Paginated](https://img.shields.io/badge/-List%20%26%20Paginated-blue?style=flat-square) | Paginated list view loader supporting pull-to-refresh & infinite scroll |
+| 📜 **`CkGridView`** | ![List & Paginated](https://img.shields.io/badge/-List%20%26%20Paginated-blue?style=flat-square) | Paginated grid view loader supporting pull-to-refresh & infinite scroll |
+| 📜 **`CkTabListView`** | ![List & Paginated](https://img.shields.io/badge/-List%20%26%20Paginated-blue?style=flat-square) | Tabbed layout where each tab hosts a paginated list |
+| 🔤 **`CkText`** | ![Typography](https://img.shields.io/badge/-Typography-teal?style=flat-square) | Standard text component with default styling and margins |
+| 🔤 **`CkRichText`** | ![Typography](https://img.shields.io/badge/-Typography-teal?style=flat-square) | Styled rich text supporting clickable segments |
+| 🧭 **`CkTabBar`** | ![Navigation](https://img.shields.io/badge/-Navigation-indigo?style=flat-square) | Custom horizontal tab bar |
+| 📝 **`CkForm`** | ![Form](https://img.shields.io/badge/-Form-blueviolet?style=flat-square) | Form wrapper for validation management |
+| 📝 **`CkFormBuilder`** | ![Form](https://img.shields.io/badge/-Form-blueviolet?style=flat-square) | Form builder supporting automated form layout |
+| 🎨 **`CkDottedBorder`** | ![Style / Containers](https://img.shields.io/badge/-Style%20%2F%20Containers-pink?style=flat-square) | Renders a custom dotted/dashed border around widgets |
+| ⏳ **`CkLoader`** | ![Loading](https://img.shields.io/badge/-Loading-lightgrey?style=flat-square) | Global indicator shown during async loading states |
+| 💬 **`CkRatingBar`** | ![Feedback](https://img.shields.io/badge/-Feedback-yellowgreen?style=flat-square) | Interactive/read-only star rating indicator |
+| 💬 **`CkSpotlight`** | ![Feedback](https://img.shields.io/badge/-Feedback-yellowgreen?style=flat-square) | Feature spotlight tour helper overlaying highlight regions |
+| 🪟 **`CkDialog`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Standard base overlay dialog builder |
+| 🪟 **`CkAlert`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Interactive alert dialog with buttons for callbacks |
+| 🪟 **`CkPopupMenu`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Styled context popup menu options |
+| 🪟 **`CkDraggableBottomSheet`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Bottom sheet overlay that can be dragged up or down |
+| 🪟 **`CkCommentSheet`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Pre-built comments section layout inside a bottom sheet |
+| 🪟 **`CkScreenshotPreview`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Interactive preview overlay for capturing screenshots |
+| 🪟 **`CkSnackBar`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Custom overlay banner showing feedback notices |
 
 ---
 
@@ -540,52 +588,6 @@ final base = coreKitInstance.imageBaseUrl;
 ---
 
 ## UI Components
-
-### List of All Widgets
-
-CoreKit provides the following comprehensive set of custom widgets, prefixed with `Ck` for easy autocomplete:
-
-| Widget Name | Category | Description |
-| :--- | :--- | :--- |
-| `CkAppBar` | Navigation | Custom app bar with global back navigation & actions |
-| `CkButton` | Button | Standard elevated/gradient button with optional loading state |
-| `CkSelectableButton` | Button | Toggleable button for selecting options/configurations |
-| `CkRadioGroup` | Button | Radio selection group with custom item builder |
-| `CkRadioGroupFormField` | Button | Form-integrated version of radio group selection |
-| `CkMultipleSelector` | Button | Select multiple options with check/active states |
-| `CkTextField` | Inputs | Text input field with built-in validation types and formatting |
-| `CkMultilineTextField` | Inputs | Multi-line text field with character, word, and line restrictions |
-| `CkPhoneNumberTextField` | Inputs | Custom field with country code prefix & phone validation |
-| `CkDateInputTextField` | Inputs | Date picker text field with standard format validation |
-| `CkSearch` | Inputs | Search field with debounced search callback and clear action |
-| `CkDropDown` | Inputs | Styled custom dropdown picker for choosing an option |
-| `CkCountryPicker` | Location Pickers | Dropdown selector for picking countries |
-| `CkStateDropDown` | Location Pickers | Dropdown selector for choosing a state/province/territory |
-| `CkCityDropDown` | Location Pickers | Dropdown selector for cities, filtered dynamically by state |
-| `CkImage` | Media | Renders network, asset, file, or SVG images with caching |
-| `CkImagePicker` | Media | Single image picker widget with source selection |
-| `CkMultiImagePicker` | Media | Grid image picker widget for selecting multiple images |
-| `CkListView` | List & Paginated | Paginated list view loader supporting pull-to-refresh & infinite scroll |
-| `CkGridView` | List & Paginated | Paginated grid view loader supporting pull-to-refresh & infinite scroll |
-| `CkTabListView` | List & Paginated | Tabbed layout where each tab hosts a paginated list |
-| `CkText` | Typography | Standard text component with default styling and margins |
-| `CkRichText` | Typography | Styled rich text supporting clickable segments |
-| `CkTabBar` | Navigation | Custom horizontal tab bar |
-| `CkForm` | Form | Form wrapper for validation management |
-| `CkFormBuilder` | Form | Form builder supporting automated form layout |
-| `CkDottedBorder` | Style / Containers | Renders a custom dotted/dashed border around widgets |
-| `CkLoader` | Loading | Global indicator shown during async loading states |
-| `CkRatingBar` | Feedback | Interactive/read-only star rating indicator |
-| `CkSpotlight` | Feedback | Feature spotlight tour helper overlaying highlight regions |
-| `CkDialog` | Overlays & Dialogs | Standard base overlay dialog builder |
-| `CkAlert` | Overlays & Dialogs | Interactive alert dialog with buttons for callbacks |
-| `CkPopupMenu` | Overlays & Dialogs | Styled context popup menu options |
-| `CkDraggableBottomSheet` | Overlays & Dialogs | Bottom sheet overlay that can be dragged up or down |
-| `CkCommentSheet` | Overlays & Dialogs | Pre-built comments section layout inside a bottom sheet |
-| `CkScreenshotPreview` | Overlays & Dialogs | Interactive preview overlay for capturing screenshots |
-| `CkSnackBar` | Overlays & Dialogs | Custom overlay banner showing feedback notices |
-
----
 
 ### Text
 

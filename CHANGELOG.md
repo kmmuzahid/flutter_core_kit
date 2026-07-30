@@ -1,3 +1,8 @@
+
+## 1.0.7+2
+
+* **Documentation Update**: Added the latest demo screenshots and a new preview video to the `README.md`.
+
 ## 1.0.7+1
 
 * **Documentation Update**: Added the latest demo screenshots and a new preview video to the `README.md`.
