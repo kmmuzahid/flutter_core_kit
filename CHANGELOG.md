@@ -1,4 +1,8 @@
 
+## 1.0.7+6
+
+* **Static Analysis**: static analysis issues fixed and Dependencies updated.
+
 ## 1.0.7+5
 
 * **Static Analysis**: reduce static analysis issues.
