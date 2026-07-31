@@ -1,5 +1,13 @@
 
+## 1.0.7+3
+
+* **pub.dev Discoverability Improvements**:
+  * Added `topics` to `pubspec.yaml` (`ui`, `widgets`, `networking`, `authentication`, `responsive`) — enables category-based search filtering on pub.dev.
+  * Added `screenshots` to `pubspec.yaml` — four preview images now display as a carousel on the pub.dev package page.
+  * Updated `description` to include the `CoreKit` alias, `screen_utils`-inspired responsive scaling, and additional search keywords (`JWT`, `OTP`, `Dio`, `paginated lists`, `forms`, `dialogs`) for improved discoverability.
+
 ## 1.0.7+2
+
 
 * **Static Analysis Fixes**: Resolved all `lints_core` issues reported by pub.dev static analysis.
   * Fixed `INFO: Angle brackets will be interpreted as HTML` in `behavior_stream.dart` by wrapping the usage example in a `dart` fenced code block.
