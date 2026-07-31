@@ -87,7 +87,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.7+4"
+    version: "1.0.7+5"
   cross_file:
     dependency: transitive
     description:
@@ -124,10 +124,10 @@ packages:
     dependency: transitive
     description:
       name: dio
-      sha256: ea2bad3c89a27635ce2d85cce4d6b199da49a5a48ec77b03e45b65a3b90922b0
+      sha256: "0df44ebba85e503958eb75d07eedd3c86275a58c1d3eda2f2ce8f0a2c3abbb3c"
       url: "https://pub.dev"
     source: hosted
-    version: "5.10.0"
+    version: "5.11.0"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -144,6 +144,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  ffi_leak_tracker:
+    dependency: transitive
+    description:
+      name: ffi_leak_tracker
+      sha256: "4093d4ef9ca06ffe2786e73bfb25e22aa92112b9bb4ec941f11e3e6b61489a97"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   file:
     dependency: transitive
     description:
@@ -912,13 +920,13 @@ packages:
     source: hosted
     version: "1.1.1"
   win32:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: win32
-      sha256: d7cb55e04cd34096cd3a79b3330245f54cb96a370a1c27adb3c84b917de8b08e
+      sha256: ba6f4bba816c8d7e3c1580e170f3786d216951cc6b94babc3b814c08d2cb2738
       url: "https://pub.dev"
     source: hosted
-    version: "5.15.0"
+    version: "6.3.0"
   xdg_directories:
     dependency: transitive
     description:

@@ -14,5 +14,8 @@ dependencies:
   core_kit:
     path: ../
 
+dependency_overrides:
+  win32: ^6.0.1
+
 flutter:
   uses-material-design: true
