@@ -3,6 +3,23 @@ description: "A Flutter package bundling production-ready UI widgets, responsive
 version: 1.0.7+2
 homepage: https://github.com/kmmuzahid/flutter_core_kit.git
 
+topics:
+  - ui
+  - widgets
+  - networking
+  - authentication
+  - storage
+
+screenshots:
+  - description: CoreKit feature overview — widgets, networking, and auth in one package
+    path: docs_files/corekit_features_unified.png
+  - description: Authentication module — OTP, social login, and session management
+    path: docs_files/auth.png
+  - description: Comments bottom sheet — pre-built social interaction component
+    path: docs_files/comment.png
+  - description: Tabbed paginated list — infinite scroll with pull-to-refresh
+    path: docs_files/tab_list.png
+
 environment:
   sdk: ^3.12.2
 

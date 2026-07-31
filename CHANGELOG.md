@@ -1,7 +1,12 @@
 
 ## 1.0.7+2
 
-* **Documentation Update**: Added the latest demo screenshots and a new preview video to the `README.md`.
+* **Static Analysis Fixes**: Resolved all `lints_core` issues reported by pub.dev static analysis.
+  * Fixed `INFO: Angle brackets will be interpreted as HTML` in `behavior_stream.dart` by wrapping the usage example in a `dart` fenced code block.
+  * Fixed `INFO: Missing type annotation` in `profile_extractor.dart` by adding explicit `dynamic` type to `parseProfile(data)`.
+  * Fixed `directives_ordering` lint in `ck_auth_service.dart` by sorting import sections correctly (`dart:` → `package:flutter` → other packages).
+  * Fixed `avoid_annotating_with_dynamic` lint in `ck_auth_service.dart` by removing the redundant `dynamic` annotation on `_resolvePostSignupAuth`.
+* **pub.dev SEO**: Added `topics` and `screenshots` to `pubspec.yaml` for improved discoverability and pub.dev page presentation.
 
 ## 1.0.7+1
 
