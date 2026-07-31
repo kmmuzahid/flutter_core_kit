@@ -25,7 +25,11 @@ class CkScreenUtils {
     final height = _designHeight;
     final device = _deviceSize;
 
-    if (width == null || height == null || device == null || width == 0 || height == 0) {
+    if (width == null ||
+        height == null ||
+        device == null ||
+        width == 0 ||
+        height == 0) {
       return 1.0;
     }
 
@@ -46,14 +50,14 @@ extension GapExtension on int {
   Widget get height => SizedBox(height: toDouble());
 }
 
-extension responsive on int {
+extension Responsive on int {
   double get w => CkScreenUtils.width(value: this);
   double get h => CkScreenUtils.height(value: this);
   double get r => CkScreenUtils.radius(value: this);
   double get sp => CkScreenUtils.sp(value: this);
 }
 
-extension responsiveDouble on double {
+extension ResponsiveDouble on double {
   double get w => CkScreenUtils.width(value: this);
   double get h => CkScreenUtils.height(value: this);
   double get r => CkScreenUtils.radius(value: this);
@@ -110,12 +114,8 @@ extension WidgetAspectRatio on Widget {
 }
 
 extension EdgeInsetsResponsive on EdgeInsets {
-  EdgeInsets get responsive => EdgeInsets.fromLTRB(
-        left.w,
-        top.h,
-        right.w,
-        bottom.h,
-      );
+  EdgeInsets get responsive =>
+      EdgeInsets.fromLTRB(left.w, top.h, right.w, bottom.h);
 }
 
 extension EdgeInsetsGeometryResponsive on EdgeInsetsGeometry {
@@ -126,4 +126,3 @@ extension EdgeInsetsGeometryResponsive on EdgeInsetsGeometry {
     return this;
   }
 }
-

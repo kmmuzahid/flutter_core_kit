@@ -1,4 +1,8 @@
 
+## 1.0.7+5
+
+* **Static Analysis**: reduce static analysis issues.
+
 ## 1.0.7+4
 
 * **Dependencies**: Updated dependencies to address potential compatibility issues.

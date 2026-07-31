@@ -1,6 +1,6 @@
 name: core_kit
 description: "CoreKit (core_kit) — Flutter UI kit with responsive scaling, Dio HTTP, JWT auth, secure storage, and 35+ widgets."
-version: 1.0.7+4
+version: 1.0.7+5
 homepage: https://github.com/kmmuzahid/flutter_core_kit.git
 
 topics:
