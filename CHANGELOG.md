@@ -1,20 +1,12 @@
 
 ## 1.0.7+3
 
-* **pub.dev Discoverability Improvements**:
-  * Added `topics` to `pubspec.yaml` (`ui`, `widgets`, `networking`, `authentication`, `responsive`) — enables category-based search filtering on pub.dev.
-  * Added `screenshots` to `pubspec.yaml` — four preview images now display as a carousel on the pub.dev package page.
-  * Updated `description` to include the `CoreKit` alias, `screen_utils`-inspired responsive scaling, and additional search keywords (`JWT`, `OTP`, `Dio`, `paginated lists`, `forms`, `dialogs`) for improved discoverability.
+* **Documentation**: Improved pub.dev page with topics, screenshots, and an updated description.
 
 ## 1.0.7+2
 
+* **Documentation**: Internal code comments and doc organization.
 
-* **Static Analysis Fixes**: Resolved all `lints_core` issues reported by pub.dev static analysis.
-  * Fixed `INFO: Angle brackets will be interpreted as HTML` in `behavior_stream.dart` by wrapping the usage example in a `dart` fenced code block.
-  * Fixed `INFO: Missing type annotation` in `profile_extractor.dart` by adding explicit `dynamic` type to `parseProfile(data)`.
-  * Fixed `directives_ordering` lint in `ck_auth_service.dart` by sorting import sections correctly (`dart:` → `package:flutter` → other packages).
-  * Fixed `avoid_annotating_with_dynamic` lint in `ck_auth_service.dart` by removing the redundant `dynamic` annotation on `_resolvePostSignupAuth`.
-* **pub.dev SEO**: Added `topics` and `screenshots` to `pubspec.yaml` for improved discoverability and pub.dev page presentation.
 
 ## 1.0.7+1
 
