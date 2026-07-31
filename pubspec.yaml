@@ -1,5 +1,5 @@
 name: core_kit
-description: "CoreKit (core_kit) — production-ready Flutter UI widgets, responsive layout helpers, Dio networking with JWT token refresh, OTP flows, social auth, secure storage, and 35+ Ck-prefixed components."
+description: "CoreKit (core_kit) — Flutter UI kit with screen-utils responsive scaling, Dio HTTP client, JWT token refresh, OTP & social auth, secure storage, paginated lists, forms, dialogs, and 35+ Ck-prefixed widgets."
 version: 1.0.7+2
 homepage: https://github.com/kmmuzahid/flutter_core_kit.git
 
@@ -8,7 +8,7 @@ topics:
   - widgets
   - networking
   - authentication
-  - storage
+  - responsive
 
 screenshots:
   - description: CoreKit feature overview — widgets, networking, and auth in one package
