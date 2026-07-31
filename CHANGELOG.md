@@ -1,4 +1,8 @@
 
+## 1.0.7+4
+
+* **Dependencies**: Updated dependencies to address potential compatibility issues.
+
 ## 1.0.7+3
 
 * **Documentation**: Improved pub.dev page with topics, screenshots, and an updated description.
