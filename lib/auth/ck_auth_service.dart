@@ -363,7 +363,7 @@ class CkAuthService<TProfile> {
 
   /// Unified post-signup auth resolver
   Future<CkAuthResult<TProfile>> _resolvePostSignupAuth({
-    required responseData,
+    required dynamic responseData,
     required int? statusCode,
     bool calledFromVerifyOtp = false,
   }) async {

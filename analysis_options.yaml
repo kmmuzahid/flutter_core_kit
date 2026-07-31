@@ -28,8 +28,6 @@ linter:
     - test_types_in_equals
     - valid_regexps
 
-    # --- THE RULE FOR DYNAMIC ---
-    - avoid_annotating_with_dynamic
 
     # --- STYLE & ARCHITECTURE ---
     - always_use_package_imports

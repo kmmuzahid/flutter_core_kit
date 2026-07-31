@@ -258,7 +258,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
           text: title ?? '',
           fontWeight: FontWeight.w600,
           fontSize:
-              coreKitInstanceSingleton
+              CoreKitInstanceSingleton
                   .instance
                   .theme
                   .appBarTheme

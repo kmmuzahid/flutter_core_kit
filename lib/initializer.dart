@@ -14,8 +14,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-coreKitInstanceSingleton get coreKitInstance =>
-    coreKitInstanceSingleton.instance;
+CoreKitInstanceSingleton get coreKitInstance =>
+    CoreKitInstanceSingleton.instance;
 
 typedef NavigationBack = void Function();
 
@@ -70,11 +70,11 @@ class CkListLoaderConfig {
   }
 }
 
-class coreKitInstanceSingleton {
-  coreKitInstanceSingleton._();
-  static final coreKitInstanceSingleton _instance = coreKitInstanceSingleton
+class CoreKitInstanceSingleton {
+  CoreKitInstanceSingleton._();
+  static final CoreKitInstanceSingleton _instance = CoreKitInstanceSingleton
       ._();
-  static coreKitInstanceSingleton get instance => _instance;
+  static CoreKitInstanceSingleton get instance => _instance;
 
   late GlobalKey<NavigatorState> navigatorKey;
   late String imageBaseUrl;

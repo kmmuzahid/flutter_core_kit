@@ -6,4 +6,4 @@ library;
 export 'core_kit.dart';
 
 // Internal-only exports
-export 'initializer.dart' show coreKitInstanceSingleton, coreKitInstance;
+export 'initializer.dart' show CoreKitInstanceSingleton, coreKitInstance;
