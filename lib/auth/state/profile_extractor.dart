@@ -144,7 +144,8 @@ class CkProfileExtractor<TProfile> {
     await CkStorage.delete(CkAuthStorageKeys.profileDataKey);
   }
 
-  TProfile? parseProfile(data) {
+  // ignore: avoid_annotating_with_dynamic
+  TProfile? parseProfile(dynamic data) {
     if (data == null) return null;
 
     // Use custom profile extractor if provided

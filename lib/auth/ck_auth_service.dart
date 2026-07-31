@@ -1,10 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-
 import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
-
 import 'package:core_kit/auth/logout/logout_handler.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
@@ -21,6 +18,7 @@ import 'package:core_kit/auth/token/auth_token_manager.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/storage/ck_storage.dart';
+import 'package:flutter/foundation.dart';
 
 /// Token layer prepared before [CkTransport.init] (CoreKit internal).
 class CkAuthNetworkBootstrap {
@@ -212,7 +210,6 @@ class CkAuthService<TProfile> {
 
   // ─── Auth Actions ───
 
-
   /// Handles OTP flow check and returns OTP result if triggered
   /// Handles OTP flow check and returns OTP result if triggered
   CkAuthResult<TProfile>? _handleOtpFlow(
@@ -366,7 +363,7 @@ class CkAuthService<TProfile> {
 
   /// Unified post-signup auth resolver
   Future<CkAuthResult<TProfile>> _resolvePostSignupAuth({
-    required dynamic responseData,
+    required responseData,
     required int? statusCode,
     bool calledFromVerifyOtp = false,
   }) async {
@@ -410,9 +407,7 @@ class CkAuthService<TProfile> {
     _pendingLoginCallback = loginCallback;
     return loadingController.wrap(CkAuthLoadingType.signUp, () async {
       final builtHeaders = {
-        ...?config.signupHeadersBuilder?.call(
-          otpManager.lastVerificationToken,
-        ),
+        ...?config.signupHeadersBuilder?.call(otpManager.lastVerificationToken),
         ...?headers,
       };
 

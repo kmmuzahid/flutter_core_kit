@@ -7,12 +7,14 @@ import 'dart:async';
 /// the last emitted value (if any), so the screen never starts blank.
 ///
 /// Usage:
-///   final stream = CkBehaviorStream<int>(initialValue: 0);
-///   stream.listen((value) => print(value)); // prints 0 immediately
-///   stream.add(1); // prints 1
-///   
-///   // New subscriber gets last value (1) immediately
-///   stream.listen((value) => print(value)); // prints 1 immediately
+/// ```dart
+/// final stream = CkBehaviorStream<int>(initialValue: 0);
+/// stream.listen((value) => print(value)); // prints 0 immediately
+/// stream.add(1); // prints 1
+///
+/// // New subscriber gets last value (1) immediately
+/// stream.listen((value) => print(value)); // prints 1 immediately
+/// ```
 class CkBehaviorStream<T> {
   T _value;
   final StreamController<T> _controller = StreamController<T>.broadcast();
