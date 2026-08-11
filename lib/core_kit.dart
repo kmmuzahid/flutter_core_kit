@@ -96,6 +96,7 @@ export 'package:core_kit/text_field/ck_validation_type.dart';
 export 'package:core_kit/utils/ck_debouncer.dart';
 // utils
 export 'package:core_kit/utils/ck_logger.dart';
+export 'package:core_kit/utils/ck_path.dart';
 export 'package:core_kit/utils/ck_permission.dart';
 export 'package:core_kit/utils/ck_permission_handler.dart';
 export 'package:core_kit/utils/ck_permission_helper.dart';
@@ -107,4 +108,5 @@ export 'package:dio/dio.dart';
 export 'package:flutter_secure_storage/flutter_secure_storage.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:image_picker/image_picker.dart';
+export 'package:path_provider/path_provider.dart';
 export 'package:permission_handler/permission_handler.dart';

@@ -1967,6 +1967,36 @@ if (await CkPermission.camera.isGranted) {
 final granted = await Permission.camera.ensure();
 ```
 
+### Directory & File Paths (`CkPath`)
+
+Quick and convenient access to standard system directories and temporary files:
+
+```dart
+// Directory instances:
+final tempDir = await CkPath.getTemporaryDirectory();
+final docsDir = await CkPath.getApplicationDocumentsDirectory();
+
+// Direct path strings:
+final tempPath = await CkPath.tempPath;
+final docsPath = await CkPath.documentsPath;
+final cachePath = await CkPath.cachePath;
+
+// Voice recording / Temp file creation:
+final voiceFile = await CkPath.createTempFile(
+  prefix: 'rec_',
+  extension: 'm4a',
+);
+
+// Get file path inside temp / docs / cache:
+final tempAudioPath = await CkPath.getTempFilePath(
+  prefix: 'voice_',
+  extension: 'm4a',
+);
+
+// Clear temporary directory files:
+await CkPath.clearTemp();
+```
+
 ### Sharing
 
 ```dart
