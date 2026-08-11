@@ -38,10 +38,7 @@ class _CkImagePickerState extends State<CkImagePicker> {
   XFile? _selectedImages;
 
   Future<void> _pickImage(FormFieldState<XFile> fieldState) async {
-    const permissionHandlerHelper = CkPermissionHandler(
-      permission: Permission.photos,
-    );
-    final status = await permissionHandlerHelper.getStatus();
+    final status = await CkPermission.photos.ensure();
     if (!status) return;
     final picked = await _picker.pickImage(source: ImageSource.gallery);
 

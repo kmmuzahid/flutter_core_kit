@@ -96,6 +96,7 @@ export 'package:core_kit/text_field/ck_validation_type.dart';
 export 'package:core_kit/utils/ck_debouncer.dart';
 // utils
 export 'package:core_kit/utils/ck_logger.dart';
+export 'package:core_kit/utils/ck_permission.dart';
 export 'package:core_kit/utils/ck_permission_handler.dart';
 export 'package:core_kit/utils/ck_permission_helper.dart';
 export 'package:core_kit/utils/ck_screen_utils.dart';

@@ -1938,13 +1938,33 @@ CkCityDropDown(
 
 ## Utilities & Extensions
 
-### Permissions
+### Permissions (`CkPermission`)
+
+CoreKit provides an intuitive and modern permission manager via `CkPermission`:
 
 ```dart
-final granted = await CkPermissionHelper.request(Permission.camera);
-if (granted) {
-  // use camera
+// Check, request, and handle settings dialog in one clean call:
+final status = await CkPermission.camera.ensure();
+if (!status) return;
+
+final picked = await ImagePicker().pickImage(
+  source: ImageSource.camera,
+);
+
+// Other permissions available:
+await CkPermission.photos.ensure();
+await CkPermission.storage.ensure();
+await CkPermission.location.ensure();
+await CkPermission.microphone.ensure();
+await CkPermission.notification.ensure();
+
+// Check status directly:
+if (await CkPermission.camera.isGranted) {
+  // Already granted
 }
+
+// Or use extension on standard Permission:
+final granted = await Permission.camera.ensure();
 ```
 
 ### Sharing

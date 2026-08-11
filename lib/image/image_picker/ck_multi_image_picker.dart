@@ -1,5 +1,5 @@
 import 'package:core_kit/image/ck_image.dart';
-import 'package:core_kit/utils/ck_permission_helper.dart';
+import 'package:core_kit/utils/ck_permission.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -101,7 +101,7 @@ class _CkMultiImagePickerField
   }
 
   Future<void> _pickImages(FormFieldState<List<XFile>> fieldState) async {
-    final status = await CkPermissionHelper.request(Permission.photos);
+    final status = await CkPermission.photos.ensure();
     if (!status) return;
 
     if (!widget.isMulti) {
