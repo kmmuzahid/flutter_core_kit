@@ -89,6 +89,7 @@ class CkCommentSheet<T> extends StatefulWidget {
     this.sendButtonBuilder,
     this.sendButtonPosition = CkSendButtonPosition.footer,
     this.showComposer = true,
+    this.preserveComposeText = false,
     this.composerHintText = 'Write a comment...',
     this.composerMinHeight = 100,
     this.composerFocusedHeight = 160,
@@ -191,6 +192,11 @@ class CkCommentSheet<T> extends StatefulWidget {
   /// own show/hide state if you want a collapsible composer.
   final bool showComposer;
 
+  /// When true, hiding the composer (via [showComposer] = false) preserves the
+  /// written text in the composer field until [onSend] is triggered.
+  /// When false (default), hiding the composer discards the current input.
+  final bool preserveComposeText;
+
   final String composerHintText;
 
   /// Height of the composer text box when not focused.
@@ -250,6 +256,9 @@ class _CkCommentSheetState<T> extends State<CkCommentSheet<T>> {
   void didUpdateWidget(covariant CkCommentSheet<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final justShown = widget.showComposer && !oldWidget.showComposer;
+    if (!widget.preserveComposeText) {
+      _composerController.clear();
+    }
     final replyTargetChanged =
         widget.replyTarget != null &&
         widget.replyTarget != oldWidget.replyTarget;

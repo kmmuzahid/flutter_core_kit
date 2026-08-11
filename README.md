@@ -1073,6 +1073,8 @@ CkCommentSheet<CommentNode>(
   itemBuilder: (context, node, depth) => Text(node.content),
   replyActionBuilder: (node, depth, expand) => IconButton(icon: Icon(Icons.reply), onPressed: expand),
   reactionBuilder: (node) => Icon(Icons.favorite_border),
+  showComposer: true,
+  preserveComposeText: true, // keeps typed text when composer is hidden until sent
   onSend: (text, replyTo) => print('Send: $text to: ${replyTo?.id}'),
 )
 ```

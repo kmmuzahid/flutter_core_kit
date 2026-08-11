@@ -121,7 +121,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
     _controller = widget.controller ?? TextEditingController();
     _focusNode = FocusNode();
 
-    _controller.text = widget.onInitalize?.call(_controller) ?? '';
+    final initialText = widget.onInitalize?.call(_controller);
+    if (initialText != null) {
+      _controller.text = initialText;
+    }
 
     _focusNode.addListener(() {
       widget.onFocusChanged?.call(_focusNode);
