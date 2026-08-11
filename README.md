@@ -151,6 +151,9 @@ CoreKit provides a comprehensive set of custom widgets, prefixed with `Ck` for e
 | 🪟 **`CkCommentSheet`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Pre-built comments section layout inside a bottom sheet |
 | 🪟 **`CkScreenshotPreview`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Interactive preview overlay for capturing screenshots |
 | 🪟 **`CkSnackBar`** | ![Overlays & Dialogs](https://img.shields.io/badge/-Overlays%20%26%20Dialogs-violet?style=flat-square) | Custom overlay banner showing feedback notices |
+| 🛡️ **`CkPermission`** | ![System & Utilities](https://img.shields.io/badge/-System%20%26%20Utilities-darkgreen?style=flat-square) | Unified permission manager with automatic settings dialogs |
+| 📁 **`CkPath`** | ![Storage & Paths](https://img.shields.io/badge/-Storage%20%26%20Paths-brown?style=flat-square) | Device directory paths & temporary/document file manager |
+| 💾 **`CkStorage`** | ![Storage & State](https://img.shields.io/badge/-Storage%20%26%20State-brown?style=flat-square) | Zero-latency secure storage with guaranteed fallback |
 
 ---
 
@@ -349,7 +352,7 @@ class CkConfigImpl extends CoreKitConfig {
         },
       );
 
-  // ─── Optional (override mixin defaults as needed) ───────────
+  // ─── Optional ───────────────────────────────────────────────
 
   @override
   Size get designSize => const Size(428, 926);
@@ -409,8 +412,8 @@ class CkConfigImpl extends CoreKitConfig {
       );
 
   @override
-  CkPermissionHelperConfig? get permissionHelperConfig =>
-      const CkPermissionHelperConfig(
+  CkPermissionConfig? get permissionHelperConfig =>
+      const CkPermissionConfig(
         permissionDenied: 'Permission denied',
         openSettings: 'Open Settings',
       );
@@ -1942,10 +1945,10 @@ CkCityDropDown(
 
 ### Permissions (`CkPermission`)
 
-CoreKit provides an intuitive and modern permission manager via `CkPermission`:
+CoreKit provides an intuitive, robust, and unified permission manager via `CkPermission`:
 
 ```dart
-// Check, request, and handle settings dialog in one clean call:
+// 1. Check, request, and handle settings dialog in one clean call:
 final status = await CkPermission.camera.ensure();
 if (!status) return;
 
@@ -1953,49 +1956,67 @@ final picked = await ImagePicker().pickImage(
   source: ImageSource.camera,
 );
 
-// Other permissions available:
+// 2. Pre-defined permissions:
 await CkPermission.photos.ensure();
 await CkPermission.storage.ensure();
 await CkPermission.location.ensure();
+await CkPermission.locationWhenInUse.ensure();
 await CkPermission.microphone.ensure();
 await CkPermission.notification.ensure();
+await CkPermission.contacts.ensure();
+await CkPermission.bluetooth.ensure();
+await CkPermission.mediaLibrary.ensure();
+await CkPermission.audio.ensure();
+await CkPermission.videos.ensure();
 
-// Check status directly:
+// 3. Ensure multiple permissions concurrently:
+final results = await CkPermission.ensureMultiple([
+  CkPermission.camera,
+  CkPermission.microphone,
+]);
+
+// 4. Check status directly without requesting:
 if (await CkPermission.camera.isGranted) {
   // Already granted
 }
 
-// Or use extension on standard Permission:
+// 5. Or use the extension on standard Permission:
 final granted = await Permission.camera.ensure();
 ```
 
 ### Directory & File Paths (`CkPath`)
 
-Quick and convenient access to standard system directories and temporary files:
+Quick and convenient access to standard system directories, paths, and temporary files:
 
 ```dart
-// Directory instances:
+// 1. Get Directory instances:
 final tempDir = await CkPath.getTemporaryDirectory();
 final docsDir = await CkPath.getApplicationDocumentsDirectory();
+final cacheDir = await CkPath.getApplicationCacheDirectory();
 
-// Direct path strings:
+// 2. Direct string paths:
 final tempPath = await CkPath.tempPath;
 final docsPath = await CkPath.documentsPath;
 final cachePath = await CkPath.cachePath;
+final downloadsPath = await CkPath.downloadsPath;
 
-// Voice recording / Temp file creation:
+// 3. Voice recording / Media temporary files:
 final voiceFile = await CkPath.createTempFile(
   prefix: 'rec_',
   extension: 'm4a',
 );
 
-// Get file path inside temp / docs / cache:
-final tempAudioPath = await CkPath.getTempFilePath(
+// 4. Generate file paths inside temp/docs/cache:
+final recordingPath = await CkPath.getTempFilePath(
   prefix: 'voice_',
   extension: 'm4a',
 );
+final docFilePath = await CkPath.getDocumentFilePath('report.pdf');
 
-// Clear temporary directory files:
+// 5. Cross-platform path join:
+final fullPath = CkPath.join(tempPath, 'voice', 'rec.m4a');
+
+// 6. Clear temporary directory files:
 await CkPath.clearTemp();
 ```
 

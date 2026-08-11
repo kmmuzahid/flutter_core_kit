@@ -1,4 +1,18 @@
 
+## 1.0.7+7
+
+* **CkPermission Manager**:
+  * Introduced modern, unified permission manager `CkPermission` (`await CkPermission.camera.ensure()`, `await CkPermission.photos.ensure()`, etc.) with pre-defined typed constants and convenience getters (`status`, `isGranted`, `isDenied`, `isPermanentlyDenied`).
+  * Added `.ensure()` extension on standard `Permission` (`await Permission.camera.ensure()`).
+  * Marked legacy `CkPermissionHelper` and `CkPermissionHandler` as `@Deprecated`.
+* **CkPath Directory & Path Manager**:
+  * Added `CkPath` utility for easy access to device directories (`getTemporaryDirectory()`, `getApplicationDocumentsDirectory()`, cache, downloads, support) and direct string paths (`tempPath`, `documentsPath`, `cachePath`).
+  * Added helpers to create temporary and document files (`createTempFile()`, `getTempFilePath()`, `createDocumentFile()`, `join()`, `clearTemp()`).
+  * Re-exported `path_provider` directly in `core_kit.dart`.
+* **CkCommentSheet Text Preservation**:
+  * Added `preserveComposeText` parameter to `CkCommentSheet` to preserve written comment text across show/hide composer states until send is clicked.
+  * Fixed `CkMultilineTextField` to avoid overwriting existing controller text upon mounting when `onInitalize` is null.
+
 ## 1.0.7+6
 
 * **Static Analysis**: static analysis issues fixed and Dependencies updated.
