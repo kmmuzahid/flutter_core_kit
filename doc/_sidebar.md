@@ -27,4 +27,7 @@
 
 * **Resources**
   * [Utilities & Extensions](/#utilities--extensions)
+  * [📦 Pub.dev Package](https://pub.dev/packages/core_kit)
+  * [📖 API Documentation](https://pub.dev/documentation/core_kit/latest/)
+  * [📁 GitHub Repository](https://github.com/kmmuzahid/flutter_core_kit)
   * [License / MIT](/#license)

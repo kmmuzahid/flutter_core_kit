@@ -1,8 +1,15 @@
 # CoreKit
 
-[![Pub Version](https://img.shields.io/pub/v/core_kit?color=blue&label=pub)](https://pub.dev/packages/core_kit)
-[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
+[![Pub Version](https://img.shields.io/pub/v/core_kit?color=blue&label=pub.dev&logo=dart)](https://pub.dev/packages/core_kit)
+[![Pub Points](https://img.shields.io/pub/points/core_kit?color=blue&label=pub%20points)](https://pub.dev/packages/core_kit/score)
+[![Pub Popularity](https://img.shields.io/pub/popularity/core_kit?color=blue&label=popularity)](https://pub.dev/packages/core_kit)
+[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20macos%20%7C%20windows%20%7C%20linux%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+📦 **Pub.dev Package:** [https://pub.dev/packages/core_kit](https://pub.dev/packages/core_kit)  
+📖 **API Reference:** [https://pub.dev/documentation/core_kit/latest/](https://pub.dev/documentation/core_kit/latest/)  
+🌐 **Web Documentation:** [https://kmmuzahid.github.io/flutter_core_kit/](https://kmmuzahid.github.io/flutter_core_kit/)  
+📁 **Repository:** [https://github.com/kmmuzahid/flutter_core_kit](https://github.com/kmmuzahid/flutter_core_kit)
 
 > [!NOTE]
 > **✨ It's like magic!** CoreKit drastically reduces boilerplate and saves you hours of development time. It provides a production-ready package bundling:
@@ -179,11 +186,13 @@ Only use `.w`, `.h`, `.sp`, and `.r` when configuring Flutter's native layout wi
 
 ### 1. From pub.dev (Recommended)
 
+View and install from **[pub.dev/packages/core_kit](https://pub.dev/packages/core_kit)**:
+
 Add `core_kit` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  core_kit: ^1.0.1
+  core_kit: ^1.0.7+7
 ```
 
 Or run:
