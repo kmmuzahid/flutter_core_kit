@@ -7,9 +7,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 📦 **Pub.dev Package:** [https://pub.dev/packages/core_kit](https://pub.dev/packages/core_kit)  
-📖 **API Reference:** [https://pub.dev/documentation/core_kit/latest/](https://pub.dev/documentation/core_kit/latest/)  
-🌐 **Web Documentation:** [https://kmmuzahid.github.io/flutter_core_kit/](https://kmmuzahid.github.io/flutter_core_kit/)  
-📁 **Repository:** [https://github.com/kmmuzahid/flutter_core_kit](https://github.com/kmmuzahid/flutter_core_kit)
+📖 **API Reference:** [https://pub.dev/documentation/core_kit/latest/](https://pub.dev/documentation/core_kit/latest/)   
 
 > [!NOTE]
 > **✨ It's like magic!** CoreKit drastically reduces boilerplate and saves you hours of development time. It provides a production-ready package bundling:
