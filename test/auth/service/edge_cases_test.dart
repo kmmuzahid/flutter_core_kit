@@ -1,7 +1,6 @@
 // test/auth/service/edge_cases_test.dart
 import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_extractors.dart';
-import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/otp/otp_flow_manager.dart';
@@ -38,20 +37,6 @@ void main() {
     // EC-02
     test('verifyOtp with no lastTrigger → returns failure', () async {
       // Build service with NO OTP autoTriggers, so lastTrigger stays null
-      final config = buildMockConfig(
-        handlers: handlers,
-        autoTriggers: {},
-        mockAuth: false, // non-mock so it goes through real verifyOtp path
-      );
-      final service = await CkAuthService.initForTests(
-        config: config,
-        tokenManager: CkAuthTokenManager(),
-      );
-
-      // otpManager.lastTrigger is null — verifyOtp should fail
-      // In mock=false mode, verifyOtp calls otpManager.verifyOtp directly
-      // But without mockAuth the service will try network. Let's use mock=true
-      // and simply check the OTP manager returns failure.
       final mockConfig = buildMockConfig(
         handlers: handlers,
         autoTriggers: {},
@@ -254,4 +239,3 @@ CkOtpFlowManager _buildOtpManagerWithUrl() {
     verifyUrl: '/otp/verify',
   );
 }
-

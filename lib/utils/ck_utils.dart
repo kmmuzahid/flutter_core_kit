@@ -87,8 +87,18 @@ class CkUtils {
   static String formatDateToShortMonth(DateTime dateTime) {
     final localDate = dateTime.toLocal();
     const monthAbbr = <String>[
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     final day = localDate.day.toString().padLeft(2, '0');
@@ -112,4 +122,3 @@ class CkUtils {
     }
   }
 }
-

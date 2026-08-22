@@ -85,9 +85,12 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
       duration: const Duration(milliseconds: 300),
     );
 
-    final position = coreKitInstance.snackBarConfig.position ?? CkSnackBarPosition.bottom;
+    final position =
+        coreKitInstance.snackBarConfig.position ?? CkSnackBarPosition.bottom;
     _slideAnimation = Tween<Offset>(
-      begin: position == CkSnackBarPosition.top ? const Offset(0, -1) : const Offset(0, 1),
+      begin: position == CkSnackBarPosition.top
+          ? const Offset(0, -1)
+          : const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
@@ -133,28 +136,39 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
           final config = coreKitInstance.snackBarConfig;
           final position = config.position ?? CkSnackBarPosition.bottom;
           final borderRadius = config.borderRadius ?? 12;
-          final margin = config.margin ?? snackBarTheme.insetPadding ?? const EdgeInsets.all(16);
-          final padding = config.padding ?? snackBarTheme.insetPadding ?? const EdgeInsets.symmetric(
-            horizontal: 5,
-            vertical: 10,
-          );
-          final backgroundColor = config.backgroundColor ?? snackBarTheme.backgroundColor ?? colorScheme.surface;
-          final boxShadow = config.boxShadow ?? [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 10,
-              spreadRadius: 1,
-              offset: const Offset(0, 4),
-            ),
-          ];
+          final margin =
+              config.margin ??
+              snackBarTheme.insetPadding ??
+              const EdgeInsets.all(16);
+          final padding =
+              config.padding ??
+              snackBarTheme.insetPadding ??
+              const EdgeInsets.symmetric(horizontal: 5, vertical: 10);
+          final backgroundColor =
+              config.backgroundColor ??
+              snackBarTheme.backgroundColor ??
+              colorScheme.surface;
+          final boxShadow =
+              config.boxShadow ??
+              [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ];
           final borderWidthLeft = config.borderWidthLeft ?? 10;
           final borderWidthOthers = config.borderWidthOthers ?? 1;
           final iconSize = config.iconSize ?? 24;
-          final textStyle = config.textStyle ?? snackBarTheme.contentTextStyle ?? TextStyle(
-            color: colorScheme.onSurface.withValues(alpha: 0.85),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          );
+          final textStyle =
+              config.textStyle ??
+              snackBarTheme.contentTextStyle ??
+              TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.85),
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              );
 
           return IgnorePointer(
             ignoring: true,
@@ -165,14 +179,18 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
                 bottom: position == CkSnackBarPosition.bottom,
                 child: Align(
                   heightFactor: 1,
-                  alignment: position == CkSnackBarPosition.top ? Alignment.topCenter : Alignment.bottomCenter,
+                  alignment: position == CkSnackBarPosition.top
+                      ? Alignment.topCenter
+                      : Alignment.bottomCenter,
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: IgnorePointer(
                       ignoring: false,
                       child: Dismissible(
                         key: UniqueKey(),
-                        direction: position == CkSnackBarPosition.top ? DismissDirection.up : DismissDirection.down,
+                        direction: position == CkSnackBarPosition.top
+                            ? DismissDirection.up
+                            : DismissDirection.down,
                         onDismissed: (_) => _dismiss(),
                         child: Container(
                           padding: EdgeInsets.zero,
@@ -187,21 +205,34 @@ class _SnackBarOverlayState extends State<_SnackBarOverlay>
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(borderRadius),
                               border: Border(
-                                left: BorderSide(color: accentColor, width: borderWidthLeft),
-                                right: BorderSide(color: accentColor, width: borderWidthOthers),
-                                top: BorderSide(color: accentColor, width: borderWidthOthers),
-                                bottom: BorderSide(color: accentColor, width: borderWidthOthers),
+                                left: BorderSide(
+                                  color: accentColor,
+                                  width: borderWidthLeft,
+                                ),
+                                right: BorderSide(
+                                  color: accentColor,
+                                  width: borderWidthOthers,
+                                ),
+                                top: BorderSide(
+                                  color: accentColor,
+                                  width: borderWidthOthers,
+                                ),
+                                bottom: BorderSide(
+                                  color: accentColor,
+                                  width: borderWidthOthers,
+                                ),
                               ),
                             ),
                             child: Row(
                               children: [
-                                Icon(iconData, color: accentColor, size: iconSize),
+                                Icon(
+                                  iconData,
+                                  color: accentColor,
+                                  size: iconSize,
+                                ),
                                 const SizedBox(width: 5),
                                 Expanded(
-                                  child: Text(
-                                    widget.text,
-                                    style: textStyle,
-                                  ),
+                                  child: Text(widget.text, style: textStyle),
                                 ),
                               ],
                             ),

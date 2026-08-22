@@ -15,10 +15,7 @@ class SentenceCapitalizationFormatter extends TextInputFormatter {
     final formatted = _format(newValue.text);
     final formattedBeforeCursor = _format(textBeforeCursor);
 
-    final newCursor = formattedBeforeCursor.length.clamp(
-      0,
-      formatted.length,
-    );
+    final newCursor = formattedBeforeCursor.length.clamp(0, formatted.length);
 
     return TextEditingValue(
       text: formatted,
@@ -67,10 +64,7 @@ class WordCapitalizationFormatter extends TextInputFormatter {
     final formatted = _format(newValue.text);
     final formattedBeforeCursor = _format(textBeforeCursor);
 
-    final newCursor = formattedBeforeCursor.length.clamp(
-      0,
-      formatted.length,
-    );
+    final newCursor = formattedBeforeCursor.length.clamp(0, formatted.length);
 
     return TextEditingValue(
       text: formatted,
@@ -134,10 +128,6 @@ class UrlLowercaseFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    return TextEditingValue(
-      text: formattedText,
-      selection: newValue.selection,
-    );
+    return TextEditingValue(text: formattedText, selection: newValue.selection);
   }
 }
-

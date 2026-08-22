@@ -47,7 +47,8 @@ class CkAuthExtractors {
     return CkAuthExtractors(
       accessToken: (data) => _extractByKey(data, accessTokenKey)?.toString(),
       refreshToken: (data) => _extractByKey(data, refreshTokenKey)?.toString(),
-      resetPasswordToken: (data) => _extractByKey(data, resetPasswordTokenKey)?.toString(),
+      resetPasswordToken: (data) =>
+          _extractByKey(data, resetPasswordTokenKey)?.toString(),
       verificationTokens: _buildVerificationTokenExtractors(
         verificationTokenKeys,
         _extractByKey,
@@ -86,17 +87,15 @@ class CkAuthExtractors {
     );
   }
 
-  static Map<CkOtpTrigger, String? Function(dynamic data)>? 
-      _buildVerificationTokenExtractors(
+  static Map<CkOtpTrigger, String? Function(dynamic data)>?
+  _buildVerificationTokenExtractors(
     Map<CkOtpTrigger, String>? tokenKeys,
     dynamic Function(dynamic data, String key) extractor,
   ) {
     if (tokenKeys == null) return null;
     return tokenKeys.map(
-      (trigger, key) => MapEntry(
-        trigger,
-        (data) => extractor(data, key)?.toString(),
-      ),
+      (trigger, key) =>
+          MapEntry(trigger, (data) => extractor(data, key)?.toString()),
     );
   }
 

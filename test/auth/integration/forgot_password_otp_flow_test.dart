@@ -39,14 +39,17 @@ void main() {
     });
 
     // FO-03
-    test('verifyOtp for FP trigger → calls showResetPassword handler', () async {
-      final service = await _buildService(handlers);
-      await service.forgotPassword(body: {'email': 'a@b.com'});
+    test(
+      'verifyOtp for FP trigger → calls showResetPassword handler',
+      () async {
+        final service = await _buildService(handlers);
+        await service.forgotPassword(body: {'email': 'a@b.com'});
 
-      handlers.reset();
-      await service.verifyOtp(otp: '654321');
-      expect(handlers.showResetPasswordCalled, isTrue);
-    });
+        handlers.reset();
+        await service.verifyOtp(otp: '654321');
+        expect(handlers.showResetPasswordCalled, isTrue);
+      },
+    );
 
     // FO-05
     test('updatePassword success → calls showLogin handler', () async {
@@ -74,19 +77,26 @@ void main() {
     // FO-06
     test('updatePassword mock mode always returns success', () async {
       final service = await _buildService(handlers);
-      final result = await service.updatePassword(body: {'password': 'new_pass'});
+      final result = await service.updatePassword(
+        body: {'password': 'new_pass'},
+      );
       expect(result.isSuccess, isTrue);
     });
 
-    test('forgotPassword in mock mode sets lastTrigger to forgetPassword', () async {
-      final service = await _buildService(handlers);
-      await service.forgotPassword(body: {'email': 'a@b.com'});
-      expect(service.otpManager.lastTrigger, equals(CkOtpTrigger.forgetPassword));
-    });
+    test(
+      'forgotPassword in mock mode sets lastTrigger to forgetPassword',
+      () async {
+        final service = await _buildService(handlers);
+        await service.forgotPassword(body: {'email': 'a@b.com'});
+        expect(
+          service.otpManager.lastTrigger,
+          equals(CkOtpTrigger.forgetPassword),
+        );
+      },
+    );
 
     test('full forgot password flow completes in correct order', () async {
-      final service = await _buildService(handlers);
-      final List<String> events = [];
+      final events = <String>[];
 
       handlers.reset();
       // Override to capture order

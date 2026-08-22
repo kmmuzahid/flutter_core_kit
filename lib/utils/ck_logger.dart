@@ -12,7 +12,8 @@ class CkLogger {
   static bool enableColors = () {
     try {
       if (kIsWeb) return false;
-      return (Platform.isMacOS || Platform.isWindows || Platform.isLinux) && stdout.supportsAnsiEscapes;
+      return (Platform.isMacOS || Platform.isWindows || Platform.isLinux) &&
+          stdout.supportsAnsiEscapes;
     } catch (_) {
       return false;
     }

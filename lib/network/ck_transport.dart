@@ -29,12 +29,11 @@ class CkTokenProvider {
 
   /// Used when [CkAuthConfig] is not set (no auth module).
   factory CkTokenProvider.unauthenticated() => CkTokenProvider(
-        accessToken: () async => '',
-        refreshToken: () async => '',
-        updateTokens: (_) async {},
-      );
+    accessToken: () async => '',
+    refreshToken: () async => '',
+    updateTokens: (_) async {},
+  );
 }
-
 
 class CkTransport {
   CkTransport._(this._dio, this._config);
@@ -272,5 +271,3 @@ class CkTransport {
     return e.message ?? 'An unknown error occurred.';
   }
 }
-
-

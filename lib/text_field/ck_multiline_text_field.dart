@@ -232,14 +232,17 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
     double? height,
     FontStyle? fontStyle,
   }) {
-    return (widget.textStyle ?? coreKitInstance.inputConfig.textStyle ?? const TextStyle()).copyWith(
-      fontFamily: coreKitInstance.fontFamily,
-      fontWeight: fontWeight,
-      fontSize: fontSize?.sp,
-      color: textColor,
-      height: height,
-      fontStyle: fontStyle,
-    );
+    return (widget.textStyle ??
+            coreKitInstance.inputConfig.textStyle ??
+            const TextStyle())
+        .copyWith(
+          fontFamily: coreKitInstance.fontFamily,
+          fontWeight: fontWeight,
+          fontSize: fontSize?.sp,
+          color: textColor,
+          height: height,
+          fontStyle: fontStyle,
+        );
   }
 
   Color hintColor() {
@@ -251,13 +254,12 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
     final effectiveRadius = widget.borderRadius != 12
         ? widget.borderRadius
         : (coreKitInstance.inputConfig.borderRadius ?? widget.borderRadius);
-    final effectiveWidth = width ?? (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w;
+    final effectiveWidth =
+        width ??
+        (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w;
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(effectiveRadius.r),
-      borderSide: BorderSide(
-        color: color,
-        width: effectiveWidth,
-      ),
+      borderSide: BorderSide(color: color, width: effectiveWidth),
     );
   }
 
@@ -319,8 +321,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                         coreKitInstance.primaryColor)
                   : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
                         Colors.red),
-              textCapitalization: (widget.enableCapitalization &&
-                      (coreKitInstance.inputConfig.enableCapitalization ?? true) &&
+              textCapitalization:
+                  (widget.enableCapitalization &&
+                      (coreKitInstance.inputConfig.enableCapitalization ??
+                          true) &&
                       InputHelper.shouldCapitalize(widget.validationType))
                   ? TextCapitalization.sentences
                   : TextCapitalization.none,
@@ -328,7 +332,9 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
               inputFormatters: [
                 ...InputHelper.getInputFormatters(widget.validationType).where(
                   (formatter) =>
-                      (widget.enableCapitalization && (coreKitInstance.inputConfig.enableCapitalization ?? true)) ||
+                      (widget.enableCapitalization &&
+                          (coreKitInstance.inputConfig.enableCapitalization ??
+                              true)) ||
                       (formatter is! SentenceCapitalizationFormatter &&
                           formatter is! WordCapitalizationFormatter),
                 ),
@@ -427,7 +433,8 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                   },
               style: _getStyle(
                 fontWeight: FontWeight.w500,
-                fontSize: widget.fontSize ?? coreKitInstance.inputConfig.fontSize,
+                fontSize:
+                    widget.fontSize ?? coreKitInstance.inputConfig.fontSize,
               ),
               expands: widget.expand,
               minLines: widget.expand ? null : 1,
@@ -436,9 +443,12 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                 filled: true,
                 counterText: '',
                 errorStyle: _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
-                fillColor: widget.backgroundColor ?? coreKitInstance.inputConfig.backgroundColor,
+                fillColor:
+                    widget.backgroundColor ??
+                    coreKitInstance.inputConfig.backgroundColor,
                 hintStyle:
-                    widget.hintStyle ?? coreKitInstance.inputConfig.hintStyle ??
+                    widget.hintStyle ??
+                    coreKitInstance.inputConfig.hintStyle ??
                     _getStyle(
                       fontSize:
                           widget.fontSize ??
@@ -564,21 +574,26 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                     ? InputBorder.none
                     : _buildBorder(
                         color:
-                            widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                            widget.borderColor ??
+                            coreKitInstance.inputConfig.borderColor ??
                             theme
                                 .inputDecorationTheme
                                 .enabledBorder
                                 ?.borderSide
                                 .color ??
                             coreKitInstance.outlineColor,
-                        width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                        width:
+                            (widget.borderWidth ??
+                                    coreKitInstance.inputConfig.borderWidth)
+                                .w,
                       ),
                 disabledBorder: widget.footer != null ? InputBorder.none : null,
                 focusedBorder: widget.footer != null
                     ? InputBorder.none
                     : _buildBorder(
                         color: widget.isReadOnly
-                            ? (widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                            ? (widget.borderColor ??
+                                  coreKitInstance.inputConfig.borderColor ??
                                   theme
                                       .inputDecorationTheme
                                       .disabledBorder
@@ -591,7 +606,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                                       ?.borderSide
                                       .color ??
                                   coreKitInstance.primaryColor,
-                        width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                        width:
+                            (widget.borderWidth ??
+                                    coreKitInstance.inputConfig.borderWidth)
+                                .w,
                       ),
                 errorBorder: widget.footer != null
                     ? InputBorder.none
@@ -603,7 +621,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                                 ?.borderSide
                                 .color ??
                             Colors.red,
-                        width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                        width:
+                            (widget.borderWidth ??
+                                    coreKitInstance.inputConfig.borderWidth)
+                                .w,
                       ),
                 focusedErrorBorder: widget.footer != null
                     ? InputBorder.none
@@ -615,7 +636,10 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                                 ?.borderSide
                                 .color ??
                             Colors.red,
-                        width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                        width:
+                            (widget.borderWidth ??
+                                    coreKitInstance.inputConfig.borderWidth)
+                                .w,
                       ),
                 contentPadding:
                     widget.contentPadding ??
@@ -646,12 +670,16 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
 
             if (widget.footer != null) {
               final decoration = BoxDecoration(
-                color: widget.backgroundColor ?? coreKitInstance.inputConfig.backgroundColor,
+                color:
+                    widget.backgroundColor ??
+                    coreKitInstance.inputConfig.backgroundColor,
                 borderRadius: BorderRadius.circular(
-                    (widget.borderRadius != 12
-                        ? widget.borderRadius
-                        : (coreKitInstance.inputConfig.borderRadius ?? widget.borderRadius)).r,
-                  ),
+                  (widget.borderRadius != 12
+                          ? widget.borderRadius
+                          : (coreKitInstance.inputConfig.borderRadius ??
+                                widget.borderRadius))
+                      .r,
+                ),
                 border: Border.all(
                   color: _focusNode.hasFocus
                       ? (theme
@@ -661,21 +689,26 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                                 .color ??
                             coreKitInstance.primaryColor)
                       : (widget.isReadOnly
-                            ? (widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                            ? (widget.borderColor ??
+                                  coreKitInstance.inputConfig.borderColor ??
                                   theme
                                       .inputDecorationTheme
                                       .disabledBorder
                                       ?.borderSide
                                       .color ??
                                   coreKitInstance.outlineColor)
-                            : (widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                            : (widget.borderColor ??
+                                  coreKitInstance.inputConfig.borderColor ??
                                   theme
                                       .inputDecorationTheme
                                       .enabledBorder
                                       ?.borderSide
                                       .color ??
                                   coreKitInstance.outlineColor)),
-                  width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                  width:
+                      (widget.borderWidth ??
+                              coreKitInstance.inputConfig.borderWidth)
+                          .w,
                 ),
               );
               return Container(

@@ -367,4 +367,3 @@ class _AdaptiveText extends StatelessWidget {
     );
   }
 }
-

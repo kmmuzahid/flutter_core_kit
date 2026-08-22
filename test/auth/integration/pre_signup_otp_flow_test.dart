@@ -60,29 +60,41 @@ void main() {
     );
 
     // PS-02
-    test('verifyOtp with no pending callback sets _preSignupOtpVerified=true', () async {
-      final service = await _buildService(handlers);
-      await service.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'a@b.com');
-      await service.verifyOtp(otp: '123456');
+    test(
+      'verifyOtp with no pending callback sets _preSignupOtpVerified=true',
+      () async {
+        final service = await _buildService(handlers);
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'a@b.com',
+        );
+        await service.verifyOtp(otp: '123456');
 
-      // State: _preSignupOtpVerified=true
-      // Next signUp should bypass OTP
-      final signUpResult = await service.signUp(body: {'email': 'a@b.com'});
-      expect(signUpResult.requiresOtp, isFalse);
-    });
+        // State: _preSignupOtpVerified=true
+        // Next signUp should bypass OTP
+        final signUpResult = await service.signUp(body: {'email': 'a@b.com'});
+        expect(signUpResult.requiresOtp, isFalse);
+      },
+    );
 
     // PS-03
-    test('signUp resets _preSignupOtpVerified to false after completing', () async {
-      final service = await _buildService(handlers);
-      await service.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'a@b.com');
-      await service.verifyOtp(otp: '123456');
-      await service.signUp(body: {'email': 'a@b.com'});
+    test(
+      'signUp resets _preSignupOtpVerified to false after completing',
+      () async {
+        final service = await _buildService(handlers);
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'a@b.com',
+        );
+        await service.verifyOtp(otp: '123456');
+        await service.signUp(body: {'email': 'a@b.com'});
 
-      // Flag should be reset — next signUp re-triggers OTP
-      handlers.reset();
-      final secondSignUp = await service.signUp(body: {'email': 'b@c.com'});
-      expect(secondSignUp.requiresOtp, isTrue);
-    });
+        // Flag should be reset — next signUp re-triggers OTP
+        handlers.reset();
+        final secondSignUp = await service.signUp(body: {'email': 'b@c.com'});
+        expect(secondSignUp.requiresOtp, isTrue);
+      },
+    );
 
     // PS-04 — CRITICAL REGRESSION TEST
     test(
@@ -91,15 +103,21 @@ void main() {
         final service = await _buildService(handlers);
 
         // Complete pre-signup flow once
-        await service.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'a@b.com');
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'a@b.com',
+        );
         await service.verifyOtp(otp: '123456');
         await service.signUp(body: {'email': 'a@b.com'}); // consumes the flag
 
         // Second signUp — flag already consumed → OTP required again
         handlers.reset();
         final secondResult = await service.signUp(body: {'email': 'a@b.com'});
-        expect(secondResult.requiresOtp, isTrue,
-            reason: 'The one-shot bypass must NOT apply to subsequent signUps');
+        expect(
+          secondResult.requiresOtp,
+          isTrue,
+          reason: 'The one-shot bypass must NOT apply to subsequent signUps',
+        );
         expect(handlers.showOtpVerificationCalled, isTrue);
       },
     );

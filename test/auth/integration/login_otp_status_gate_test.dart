@@ -2,7 +2,6 @@
 // CRITICAL: Tests the status-code gated OTP trigger for login.
 // Architecture rule: login OTP is ONLY triggered when statusCode == otpNotVerifiedStatusCode.
 // This tests _handleOtpFlow logic directly via mock mode + autoTriggers.
-import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_result.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,7 +31,8 @@ void main() {
     }) {
       if (!triggerInAutoTriggers) return false;
 
-      final isStatusCodeMatch = statusCode != null &&
+      final isStatusCodeMatch =
+          statusCode != null &&
           expectedStatusCode != null &&
           statusCode == expectedStatusCode;
 
@@ -53,8 +53,11 @@ void main() {
         triggerInAutoTriggers: true,
         vToken: null,
       );
-      expect(triggered, isFalse,
-          reason: 'HTTP 401 must NOT trigger OTP — it means wrong password');
+      expect(
+        triggered,
+        isFalse,
+        reason: 'HTTP 401 must NOT trigger OTP — it means wrong password',
+      );
     });
 
     // LG-02 — CRITICAL
@@ -66,8 +69,7 @@ void main() {
         triggerInAutoTriggers: true,
         vToken: null,
       );
-      expect(triggered, isTrue,
-          reason: 'HTTP 403 must trigger OTP for login');
+      expect(triggered, isTrue, reason: 'HTTP 403 must trigger OTP for login');
     });
 
     // LG-03 — CRITICAL
@@ -79,8 +81,11 @@ void main() {
         triggerInAutoTriggers: true,
         vToken: null,
       );
-      expect(triggered, isFalse,
-          reason: 'HTTP 200 must NOT trigger OTP — user is already logged in');
+      expect(
+        triggered,
+        isFalse,
+        reason: 'HTTP 200 must NOT trigger OTP — user is already logged in',
+      );
     });
 
     // LG-04
@@ -104,20 +109,26 @@ void main() {
         triggerInAutoTriggers: true,
         vToken: null,
       );
-      expect(triggered, isFalse,
-          reason: 'null otpNotVerifiedStatusCode must disable OTP gate');
+      expect(
+        triggered,
+        isFalse,
+        reason: 'null otpNotVerifiedStatusCode must disable OTP gate',
+      );
     });
 
-    test('login NOT in autoTriggers → never triggers regardless of status code', () {
-      final triggered = shouldTriggerOtp(
-        trigger: CkOtpTrigger.login,
-        statusCode: 403,
-        expectedStatusCode: 403,
-        triggerInAutoTriggers: false, // not in autoTriggers
-        vToken: null,
-      );
-      expect(triggered, isFalse);
-    });
+    test(
+      'login NOT in autoTriggers → never triggers regardless of status code',
+      () {
+        final triggered = shouldTriggerOtp(
+          trigger: CkOtpTrigger.login,
+          statusCode: 403,
+          expectedStatusCode: 403,
+          triggerInAutoTriggers: false, // not in autoTriggers
+          vToken: null,
+        );
+        expect(triggered, isFalse);
+      },
+    );
 
     // HO-04 — signup trigger with vToken present
     test('signup trigger + vToken present → OTP triggered', () {
@@ -144,16 +155,19 @@ void main() {
     });
 
     // HO-06 — signup trigger with status match (no vToken needed)
-    test('signup trigger + status matches → OTP triggered (no token needed)', () {
-      final triggered = shouldTriggerOtp(
-        trigger: CkOtpTrigger.signup,
-        statusCode: 403,
-        expectedStatusCode: 403,
-        triggerInAutoTriggers: true,
-        vToken: null,
-      );
-      expect(triggered, isTrue);
-    });
+    test(
+      'signup trigger + status matches → OTP triggered (no token needed)',
+      () {
+        final triggered = shouldTriggerOtp(
+          trigger: CkOtpTrigger.signup,
+          statusCode: 403,
+          expectedStatusCode: 403,
+          triggerInAutoTriggers: true,
+          vToken: null,
+        );
+        expect(triggered, isTrue);
+      },
+    );
 
     // HO-07 — forgetPassword trigger
     test('forgetPassword trigger + vToken → OTP triggered', () {

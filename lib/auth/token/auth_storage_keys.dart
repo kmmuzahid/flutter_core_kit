@@ -12,7 +12,7 @@ abstract class CkAuthStorageKeys {
     final value = await CkStorage.read(firstTimeUserKey);
     return value == null; // null means never logged in before
   }
-  
+
   /// Mark user as not first-time (called after first successful login)
   static Future<void> markNotFirstTimeUser() async {
     await CkStorage.write(firstTimeUserKey, 'false');

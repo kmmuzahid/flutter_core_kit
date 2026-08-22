@@ -6,10 +6,10 @@ class CkAuthResult<T> {
   final T? data;
   final String? message;
   final int? statusCode;
-  final bool requiresOtp;        // true if OTP step is needed next
-  final CkOtpTrigger? otpTrigger;  // which flow triggered OTP
-  final dynamic rawResponse;     // escape hatch for unusual needs
-  
+  final bool requiresOtp; // true if OTP step is needed next
+  final CkOtpTrigger? otpTrigger; // which flow triggered OTP
+  final dynamic rawResponse; // escape hatch for unusual needs
+
   const CkAuthResult({
     required this.isSuccess,
     this.data,
@@ -25,16 +25,13 @@ class CkAuthResult<T> {
     this.message,
     this.statusCode,
     this.rawResponse,
-  })  : isSuccess = true,
-        requiresOtp = false,
-        otpTrigger = null;
+  }) : isSuccess = true,
+       requiresOtp = false,
+       otpTrigger = null;
 
-  const CkAuthResult.failure({
-    this.message,
-    this.statusCode,
-    this.rawResponse,
-  })  : isSuccess = false,
-        data = null,
-        requiresOtp = false,
-        otpTrigger = null;
+  const CkAuthResult.failure({this.message, this.statusCode, this.rawResponse})
+    : isSuccess = false,
+      data = null,
+      requiresOtp = false,
+      otpTrigger = null;
 }

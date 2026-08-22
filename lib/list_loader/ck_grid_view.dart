@@ -269,7 +269,10 @@ class _CkGridViewState extends State<CkGridView> {
 
         SliverPadding(
           padding: widget.padding ?? EdgeInsets.zero,
-          sliver: widget.isLoading && widget.itemCount == 0 && widget.shimmerItem != null
+          sliver:
+              widget.isLoading &&
+                  widget.itemCount == 0 &&
+                  widget.shimmerItem != null
               ? _buildShimmerSliver()
               : widget.itemCount == 0 && !widget.isLoading
               ? SliverToBoxAdapter(child: _empty())
@@ -575,6 +578,3 @@ class CkGridChildInfo {
   final bool isLastInRow;
   final bool isItInLastRow;
 }
-
-
-

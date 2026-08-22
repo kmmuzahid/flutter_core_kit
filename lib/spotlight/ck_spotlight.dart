@@ -23,7 +23,11 @@ class CkSpotlight extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size.infinite,
-      painter: _CkSpotlightPainter(center: center, radius: radius, color: color),
+      painter: _CkSpotlightPainter(
+        center: center,
+        radius: radius,
+        color: color,
+      ),
     );
   }
 }
@@ -207,6 +211,3 @@ class _CkSpotlightAdvancedPainter extends CustomPainter {
         oldDelegate.gradientSteps != gradientSteps;
   }
 }
-
-
-

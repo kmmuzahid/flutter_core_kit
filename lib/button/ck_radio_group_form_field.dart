@@ -16,19 +16,19 @@ class CkRadioGroupFormField<T> extends FormField<T> {
            return Column(
              crossAxisAlignment: CrossAxisAlignment.start,
              children: [
-                RadioGroup<T>(
-                  groupValue: state.value,
-                  onChanged: (val) => state.didChange(val),
-                  child: Flex(
-                    direction: direction,
-                    children: options.map((T option) {
-                      return RadioListTile<T>(
-                        title: Text(labelBuilder(option)),
-                        value: option,
-                      );
-                    }).toList(),
-                  ),
-                ),
+               RadioGroup<T>(
+                 groupValue: state.value,
+                 onChanged: (val) => state.didChange(val),
+                 child: Flex(
+                   direction: direction,
+                   children: options.map((T option) {
+                     return RadioListTile<T>(
+                       title: Text(labelBuilder(option)),
+                       value: option,
+                     );
+                   }).toList(),
+                 ),
+               ),
                if (state.hasError)
                  Padding(
                    padding: const EdgeInsets.only(left: 16.0),
@@ -45,4 +45,3 @@ class CkRadioGroupFormField<T> extends FormField<T> {
          },
        );
 }
-

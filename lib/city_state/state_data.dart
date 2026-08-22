@@ -95,7 +95,10 @@ class StateAbbreviations {
     final s = state.trim().toLowerCase();
 
     Map<String, String>? targetMap;
-    if (c == 'united states' || c == 'us' || c == 'usa' || c == 'united states of america') {
+    if (c == 'united states' ||
+        c == 'us' ||
+        c == 'usa' ||
+        c == 'united states of america') {
       targetMap = usStates;
     } else if (c == 'canada') {
       targetMap = canadaProvinces;

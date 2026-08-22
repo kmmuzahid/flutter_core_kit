@@ -6,9 +6,9 @@ import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 CkOtpConfig _otpConfig() => CkOtpConfig(
-      verifyBodyBuilder: (cb) => {'otp': cb.otp},
-      resendBodyBuilder: (cb) => {'email': cb.recipient},
-    );
+  verifyBodyBuilder: (cb) => {'otp': cb.otp},
+  resendBodyBuilder: (cb) => {'email': cb.recipient},
+);
 
 const _endpoints = CkAuthEndpoints(
   signup: '/signup',
@@ -29,8 +29,9 @@ void main() {
       final config = CkAuthConfig(
         endpoints: _endpoints,
         otpConfig: _otpConfig(),
-        loginRequestBuilder: (cb) =>
-            CkLoginRequest(body: {'email': cb.account, 'password': cb.password}),
+        loginRequestBuilder: (cb) => CkLoginRequest(
+          body: {'email': cb.account, 'password': cb.password},
+        ),
       );
 
       final req = config.resolveLoginRequest(
@@ -42,13 +43,13 @@ void main() {
 
     // AC-02
     test('falls back to deprecated loginBodyBuilder', () {
-      // ignore: deprecated_member_use
       final config = CkAuthConfig(
         endpoints: _endpoints,
         otpConfig: _otpConfig(),
-        // ignore: deprecated_member_use
-        loginBodyBuilder: (cb) =>
-            {'username': cb.account, 'pass': cb.password ?? ''},
+        loginBodyBuilder: (cb) => {
+          'username': cb.account,
+          'pass': cb.password ?? '',
+        },
       );
 
       final req = config.resolveLoginRequest(
@@ -63,7 +64,7 @@ void main() {
         endpoints: _endpoints,
         otpConfig: _otpConfig(),
         loginRequestBuilder: (cb) =>
-            CkLoginRequest(body: {}, headers: {'X-Existing': 'yes'}),
+            const CkLoginRequest(body: {}, headers: {'X-Existing': 'yes'}),
       );
 
       final req = config.resolveLoginRequest(
@@ -80,12 +81,10 @@ void main() {
         endpoints: _endpoints,
         otpConfig: _otpConfig(),
         loginRequestBuilder: (cb) =>
-            CkLoginRequest(body: {}, headers: {'X-Token': 'abc'}),
+            const CkLoginRequest(body: {}, headers: {'X-Token': 'abc'}),
       );
 
-      final req = config.resolveLoginRequest(
-        LoginCallback(account: 'a@b.com'),
-      );
+      final req = config.resolveLoginRequest(LoginCallback(account: 'a@b.com'));
       expect(req.headers, equals({'X-Token': 'abc'}));
     });
 
@@ -107,35 +106,41 @@ void main() {
       final config = CkAuthConfig(
         endpoints: _endpoints,
         otpConfig: _otpConfig(),
-        loginRequestBuilder: (cb) => CkLoginRequest(body: {}),
+        loginRequestBuilder: (cb) => const CkLoginRequest(body: {}),
       );
       expect(config.mockAuth, isFalse);
     });
 
     // AC-07
-    test('extractors defaults to CkAuthExtractors.standard() when not provided', () {
-      final config = CkAuthConfig(
-        endpoints: _endpoints,
-        otpConfig: _otpConfig(),
-        loginRequestBuilder: (cb) => CkLoginRequest(body: {}),
-      );
-      // Standard extractors should extract 'accessToken' key
-      final token = config.extractors.accessToken({'accessToken': 'tok123'});
-      expect(token, equals('tok123'));
-    });
+    test(
+      'extractors defaults to CkAuthExtractors.standard() when not provided',
+      () {
+        final config = CkAuthConfig(
+          endpoints: _endpoints,
+          otpConfig: _otpConfig(),
+          loginRequestBuilder: (cb) => const CkLoginRequest(body: {}),
+        );
+        // Standard extractors should extract 'accessToken' key
+        final token = config.extractors.accessToken({'accessToken': 'tok123'});
+        expect(token, equals('tok123'));
+      },
+    );
 
-    test('resolveLoginRequest with empty extra headers does not modify request', () {
-      final config = CkAuthConfig(
-        endpoints: _endpoints,
-        otpConfig: _otpConfig(),
-        loginRequestBuilder: (cb) =>
-            CkLoginRequest(body: {}, headers: {'X-Keep': 'me'}),
-      );
-      final req = config.resolveLoginRequest(
-        LoginCallback(account: 'a@b.com'),
-        headers: {}, // empty — should not change anything
-      );
-      expect(req.headers, equals({'X-Keep': 'me'}));
-    });
+    test(
+      'resolveLoginRequest with empty extra headers does not modify request',
+      () {
+        final config = CkAuthConfig(
+          endpoints: _endpoints,
+          otpConfig: _otpConfig(),
+          loginRequestBuilder: (cb) =>
+              const CkLoginRequest(body: {}, headers: {'X-Keep': 'me'}),
+        );
+        final req = config.resolveLoginRequest(
+          LoginCallback(account: 'a@b.com'),
+          headers: {}, // empty — should not change anything
+        );
+        expect(req.headers, equals({'X-Keep': 'me'}));
+      },
+    );
   });
 }

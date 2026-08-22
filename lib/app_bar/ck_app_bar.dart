@@ -178,8 +178,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
   ) {
     final titleSpacing = config.titleSpacing ?? 0;
     final actionsPadding =
-        config.actionsPadding ??
-        const EdgeInsets.only(right: 16.0, left: 8.0);
+        config.actionsPadding ?? const EdgeInsets.only(right: 16.0, left: 8.0);
 
     return Stack(
       children: [
@@ -219,8 +218,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
   ) {
     final titleSpacing = config.titleSpacing ?? 0;
     final actionsPadding =
-        config.actionsPadding ??
-        const EdgeInsets.only(right: 16.0, left: 8.0);
+        config.actionsPadding ?? const EdgeInsets.only(right: 16.0, left: 8.0);
 
     return Row(
       children: [
@@ -274,8 +272,7 @@ class CkAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     final icon = config.backIcon ?? const Icon(Icons.arrow_back_ios, size: 25);
     final leadingPadding =
-        config.leadingPadding ??
-        const EdgeInsets.only(left: 16.0, right: 8.0);
+        config.leadingPadding ?? const EdgeInsets.only(left: 16.0, right: 8.0);
 
     final buttonContent =
         leading ??

@@ -188,14 +188,17 @@ class _CkTextFieldState extends State<CkTextField> {
     double? height,
     FontStyle? fontStyle,
   }) {
-    return (widget.textStyle ?? coreKitInstance.inputConfig.textStyle ?? const TextStyle()).copyWith(
-      fontFamily: coreKitInstance.fontFamily,
-      fontWeight: fontWeight,
-      fontSize: fontSize,
-      color: textColor,
-      height: height,
-      fontStyle: fontStyle,
-    );
+    return (widget.textStyle ??
+            coreKitInstance.inputConfig.textStyle ??
+            const TextStyle())
+        .copyWith(
+          fontFamily: coreKitInstance.fontFamily,
+          fontWeight: fontWeight,
+          fontSize: fontSize,
+          color: textColor,
+          height: height,
+          fontStyle: fontStyle,
+        );
   }
 
   @override
@@ -209,9 +212,14 @@ class _CkTextFieldState extends State<CkTextField> {
             if (widget.footer != null) {
               return Container(
                 decoration: BoxDecoration(
-                  color: widget.backgroundColor ?? coreKitInstance.inputConfig.backgroundColor,
+                  color:
+                      widget.backgroundColor ??
+                      coreKitInstance.inputConfig.backgroundColor,
                   borderRadius: BorderRadius.circular(
-                    (widget.borderRadius ?? coreKitInstance.inputConfig.borderRadius)?.r ?? 12.r,
+                    (widget.borderRadius ??
+                                coreKitInstance.inputConfig.borderRadius)
+                            ?.r ??
+                        12.r,
                   ),
                   border: Border.all(
                     color: _focusNode.hasFocus
@@ -222,21 +230,26 @@ class _CkTextFieldState extends State<CkTextField> {
                                   .color ??
                               coreKitInstance.primaryColor)
                         : (widget.isReadOnly
-                              ? (widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                              ? (widget.borderColor ??
+                                    coreKitInstance.inputConfig.borderColor ??
                                     theme
                                         .inputDecorationTheme
                                         .disabledBorder
                                         ?.borderSide
                                         .color ??
                                     coreKitInstance.outlineColor)
-                              : (widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                              : (widget.borderColor ??
+                                    coreKitInstance.inputConfig.borderColor ??
                                     theme
                                         .inputDecorationTheme
                                         .enabledBorder
                                         ?.borderSide
                                         .color ??
                                     coreKitInstance.outlineColor)),
-                    width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                    width:
+                        (widget.borderWidth ??
+                                coreKitInstance.inputConfig.borderWidth)
+                            .w,
                   ),
                 ),
                 child: Column(
@@ -292,7 +305,9 @@ class _CkTextFieldState extends State<CkTextField> {
                 coreKitInstance.primaryColor)
           : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
                 Colors.red),
-      textAlign: widget.textAlign != TextAlign.left ? widget.textAlign : (coreKitInstance.inputConfig.textAlign ?? widget.textAlign),
+      textAlign: widget.textAlign != TextAlign.left
+          ? widget.textAlign
+          : (coreKitInstance.inputConfig.textAlign ?? widget.textAlign),
       controller: _controller,
       focusNode: _focusNode,
       enableInteractiveSelection: !widget.isReadOnly,
@@ -314,7 +329,8 @@ class _CkTextFieldState extends State<CkTextField> {
       readOnly: widget.isReadOnly,
       onChanged: widget.onChanged,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      textCapitalization: (widget.enableCapitalization &&
+      textCapitalization:
+          (widget.enableCapitalization &&
               (coreKitInstance.inputConfig.enableCapitalization ?? true) &&
               InputHelper.shouldCapitalize(widget.validationType))
           ? TextCapitalization.sentences
@@ -326,7 +342,8 @@ class _CkTextFieldState extends State<CkTextField> {
       inputFormatters: [
         ...InputHelper.getInputFormatters(widget.validationType).where(
           (formatter) =>
-              (widget.enableCapitalization && (coreKitInstance.inputConfig.enableCapitalization ?? true)) ||
+              (widget.enableCapitalization &&
+                  (coreKitInstance.inputConfig.enableCapitalization ?? true)) ||
               (formatter is! SentenceCapitalizationFormatter &&
                   formatter is! WordCapitalizationFormatter),
         ),
@@ -414,9 +431,12 @@ class _CkTextFieldState extends State<CkTextField> {
         errorStyle: widget.showValidationMessage
             ? null
             : _getStyle(fontSize: 0, fontWeight: FontWeight.w400),
-        fillColor: widget.backgroundColor ?? coreKitInstance.inputConfig.backgroundColor,
+        fillColor:
+            widget.backgroundColor ??
+            coreKitInstance.inputConfig.backgroundColor,
         hintStyle:
-            widget.hintStyle ?? coreKitInstance.inputConfig.hintStyle ??
+            widget.hintStyle ??
+            coreKitInstance.inputConfig.hintStyle ??
             _getStyle(
               fontSize:
                   widget.fontSize ??
@@ -487,7 +507,8 @@ class _CkTextFieldState extends State<CkTextField> {
             ? InputBorder.none
             : _buildBorder(
                 color: widget.isReadOnly
-                    ? (widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                    ? (widget.borderColor ??
+                          coreKitInstance.inputConfig.borderColor ??
                           theme
                               .inputDecorationTheme
                               .disabledBorder
@@ -500,21 +521,28 @@ class _CkTextFieldState extends State<CkTextField> {
                               ?.borderSide
                               .color ??
                           coreKitInstance.primaryColor,
-                width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                width:
+                    (widget.borderWidth ??
+                            coreKitInstance.inputConfig.borderWidth)
+                        .w,
               ),
 
         enabledBorder: widget.footer != null
             ? InputBorder.none
             : _buildBorder(
                 color:
-                    widget.borderColor ?? coreKitInstance.inputConfig.borderColor ??
+                    widget.borderColor ??
+                    coreKitInstance.inputConfig.borderColor ??
                     theme
                         .inputDecorationTheme
                         .enabledBorder
                         ?.borderSide
                         .color ??
                     coreKitInstance.outlineColor,
-                width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                width:
+                    (widget.borderWidth ??
+                            coreKitInstance.inputConfig.borderWidth)
+                        .w,
               ),
 
         errorBorder: widget.footer != null
@@ -523,7 +551,10 @@ class _CkTextFieldState extends State<CkTextField> {
                 color:
                     theme.inputDecorationTheme.errorBorder?.borderSide.color ??
                     Colors.red,
-                width: (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w,
+                width:
+                    (widget.borderWidth ??
+                            coreKitInstance.inputConfig.borderWidth)
+                        .w,
               ),
 
         contentPadding: EdgeInsets.symmetric(
@@ -541,8 +572,11 @@ class _CkTextFieldState extends State<CkTextField> {
   }
 
   InputBorder _buildBorder({required Color color, double? width}) {
-    final effectiveRadius = widget.borderRadius ?? coreKitInstance.inputConfig.borderRadius;
-    final effectiveWidth = width ?? (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w;
+    final effectiveRadius =
+        widget.borderRadius ?? coreKitInstance.inputConfig.borderRadius;
+    final effectiveWidth =
+        width ??
+        (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w;
     if (widget.borderType == CkBorderType.underline) {
       return UnderlineInputBorder(
         borderRadius: effectiveRadius == null
@@ -553,10 +587,7 @@ class _CkTextFieldState extends State<CkTextField> {
                         .borderRadius
                   : BorderRadius.circular(12)
             : BorderRadius.circular(effectiveRadius.r),
-        borderSide: BorderSide(
-          color: color,
-          width: effectiveWidth,
-        ),
+        borderSide: BorderSide(color: color, width: effectiveWidth),
       );
     }
     return OutlineInputBorder(
@@ -567,10 +598,7 @@ class _CkTextFieldState extends State<CkTextField> {
                       .borderRadius
                 : BorderRadius.circular(12)
           : BorderRadius.circular(effectiveRadius.r),
-      borderSide: BorderSide(
-        color: color,
-        width: effectiveWidth,
-      ),
+      borderSide: BorderSide(color: color, width: effectiveWidth),
     );
   }
 

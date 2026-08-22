@@ -8,23 +8,23 @@ import 'package:core_kit/auth/social/google_auth_config.dart';
 class CkSocialLoginConfig {
   /// Google Sign-In config (null = Google login not available)
   final CkGoogleAuthConfig? google;
-  
+
   /// Apple Sign-In config (null = Apple login not available)
   final CkAppleAuthConfig? apple;
-  
+
   /// Facebook Sign-In config (null = Facebook login not available)
   final CkFacebookAuthConfig? facebook;
-  
+
   /// Custom social providers (for any other OAuth/social provider)
   final List<CkCustomSocialAuthConfig>? customProviders;
-  
+
   const CkSocialLoginConfig({
     this.google,
     this.apple,
     this.facebook,
     this.customProviders,
   });
-  
+
   /// Which providers are enabled
   List<CkSocialProvider> get availableProviders => [
     if (google != null) CkSocialProvider.google,

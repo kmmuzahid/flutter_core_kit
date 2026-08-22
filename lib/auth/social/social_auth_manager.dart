@@ -63,8 +63,7 @@ class CkSocialAuthManager<TProfile> {
 
     final gConfig = _config!.google!;
     final body = gConfig.bodyBuilder(data);
-    final extractors =
-        gConfig.responseExtractors ?? _defaultExtractors;
+    final extractors = gConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: gConfig.backendUrl,
@@ -84,8 +83,7 @@ class CkSocialAuthManager<TProfile> {
 
     final aConfig = _config!.apple!;
     final body = aConfig.bodyBuilder(data);
-    final extractors =
-        aConfig.responseExtractors ?? _defaultExtractors;
+    final extractors = aConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: aConfig.backendUrl,
@@ -107,8 +105,7 @@ class CkSocialAuthManager<TProfile> {
 
     final fConfig = _config!.facebook!;
     final body = fConfig.bodyBuilder(data);
-    final extractors =
-        fConfig.responseExtractors ?? _defaultExtractors;
+    final extractors = fConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: fConfig.backendUrl,
@@ -136,8 +133,7 @@ class CkSocialAuthManager<TProfile> {
     );
 
     final body = cConfig.bodyBuilder(authData);
-    final extractors =
-        cConfig.responseExtractors ?? _defaultExtractors;
+    final extractors = cConfig.responseExtractors ?? _defaultExtractors;
 
     return _executeSocialRequest(
       url: cConfig.backendUrl,

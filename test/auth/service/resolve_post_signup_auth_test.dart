@@ -7,7 +7,6 @@
 // Change: `required responseData` → `required dynamic responseData`
 // (lib/auth/ck_auth_service.dart:366)
 
-import 'package:core_kit/auth/ck_auth_config.dart';
 import 'package:core_kit/auth/ck_auth_service.dart';
 import 'package:core_kit/auth/otp/otp_config.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
@@ -69,9 +68,7 @@ void main() {
     // was passed into _resolvePostSignupAuth. Verifies the value is not lost.
     test('RPSA-02: rawResponse is preserved from dynamic Map input', () async {
       final service = await _buildNoOtpService();
-      final result = await service.signUp(
-        body: {'email': 'test@x.com'},
-      );
+      final result = await service.signUp(body: {'email': 'test@x.com'});
       expect(result.rawResponse, isNotNull);
       expect(result.rawResponse, isA<Map>());
     });
@@ -79,13 +76,14 @@ void main() {
     // RPSA-03
     // statusCode from the call site (200 in mock) must be forwarded correctly
     // through _resolvePostSignupAuth to the result.
-    test('RPSA-03: statusCode is forwarded correctly through dynamic path', () async {
-      final service = await _buildNoOtpService();
-      final result = await service.signUp(
-        body: {'email': 'test@x.com'},
-      );
-      expect(result.statusCode, equals(200));
-    });
+    test(
+      'RPSA-03: statusCode is forwarded correctly through dynamic path',
+      () async {
+        final service = await _buildNoOtpService();
+        final result = await service.signUp(body: {'email': 'test@x.com'});
+        expect(result.statusCode, equals(200));
+      },
+    );
 
     // RPSA-04
     // Calling signUp multiple times (each creates a fresh _resolvePostSignupAuth
@@ -108,60 +106,69 @@ void main() {
     // verifyOtp in mock mode for signup trigger calls _resolvePostSignupAuth
     // with `const {'message': 'Mock OTP verification successful'}` (Map).
     // Verifies dynamic Map data flows through the verifyOtp code path.
-    test('RPSA-05: verifyOtp signup trigger → Map responseData → isSuccess', () async {
-      final handlers = TestFlowHandlers();
-      final service = await _buildWithSignupOtp(handlers: handlers);
+    test(
+      'RPSA-05: verifyOtp signup trigger → Map responseData → isSuccess',
+      () async {
+        final handlers = TestFlowHandlers();
+        final service = await _buildWithSignupOtp(handlers: handlers);
 
-      await service.sendOtp(
-        trigger: CkOtpTrigger.signup,
-        recipient: 'a@b.com',
-      );
-      final result = await service.verifyOtp(otp: '123456');
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'a@b.com',
+        );
+        final result = await service.verifyOtp(otp: '123456');
 
-      expect(result.isSuccess, isTrue);
-    });
+        expect(result.isSuccess, isTrue);
+      },
+    );
 
     // RPSA-06
     // rawResponse from the verifyOtp path must be the Map passed into
     // _resolvePostSignupAuth and not null.
-    test('RPSA-06: verifyOtp path preserves rawResponse from dynamic Map', () async {
-      final handlers = TestFlowHandlers();
-      final service = await _buildWithSignupOtp(handlers: handlers);
+    test(
+      'RPSA-06: verifyOtp path preserves rawResponse from dynamic Map',
+      () async {
+        final handlers = TestFlowHandlers();
+        final service = await _buildWithSignupOtp(handlers: handlers);
 
-      await service.sendOtp(
-        trigger: CkOtpTrigger.signup,
-        recipient: 'a@b.com',
-      );
-      final result = await service.verifyOtp(otp: '123456');
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'a@b.com',
+        );
+        final result = await service.verifyOtp(otp: '123456');
 
-      expect(result.rawResponse, isNotNull);
-    });
+        expect(result.rawResponse, isNotNull);
+      },
+    );
 
     // RPSA-07
     // calledFromVerifyOtp=true path: verifyOtp sets _preSignupOtpVerified=true
     // then calls _resolvePostSignupAuth. The subsequent signUp should bypass
     // OTP entirely, proving the full flow through the dynamic param works end-to-end.
-    test('RPSA-07: verifyOtp+signUp end-to-end — dynamic param does not break flow', () async {
-      final handlers = TestFlowHandlers();
-      final service = await _buildWithSignupOtp(handlers: handlers);
+    test(
+      'RPSA-07: verifyOtp+signUp end-to-end — dynamic param does not break flow',
+      () async {
+        final handlers = TestFlowHandlers();
+        final service = await _buildWithSignupOtp(handlers: handlers);
 
-      // Step 1: trigger OTP
-      await service.sendOtp(
-        trigger: CkOtpTrigger.signup,
-        recipient: 'user@test.com',
-      );
-      // Step 2: verify OTP → _resolvePostSignupAuth called with dynamic Map
-      final verifyResult = await service.verifyOtp(otp: '999999');
-      expect(verifyResult.isSuccess, isTrue);
+        // Step 1: trigger OTP
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'user@test.com',
+        );
+        // Step 2: verify OTP → _resolvePostSignupAuth called with dynamic Map
+        final verifyResult = await service.verifyOtp(otp: '999999');
+        expect(verifyResult.isSuccess, isTrue);
 
-      // Step 3: signUp bypasses OTP because _preSignupOtpVerified=true
-      handlers.reset();
-      final signUpResult = await service.signUp(
-        body: {'email': 'user@test.com', 'password': 'abc'},
-      );
-      expect(signUpResult.isSuccess, isTrue);
-      expect(signUpResult.requiresOtp, isFalse);
-      expect(handlers.showOtpVerificationCalled, isFalse);
-    });
+        // Step 3: signUp bypasses OTP because _preSignupOtpVerified=true
+        handlers.reset();
+        final signUpResult = await service.signUp(
+          body: {'email': 'user@test.com', 'password': 'abc'},
+        );
+        expect(signUpResult.isSuccess, isTrue);
+        expect(signUpResult.requiresOtp, isFalse);
+        expect(handlers.showOtpVerificationCalled, isFalse);
+      },
+    );
   });
 }

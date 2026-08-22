@@ -43,34 +43,43 @@ void main() {
     });
 
     // FP-02
-    test('forgotPassword without FP in autoTriggers → success without OTP', () async {
-      final service = await _buildService(
-        handlers: handlers,
-        autoTriggers: {},
-      );
-      final result = await service.forgotPassword(body: {'email': 'a@b.com'});
-      expect(result.isSuccess, isTrue);
-      expect(result.requiresOtp, isFalse);
-    });
+    test(
+      'forgotPassword without FP in autoTriggers → success without OTP',
+      () async {
+        final service = await _buildService(
+          handlers: handlers,
+          autoTriggers: {},
+        );
+        final result = await service.forgotPassword(body: {'email': 'a@b.com'});
+        expect(result.isSuccess, isTrue);
+        expect(result.requiresOtp, isFalse);
+      },
+    );
 
     // FP-04
-    test('forgotPassword mockAuth + FP in triggers → shows OTP screen', () async {
-      final service = await _buildService(
-        handlers: handlers,
-        autoTriggers: {CkOtpTrigger.forgetPassword},
-      );
-      await service.forgotPassword(body: {'email': 'a@b.com'});
-      expect(handlers.showOtpVerificationCalled, isTrue);
-    });
+    test(
+      'forgotPassword mockAuth + FP in triggers → shows OTP screen',
+      () async {
+        final service = await _buildService(
+          handlers: handlers,
+          autoTriggers: {CkOtpTrigger.forgetPassword},
+        );
+        await service.forgotPassword(body: {'email': 'a@b.com'});
+        expect(handlers.showOtpVerificationCalled, isTrue);
+      },
+    );
 
     // FP-05
-    test('forgotPassword mockAuth without FP trigger → calls showResetPassword', () async {
-      final service = await _buildService(
-        handlers: handlers,
-        autoTriggers: {},
-      );
-      await service.forgotPassword(body: {'email': 'a@b.com'});
-      expect(handlers.showResetPasswordCalled, isTrue);
-    });
+    test(
+      'forgotPassword mockAuth without FP trigger → calls showResetPassword',
+      () async {
+        final service = await _buildService(
+          handlers: handlers,
+          autoTriggers: {},
+        );
+        await service.forgotPassword(body: {'email': 'a@b.com'});
+        expect(handlers.showResetPasswordCalled, isTrue);
+      },
+    );
   });
 }

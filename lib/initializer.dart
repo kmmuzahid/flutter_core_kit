@@ -46,6 +46,8 @@ class CkListLoaderConfig {
   /// Widget shown when all pages have been loaded.
   final Widget noMoreDataWidget;
 
+  final Widget? emptyWidget;
+
   const CkListLoaderConfig({
     this.loaderWidget = const Padding(
       padding: EdgeInsets.all(20),
@@ -57,23 +59,26 @@ class CkListLoaderConfig {
         child: Text('No more data', style: TextStyle(color: Colors.grey)),
       ),
     ),
+    this.emptyWidget,
   });
 
   CkListLoaderConfig copyWith({
     Widget? loaderWidget,
     Widget? noMoreDataWidget,
+    Widget? emptyWidget,
   }) {
     return CkListLoaderConfig(
       loaderWidget: loaderWidget ?? this.loaderWidget,
       noMoreDataWidget: noMoreDataWidget ?? this.noMoreDataWidget,
+      emptyWidget: emptyWidget ?? this.emptyWidget,
     );
   }
 }
 
 class CoreKitInstanceSingleton {
   CoreKitInstanceSingleton._();
-  static final CoreKitInstanceSingleton _instance = CoreKitInstanceSingleton
-      ._();
+  static final CoreKitInstanceSingleton _instance =
+      CoreKitInstanceSingleton._();
   static CoreKitInstanceSingleton get instance => _instance;
 
   late GlobalKey<NavigatorState> navigatorKey;
@@ -203,7 +208,9 @@ abstract class CoreKitConfig {
   int get splashDelayMs => 3000;
 }
 
-@Deprecated('Inheriting directly from CoreKitConfig is recommended, as CoreKitConfig now provides concrete default implementations.')
+@Deprecated(
+  'Inheriting directly from CoreKitConfig is recommended, as CoreKitConfig now provides concrete default implementations.',
+)
 mixin CoreKitConfigDefaults on CoreKitConfig {
   @override
   CkAuthConfig? get authConfig => null;

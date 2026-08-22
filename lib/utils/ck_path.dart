@@ -36,8 +36,7 @@ abstract class CkPath {
   static Future<Directory> get tempDir => pp.getTemporaryDirectory();
 
   /// Alias for [getTemporaryDirectory].
-  static Future<Directory> get temporaryDirectory =>
-      pp.getTemporaryDirectory();
+  static Future<Directory> get temporaryDirectory => pp.getTemporaryDirectory();
 
   /// Path to a directory where the application may place data that is
   /// user-generated, or that cannot otherwise be recreated by your application.
@@ -53,8 +52,7 @@ abstract class CkPath {
       pp.getApplicationDocumentsDirectory();
 
   /// Alias for [getApplicationDocumentsDirectory].
-  static Future<Directory> get docsDir =>
-      pp.getApplicationDocumentsDirectory();
+  static Future<Directory> get docsDir => pp.getApplicationDocumentsDirectory();
 
   /// Path to a directory where the application may place application support
   /// files.
@@ -74,8 +72,7 @@ abstract class CkPath {
       pp.getApplicationCacheDirectory();
 
   /// Alias for [getApplicationCacheDirectory].
-  static Future<Directory> get cacheDir =>
-      pp.getApplicationCacheDirectory();
+  static Future<Directory> get cacheDir => pp.getApplicationCacheDirectory();
 
   /// Alias for [getApplicationCacheDirectory].
   static Future<Directory> get cacheDirectory =>
@@ -108,8 +105,7 @@ abstract class CkPath {
   /// Paths to directories where application specific data can be stored (Android only).
   static Future<List<Directory>?> getExternalStorageDirectories({
     pp.StorageDirectory? type,
-  }) =>
-      pp.getExternalStorageDirectories(type: type);
+  }) => pp.getExternalStorageDirectories(type: type);
 
   // ---------------------------------------------------------------------------
   // String Path Getters
@@ -196,7 +192,7 @@ abstract class CkPath {
       extension: extension,
     );
     final file = File(filePath);
-    if (!await file.exists()) {
+    if (!file.existsSync()) {
       await file.create(recursive: true);
     }
     return file;
@@ -206,7 +202,7 @@ abstract class CkPath {
   static Future<File> createDocumentFile(String fileName) async {
     final filePath = await getDocumentFilePath(fileName);
     final file = File(filePath);
-    if (!await file.exists()) {
+    if (!file.existsSync()) {
       await file.create(recursive: true);
     }
     return file;
@@ -233,15 +229,22 @@ abstract class CkPath {
       return s;
     }
 
-    var base = part1.endsWith('/') || part1.endsWith(r'\')
-        ? part1.substring(0, part1.length - 1)
-        : part1;
+    var base = part1;
+    while (base.length > 1 && (base.endsWith('/') || base.endsWith(r'\'))) {
+      base = base.substring(0, base.length - 1);
+    }
 
     final parts = [part2, part3, part4, part5].whereType<String>();
     for (final part in parts) {
       final trimmed = trimPart(part);
       if (trimmed.isNotEmpty) {
-        base = '$base$separator$trimmed';
+        if (base.isEmpty) {
+          base = trimmed;
+        } else if (base.endsWith(separator)) {
+          base = '$base$trimmed';
+        } else {
+          base = '$base$separator$trimmed';
+        }
       }
     }
     return base;
@@ -251,13 +254,15 @@ abstract class CkPath {
   static Future<void> clearTemp() async {
     try {
       final dir = await getTemporaryDirectory();
-      if (await dir.exists()) {
+      if (dir.existsSync()) {
         final entities = dir.listSync();
         for (final entity in entities) {
           try {
             await entity.delete(recursive: true);
           } catch (e) {
-            debugPrint('Failed to delete temp entity: ${entity.path}, error: $e');
+            debugPrint(
+              'Failed to delete temp entity: ${entity.path}, error: $e',
+            );
           }
         }
       }

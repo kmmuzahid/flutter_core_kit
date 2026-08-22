@@ -70,5 +70,3 @@ class CkRatingBar extends StatelessWidget {
     );
   }
 }
-
-

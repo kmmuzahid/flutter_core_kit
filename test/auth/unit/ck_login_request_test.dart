@@ -31,24 +31,27 @@ void main() {
     });
 
     // LR-04
-    test('all fields are nullable — empty constructor compiles and has nulls', () {
-      const request = CkLoginRequest();
-      expect(request.body, isNull);
-      expect(request.pathParams, isNull);
-      expect(request.queryParams, isNull);
-      expect(request.formFields, isNull);
-      expect(request.listBody, isNull);
-      expect(request.files, isNull);
-      expect(request.headers, isNull);
-    });
+    test(
+      'all fields are nullable — empty constructor compiles and has nulls',
+      () {
+        const request = CkLoginRequest();
+        expect(request.body, isNull);
+        expect(request.pathParams, isNull);
+        expect(request.queryParams, isNull);
+        expect(request.formFields, isNull);
+        expect(request.listBody, isNull);
+        expect(request.files, isNull);
+        expect(request.headers, isNull);
+      },
+    );
 
     test('copyWith merges headers correctly', () {
-      const original = CkLoginRequest(
-        body: {'k': 'v'},
-        headers: {'X-A': '1'},
-      );
+      const original = CkLoginRequest(body: {'k': 'v'}, headers: {'X-A': '1'});
       final copy = original.copyWith(headers: {'X-B': '2'});
-      expect(copy.headers, equals({'X-B': '2'})); // copyWith replaces headers entirely
+      expect(
+        copy.headers,
+        equals({'X-B': '2'}),
+      ); // copyWith replaces headers entirely
     });
   });
 }

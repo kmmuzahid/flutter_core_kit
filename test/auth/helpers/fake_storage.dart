@@ -27,7 +27,6 @@ class _TestStorageBackdoor {
   static void reset() {
     // Access the static cache via the exposed test hook
     _storageCache.clear();
-    _storageInitialized = true; // Mark as initialized so no disk calls
   }
 
   static void seed(String key, String value) {
@@ -37,5 +36,4 @@ class _TestStorageBackdoor {
   static String? get(String key) => _storageCache[key];
 
   static final Map<String, String?> _storageCache = {};
-  static bool _storageInitialized = false;
 }

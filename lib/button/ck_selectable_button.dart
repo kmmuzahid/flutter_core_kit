@@ -59,7 +59,9 @@ class CkSelectableButton extends FormField<String> {
                    padding: const EdgeInsets.only(top: 8.0, left: 8.0),
                    child: Text(
                      field.errorText ?? '',
-                     style: TextStyle(color: Theme.of(state.context).colorScheme.error),
+                     style: TextStyle(
+                       color: Theme.of(state.context).colorScheme.error,
+                     ),
                    ),
                  ),
              ],
@@ -79,4 +81,3 @@ class _SelectableButtonsState extends FormFieldState<String> {
     super.initState();
   }
 }
-

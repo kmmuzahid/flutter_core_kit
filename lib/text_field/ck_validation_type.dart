@@ -26,5 +26,3 @@ enum CkValidationType {
   validateYear,
   validateWebURL,
 }
-
-

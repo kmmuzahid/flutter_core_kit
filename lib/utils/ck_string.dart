@@ -84,4 +84,3 @@ class CkString {
   // ===== IP Address =====
   static const String invalidIP = 'Please enter a valid IP address';
 }
-

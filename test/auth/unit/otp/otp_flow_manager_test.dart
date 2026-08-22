@@ -51,7 +51,9 @@ void main() {
     // OF-01
     test('startResendTimer decrements countdown to 0', () {
       fakeAsync((async) {
-        final manager = _buildManager(resendCooldown: const Duration(seconds: 3));
+        final manager = _buildManager(
+          resendCooldown: const Duration(seconds: 3),
+        );
         manager.startResendTimer();
 
         expect(manager.resendCountdown.value, equals(3));
@@ -69,7 +71,9 @@ void main() {
     // OF-02
     test('startResendTimer cancels previous timer on restart', () {
       fakeAsync((async) {
-        final manager = _buildManager(resendCooldown: const Duration(seconds: 10));
+        final manager = _buildManager(
+          resendCooldown: const Duration(seconds: 10),
+        );
         manager.startResendTimer();
         async.elapse(const Duration(seconds: 5));
         expect(manager.resendCountdown.value, equals(5));
@@ -87,18 +91,23 @@ void main() {
 
   group('CkOtpFlowManager — canResend', () {
     // OF-03
-    test('canResend is true when countdown is 0 and attempts < max (unlimited)', () {
-      fakeAsync((async) {
-        final manager = _buildManager(maxResendAttempts: 0);
-        expect(manager.canResend, isTrue);
-        manager.dispose();
-      });
-    });
+    test(
+      'canResend is true when countdown is 0 and attempts < max (unlimited)',
+      () {
+        fakeAsync((async) {
+          final manager = _buildManager(maxResendAttempts: 0);
+          expect(manager.canResend, isTrue);
+          manager.dispose();
+        });
+      },
+    );
 
     // OF-04
     test('canResend is false when countdown > 0', () {
       fakeAsync((async) {
-        final manager = _buildManager(resendCooldown: const Duration(seconds: 60));
+        final manager = _buildManager(
+          resendCooldown: const Duration(seconds: 60),
+        );
         manager.startResendTimer();
         expect(manager.resendCountdown.value, greaterThan(0));
         expect(manager.canResend, isFalse);
@@ -129,7 +138,10 @@ void main() {
     test('storeVerificationToken saves token to in-memory map', () async {
       final manager = _buildManager();
       await manager.storeVerificationToken(CkOtpTrigger.signup, 'tok123');
-      expect(manager.getVerificationToken(CkOtpTrigger.signup), equals('tok123'));
+      expect(
+        manager.getVerificationToken(CkOtpTrigger.signup),
+        equals('tok123'),
+      );
       manager.dispose();
     });
 
@@ -145,18 +157,27 @@ void main() {
     // OF-09
     test('getVerificationToken returns stored token for trigger', () async {
       final manager = _buildManager();
-      await manager.storeVerificationToken(CkOtpTrigger.forgetPassword, 'fp_tok');
-      expect(manager.getVerificationToken(CkOtpTrigger.forgetPassword), equals('fp_tok'));
+      await manager.storeVerificationToken(
+        CkOtpTrigger.forgetPassword,
+        'fp_tok',
+      );
+      expect(
+        manager.getVerificationToken(CkOtpTrigger.forgetPassword),
+        equals('fp_tok'),
+      );
       manager.dispose();
     });
 
     // OF-10
-    test('lastVerificationToken returns token for current lastTrigger', () async {
-      final manager = _buildManager();
-      await manager.storeVerificationToken(CkOtpTrigger.login, 'login_tok');
-      expect(manager.lastVerificationToken, equals('login_tok'));
-      manager.dispose();
-    });
+    test(
+      'lastVerificationToken returns token for current lastTrigger',
+      () async {
+        final manager = _buildManager();
+        await manager.storeVerificationToken(CkOtpTrigger.login, 'login_tok');
+        expect(manager.lastVerificationToken, equals('login_tok'));
+        manager.dispose();
+      },
+    );
 
     test('lastVerificationToken is null when no trigger is set', () {
       final manager = _buildManager();
@@ -188,11 +209,16 @@ void main() {
     // OF-13
     test('returns failure if canResend is false (cooldown active)', () {
       fakeAsync((async) async {
-        final manager = _buildManager(resendCooldown: const Duration(seconds: 60));
+        final manager = _buildManager(
+          resendCooldown: const Duration(seconds: 60),
+        );
         manager.startResendTimer(); // starts countdown
         // canResend = false
         expect(manager.canResend, isFalse);
-        final result = await manager.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'a@b.com');
+        final result = await manager.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'a@b.com',
+        );
         expect(result.isSuccess, isFalse);
         expect(result.message, contains('cooldown'));
         manager.dispose();
@@ -212,14 +238,17 @@ void main() {
     });
 
     // OF-20
-    test('returns failure if verifyUrl is null and trigger is not forgetPassword', () async {
-      final manager = _buildManager(verifyUrl: null);
-      await manager.storeVerificationToken(CkOtpTrigger.signup, 'tok');
-      final result = await manager.verifyOtp(otp: '123456');
-      expect(result.isSuccess, isFalse);
-      expect(result.message, contains('not configured'));
-      manager.dispose();
-    });
+    test(
+      'returns failure if verifyUrl is null and trigger is not forgetPassword',
+      () async {
+        final manager = _buildManager(verifyUrl: null);
+        await manager.storeVerificationToken(CkOtpTrigger.signup, 'tok');
+        final result = await manager.verifyOtp(otp: '123456');
+        expect(result.isSuccess, isFalse);
+        expect(result.message, contains('not configured'));
+        manager.dispose();
+      },
+    );
   });
 
   group('CkOtpFlowManager.clearOtpState()', () {
@@ -244,7 +273,10 @@ void main() {
       final manager = _buildManager();
       await manager.restoreTokens();
 
-      expect(manager.getVerificationToken(CkOtpTrigger.signup), equals('stored_vtoken'));
+      expect(
+        manager.getVerificationToken(CkOtpTrigger.signup),
+        equals('stored_vtoken'),
+      );
       expect(manager.lastTrigger, equals(CkOtpTrigger.signup));
       manager.dispose();
     });
@@ -254,7 +286,9 @@ void main() {
     // EC-07
     test('dispose cancels timer and disposes stream without error', () {
       fakeAsync((async) {
-        final manager = _buildManager(resendCooldown: const Duration(seconds: 60));
+        final manager = _buildManager(
+          resendCooldown: const Duration(seconds: 60),
+        );
         manager.startResendTimer();
         expect(() => manager.dispose(), returnsNormally);
       });

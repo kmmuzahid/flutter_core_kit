@@ -36,7 +36,7 @@ void main() {
 
       // First sign in to get tokens
       await service.signIn(
-        request: CkLoginRequest(
+        request: const CkLoginRequest(
           body: {'email': 'a@b.com', 'password': 'p'},
         ),
       );
@@ -53,7 +53,7 @@ void main() {
     test('logout calls showLogin handler', () async {
       final service = await _buildService(handlers: handlers);
       await service.signIn(
-        request: CkLoginRequest(
+        request: const CkLoginRequest(
           body: {'email': 'a@b.com', 'password': 'p'},
         ),
       );
@@ -69,7 +69,7 @@ void main() {
         // If mock auth, logout should still succeed without any network call
         final service = await _buildService(handlers: handlers);
         await service.signIn(
-          request: CkLoginRequest(
+          request: const CkLoginRequest(
             body: {'email': 'a@b.com', 'password': 'p'},
           ),
         );

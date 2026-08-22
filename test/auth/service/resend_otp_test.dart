@@ -51,12 +51,18 @@ void main() {
     });
 
     // RO-04
-    test('sendOtp with trigger+recipient sets lastTrigger and lastRecipient', () async {
-      final service = await _buildService(handlers: handlers);
-      await service.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'user@test.com');
-      expect(service.otpManager.lastTrigger, equals(CkOtpTrigger.signup));
-      expect(service.otpManager.lastRecipient, equals('user@test.com'));
-    });
+    test(
+      'sendOtp with trigger+recipient sets lastTrigger and lastRecipient',
+      () async {
+        final service = await _buildService(handlers: handlers);
+        await service.sendOtp(
+          trigger: CkOtpTrigger.signup,
+          recipient: 'user@test.com',
+        );
+        expect(service.otpManager.lastTrigger, equals(CkOtpTrigger.signup));
+        expect(service.otpManager.lastRecipient, equals('user@test.com'));
+      },
+    );
 
     // RO-05
     test('sendOtp shows OTP verification screen on success', () async {

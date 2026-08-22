@@ -36,15 +36,13 @@ void main() {
 
     // AR-04
     test('rawResponse is preserved on success', () {
-      final result = CkAuthResult<void>.success(
-        rawResponse: {'key': 'value'},
-      );
+      const result = CkAuthResult<void>.success(rawResponse: {'key': 'value'});
       expect(result.rawResponse, equals({'key': 'value'}));
     });
 
     // AR-04b
     test('rawResponse is preserved on failure', () {
-      final result = CkAuthResult<void>.failure(
+      const result = CkAuthResult<void>.failure(
         rawResponse: {'error': 'unauthorized'},
       );
       expect(result.rawResponse, equals({'error': 'unauthorized'}));

@@ -177,10 +177,15 @@ class CkCityDropDown extends StatelessWidget {
       for (final stateData in selectedCountryData) {
         for (final stateEntry in stateData.entries) {
           final stateName = stateEntry.key;
-          final stateAbbr = CkStateDropDown.getStateAbbreviation(country, stateName, customAbbreviationMap);
+          final stateAbbr = CkStateDropDown.getStateAbbreviation(
+            country,
+            stateName,
+            customAbbreviationMap,
+          );
           final searchState = state.trim().toLowerCase();
           if (stateName.trim().toLowerCase() == searchState ||
-              (stateAbbr != null && stateAbbr.trim().toLowerCase() == searchState)) {
+              (stateAbbr != null &&
+                  stateAbbr.trim().toLowerCase() == searchState)) {
             return stateEntry.value;
           }
         }
@@ -189,4 +194,3 @@ class CkCityDropDown extends StatelessWidget {
     return [];
   }
 }
-

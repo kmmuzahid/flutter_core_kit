@@ -29,15 +29,14 @@ class AppConfig extends CoreKitConfig {
 
   @override
   CkTransportConfig get ckTransportConfig => CkTransportConfig(
-        baseUrl: 'https://jsonplaceholder.typicode.com',
-        refreshTokenEndpoint: '/auth/refresh',
-        enableDebugLogs: true,
-      );
+    baseUrl: 'https://jsonplaceholder.typicode.com',
+    refreshTokenEndpoint: '/auth/refresh',
+    enableDebugLogs: true,
+  );
 
   @override
-  Widget? get preInitChild => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+  Widget? get preInitChild =>
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
 
   // Disable the 3 s splash delay in this demo so we reach the UI quickly.
   @override
@@ -138,10 +137,8 @@ class _HomePage extends StatelessWidget {
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
         title: CkText(text: title, textAlign: TextAlign.left),
         trailing: Icon(Icons.arrow_forward_ios, size: 14.sp),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => page),
-        ),
+        onTap: () =>
+            Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
       ),
     );
   }
@@ -192,11 +189,7 @@ class _TextButtonPage extends StatelessWidget {
               ),
             ),
             12.height,
-            CkButton(
-              titleText: 'Loading state',
-              isLoading: true,
-              onTap: () {},
-            ),
+            CkButton(titleText: 'Loading state', isLoading: true, onTap: () {}),
             12.height,
             CkButton(
               titleText: 'Gradient button',
@@ -289,7 +282,10 @@ class _ImagePage extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.all(20.w),
         children: [
-          const CkText(text: 'Network URL (absolute)', textAlign: TextAlign.left),
+          const CkText(
+            text: 'Network URL (absolute)',
+            textAlign: TextAlign.left,
+          ),
           8.height,
           const CkImage(
             src: 'https://picsum.photos/seed/a/600/300',
@@ -308,7 +304,10 @@ class _ImagePage extends StatelessWidget {
             enableGrayscale: true,
           ),
           16.height,
-          const CkText(text: 'Fixed size with border', textAlign: TextAlign.left),
+          const CkText(
+            text: 'Fixed size with border',
+            textAlign: TextAlign.left,
+          ),
           8.height,
           Center(
             child: CkImage(
@@ -346,10 +345,7 @@ class _TransportPageState extends State<_TransportPage> {
 
     // GET request — mirrors README section "Transport (HTTP)"
     final res = await CkTransport.request<Map<String, dynamic>>(
-      input: RequestInput(
-        endpoint: '/posts/1',
-        method: RequestMethod.GET,
-      ),
+      input: RequestInput(endpoint: '/posts/1', method: RequestMethod.GET),
       responseBuilder: (data) => data is Map<String, dynamic> ? data : null,
     );
 
@@ -420,7 +416,8 @@ class _TransportPageState extends State<_TransportPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CkText(
-                      text: 'Status ${res.statusCode} · '
+                      text:
+                          'Status ${res.statusCode} · '
                           '${res.isSuccess ? "✅ isSuccess" : "❌ failed"}',
                       fontWeight: FontWeight.bold,
                       textAlign: TextAlign.left,
@@ -456,7 +453,10 @@ class _StoragePageState extends State<_StoragePage> {
   String? _readValue;
 
   Future<void> _write() async {
-    await CkStorage.write('demo_key', 'hello_core_kit_${DateTime.now().second}');
+    await CkStorage.write(
+      'demo_key',
+      'hello_core_kit_${DateTime.now().second}',
+    );
     CkSnackBar('Written ✅', type: CkSnackBarType.success);
   }
 
@@ -537,9 +537,8 @@ class _ListPageState extends State<_ListPage> {
         queryParams: {'_start': (page - 1) * 10, '_limit': 10},
         requiresToken: false,
       ),
-      responseBuilder: (data) => data is List
-          ? data.whereType<Map<String, dynamic>>().toList()
-          : null,
+      responseBuilder: (data) =>
+          data is List ? data.whereType<Map<String, dynamic>>().toList() : null,
     );
 
     if (res.isSuccess && res.data != null) {
@@ -571,17 +570,13 @@ class _ListPageState extends State<_ListPage> {
         isLoadDone: _loadDone,
         onRefresh: () => _fetch(1),
         onLoadMore: (page) => _fetch(page),
-        emptyWidget: const Center(
-          child: CkText(text: 'No posts'),
-        ),
+        emptyWidget: const Center(child: CkText(text: 'No posts')),
         itemBuilder: (context, index) {
           final post = _items[index];
           return Card(
             margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
             child: ListTile(
-              leading: CircleAvatar(
-                child: CkText(text: '${post['id']}'),
-              ),
+              leading: CircleAvatar(child: CkText(text: '${post['id']}')),
               title: CkText(
                 text: post['title'] ?? '',
                 maxLines: 1,
@@ -617,7 +612,8 @@ class _ResponsivePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const CkText(
-              text: 'Widths / heights / font-sizes below scale automatically '
+              text:
+                  'Widths / heights / font-sizes below scale automatically '
                   'relative to the design size (428 × 926).',
               textColor: Colors.grey,
               textAlign: TextAlign.left,
@@ -640,10 +636,7 @@ class _ResponsivePage extends StatelessWidget {
               height: 60.h,
               color: const Color(0xFF03DAC6),
               alignment: Alignment.center,
-              child: const CkText(
-                text: '300.w × 60.h',
-                fontSize: 16,
-              ),
+              child: const CkText(text: '300.w × 60.h', fontSize: 16),
             ),
             20.height,
             const CkText(

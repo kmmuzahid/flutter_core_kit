@@ -60,8 +60,9 @@ class DioRequestBuilder {
 
     final raw = response.data;
     final extractedData = raw != null ? _responseExtractor.data(raw) : null;
-    final parsed =
-        extractedData != null ? responseBuilder(extractedData) : null;
+    final parsed = extractedData != null
+        ? responseBuilder(extractedData)
+        : null;
 
     final message =
         (raw != null ? _responseExtractor.message(raw) : null) ??

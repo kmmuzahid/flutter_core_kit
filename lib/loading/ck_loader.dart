@@ -18,4 +18,3 @@ class CkLoader extends StatelessWidget {
     );
   }
 }
-

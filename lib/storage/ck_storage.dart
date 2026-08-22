@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 /// Secure storage with guaranteed fallback + zero-latency in-memory cache.
 ///
 /// Read layer  : memory cache → (miss) disk read → populate cache

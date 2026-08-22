@@ -61,7 +61,7 @@ void main() {
 
       // After signIn with OTP required, lastTrigger=login
       await service.signIn(
-        request: CkLoginRequest(
+        request: const CkLoginRequest(
           body: {'email': 'u@test.com', 'password': 'p'},
         ),
       );
@@ -112,7 +112,7 @@ void main() {
     test('verifyOtp mockAuth + login trigger → returns success', () async {
       final service = await _buildService(handlers: handlers);
       await service.signIn(
-        request: CkLoginRequest(
+        request: const CkLoginRequest(
           body: {'email': 'u@test.com', 'password': 'p'},
         ),
       );

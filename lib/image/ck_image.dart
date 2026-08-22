@@ -49,8 +49,10 @@ class CkImage extends StatelessWidget {
       return BorderRadius.only(
         topLeft: borderRadiusCustom!.topLeft + Radius.circular(totalAddition),
         topRight: borderRadiusCustom!.topRight + Radius.circular(totalAddition),
-        bottomLeft: borderRadiusCustom!.bottomLeft + Radius.circular(totalAddition),
-        bottomRight: borderRadiusCustom!.bottomRight + Radius.circular(totalAddition),
+        bottomLeft:
+            borderRadiusCustom!.bottomLeft + Radius.circular(totalAddition),
+        bottomRight:
+            borderRadiusCustom!.bottomRight + Radius.circular(totalAddition),
       );
     }
 
@@ -74,7 +76,11 @@ class CkImage extends StatelessWidget {
   }
 
   Widget _finalImage() {
-    if (enableAspectRatio && width != null && height != null && width! > 0 && height! > 0) {
+    if (enableAspectRatio &&
+        width != null &&
+        height != null &&
+        width! > 0 &&
+        height! > 0) {
       return _genralChild().toAr(width!, height!);
     }
     return _genralChild();
@@ -96,7 +102,10 @@ class CkImage extends StatelessWidget {
         child: getImage(),
       );
     } catch (e) {
-      return ClipRRect(borderRadius: getBorderRadius(), child: _buildErrorWidget());
+      return ClipRRect(
+        borderRadius: getBorderRadius(),
+        child: _buildErrorWidget(),
+      );
     }
   }
 
@@ -112,7 +121,8 @@ class CkImage extends StatelessWidget {
   }
 
   Widget getImage() {
-    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) && src.startsWith('assets/')) {
+    if ((src.startsWith('assets/svg') || src.endsWith('.svg')) &&
+        src.startsWith('assets/')) {
       return _buildSvgImage();
     }
 
@@ -161,7 +171,10 @@ class CkImage extends StatelessWidget {
           ),
         ),
         progressIndicatorBuilder: (context, url, downloadProgress) {
-          return Skeletonizer(enabled: (downloadProgress.progress ?? 0) < 1, child: placeholder());
+          return Skeletonizer(
+            enabled: (downloadProgress.progress ?? 0) < 1,
+            child: placeholder(),
+          );
         },
         errorWidget: (context, url, error) {
           CkLogger.error(error.toString(), tag: 'Common Image');
@@ -177,7 +190,9 @@ class CkImage extends StatelessWidget {
       borderRadius: getBorderRadius(),
       child: SvgPicture.asset(
         src,
-        colorFilter: imageColor != null ? ColorFilter.mode(imageColor!, BlendMode.srcIn) : null,
+        colorFilter: imageColor != null
+            ? ColorFilter.mode(imageColor!, BlendMode.srcIn)
+            : null,
         height: size?.w ?? height?.w,
         width: size?.w ?? width?.w,
         fit: fill,
@@ -215,5 +230,3 @@ class CkImage extends StatelessWidget {
     );
   }
 }
-
-

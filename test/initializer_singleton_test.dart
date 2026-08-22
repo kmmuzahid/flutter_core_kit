@@ -27,11 +27,14 @@ void main() {
     // CS-02
     // Singleton contract: two calls to `.instance` must return the
     // exact same object (identical), not just equal.
-    test('CS-02: .instance always returns the same object (singleton identity)', () {
-      final a = CoreKitInstanceSingleton.instance;
-      final b = CoreKitInstanceSingleton.instance;
-      expect(identical(a, b), isTrue);
-    });
+    test(
+      'CS-02: .instance always returns the same object (singleton identity)',
+      () {
+        final a = CoreKitInstanceSingleton.instance;
+        final b = CoreKitInstanceSingleton.instance;
+        expect(identical(a, b), isTrue);
+      },
+    );
 
     // CS-03
     // The `coreKitInstance` top-level getter is defined as:
@@ -46,18 +49,21 @@ void main() {
     // CS-04
     // Multiple repeated accesses through both paths must all be identical,
     // confirming the singleton is not re-created between calls.
-    test('CS-04: repeated access through getter and .instance are all identical', () {
-      final instances = [
-        coreKitInstance,
-        CoreKitInstanceSingleton.instance,
-        coreKitInstance,
-        CoreKitInstanceSingleton.instance,
-      ];
-      final first = instances.first;
-      for (final inst in instances) {
-        expect(identical(inst, first), isTrue);
-      }
-    });
+    test(
+      'CS-04: repeated access through getter and .instance are all identical',
+      () {
+        final instances = [
+          coreKitInstance,
+          CoreKitInstanceSingleton.instance,
+          coreKitInstance,
+          CoreKitInstanceSingleton.instance,
+        ];
+        final first = instances.first;
+        for (final inst in instances) {
+          expect(identical(inst, first), isTrue);
+        }
+      },
+    );
 
     // CS-05
     // Type check: the object returned is specifically a CoreKitInstanceSingleton,

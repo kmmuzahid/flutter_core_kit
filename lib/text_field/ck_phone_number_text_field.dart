@@ -78,12 +78,10 @@ class CkPhoneNumberTextField extends StatefulWidget {
   final AutovalidateMode? autovalidateMode;
 
   @override
-  State<CkPhoneNumberTextField> createState() =>
-      _CkPhoneNumberTextFieldState();
+  State<CkPhoneNumberTextField> createState() => _CkPhoneNumberTextFieldState();
 }
 
-class _CkPhoneNumberTextFieldState
-    extends State<CkPhoneNumberTextField> {
+class _CkPhoneNumberTextFieldState extends State<CkPhoneNumberTextField> {
   late List<Country> _countryList;
   late Country _selectedCountry;
   late List<Country> filteredCountries;
@@ -310,11 +308,15 @@ class _CkPhoneNumberTextFieldState
 
     return TextFormField(
       cursorColor: _focusNode.hasFocus
-          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? theme.colorScheme.error),
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+                theme.colorScheme.error),
       cursorErrorColor: _focusNode.hasFocus
-          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ?? coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ?? theme.colorScheme.error),
+          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
+                coreKitInstance.primaryColor)
+          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
+                theme.colorScheme.error),
       controller: _internalController,
       focusNode: _focusNode,
       readOnly: widget.isReadOnly,
@@ -475,4 +477,3 @@ class _CkPhoneNumberTextFieldState
         coreKitInstance.outlineColor;
   }
 }
-

@@ -8,7 +8,9 @@ import 'package:core_kit/core_kit_internal.dart';
 /// // or
 /// final status = await Permission.camera.ensure();
 /// ```
-@Deprecated('Use CkPermission or Permission.ensure() extension instead. Example: CkPermission.camera.ensure() or Permission.camera.ensure()')
+@Deprecated(
+  'Use CkPermission or Permission.ensure() extension instead. Example: CkPermission.camera.ensure() or Permission.camera.ensure()',
+)
 class CkPermissionHandler {
   const CkPermissionHandler({required this.permission});
   final Permission permission;

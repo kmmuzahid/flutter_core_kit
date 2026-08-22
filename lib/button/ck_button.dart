@@ -99,7 +99,9 @@ class _CkButtonState extends State<CkButton>
     final elevatedButtonTheme = Theme.of(context).elevatedButtonTheme;
 
     final themeShape = elevatedButtonTheme.style?.shape?.resolve({});
-    final resolvedShape = themeShape is RoundedRectangleBorder ? themeShape : null;
+    final resolvedShape = themeShape is RoundedRectangleBorder
+        ? themeShape
+        : null;
 
     final themeBorderRadius = resolvedShape?.borderRadius
         .resolve(TextDirection.ltr)
@@ -112,28 +114,46 @@ class _CkButtonState extends State<CkButton>
     final themeMinSize = elevatedButtonTheme.style?.minimumSize?.resolve({});
     final themePadding = elevatedButtonTheme.style?.padding?.resolve({});
 
-    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({});
+    final themeBackgroundColor = elevatedButtonTheme.style?.backgroundColor
+        ?.resolve({});
     final titleColor = elevatedButtonTheme.style?.textStyle?.resolve({})?.color;
 
-    final themeDisabledBackgroundColor = elevatedButtonTheme.style?.backgroundColor?.resolve({WidgetState.disabled});
-    final themeDisabledForegroundColor = elevatedButtonTheme.style?.foregroundColor?.resolve({WidgetState.disabled});
+    final themeDisabledBackgroundColor = elevatedButtonTheme
+        .style
+        ?.backgroundColor
+        ?.resolve({WidgetState.disabled});
+    final themeDisabledForegroundColor = elevatedButtonTheme
+        .style
+        ?.foregroundColor
+        ?.resolve({WidgetState.disabled});
     final themeElevation = elevatedButtonTheme.style?.elevation?.resolve({});
     final themeTextStyle = elevatedButtonTheme.style?.textStyle?.resolve({});
 
     final borderRadius = widget.buttonRadius?.r ?? themeBorderRadius ?? 8.0;
     final borderWidth = widget.borderWidth?.w ?? themeBorderWidth ?? 1.5;
-    final borderColor = widget.borderColor ?? themeBorderColor ?? Colors.transparent;
+    final borderColor =
+        widget.borderColor ?? themeBorderColor ?? Colors.transparent;
     final minHeight = widget.buttonHeight?.h ?? themeMinSize?.height ?? 48.0;
-    final backgroundColor = widget.buttonColor ?? themeBackgroundColor ?? coreKitInstance.primaryColor;
-    final foregroundColor = widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
-    final loaderColor = elevatedButtonTheme.style?.foregroundColor?.resolve({}) ?? coreKitInstance.secondaryColor;
-    final disabledBackgroundColor = widget.buttonColor ?? themeDisabledBackgroundColor ?? backgroundColor;
-    final disabledForegroundColor = widget.titleColor ?? themeDisabledForegroundColor ?? foregroundColor;
+    final backgroundColor =
+        widget.buttonColor ??
+        themeBackgroundColor ??
+        coreKitInstance.primaryColor;
+    final foregroundColor =
+        widget.titleColor ?? titleColor ?? coreKitInstance.onPrimaryColor;
+    final loaderColor =
+        elevatedButtonTheme.style?.foregroundColor?.resolve({}) ??
+        coreKitInstance.secondaryColor;
+    final disabledBackgroundColor =
+        widget.buttonColor ?? themeDisabledBackgroundColor ?? backgroundColor;
+    final disabledForegroundColor =
+        widget.titleColor ?? themeDisabledForegroundColor ?? foregroundColor;
     final buttonElevation = widget.elevation ?? themeElevation ?? 2.0;
 
     final padding = toEdgeInsets(
       context,
-      widget.padding ?? themePadding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      widget.padding ??
+          themePadding ??
+          const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
     );
 
     return LayoutBuilder(
@@ -144,14 +164,23 @@ class _CkButtonState extends State<CkButton>
         final textStyle = (themeTextStyle ?? const TextStyle()).copyWith(
           fontFamily: coreKitInstance.fontFamily,
           fontSize: _fontSize(elevatedButtonTheme),
-          fontWeight: widget.titleWeight ?? themeTextStyle?.fontWeight ?? FontWeight.w600,
+          fontWeight:
+              widget.titleWeight ??
+              themeTextStyle?.fontWeight ??
+              FontWeight.w600,
         );
 
-        final minRequiredWidth = _measureMinWidth(context: context, textStyle: textStyle, padding: padding);
+        final minRequiredWidth = _measureMinWidth(
+          context: context,
+          textStyle: textStyle,
+          padding: padding,
+        );
 
         final themeMinWidthRaw = themeMinSize?.width;
         final isThemeFullWidth = themeMinWidthRaw == double.infinity;
-        final themeMinWidth = isThemeFullWidth ? 0.0 : (themeMinWidthRaw ?? 88.0);
+        final themeMinWidth = isThemeFullWidth
+            ? 0.0
+            : (themeMinWidthRaw ?? 88.0);
 
         final requestedWidth = widget.buttonWidth ?? double.nan;
         double? calculatedWidth;
@@ -160,13 +189,18 @@ class _CkButtonState extends State<CkButton>
           calculatedWidth = hasBoundedWidth ? maxAvailableWidth : null;
         } else if (!requestedWidth.isNaN) {
           if (hasBoundedWidth) {
-            calculatedWidth = requestedWidth.clamp(minRequiredWidth, maxAvailableWidth);
+            calculatedWidth = requestedWidth.clamp(
+              minRequiredWidth,
+              maxAvailableWidth,
+            );
           } else {
             calculatedWidth = requestedWidth;
           }
         } else {
           if (hasBoundedWidth) {
-            calculatedWidth = isThemeFullWidth ? maxAvailableWidth : minRequiredWidth.clamp(themeMinWidth, maxAvailableWidth);
+            calculatedWidth = isThemeFullWidth
+                ? maxAvailableWidth
+                : minRequiredWidth.clamp(themeMinWidth, maxAvailableWidth);
           } else {
             calculatedWidth = isThemeFullWidth ? null : minRequiredWidth;
           }
@@ -220,10 +254,14 @@ class _CkButtonState extends State<CkButton>
             onPressed: widget.isLoading ? null : widget.onTap,
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.resolveWith(
-                (states) => states.contains(WidgetState.disabled) ? disabledBackgroundColor : backgroundColor,
+                (states) => states.contains(WidgetState.disabled)
+                    ? disabledBackgroundColor
+                    : backgroundColor,
               ),
               foregroundColor: WidgetStateProperty.resolveWith(
-                (states) => states.contains(WidgetState.disabled) ? disabledForegroundColor : foregroundColor,
+                (states) => states.contains(WidgetState.disabled)
+                    ? disabledForegroundColor
+                    : foregroundColor,
               ),
               textStyle: WidgetStateProperty.all(textStyle),
               shape: WidgetStateProperty.all(
@@ -240,15 +278,25 @@ class _CkButtonState extends State<CkButton>
                 if (widget.buttonColor != null || widget.gradient != null) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: widget.gradient != null ? null : widget.buttonColor,
+                      color: widget.gradient != null
+                          ? null
+                          : widget.buttonColor,
                       gradient: widget.gradient,
                       borderRadius: BorderRadius.circular(borderRadius),
-                      border: Border.all(color: borderColor, width: borderWidth),
+                      border: Border.all(
+                        color: borderColor,
+                        width: borderWidth,
+                      ),
                     ),
                     child: child,
                   );
                 }
-                return coreKitInstance.theme.elevatedButtonTheme.style?.backgroundBuilder?.call(context, state, child) ??
+                return coreKitInstance
+                        .theme
+                        .elevatedButtonTheme
+                        .style
+                        ?.backgroundBuilder
+                        ?.call(context, state, child) ??
                     child ??
                     const SizedBox.shrink();
               },
@@ -274,7 +322,11 @@ class _CkButtonState extends State<CkButton>
               child: AnimatedBuilder(
                 animation: _animation,
                 builder: (_, _) => CustomPaint(
-                  painter: _BorderLoaderPainter(_animation.value, loaderColor, borderRadius),
+                  painter: _BorderLoaderPainter(
+                    _animation.value,
+                    loaderColor,
+                    borderRadius,
+                  ),
                 ),
               ),
             ),
@@ -297,7 +349,11 @@ class _CkButtonState extends State<CkButton>
     final prefixWidth = widget.prefix != null ? 24.0 : 0.0;
     final suffixWidth = widget.suffix != null ? 24.0 : 0.0;
 
-    return textPainter.width + prefixWidth + suffixWidth + padding.left + padding.right;
+    return textPainter.width +
+        prefixWidth +
+        suffixWidth +
+        padding.left +
+        padding.right;
   }
 }
 
@@ -310,7 +366,8 @@ class _BorderLoaderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    final path = Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
 
     final paint = Paint()
       ..color = color
@@ -336,4 +393,3 @@ class _BorderLoaderPainter extends CustomPainter {
   bool shouldRepaint(covariant _BorderLoaderPainter oldDelegate) =>
       oldDelegate.progress != progress;
 }
-

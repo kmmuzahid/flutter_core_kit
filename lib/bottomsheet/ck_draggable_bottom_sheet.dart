@@ -18,12 +18,10 @@ class CkDraggableBottomSheet extends StatefulWidget {
   final double maxChildSize;
 
   @override
-  State<CkDraggableBottomSheet> createState() =>
-      _CkDraggableBottomSheetState();
+  State<CkDraggableBottomSheet> createState() => _CkDraggableBottomSheetState();
 }
 
-class _CkDraggableBottomSheetState
-    extends State<CkDraggableBottomSheet> {
+class _CkDraggableBottomSheetState extends State<CkDraggableBottomSheet> {
   late DraggableScrollableController _draggableController;
   double _currentSize = 0.15;
 
@@ -105,4 +103,3 @@ class _CkDraggableBottomSheetState
     );
   }
 }
-

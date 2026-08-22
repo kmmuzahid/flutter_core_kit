@@ -74,4 +74,3 @@ class CkScreenshotPreview {
     _overlayEntry = null;
   }
 }
-

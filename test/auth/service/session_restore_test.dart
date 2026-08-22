@@ -67,11 +67,6 @@ void main() {
       CkStorage.seedForTests(CkAuthStorageKeys.accessTokenKey, 'tok');
       var hookCalled = false;
 
-      final config = buildMockConfig(
-        handlers: handlers,
-        autoTriggers: {},
-        mockAuth: true,
-      );
       // Build config with onTokenRestored — we need to build manually
       final configWithHook = CkAuthConfig(
         endpoints: kTestEndpoints,
@@ -129,14 +124,15 @@ void main() {
       CkStorage.seedForTests(CkAuthStorageKeys.accessTokenKey, 'tok');
 
       // Track whether the validator was called
-      bool validatorCalled = false;
+      var validatorCalled = false;
 
       final configWithValidator = CkAuthConfig(
         endpoints: kTestEndpoints,
         extractors: kTestExtractors,
         otpConfig: buildOtpConfig(autoTriggers: {}),
         handlers: handlers.build(),
-        loginRequestBuilder: (cb) => CkLoginRequest(body: {'email': cb.account}),
+        loginRequestBuilder: (cb) =>
+            CkLoginRequest(body: {'email': cb.account}),
         mockAuth: false,
         customAuthValidator: () async {
           validatorCalled = true;
@@ -162,12 +158,15 @@ void main() {
       }
 
       // The critical test: customAuthValidator was invoked
-      expect(validatorCalled, isTrue,
-          reason: 'customAuthValidator must be called during restoreSession with tokens');
+      expect(
+        validatorCalled,
+        isTrue,
+        reason:
+            'customAuthValidator must be called during restoreSession with tokens',
+      );
       // The auth state is set to unauthenticated by _stateController.setUnauthenticated()
       // inside logoutHandler.execute() — which runs AFTER the network call (or despite errors).
       // In tests, the network throws before clearTokens(), so we can only test validator invocation.
     });
-
   });
 }

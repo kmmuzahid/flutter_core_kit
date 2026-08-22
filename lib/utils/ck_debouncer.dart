@@ -14,4 +14,3 @@ class CkDebouncer {
     _timer?.cancel();
   }
 }
-

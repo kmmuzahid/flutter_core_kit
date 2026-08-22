@@ -13,7 +13,8 @@ class CkFormBuilder<T> extends StatefulWidget {
     BuildContext context,
     GlobalKey<FormState> formKey,
     T entity,
-  ) builder;
+  )
+  builder;
 
   final T entity;
   final ScrollPhysics? scrollPhysics;
@@ -50,4 +51,3 @@ class _CkFormBuilderState<T> extends State<CkFormBuilder<T>> {
     );
   }
 }
-

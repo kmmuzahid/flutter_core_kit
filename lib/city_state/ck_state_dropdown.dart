@@ -20,10 +20,10 @@ class CkStateDropDownItemProperty
     this.abbreviation,
     required super.isSelected,
   }) : super(
-          item: (abbreviation != null && abbreviation.isNotEmpty)
-              ? abbreviation
-              : stateName,
-        );
+         item: (abbreviation != null && abbreviation.isNotEmpty)
+             ? abbreviation
+             : stateName,
+       );
 
   /// Full state name (e.g. `'California'`)
   String get name => stateName;
@@ -32,8 +32,9 @@ class CkStateDropDownItemProperty
   String get key => stateName;
 
   /// Returns abbreviation if non-null and not empty, otherwise state name.
-  String get value =>
-      (abbreviation != null && abbreviation!.isNotEmpty) ? abbreviation! : stateName;
+  String get value => (abbreviation != null && abbreviation!.isNotEmpty)
+      ? abbreviation!
+      : stateName;
 }
 
 /// A dropdown widget for selecting states/provinces of a country.
@@ -164,8 +165,7 @@ class CkStateDropDown extends StatelessWidget {
     final state = getStates(country: countryName).map((e) {
       final abbr = getStateAbbreviation(countryName, e, customAbbreviationMap);
       return MapEntry(e, abbr ?? e);
-    }).toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
+    }).toList()..sort((a, b) => a.key.compareTo(b.key));
 
     final searchKey = initialState ?? initialValue?.key;
     final searchValue = initialState ?? initialValue?.value;
@@ -183,7 +183,8 @@ class CkStateDropDown extends StatelessWidget {
             return (sKey.isNotEmpty && (eKey == sKey || eVal == sKey)) ||
                 (sVal.isNotEmpty && (eKey == sVal || eVal == sVal));
           },
-          orElse: () => initialValue ?? MapEntry(searchKey ?? '', searchValue ?? ''),
+          orElse: () =>
+              initialValue ?? MapEntry(searchKey ?? '', searchValue ?? ''),
         );
       } catch (_) {
         resolvedInitialValue = initialValue;
@@ -215,7 +216,11 @@ class CkStateDropDown extends StatelessWidget {
         final stateName = entry.key;
         final abbr = entry.value != entry.key
             ? entry.value
-            : getStateAbbreviation(countryName, stateName, customAbbreviationMap);
+            : getStateAbbreviation(
+                countryName,
+                stateName,
+                customAbbreviationMap,
+              );
         onChanged(
           CkStateDropDownItemProperty(
             stateName: stateName,
@@ -228,7 +233,11 @@ class CkStateDropDown extends StatelessWidget {
         final stateName = value.key;
         final abbr = value.value != value.key
             ? value.value
-            : getStateAbbreviation(countryName, stateName, customAbbreviationMap);
+            : getStateAbbreviation(
+                countryName,
+                stateName,
+                customAbbreviationMap,
+              );
         final prop = CkStateDropDownItemProperty(
           stateName: stateName,
           abbreviation: abbr,
@@ -251,8 +260,13 @@ class CkStateDropDown extends StatelessWidget {
         final stateName = states.item.key;
         final abbr = states.item.value != states.item.key
             ? states.item.value
-            : getStateAbbreviation(countryName, stateName, customAbbreviationMap);
-        final displayText = (showAbbreviationInMenu && abbr != null && abbr != stateName)
+            : getStateAbbreviation(
+                countryName,
+                stateName,
+                customAbbreviationMap,
+              );
+        final displayText =
+            (showAbbreviationInMenu && abbr != null && abbr != stateName)
             ? '$stateName ($abbr)'
             : stateName;
 
@@ -294,4 +308,3 @@ class CkStateDropDown extends StatelessWidget {
     return stateList;
   }
 }
-

@@ -2,7 +2,7 @@ import 'dart:async';
 
 /// A stream that caches the latest value and replays it to new listeners.
 /// Pure Dart — no Flutter dependency, no state management lock-in.
-/// 
+///
 /// When a listener subscribes for the first time, it immediately receives
 /// the last emitted value (if any), so the screen never starts blank.
 ///
@@ -18,18 +18,18 @@ import 'dart:async';
 class CkBehaviorStream<T> {
   T _value;
   final StreamController<T> _controller = StreamController<T>.broadcast();
-  
+
   CkBehaviorStream({required T initialValue}) : _value = initialValue;
-  
+
   /// Current value (synchronous access)
   T get value => _value;
-  
+
   /// Add new value to the stream
   void add(T value) {
     _value = value;
     _controller.add(value);
   }
-  
+
   /// Listen to the stream — immediately receives last value, then future updates
   StreamSubscription<T> listen(
     void Function(T value) onData, {
@@ -46,10 +46,10 @@ class CkBehaviorStream<T> {
       cancelOnError: cancelOnError,
     );
   }
-  
+
   /// Get the raw stream (without replay — for advanced use)
   Stream<T> get stream => _controller.stream;
-  
+
   /// Dispose the stream controller
   void dispose() => _controller.close();
 }

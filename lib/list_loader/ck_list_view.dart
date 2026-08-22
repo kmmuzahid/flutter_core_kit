@@ -146,7 +146,8 @@ class _CkListViewState extends State<CkListView> {
 
   @override
   Widget build(BuildContext context) {
-    final sliverContent = widget.isLoading && widget.itemCount == 0 && widget.shimmerItem != null
+    final sliverContent =
+        widget.isLoading && widget.itemCount == 0 && widget.shimmerItem != null
         ? _buildShimmerSliver()
         : widget.itemCount == 0 && !widget.isLoading
         ? SliverToBoxAdapter(child: _empty())
@@ -309,19 +310,17 @@ class _CkListViewState extends State<CkListView> {
     return SliverSkeletonizer(
       enabled: true,
       child: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (ctx, i) {
-            if (widget.seperator != null && i.isOdd) return widget.seperator!;
-            return widget.shimmerItem!;
-          },
-          childCount: count,
-        ),
+        delegate: SliverChildBuilderDelegate((ctx, i) {
+          if (widget.seperator != null && i.isOdd) return widget.seperator!;
+          return widget.shimmerItem!;
+        }, childCount: count),
       ),
     );
   }
 
   Widget _empty() {
     return widget.emptyWidget ??
+        coreKitInstance.listLoaderConfig.emptyWidget ??
         Center(
           child: Image.asset(
             'assets/images/empty_icon.png',
@@ -450,4 +449,3 @@ class _AppBarCollapseDelegate extends SliverPersistentHeaderDelegate {
         old.backgroundColor != backgroundColor;
   }
 }
-

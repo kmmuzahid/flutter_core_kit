@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
-import 'package:permission_handler/permission_handler.dart';
 
 class CkMultiImagePickerFormField extends StatefulWidget {
   final bool isMulti;
@@ -43,8 +42,7 @@ class CkMultiImagePickerFormField extends StatefulWidget {
 
 typedef CkMultiImagePicker = CkMultiImagePickerFormField;
 
-class _CkMultiImagePickerField
-    extends State<CkMultiImagePickerFormField> {
+class _CkMultiImagePickerField extends State<CkMultiImagePickerFormField> {
   final ImagePicker _picker = ImagePicker();
 
   /// Shown in the grid (network, asset, file path, etc.). Not part of form value.
@@ -208,94 +206,94 @@ class _CkMultiImagePickerField
                 widget.emptyWidget!
               else
                 GridView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  childAspectRatio: 1,
-                ),
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  if (_showAddButton && index == _displayCount) {
-                    return GestureDetector(
-                      onTap: () => _pickImages(fieldState),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF6F6F6),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFE0E0E0)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(5),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 5,
+                    crossAxisSpacing: 5,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    if (_showAddButton && index == _displayCount) {
+                      return GestureDetector(
+                        onTap: () => _pickImages(fieldState),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF6F6F6),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFE0E0E0)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(5),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 26,
+                              color: Colors.grey,
                             ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.add_a_photo_outlined,
-                            size: 26,
-                            color: Colors.grey,
                           ),
                         ),
-                      ),
+                      );
+                    }
+
+                    final src = _srcAtDisplayIndex(index);
+
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(8),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: CkImage(
+                              src: src,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fill: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: -6,
+                          right: -6,
+                          child: GestureDetector(
+                            onTap: () => _removeAt(index, fieldState),
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     );
-                  }
-
-                  final src = _srcAtDisplayIndex(index);
-
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(8),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: CkImage(
-                            src: src,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fill: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -6,
-                        right: -6,
-                        child: GestureDetector(
-                          onTap: () => _removeAt(index, fieldState),
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                  },
+                ),
               if (fieldState.hasError)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 8.0),
@@ -314,6 +312,3 @@ class _CkMultiImagePickerField
     );
   }
 }
-
-
-

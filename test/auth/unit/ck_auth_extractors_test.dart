@@ -33,20 +33,29 @@ void main() {
     // AE-04
     test('extracts verificationToken for signup trigger (createUserToken)', () {
       final data = {'createUserToken': 'vt_signup_123'};
-      final token = extractors.verificationTokens?[CkOtpTrigger.signup]?.call(data);
+      final token = extractors.verificationTokens?[CkOtpTrigger.signup]?.call(
+        data,
+      );
       expect(token, equals('vt_signup_123'));
     });
 
     // AE-05
-    test('extracts verificationToken for forgetPassword trigger (forgetToken)', () {
-      final data = {'forgetToken': 'vt_forget_456'};
-      final token = extractors.verificationTokens?[CkOtpTrigger.forgetPassword]?.call(data);
-      expect(token, equals('vt_forget_456'));
-    });
+    test(
+      'extracts verificationToken for forgetPassword trigger (forgetToken)',
+      () {
+        final data = {'forgetToken': 'vt_forget_456'};
+        final token = extractors
+            .verificationTokens?[CkOtpTrigger.forgetPassword]
+            ?.call(data);
+        expect(token, equals('vt_forget_456'));
+      },
+    );
 
     test('extracts verificationToken for login trigger (loginUserToken)', () {
       final data = {'loginUserToken': 'vt_login_789'};
-      final token = extractors.verificationTokens?[CkOtpTrigger.login]?.call(data);
+      final token = extractors.verificationTokens?[CkOtpTrigger.login]?.call(
+        data,
+      );
       expect(token, equals('vt_login_789'));
     });
 
@@ -75,7 +84,9 @@ void main() {
       final extractors = CkAuthExtractors.fromPaths(
         accessTokenPath: 'data.token',
       );
-      final data = {'data': {'token': 'nested_token'}};
+      final data = {
+        'data': {'token': 'nested_token'},
+      };
       expect(extractors.accessToken(data), equals('nested_token'));
     });
 
@@ -84,7 +95,9 @@ void main() {
       final extractors = CkAuthExtractors.fromPaths(
         accessTokenPath: 'data.missing.key',
       );
-      final data = {'data': {'token': 'nested_token'}};
+      final data = {
+        'data': {'token': 'nested_token'},
+      };
       expect(extractors.accessToken(data), isNull);
     });
 
@@ -94,7 +107,9 @@ void main() {
         accessTokenPath: 'data.token.value',
       );
       // data.token is a string, not a map — should not throw
-      final data = {'data': {'token': 'just_a_string'}};
+      final data = {
+        'data': {'token': 'just_a_string'},
+      };
       expect(() => extractors.accessToken(data), returnsNormally);
       expect(extractors.accessToken(data), isNull);
     });
@@ -104,7 +119,10 @@ void main() {
         accessTokenPath: 'access',
         refreshTokenPath: 'nested.refresh',
       );
-      final data = {'access': 'tok', 'nested': {'refresh': 'rtok'}};
+      final data = {
+        'access': 'tok',
+        'nested': {'refresh': 'rtok'},
+      };
       expect(extractors.accessToken(data), equals('tok'));
       expect(extractors.refreshToken?.call(data), equals('rtok'));
     });
@@ -120,7 +138,10 @@ void main() {
     test('standard extractor uses "token" key', () {
       final extractors = CkAuthExtractors.standard();
       final data = {'token': 'reset_token_abc'};
-      expect(extractors.resetPasswordToken?.call(data), equals('reset_token_abc'));
+      expect(
+        extractors.resetPasswordToken?.call(data),
+        equals('reset_token_abc'),
+      );
     });
 
     test('returns null when token key is absent', () {

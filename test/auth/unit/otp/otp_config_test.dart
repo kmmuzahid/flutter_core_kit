@@ -100,21 +100,27 @@ void main() {
 
   group('CkOtpTrigger enum', () {
     test('contains signup, login, forgetPassword', () {
-      expect(CkOtpTrigger.values, containsAll([
-        CkOtpTrigger.signup,
-        CkOtpTrigger.login,
-        CkOtpTrigger.forgetPassword,
-      ]));
+      expect(
+        CkOtpTrigger.values,
+        containsAll([
+          CkOtpTrigger.signup,
+          CkOtpTrigger.login,
+          CkOtpTrigger.forgetPassword,
+        ]),
+      );
     });
   });
 
   group('CkOtpVerificationStrategy', () {
     test('contains tokenBased, sessionBased, identifierBased', () {
-      expect(CkOtpVerificationStrategy.values, containsAll([
-        CkOtpVerificationStrategy.tokenBased,
-        CkOtpVerificationStrategy.sessionBased,
-        CkOtpVerificationStrategy.identifierBased,
-      ]));
+      expect(
+        CkOtpVerificationStrategy.values,
+        containsAll([
+          CkOtpVerificationStrategy.tokenBased,
+          CkOtpVerificationStrategy.sessionBased,
+          CkOtpVerificationStrategy.identifierBased,
+        ]),
+      );
     });
   });
 }

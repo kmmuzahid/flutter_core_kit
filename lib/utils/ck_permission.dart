@@ -35,8 +35,9 @@ class CkPermission {
   static const CkPermission photos = CkPermission(Permission.photos);
 
   /// Photos Add-Only permission (`Permission.photosAddOnly`).
-  static const CkPermission photosAddOnly =
-      CkPermission(Permission.photosAddOnly);
+  static const CkPermission photosAddOnly = CkPermission(
+    Permission.photosAddOnly,
+  );
 
   /// Storage permission (`Permission.storage`).
   static const CkPermission storage = CkPermission(Permission.storage);
@@ -48,16 +49,19 @@ class CkPermission {
   static const CkPermission location = CkPermission(Permission.location);
 
   /// Location when in use permission (`Permission.locationWhenInUse`).
-  static const CkPermission locationWhenInUse =
-      CkPermission(Permission.locationWhenInUse);
+  static const CkPermission locationWhenInUse = CkPermission(
+    Permission.locationWhenInUse,
+  );
 
   /// Location always permission (`Permission.locationAlways`).
-  static const CkPermission locationAlways =
-      CkPermission(Permission.locationAlways);
+  static const CkPermission locationAlways = CkPermission(
+    Permission.locationAlways,
+  );
 
   /// Notification permission (`Permission.notification`).
-  static const CkPermission notification =
-      CkPermission(Permission.notification);
+  static const CkPermission notification = CkPermission(
+    Permission.notification,
+  );
 
   /// Contacts permission (`Permission.contacts`).
   static const CkPermission contacts = CkPermission(Permission.contacts);
@@ -69,15 +73,19 @@ class CkPermission {
   static const CkPermission phone = CkPermission(Permission.phone);
 
   /// Calendar permission (`Permission.calendar`).
+  @Deprecated('Use [calendarFullAccess] or [calendarWriteOnly] instead.')
+  // ignore: deprecated_member_use
   static const CkPermission calendar = CkPermission(Permission.calendar);
 
   /// Calendar full access permission (`Permission.calendarFullAccess`).
-  static const CkPermission calendarFullAccess =
-      CkPermission(Permission.calendarFullAccess);
+  static const CkPermission calendarFullAccess = CkPermission(
+    Permission.calendarFullAccess,
+  );
 
   /// Calendar write-only permission (`Permission.calendarWriteOnly`).
-  static const CkPermission calendarWriteOnly =
-      CkPermission(Permission.calendarWriteOnly);
+  static const CkPermission calendarWriteOnly = CkPermission(
+    Permission.calendarWriteOnly,
+  );
 
   /// Reminders permission (`Permission.reminders`).
   static const CkPermission reminders = CkPermission(Permission.reminders);
@@ -86,8 +94,9 @@ class CkPermission {
   static const CkPermission sensors = CkPermission(Permission.sensors);
 
   /// Sensors always permission (`Permission.sensorsAlways`).
-  static const CkPermission sensorsAlways =
-      CkPermission(Permission.sensorsAlways);
+  static const CkPermission sensorsAlways = CkPermission(
+    Permission.sensorsAlways,
+  );
 
   /// Speech recognition permission (`Permission.speech`).
   static const CkPermission speech = CkPermission(Permission.speech);
@@ -96,24 +105,29 @@ class CkPermission {
   static const CkPermission bluetooth = CkPermission(Permission.bluetooth);
 
   /// Bluetooth scan permission (`Permission.bluetoothScan`).
-  static const CkPermission bluetoothScan =
-      CkPermission(Permission.bluetoothScan);
+  static const CkPermission bluetoothScan = CkPermission(
+    Permission.bluetoothScan,
+  );
 
   /// Bluetooth advertise permission (`Permission.bluetoothAdvertise`).
-  static const CkPermission bluetoothAdvertise =
-      CkPermission(Permission.bluetoothAdvertise);
+  static const CkPermission bluetoothAdvertise = CkPermission(
+    Permission.bluetoothAdvertise,
+  );
 
   /// Bluetooth connect permission (`Permission.bluetoothConnect`).
-  static const CkPermission bluetoothConnect =
-      CkPermission(Permission.bluetoothConnect);
+  static const CkPermission bluetoothConnect = CkPermission(
+    Permission.bluetoothConnect,
+  );
 
   /// Nearby Wi-Fi devices permission (`Permission.nearbyWifiDevices`).
-  static const CkPermission nearbyWifiDevices =
-      CkPermission(Permission.nearbyWifiDevices);
+  static const CkPermission nearbyWifiDevices = CkPermission(
+    Permission.nearbyWifiDevices,
+  );
 
   /// Media Library permission (`Permission.mediaLibrary`).
-  static const CkPermission mediaLibrary =
-      CkPermission(Permission.mediaLibrary);
+  static const CkPermission mediaLibrary = CkPermission(
+    Permission.mediaLibrary,
+  );
 
   /// Audio permission (`Permission.audio`).
   static const CkPermission audio = CkPermission(Permission.audio);
@@ -122,48 +136,59 @@ class CkPermission {
   static const CkPermission videos = CkPermission(Permission.videos);
 
   /// Ignore battery optimizations permission (`Permission.ignoreBatteryOptimizations`).
-  static const CkPermission ignoreBatteryOptimizations =
-      CkPermission(Permission.ignoreBatteryOptimizations);
+  static const CkPermission ignoreBatteryOptimizations = CkPermission(
+    Permission.ignoreBatteryOptimizations,
+  );
 
   /// Access media location permission (`Permission.accessMediaLocation`).
-  static const CkPermission accessMediaLocation =
-      CkPermission(Permission.accessMediaLocation);
+  static const CkPermission accessMediaLocation = CkPermission(
+    Permission.accessMediaLocation,
+  );
 
   /// Activity recognition permission (`Permission.activityRecognition`).
-  static const CkPermission activityRecognition =
-      CkPermission(Permission.activityRecognition);
+  static const CkPermission activityRecognition = CkPermission(
+    Permission.activityRecognition,
+  );
 
   /// Manage external storage permission (`Permission.manageExternalStorage`).
-  static const CkPermission manageExternalStorage =
-      CkPermission(Permission.manageExternalStorage);
+  static const CkPermission manageExternalStorage = CkPermission(
+    Permission.manageExternalStorage,
+  );
 
   /// System alert window permission (`Permission.systemAlertWindow`).
-  static const CkPermission systemAlertWindow =
-      CkPermission(Permission.systemAlertWindow);
+  static const CkPermission systemAlertWindow = CkPermission(
+    Permission.systemAlertWindow,
+  );
 
   /// Request install packages permission (`Permission.requestInstallPackages`).
-  static const CkPermission requestInstallPackages =
-      CkPermission(Permission.requestInstallPackages);
+  static const CkPermission requestInstallPackages = CkPermission(
+    Permission.requestInstallPackages,
+  );
 
   /// App tracking transparency permission (`Permission.appTrackingTransparency`).
-  static const CkPermission appTrackingTransparency =
-      CkPermission(Permission.appTrackingTransparency);
+  static const CkPermission appTrackingTransparency = CkPermission(
+    Permission.appTrackingTransparency,
+  );
 
   /// Critical alerts permission (`Permission.criticalAlerts`).
-  static const CkPermission criticalAlerts =
-      CkPermission(Permission.criticalAlerts);
+  static const CkPermission criticalAlerts = CkPermission(
+    Permission.criticalAlerts,
+  );
 
   /// Access notification policy permission (`Permission.accessNotificationPolicy`).
-  static const CkPermission accessNotificationPolicy =
-      CkPermission(Permission.accessNotificationPolicy);
+  static const CkPermission accessNotificationPolicy = CkPermission(
+    Permission.accessNotificationPolicy,
+  );
 
   /// Schedule exact alarm permission (`Permission.scheduleExactAlarm`).
-  static const CkPermission scheduleExactAlarm =
-      CkPermission(Permission.scheduleExactAlarm);
+  static const CkPermission scheduleExactAlarm = CkPermission(
+    Permission.scheduleExactAlarm,
+  );
 
   /// Background refresh permission (`Permission.backgroundRefresh`).
-  static const CkPermission backgroundRefresh =
-      CkPermission(Permission.backgroundRefresh);
+  static const CkPermission backgroundRefresh = CkPermission(
+    Permission.backgroundRefresh,
+  );
 
   /// Assistant permission (`Permission.assistant`).
   static const CkPermission assistant = CkPermission(Permission.assistant);
@@ -176,16 +201,13 @@ class CkPermission {
   /// If permanently denied, shows the settings dialog if [showDialog] is true.
   ///
   /// Returns `true` if granted (or limited on iOS/Android), `false` otherwise.
-  Future<bool> ensure({
-    bool showDialog = true,
-    BuildContext? context,
-  }) async {
+  Future<bool> ensure({bool showDialog = true, BuildContext? context}) async {
     var isAlreadyGranted = false;
 
-    if ((permission == Permission.photos ||
-            permission == Permission.storage) &&
+    if ((permission == Permission.photos || permission == Permission.storage) &&
         Platform.isAndroid) {
-      isAlreadyGranted = (await Permission.mediaLibrary.status).isGranted ||
+      isAlreadyGranted =
+          (await Permission.mediaLibrary.status).isGranted ||
           (await permission.status).isGranted;
     } else {
       isAlreadyGranted = (await permission.status).isGranted;
@@ -223,8 +245,7 @@ class CkPermission {
 
   /// Returns `true` if the permission is granted.
   Future<bool> get isGranted async {
-    if ((permission == Permission.photos ||
-            permission == Permission.storage) &&
+    if ((permission == Permission.photos || permission == Permission.storage) &&
         Platform.isAndroid) {
       final isMediaGranted = (await Permission.mediaLibrary.status).isGranted;
       if (isMediaGranted) return true;
@@ -400,6 +421,7 @@ class CkPermission {
         return 'SMS';
       case Permission.phone:
         return 'Phone';
+      // ignore: deprecated_member_use
       case Permission.calendar:
       case Permission.calendarFullAccess:
       case Permission.calendarWriteOnly:
@@ -446,10 +468,9 @@ class CkPermission {
     bool showDialog = true,
     BuildContext? context,
   }) {
-    return CkPermission(permission).ensure(
-      showDialog: showDialog,
-      context: context,
-    );
+    return CkPermission(
+      permission,
+    ).ensure(showDialog: showDialog, context: context);
   }
 
   /// Ensures multiple [CkPermission] permissions concurrently.
@@ -498,14 +519,8 @@ class CkPermission {
 /// Extension on [Permission] to provide easy access to `.ensure()`.
 extension CkPermissionExtension on Permission {
   /// Checks if the permission is granted, requests if needed, and shows settings dialog if permanently denied.
-  Future<bool> ensure({
-    bool showDialog = true,
-    BuildContext? context,
-  }) {
-    return CkPermission(this).ensure(
-      showDialog: showDialog,
-      context: context,
-    );
+  Future<bool> ensure({bool showDialog = true, BuildContext? context}) {
+    return CkPermission(this).ensure(showDialog: showDialog, context: context);
   }
 
   /// Wraps this [Permission] in a [CkPermission].

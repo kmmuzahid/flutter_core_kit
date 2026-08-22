@@ -72,7 +72,10 @@ class TestFlowHandlers {
 /// Build a full CkAuthConfig for tests with mock mode enabled
 CkAuthConfig<dynamic> buildMockConfig({
   TestFlowHandlers? handlers,
-  Set<CkOtpTrigger> autoTriggers = const {CkOtpTrigger.signup, CkOtpTrigger.forgetPassword},
+  Set<CkOtpTrigger> autoTriggers = const {
+    CkOtpTrigger.signup,
+    CkOtpTrigger.forgetPassword,
+  },
   bool mockAuth = true,
 }) {
   return CkAuthConfig(
@@ -80,9 +83,8 @@ CkAuthConfig<dynamic> buildMockConfig({
     extractors: kTestExtractors,
     otpConfig: buildOtpConfig(autoTriggers: autoTriggers),
     handlers: handlers?.build(),
-    loginRequestBuilder: (cb) => CkLoginRequest(
-      body: {'email': cb.account, 'password': cb.password},
-    ),
+    loginRequestBuilder: (cb) =>
+        CkLoginRequest(body: {'email': cb.account, 'password': cb.password}),
     mockAuth: mockAuth,
   );
 }

@@ -31,32 +31,44 @@ void main() {
     });
 
     // PO-01
-    test('signUp with loginCallback → requiresOtp=true (OTP screen shown)', () async {
-      final service = await _buildService(handlers);
+    test(
+      'signUp with loginCallback → requiresOtp=true (OTP screen shown)',
+      () async {
+        final service = await _buildService(handlers);
 
-      final result = await service.signUp(
-        body: {'email': 'user@test.com', 'password': 'pass'},
-        loginCallback: LoginCallback(account: 'user@test.com', password: 'pass'),
-      );
+        final result = await service.signUp(
+          body: {'email': 'user@test.com', 'password': 'pass'},
+          loginCallback: LoginCallback(
+            account: 'user@test.com',
+            password: 'pass',
+          ),
+        );
 
-      expect(result.requiresOtp, isTrue);
-      expect(handlers.showOtpVerificationCalled, isTrue);
-    });
+        expect(result.requiresOtp, isTrue);
+        expect(handlers.showOtpVerificationCalled, isTrue);
+      },
+    );
 
     // PO-02 & PO-03
-    test('verifyOtp consumes pendingLoginCallback (one-shot) and auto-logs in', () async {
-      final service = await _buildService(handlers);
+    test(
+      'verifyOtp consumes pendingLoginCallback (one-shot) and auto-logs in',
+      () async {
+        final service = await _buildService(handlers);
 
-      await service.signUp(
-        body: {'email': 'user@test.com', 'password': 'pass'},
-        loginCallback: LoginCallback(account: 'user@test.com', password: 'pass'),
-      );
+        await service.signUp(
+          body: {'email': 'user@test.com', 'password': 'pass'},
+          loginCallback: LoginCallback(
+            account: 'user@test.com',
+            password: 'pass',
+          ),
+        );
 
-      handlers.reset();
-      // verifyOtp triggers _resolvePostSignupAuth → _pendingLoginCallback consumed → auto signIn
-      final verifyResult = await service.verifyOtp(otp: '123456');
-      expect(verifyResult.isSuccess, isTrue);
-    });
+        handlers.reset();
+        // verifyOtp triggers _resolvePostSignupAuth → _pendingLoginCallback consumed → auto signIn
+        final verifyResult = await service.verifyOtp(otp: '123456');
+        expect(verifyResult.isSuccess, isTrue);
+      },
+    );
 
     // PO-04 & PO-05
     test('after auto-login via loginCallback, user is authenticated', () async {
@@ -64,7 +76,10 @@ void main() {
 
       await service.signUp(
         body: {'email': 'user@test.com', 'password': 'pass'},
-        loginCallback: LoginCallback(account: 'user@test.com', password: 'pass'),
+        loginCallback: LoginCallback(
+          account: 'user@test.com',
+          password: 'pass',
+        ),
       );
 
       await service.verifyOtp(otp: '123456');

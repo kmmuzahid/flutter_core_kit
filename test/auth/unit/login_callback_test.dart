@@ -14,7 +14,6 @@ void main() {
 
     // LC-02
     test('deprecated username param silently maps to account', () {
-      // ignore: deprecated_member_use
       final cb = LoginCallback(username: 'legacyuser', password: 'pass');
       expect(cb.account, equals('legacyuser'));
     });
@@ -22,7 +21,6 @@ void main() {
     // LC-03
     test('deprecated username getter returns same value as account', () {
       final cb = LoginCallback(account: 'myuser', password: 'pass');
-      // ignore: deprecated_member_use
       expect(cb.username, equals(cb.account));
     });
 

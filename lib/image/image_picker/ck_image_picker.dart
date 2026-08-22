@@ -142,5 +142,3 @@ class _CkImagePickerState extends State<CkImagePicker> {
     );
   }
 }
-
-

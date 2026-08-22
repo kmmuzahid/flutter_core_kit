@@ -45,9 +45,8 @@ class CkTransportConfig {
            responseExtractor ??
            CkResponseExtractor(
              data: (response) => response is Map ? response['data'] : response,
-             message: (response) => response is Map ? response['message']?.toString() : null,
+             message: (response) =>
+                 response is Map ? response['message']?.toString() : null,
              meta: CkResponseExtractor.defaultMeta,
            );
 }
-
-
