@@ -1,5 +1,5 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A theme-aware radio group that accepts a Map of options where
 /// - key: submitted value (what the form gets)

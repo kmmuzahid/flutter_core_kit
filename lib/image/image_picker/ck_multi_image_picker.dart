@@ -1,8 +1,8 @@
 import 'package:core_kit/image/ck_image.dart';
 import 'package:core_kit/utils/ck_permission.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_ui/material_ui.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
 

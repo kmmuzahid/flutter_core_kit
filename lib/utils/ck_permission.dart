@@ -1,6 +1,6 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:flutter/material.dart' hide showDialog;
-import 'package:flutter/material.dart' as material show showDialog;
+import 'package:material_ui/material_ui.dart' hide showDialog;
+import 'package:material_ui/material_ui.dart' as material show showDialog;
 import 'package:universal_io/io.dart';
 
 /// A modern, developer-friendly permission manager for CoreKit.

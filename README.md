@@ -1975,6 +1975,8 @@ await CkPermission.bluetooth.ensure();
 await CkPermission.mediaLibrary.ensure();
 await CkPermission.audio.ensure();
 await CkPermission.videos.ensure();
+await CkPermission.calendarFullAccess.ensure();
+await CkPermission.calendarWriteOnly.ensure();
 
 // 3. Ensure multiple permissions concurrently:
 final results = await CkPermission.ensureMultiple([

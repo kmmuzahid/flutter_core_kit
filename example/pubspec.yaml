@@ -14,6 +14,7 @@ dependencies:
   core_kit:
     path: ../
 
+  material_ui: any
 dependency_overrides:
   win32: ^6.0.1
 

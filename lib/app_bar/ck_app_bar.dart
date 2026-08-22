@@ -1,6 +1,6 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CkAppBarConfig {
   /// ()=> Get.back() or Navigator.pop(context) etc

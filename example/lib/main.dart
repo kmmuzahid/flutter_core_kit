@@ -14,7 +14,7 @@
 
 import 'package:core_kit/core_kit.dart';
 import 'package:core_kit/network/request_input.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 // ── App entry point ────────────────────────────────────────────────────────
 

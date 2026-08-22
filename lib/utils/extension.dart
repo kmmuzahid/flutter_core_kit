@@ -1,8 +1,8 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
+import 'package:material_ui/material_ui.dart';
 
 ThemeData get getTheme =>
     Theme.of(coreKitInstance.navigatorKey.currentContext!);

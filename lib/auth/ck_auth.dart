@@ -12,7 +12,7 @@ import 'package:core_kit/auth/social/social_login_config.dart';
 import 'package:core_kit/auth/state/auth_loading_controller.dart';
 import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Map<String, dynamic> lastSubmitAuthData = {};
 

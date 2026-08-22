@@ -1,6 +1,6 @@
 name: core_kit
 description: "CoreKit (core_kit) — Flutter UI kit with responsive scaling, Dio HTTP, JWT auth, secure storage, and 35+ widgets."
-version: 1.0.7+7
+version: 1.0.1
 homepage: https://github.com/kmmuzahid/flutter_core_kit.git
 documentation: https://pub.dev/documentation/core_kit/latest/
 repository: https://github.com/kmmuzahid/flutter_core_kit.git
@@ -48,7 +48,7 @@ dependencies:
   image_picker: ^1.2.3
   permission_handler: ^12.0.3
   dio: ^5.11.0
-  intl_phone_field_v2: ^4.0.5
+  intl_phone_field_v2: ^4.0.5 
  
   share_plus: ^12.0.2
   http: ^1.6.0
@@ -61,6 +61,7 @@ dependencies:
   android_id: ^0.5.2+1
   uuid: ^4.6.0
   path: ^1.9.1
+  material_ui: ^1.0.1
 
 
 dev_dependencies:

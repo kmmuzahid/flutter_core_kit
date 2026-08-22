@@ -1,8 +1,8 @@
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text_field/input_formatters/capitalization_formatter.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CkMultilineTextField extends StatefulWidget {
   const CkMultilineTextField({

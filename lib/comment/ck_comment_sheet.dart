@@ -1,5 +1,5 @@
 import 'package:core_kit/core_kit.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Returns the direct replies/children of [item]. Called recursively, so
 /// replies can themselves have replies — depth is not limited to 2 levels.

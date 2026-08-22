@@ -9,12 +9,15 @@ import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/text_field/input_formatters/input_helper.dart';
 import 'package:core_kit/text_field/input_formatters/phone_input_formater.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    as material
+    show InputDecoration, OutlineInputBorder;
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field_v2/countries.dart';
 import 'package:intl_phone_field_v2/country_picker_dialog.dart';
 import 'package:intl_phone_field_v2/helpers.dart';
 import 'package:intl_phone_field_v2/phone_number.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CkPhoneNumberTextField extends StatefulWidget {
   const CkPhoneNumberTextField({
@@ -236,7 +239,7 @@ class _CkPhoneNumberTextFieldState extends State<CkPhoneNumberTextField> {
               widget.pickerDialogStyle ??
               PickerDialogStyle(
                 backgroundColor: coreKitInstance.theme.scaffoldBackgroundColor,
-                searchFieldInputDecoration: InputDecoration(
+                searchFieldInputDecoration: material.InputDecoration(
                   hintText: widget.hint,
                   hintStyle:
                       widget.hintStyle ??
@@ -258,7 +261,7 @@ class _CkPhoneNumberTextFieldState extends State<CkPhoneNumberTextField> {
                         textColor: _hintColor(),
                       ),
                   suffixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
+                  border: material.OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

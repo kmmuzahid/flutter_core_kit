@@ -1,6 +1,6 @@
 import 'package:core_kit/initializer.dart';
 import 'package:core_kit/snackbar/ck_snackbar_config.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum CkSnackBarType { success, error, warning, info }
 

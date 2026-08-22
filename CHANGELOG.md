@@ -1,4 +1,17 @@
 
+## 1.0.1
+
+* **`material_ui` Integration & Type Fixes**:
+  * Added `material_ui` support across core UI components.
+  * Resolved `InputDecoration` type collision between `material_ui` and Flutter's native `material.dart` inside `CkPhoneNumberTextField`.
+* **Static Analysis & Code Health (50/50 Pana Score)**:
+  * Resolved all static analysis warnings, lints, and formatting issues across library and test suite.
+  * Deprecated `CkPermission.calendar` with migration guidance towards `CkPermission.calendarFullAccess` and `CkPermission.calendarWriteOnly` matching `permission_handler` deprecation.
+  * Optimized file existence checks in `CkPath` with synchronous `existsSync()` for better performance (`avoid_slow_async_io`).
+  * Fixed multi-slash path normalization in `CkPath.join()`.
+  * Cleaned up unused imports and standardized directive ordering with `dart fix`.
+  * `CkListLoaderConfig` now supports a global empty-state widget for `CkListView`, `CkTabListView` and `CkGridView`.
+
 ## 1.0.7+7
 
 * **CkPermission Manager**:

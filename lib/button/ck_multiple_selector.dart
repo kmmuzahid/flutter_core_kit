@@ -1,6 +1,6 @@
 import 'package:core_kit/text/ck_text.dart';
 import 'package:core_kit/utils/ck_screen_utils.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CkMultipleSelector extends StatefulWidget {
   final List<String> items;

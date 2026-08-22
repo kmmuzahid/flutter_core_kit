@@ -1,5 +1,5 @@
 import 'package:core_kit/utils/ck_screen_utils.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CkLoader extends StatelessWidget {
   const CkLoader({super.key, this.size = 60, this.strokeWidth = 4});
