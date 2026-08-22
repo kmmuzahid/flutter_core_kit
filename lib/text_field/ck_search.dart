@@ -15,6 +15,7 @@ class CkSearch extends StatefulWidget {
     this.suffixBuilder,
     this.prefixBuilder,
     this.borderColor,
+    this.errorColor,
     this.backgroundColor,
     this.borderRadius,
     this.borderWidth = 1.2,
@@ -58,6 +59,7 @@ class CkSearch extends StatefulWidget {
   prefixBuilder;
 
   final Color? borderColor;
+  final Color? errorColor;
   final Color? backgroundColor;
   final double? borderRadius;
   final double borderWidth;
@@ -257,9 +259,12 @@ class _CkSearchState extends State<CkSearch> {
   }
 
   InputBorder _buildBorder({required Color color, double? width}) {
+    final effectiveRadius =
+        widget.borderRadius ?? coreKitInstance.inputConfig.borderRadius;
+    final effectiveWidth = width ?? widget.borderWidth.w;
     final BorderRadius radius;
-    if (widget.borderRadius != null) {
-      radius = BorderRadius.circular(widget.borderRadius!.r);
+    if (effectiveRadius != null) {
+      radius = BorderRadius.circular(effectiveRadius.r);
     } else if (coreKitInstance.theme.inputDecorationTheme.border?.isOutline ==
         true) {
       radius =
@@ -267,10 +272,10 @@ class _CkSearchState extends State<CkSearch> {
                   as OutlineInputBorder)
               .borderRadius;
     } else {
-      radius = BorderRadius.circular(12);
+      radius = BorderRadius.circular(12.r);
     }
 
-    final side = BorderSide(color: color, width: width ?? widget.borderWidth.w);
+    final side = BorderSide(color: color, width: effectiveWidth);
 
     if (widget.borderType == CkBorderType.underline) {
       return UnderlineInputBorder(borderRadius: radius, borderSide: side);
@@ -305,13 +310,10 @@ class _CkSearchState extends State<CkSearch> {
         cursorColor: _focusNode.hasFocus
             ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
                   coreKitInstance.primaryColor)
-            : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                  Colors.red),
-        cursorErrorColor: _focusNode.hasFocus
-            ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
-                  coreKitInstance.primaryColor)
-            : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                  Colors.red),
+            : (widget.errorColor ??
+                  coreKitInstance.inputConfig.errorColor),
+        cursorErrorColor: widget.errorColor ??
+            coreKitInstance.inputConfig.errorColor,
         onTapOutside: (event) {
           final renderBox = context.findRenderObject() as RenderBox?;
           if (renderBox != null) {
@@ -384,9 +386,18 @@ class _CkSearchState extends State<CkSearch> {
           suffixIconColor: _iconColor(),
 
           // Borders
+          border: _buildBorder(
+            color:
+                widget.borderColor ??
+                coreKitInstance.inputConfig.borderColor ??
+                theme.inputDecorationTheme.border?.borderSide.color ??
+                coreKitInstance.outlineColor,
+            width: widget.borderWidth.w,
+          ),
           focusedBorder: _buildBorder(
             color: widget.isReadOnly
                 ? (widget.borderColor ??
+                      coreKitInstance.inputConfig.borderColor ??
                       theme
                           .inputDecorationTheme
                           .disabledBorder
@@ -400,19 +411,27 @@ class _CkSearchState extends State<CkSearch> {
           enabledBorder: _buildBorder(
             color:
                 widget.borderColor ??
+                coreKitInstance.inputConfig.borderColor ??
                 theme.inputDecorationTheme.enabledBorder?.borderSide.color ??
                 coreKitInstance.outlineColor,
             width: widget.borderWidth.w,
           ),
           errorBorder: _buildBorder(
             color:
-                theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                Colors.red,
+                widget.errorColor ??
+                coreKitInstance.inputConfig.errorColor,
+            width: widget.borderWidth.w,
+          ),
+          focusedErrorBorder: _buildBorder(
+            color:
+                widget.errorColor ??
+                coreKitInstance.inputConfig.errorColor,
             width: widget.borderWidth.w,
           ),
           disabledBorder: _buildBorder(
             color:
                 widget.borderColor ??
+                coreKitInstance.inputConfig.borderColor ??
                 theme.inputDecorationTheme.disabledBorder?.borderSide.color ??
                 coreKitInstance.outlineColor,
             width: widget.borderWidth.w,

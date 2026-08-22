@@ -392,6 +392,7 @@ class CkConfigImpl extends CoreKitConfig {
         borderRadius: 12,
         borderWidth: 1.2,
         // borderColor: Colors.grey,
+        // errorColor: Colors.red,
         // backgroundColor: Colors.white,
         // hintStyle: TextStyle(...),
         // textStyle: TextStyle(...),

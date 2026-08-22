@@ -26,6 +26,7 @@ class CkPhoneNumberTextField extends StatefulWidget {
     this.initalCountryCode = 'US',
     this.isReadOnly = false,
     this.borderColor,
+    this.errorColor,
     this.initialPhoneNumber,
     this.showActionButton = false,
     this.actionButtonIcon,
@@ -65,6 +66,7 @@ class CkPhoneNumberTextField extends StatefulWidget {
   final String? hintText;
   final String? labelText;
   final Color? borderColor;
+  final Color? errorColor;
   final double paddingHorizontal;
   final double paddingVertical;
   final double? borderRadius;
@@ -304,22 +306,25 @@ class _CkPhoneNumberTextFieldState extends State<CkPhoneNumberTextField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final effectiveRadius =
+        widget.borderRadius ?? coreKitInstance.inputConfig.borderRadius;
     final effectiveBorderRadius = BorderRadius.circular(
-      widget.borderRadius ?? 12.r,
+      effectiveRadius != null ? effectiveRadius.r : 12.r,
     );
-    final effectiveBorderColor = widget.borderColor ?? theme.dividerColor;
+    final effectiveBorderColor =
+        widget.borderColor ??
+        coreKitInstance.inputConfig.borderColor ??
+        theme.dividerColor;
+    final effectiveErrorColor =
+        widget.errorColor ??
+        coreKitInstance.inputConfig.errorColor;
 
     return TextFormField(
       cursorColor: _focusNode.hasFocus
           ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
                 coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                theme.colorScheme.error),
-      cursorErrorColor: _focusNode.hasFocus
-          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
-                coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                theme.colorScheme.error),
+          : effectiveErrorColor,
+      cursorErrorColor: effectiveErrorColor,
       controller: _internalController,
       focusNode: _focusNode,
       readOnly: widget.isReadOnly,
@@ -365,7 +370,21 @@ class _CkPhoneNumberTextFieldState extends State<CkPhoneNumberTextField> {
         errorBorder: OutlineInputBorder(
           borderRadius: effectiveBorderRadius,
           borderSide: BorderSide(
-            color: theme.colorScheme.error,
+            color: effectiveErrorColor,
+            width: widget.borderWidth,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: effectiveBorderRadius,
+          borderSide: BorderSide(
+            color: effectiveErrorColor,
+            width: widget.borderWidth + 0.4,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: effectiveBorderRadius,
+          borderSide: BorderSide(
+            color: effectiveBorderColor,
             width: widget.borderWidth,
           ),
         ),

@@ -15,6 +15,7 @@ class CkDateInputTextField extends StatefulWidget {
     this.suffix,
     this.validation,
     this.borderColor,
+    this.errorColor,
     this.backgroundColor,
     this.initialValue,
     this.isReadOnly = false,
@@ -44,6 +45,7 @@ class CkDateInputTextField extends StatefulWidget {
   final Function(DateTime? date)? onChanged;
   final String? Function(String? value)? validation;
   final Color? borderColor;
+  final Color? errorColor;
   final Color? backgroundColor;
   final Widget? prefixIcon;
   final bool isReadOnly;
@@ -143,6 +145,7 @@ class _CkDateInputTextFieldState extends State<CkDateInputTextField> {
       prefixIcon: widget.prefixIcon,
       validation: widget.validation,
       borderColor: widget.borderColor,
+      errorColor: widget.errorColor,
       backgroundColor: widget.backgroundColor,
     );
   }

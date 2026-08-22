@@ -11,6 +11,7 @@ class CkInputConfig {
     this.fontSize,
     this.textAlign,
     this.borderColor,
+    this.errorColor = Colors.red,
     this.borderRadius,
     this.borderWidth = 1.2,
     this.backgroundColor,
@@ -33,6 +34,9 @@ class CkInputConfig {
   /// Border/outline colour when the field is not focused or in error.
   final Color? borderColor;
 
+  /// Border/outline and cursor colour when the field is in error state. Defaults to [Colors.red].
+  final Color errorColor;
+
   /// Corner radius of the input border.
   final double? borderRadius;
 
@@ -53,6 +57,7 @@ class CkInputConfig {
     double? fontSize,
     TextAlign? textAlign,
     Color? borderColor,
+    Color? errorColor,
     double? borderRadius,
     double? borderWidth,
     Color? backgroundColor,
@@ -64,6 +69,7 @@ class CkInputConfig {
       fontSize: fontSize ?? this.fontSize,
       textAlign: textAlign ?? this.textAlign,
       borderColor: borderColor ?? this.borderColor,
+      errorColor: errorColor ?? this.errorColor,
       borderRadius: borderRadius ?? this.borderRadius,
       borderWidth: borderWidth ?? this.borderWidth,
       backgroundColor: backgroundColor ?? this.backgroundColor,

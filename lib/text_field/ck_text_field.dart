@@ -23,6 +23,7 @@ class CkTextField extends StatefulWidget {
     this.onSaved,
     this.onChanged,
     this.borderColor,
+    this.errorColor,
     this.onTap,
     this.suffixIcon,
     this.isReadOnly = false,
@@ -63,6 +64,7 @@ class CkTextField extends StatefulWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final Color? borderColor;
+  final Color? errorColor;
   final double paddingHorizontal;
   final double paddingVertical;
   final double? borderRadius;
@@ -206,6 +208,7 @@ class _CkTextFieldState extends State<CkTextField> {
     return Material(
       type: MaterialType.transparency,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           () {
             final textField = _buildTextField();
@@ -298,13 +301,10 @@ class _CkTextFieldState extends State<CkTextField> {
       cursorColor: _focusNode.hasFocus
           ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
                 coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                Colors.red),
-      cursorErrorColor: _focusNode.hasFocus
-          ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
-                coreKitInstance.primaryColor)
-          : (theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                Colors.red),
+          : (widget.errorColor ??
+                coreKitInstance.inputConfig.errorColor),
+      cursorErrorColor: widget.errorColor ??
+          coreKitInstance.inputConfig.errorColor,
       textAlign: widget.textAlign != TextAlign.left
           ? widget.textAlign
           : (coreKitInstance.inputConfig.textAlign ?? widget.textAlign),
@@ -470,13 +470,15 @@ class _CkTextFieldState extends State<CkTextField> {
                   textColor: _iconColor(),
                 ),
               )
-            : Padding(
-                padding: EdgeInsets.only(
-                  left: 10.w,
-                  right: widget.paddingHorizontal,
-                ),
-                child: _getPrefix(),
-              ),
+            : (_getPrefix() != null
+                ? Padding(
+                    padding: EdgeInsets.only(
+                      left: 10.w,
+                      right: widget.paddingHorizontal,
+                    ),
+                    child: _getPrefix(),
+                  )
+                : null),
 
         //sufix
         suffixIconConstraints: BoxConstraints(
@@ -493,13 +495,15 @@ class _CkTextFieldState extends State<CkTextField> {
               )
             : widget.validationType == CkValidationType.validatePassword
             ? (_buildPasswordSuffixIcon())
-            : Padding(
-                padding: EdgeInsets.only(
-                  right: 10,
-                  left: widget.paddingHorizontal,
-                ),
-                child: getSuffix(),
-              ),
+            : (getSuffix() != null
+                ? Padding(
+                    padding: EdgeInsets.only(
+                      right: 10,
+                      left: widget.paddingHorizontal,
+                    ),
+                    child: getSuffix(),
+                  )
+                : null),
 
         prefixIconColor: _iconColor(),
         suffixIconColor: _iconColor(),
@@ -549,8 +553,56 @@ class _CkTextFieldState extends State<CkTextField> {
             ? InputBorder.none
             : _buildBorder(
                 color:
-                    theme.inputDecorationTheme.errorBorder?.borderSide.color ??
-                    Colors.red,
+                    widget.errorColor ??
+                    coreKitInstance.inputConfig.errorColor,
+                width:
+                    (widget.borderWidth ??
+                            coreKitInstance.inputConfig.borderWidth)
+                        .w,
+              ),
+
+        focusedErrorBorder: widget.footer != null
+            ? InputBorder.none
+            : _buildBorder(
+                color:
+                    widget.errorColor ??
+                    coreKitInstance.inputConfig.errorColor,
+                width:
+                    (widget.borderWidth ??
+                            coreKitInstance.inputConfig.borderWidth)
+                        .w,
+              ),
+
+        disabledBorder: widget.footer != null
+            ? InputBorder.none
+            : _buildBorder(
+                color:
+                    widget.borderColor ??
+                    coreKitInstance.inputConfig.borderColor ??
+                    theme
+                        .inputDecorationTheme
+                        .disabledBorder
+                        ?.borderSide
+                        .color ??
+                    coreKitInstance.outlineColor,
+                width:
+                    (widget.borderWidth ??
+                            coreKitInstance.inputConfig.borderWidth)
+                        .w,
+              ),
+
+        border: widget.footer != null
+            ? InputBorder.none
+            : _buildBorder(
+                color:
+                    widget.borderColor ??
+                    coreKitInstance.inputConfig.borderColor ??
+                    theme
+                        .inputDecorationTheme
+                        .border
+                        ?.borderSide
+                        .color ??
+                    coreKitInstance.outlineColor,
                 width:
                     (widget.borderWidth ??
                             coreKitInstance.inputConfig.borderWidth)
@@ -561,9 +613,6 @@ class _CkTextFieldState extends State<CkTextField> {
           horizontal: widget.paddingHorizontal.w,
           vertical: widget.paddingVertical.h,
         ),
-        border: widget.footer != null ? InputBorder.none : null,
-
-        disabledBorder: widget.footer != null ? InputBorder.none : null,
 
         hintText: widget.hintText,
         labelText: widget.labelText,
@@ -577,27 +626,25 @@ class _CkTextFieldState extends State<CkTextField> {
     final effectiveWidth =
         width ??
         (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w;
+    final BorderRadius radius;
+    if (effectiveRadius != null) {
+      radius = BorderRadius.circular(effectiveRadius.r);
+    } else if (theme.inputDecorationTheme.border?.isOutline == true) {
+      radius =
+          (theme.inputDecorationTheme.border as OutlineInputBorder)
+              .borderRadius;
+    } else {
+      radius = BorderRadius.circular(12.r);
+    }
+
     if (widget.borderType == CkBorderType.underline) {
       return UnderlineInputBorder(
-        borderRadius: effectiveRadius == null
-            ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline ==
-                      true
-                  ? (coreKitInstance.theme.inputDecorationTheme.border
-                            as OutlineInputBorder)
-                        .borderRadius
-                  : BorderRadius.circular(12)
-            : BorderRadius.circular(effectiveRadius.r),
+        borderRadius: radius,
         borderSide: BorderSide(color: color, width: effectiveWidth),
       );
     }
     return OutlineInputBorder(
-      borderRadius: effectiveRadius == null
-          ? coreKitInstance.theme.inputDecorationTheme.border?.isOutline == true
-                ? (coreKitInstance.theme.inputDecorationTheme.border
-                          as OutlineInputBorder)
-                      .borderRadius
-                : BorderRadius.circular(12)
-          : BorderRadius.circular(effectiveRadius.r),
+      borderRadius: radius,
       borderSide: BorderSide(color: color, width: effectiveWidth),
     );
   }
