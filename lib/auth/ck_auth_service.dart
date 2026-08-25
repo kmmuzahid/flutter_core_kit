@@ -909,15 +909,11 @@ class CkAuthService<TProfile> {
       if (result.isSuccess) {
         final fetchResult = await fetchProfile();
         if (fetchResult.isSuccess && fetchResult.data != null) {
-          return CkAuthResult.success(
-            data: fetchResult.data,
-            statusCode: result.statusCode,
-            rawResponse: result.rawResponse,
-          );
+          return CkAuthResult.success(statusCode: fetchResult.statusCode);
         }
       }
 
-      return result;
+      return CkAuthResult.failure();
     });
   }
 

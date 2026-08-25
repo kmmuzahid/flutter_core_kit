@@ -97,15 +97,14 @@ class CkProfileExtractor<TProfile> {
     );
   }
 
-  Future<CkAuthResult<TProfile?>> updateProfileRemote({
+  Future<CkResponse<dynamic>> updateProfileRemote({
     required String url,
     required RequestMethod method,
     Map<String, dynamic>? formFields,
     Map<String, dynamic>? files,
     Map<String, dynamic>? jsonBody,
   }) async {
-    dynamic extractedProfileData;
-    final response = await CkTransport.request<TProfile>(
+    return CkTransport.request<dynamic>(
       input: RequestInput(
         endpoint: url,
         method: method,
@@ -114,26 +113,8 @@ class CkProfileExtractor<TProfile> {
         jsonBody: jsonBody,
       ),
       responseBuilder: (data) {
-        extractedProfileData = data;
-        return parseProfile(data);
+        return data;
       },
-    );
-    if (response.isSuccess && response.data != null) {
-      final profile = response.data;
-      final fingerprint = jsonEncode(extractedProfileData);
-      cacheProfile(profile as TProfile, fingerprint);
-
-      return CkAuthResult.success(
-        data: profile,
-        statusCode: response.statusCode,
-        rawResponse: response.raw,
-      );
-    }
-    return CkAuthResult.failure(
-      message:
-          response.message ?? 'Profile could not be extracted from response',
-      statusCode: response.statusCode,
-      rawResponse: response.raw,
     );
   }
 
