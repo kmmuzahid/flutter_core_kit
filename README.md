@@ -190,7 +190,7 @@ Add `core_kit` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  core_kit: ^1.0.7+7
+  core_kit: ^1.1.0-beta.2
 ```
 
 Or run:
@@ -208,7 +208,7 @@ dependencies:
   core_kit:
     git:
       url: https://github.com/kmmuzahid/flutter_core_kit.git
-      ref: 1.0.1 # Replace with the latest tag or branch
+      ref: 1.1.0-beta.2 # Replace with the latest tag or branch
 ```
 
 Run `flutter pub get` to download.
@@ -529,7 +529,7 @@ CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
     getProfile: '/auth/profile',
     updateProfile: '/auth/profile',
     logout: '/auth/logout',
-    resetPassword: '/auth/reset-password',
+    changePassword: '/auth/reset-password',
   ),
   loginRequestBuilder: (cb) => CkLoginRequest(
     body: {'email': cb.account, 'password': cb.password},
@@ -1300,7 +1300,7 @@ All public auth types use the **`Ck` prefix** (aligned with the rest of CoreKit)
 | `getProfile` | `GET` | |
 | `updateProfile` | `PATCH` | |
 | `logout` | `POST` | |
-| `resetPassword` | `POST` | Override via `resetPasswordMethod` |
+| `changePassword` | `POST` | Override via `changePasswordMethod` |
 
 Each endpoint also has a corresponding `*Method` override (e.g. `sendOtpMethod: RequestMethod.PATCH`).
 
@@ -1414,7 +1414,7 @@ To prevent showing OTP screens on normal login failures (like wrong passwords), 
 Resetting forgotten passwords works in three distinct steps:
 1. **Request Reset**: Calling `auth.forgotPassword()` triggers `showOtpVerification` and caches the verification token internally.
 2. **Verify OTP**: The user inputs the OTP, and `auth.verifyOtp()` matches the code. Upon success, CoreKit routes the user to `showResetPassword`.
-3. **Update Password**: In the reset screen, calling `auth.updatePassword()` sends the new password along with the cached token to update the credentials, then navigates back to `showLogin`.
+3. **Change Password**: In the reset screen, calling `auth.changePassword()` sends the new password along with the cached token to update the credentials, then navigates back to `showLogin`.
 
 
 ### 1. Profile model & auth override
@@ -1461,7 +1461,7 @@ class CkConfigImpl extends CoreKitConfig {
           getProfile: '/auth/profile',
           updateProfile: '/auth/profile',
           logout: '/auth/logout',
-          resetPassword: '/auth/reset-password',
+          changePassword: '/auth/reset-password',
         ),
         extractors: CkAuthExtractors(
           accessToken: (data) => data['accessToken']?.toString(),
@@ -1547,7 +1547,7 @@ class CorekitConfigImpl extends CoreKitConfig {
   CkAuthConfig get authConfig => CkAuthConfig(
     mockAuth: false, // When true, bypasses network calls and stubs mock session
     endpoints: CkAuthEndpoints(
-      resetPassword: ApiEndPoints.resetPassword,
+      changePassword: ApiEndPoints.resetPassword,
       forgotPassword: ApiEndPoints.forgotPassword,
       signup: ApiEndPoints.createUser,
       signin: ApiEndPoints.login,
@@ -1557,7 +1557,7 @@ class CorekitConfigImpl extends CoreKitConfig {
       updateProfile: ApiEndPoints.editMyProfile,
       verifyForgetOtp: ApiEndPoints.forgotPasswordOtpMatch,
       logout: "",
-      resetPasswordMethod: RequestMethod.PATCH,
+      changePasswordMethod: RequestMethod.PATCH,
       verifyForgotOtpMethod: RequestMethod.PATCH,
       sendOtpMethod: RequestMethod.PATCH,
     ),
@@ -1688,9 +1688,9 @@ await auth.forgotPassword(
 );
 ```
 
-#### Reset Password
+#### Reset / Change Password
 ```dart
-await auth.updatePassword(
+await auth.changePassword(
   body: {'password': newPassword, 'confirmPassword': newPassword},
 );
 ```
@@ -1740,7 +1740,7 @@ Every auth operation (sign-in, sign-up, OTP, profile, social, logout, etc.) auto
 | `forgotPassword` | `auth.forgotPassword()` |
 | `verifyOtp` | `auth.verifyOtp()` |
 | `sendOtp` | `auth.sendOtp()` |
-| `updatePassword` | `auth.updatePassword()` |
+| `updatePassword` | `auth.changePassword()` |
 | `socialLogin` | `auth.signInWithGoogle()`, `auth.signInWithApple()`, `auth.signInWithFacebook()`, `auth.signInWithCustom()` |
 | `logout` | `auth.logout()` |
 | `fetchProfile` | `auth.fetchProfile()` |

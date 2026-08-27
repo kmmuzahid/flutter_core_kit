@@ -16,7 +16,7 @@ const kTestEndpoints = CkAuthEndpoints(
   getProfile: '/api/profile',
   updateProfile: '/api/profile',
   logout: '/api/logout',
-  resetPassword: '/api/reset-password',
+  changePassword: '/api/reset-password',
 );
 
 /// Standard extractors using default keys

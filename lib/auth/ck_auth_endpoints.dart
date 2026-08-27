@@ -10,7 +10,7 @@ class CkAuthEndpoints {
   final String getProfile;
   final String updateProfile;
   final String logout;
-  final String resetPassword;
+  final String changePassword;
 
   // ─── Method Overrides ───
   // Defaults: POST for mutations, GET for reads, PATCH for updates
@@ -22,7 +22,7 @@ class CkAuthEndpoints {
   final RequestMethod getProfileMethod; // default: GET
   final RequestMethod updateProfileMethod; // default: PATCH
   final RequestMethod logoutMethod; // default: POST
-  final RequestMethod resetPasswordMethod; // default: PATCH
+  final RequestMethod changePasswordMethod; // default: PATCH
   final RequestMethod verifyForgotOtpMethod;
 
   const CkAuthEndpoints({
@@ -35,7 +35,7 @@ class CkAuthEndpoints {
     required this.getProfile,
     required this.updateProfile,
     required this.logout,
-    required this.resetPassword,
+    required this.changePassword,
     this.signupMethod = RequestMethod.POST,
     this.signinMethod = RequestMethod.POST,
     this.forgotPasswordMethod = RequestMethod.POST,
@@ -44,7 +44,7 @@ class CkAuthEndpoints {
     this.getProfileMethod = RequestMethod.GET,
     this.updateProfileMethod = RequestMethod.PATCH,
     this.logoutMethod = RequestMethod.POST,
-    this.resetPasswordMethod = RequestMethod.POST,
+    this.changePasswordMethod = RequestMethod.POST,
     this.verifyForgotOtpMethod = RequestMethod.POST,
   });
 }

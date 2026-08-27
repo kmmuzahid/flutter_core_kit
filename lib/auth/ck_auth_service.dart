@@ -674,7 +674,7 @@ class CkAuthService<TProfile> {
   }
 
   /// Reset password
-  Future<CkAuthResult<void>> updatePassword({
+  Future<CkAuthResult<void>> changePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
   }) {
@@ -698,8 +698,8 @@ class CkAuthService<TProfile> {
 
       final response = await CkTransport.request(
         input: RequestInput(
-          endpoint: config.endpoints.resetPassword,
-          method: config.endpoints.resetPasswordMethod,
+          endpoint: config.endpoints.changePassword,
+          method: config.endpoints.changePasswordMethod,
           jsonBody: body,
           headers: finalHeaders,
           requiresToken: false,

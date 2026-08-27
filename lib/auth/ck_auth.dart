@@ -214,10 +214,10 @@ class CkAuth<TProfile> {
   Future<CkAuthResult<void>> resendOtp() => CkAuthService.instance.resendOtp();
 
   /// Reset password.
-  Future<CkAuthResult<void>> updatePassword({
+  Future<CkAuthResult<void>> changePassword({
     required Map<String, dynamic> body,
     Map<String, String>? headers,
-  }) => CkAuthService.instance.updatePassword(body: body, headers: headers);
+  }) => CkAuthService.instance.changePassword(body: body, headers: headers);
 
   /// Authenticate with Google.
   Future<CkAuthResult<dynamic>> signInWithGoogle(CkGoogleAuthData data) =>

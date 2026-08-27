@@ -1,4 +1,17 @@
 
+## 1.1.0-beta.2
+
+* **Auth Endpoint & Method Refactoring**:
+  * Renamed `resetPassword` endpoint to `changePassword` in `CkAuthEndpoints`.
+  * Renamed `resetPasswordMethod` override to `changePasswordMethod` in `CkAuthEndpoints`.
+  * Renamed `updatePassword()` to `changePassword()` in `CkAuth` facade and `CkAuthService`.
+  * Refined `updateProfile()` in `CkAuthService` to re-fetch canonical user profile data from the server automatically via `fetchProfile()`.
+* **Input Styling & Error Border Enhancements (`CkInputConfig`)**:
+  * Added global `errorColor` configuration to `CkInputConfig` (defaults to `Colors.red`).
+  * Added custom styling and automatic derivation for `errorBorder` and `focusedErrorBorder` across `CkTextField`, `CkMultilineTextField`, and `CkSearch` matching border style (`outline` vs `underline`) and radius.
+* **Component Improvements**:
+  * Added `preserveComposeText` in `CkCommentSheet` to retain drafted comment text during minimize/restore actions.
+
 ## 1.0.1
 
 * **`material_ui` Integration & Type Fixes**:
