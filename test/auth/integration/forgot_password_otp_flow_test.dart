@@ -52,14 +52,14 @@ void main() {
     );
 
     // FO-05
-    test('updatePassword success → calls showLogin handler', () async {
+    test('resetPassword success → calls showLogin handler', () async {
       final service = await _buildService(handlers);
       await service.forgotPassword(body: {'email': 'a@b.com'});
       await service.verifyOtp(otp: '654321');
 
       handlers.reset();
-      // In mock mode, updatePassword calls showLogin
-      final result = await service.changePassword(
+      // In mock mode, resetPassword calls showLogin
+      final result = await service.resetPassword(
         body: {'password': 'newPass123', 'confirmPassword': 'newPass123'},
       );
       expect(result.isSuccess, isTrue);
@@ -75,7 +75,15 @@ void main() {
     });
 
     // FO-06
-    test('updatePassword mock mode always returns success', () async {
+    test('resetPassword mock mode always returns success', () async {
+      final service = await _buildService(handlers);
+      final result = await service.resetPassword(
+        body: {'password': 'new_pass'},
+      );
+      expect(result.isSuccess, isTrue);
+    });
+
+    test('changePassword mock mode always returns success and logs out', () async {
       final service = await _buildService(handlers);
       final result = await service.changePassword(
         body: {'password': 'new_pass'},
@@ -119,8 +127,8 @@ void main() {
       await orderedService.verifyOtp(otp: '123456');
       events.add('reset_pw_shown');
 
-      // step 3: update password
-      await orderedService.changePassword(body: {'password': 'newPass'});
+      // step 3: reset password
+      await orderedService.resetPassword(body: {'password': 'newPass'});
       events.add('login_shown');
 
       expect(events, equals(['otp_shown', 'reset_pw_shown', 'login_shown']));

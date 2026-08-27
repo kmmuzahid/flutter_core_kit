@@ -1,10 +1,11 @@
 
-## 1.1.0-beta.2
+## 1.1.0-beta.3
 
-* **Auth Endpoint & Method Refactoring**:
-  * Renamed `resetPassword` endpoint to `changePassword` in `CkAuthEndpoints`.
-  * Renamed `resetPasswordMethod` override to `changePasswordMethod` in `CkAuthEndpoints`.
-  * Renamed `updatePassword()` to `changePassword()` in `CkAuth` facade and `CkAuthService`.
+* **Dual Password Management (`changePassword` & `resetPassword`)**:
+  * Added dedicated `resetPassword` endpoint, method override (`resetPasswordMethod`), and facade method `auth.resetPassword()` / `CkAuthService.instance.resetPassword()` for unauthenticated forgot-password completion. Automatically routes to `showLogin` upon success.
+  * Dedicated `changePassword` endpoint, method override (`changePasswordMethod`), and facade method `auth.changePassword()` / `CkAuthService.instance.changePassword()` for authenticated users to update their credentials. Automatically logs the user out upon success.
+  * Added `CkAuthLoadingType.resetPassword` and `CkAuthLoadingType.updatePassword` to track each loading state independently.
+* **Profile Synchronization**:
   * Refined `updateProfile()` in `CkAuthService` to re-fetch canonical user profile data from the server automatically via `fetchProfile()`.
 * **Input Styling & Error Border Enhancements (`CkInputConfig`)**:
   * Added global `errorColor` configuration to `CkInputConfig` (defaults to `Colors.red`).

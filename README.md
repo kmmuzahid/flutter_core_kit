@@ -529,7 +529,8 @@ CkAuthConfig<UserProfile> get authConfig => CkAuthConfig(
     getProfile: '/auth/profile',
     updateProfile: '/auth/profile',
     logout: '/auth/logout',
-    changePassword: '/auth/reset-password',
+    changePassword: '/auth/change-password',
+    resetPassword: '/auth/reset-password',
   ),
   loginRequestBuilder: (cb) => CkLoginRequest(
     body: {'email': cb.account, 'password': cb.password},
@@ -1301,6 +1302,7 @@ All public auth types use the **`Ck` prefix** (aligned with the rest of CoreKit)
 | `updateProfile` | `PATCH` | |
 | `logout` | `POST` | |
 | `changePassword` | `POST` | Override via `changePasswordMethod` |
+| `resetPassword` | `POST` | Override via `resetPasswordMethod` |
 
 Each endpoint also has a corresponding `*Method` override (e.g. `sendOtpMethod: RequestMethod.PATCH`).
 
@@ -1414,7 +1416,7 @@ To prevent showing OTP screens on normal login failures (like wrong passwords), 
 Resetting forgotten passwords works in three distinct steps:
 1. **Request Reset**: Calling `auth.forgotPassword()` triggers `showOtpVerification` and caches the verification token internally.
 2. **Verify OTP**: The user inputs the OTP, and `auth.verifyOtp()` matches the code. Upon success, CoreKit routes the user to `showResetPassword`.
-3. **Change Password**: In the reset screen, calling `auth.changePassword()` sends the new password along with the cached token to update the credentials, then navigates back to `showLogin`.
+3. **Reset Password**: In the reset screen, calling `auth.resetPassword()` sends the new password along with the cached token to update the credentials, then navigates back to `showLogin`.
 
 
 ### 1. Profile model & auth override
@@ -1461,7 +1463,8 @@ class CkConfigImpl extends CoreKitConfig {
           getProfile: '/auth/profile',
           updateProfile: '/auth/profile',
           logout: '/auth/logout',
-          changePassword: '/auth/reset-password',
+          changePassword: '/auth/change-password',
+          resetPassword: '/auth/reset-password',
         ),
         extractors: CkAuthExtractors(
           accessToken: (data) => data['accessToken']?.toString(),
@@ -1547,7 +1550,8 @@ class CorekitConfigImpl extends CoreKitConfig {
   CkAuthConfig get authConfig => CkAuthConfig(
     mockAuth: false, // When true, bypasses network calls and stubs mock session
     endpoints: CkAuthEndpoints(
-      changePassword: ApiEndPoints.resetPassword,
+      changePassword: ApiEndPoints.changePassword,
+      resetPassword: ApiEndPoints.resetPassword,
       forgotPassword: ApiEndPoints.forgotPassword,
       signup: ApiEndPoints.createUser,
       signin: ApiEndPoints.login,
@@ -1558,6 +1562,7 @@ class CorekitConfigImpl extends CoreKitConfig {
       verifyForgetOtp: ApiEndPoints.forgotPasswordOtpMatch,
       logout: "",
       changePasswordMethod: RequestMethod.PATCH,
+      resetPasswordMethod: RequestMethod.PATCH,
       verifyForgotOtpMethod: RequestMethod.PATCH,
       sendOtpMethod: RequestMethod.PATCH,
     ),
@@ -1688,9 +1693,16 @@ await auth.forgotPassword(
 );
 ```
 
-#### Reset / Change Password
+#### Change Password (Authenticated)
 ```dart
 await auth.changePassword(
+  body: {'oldPassword': oldPassword, 'newPassword': newPassword},
+);
+```
+
+#### Reset Password (Forgot Password Flow)
+```dart
+await auth.resetPassword(
   body: {'password': newPassword, 'confirmPassword': newPassword},
 );
 ```
@@ -1741,6 +1753,7 @@ Every auth operation (sign-in, sign-up, OTP, profile, social, logout, etc.) auto
 | `verifyOtp` | `auth.verifyOtp()` |
 | `sendOtp` | `auth.sendOtp()` |
 | `updatePassword` | `auth.changePassword()` |
+| `resetPassword` | `auth.resetPassword()` |
 | `socialLogin` | `auth.signInWithGoogle()`, `auth.signInWithApple()`, `auth.signInWithFacebook()`, `auth.signInWithCustom()` |
 | `logout` | `auth.logout()` |
 | `fetchProfile` | `auth.fetchProfile()` |

@@ -15,7 +15,6 @@ import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
-import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/storage/ck_storage.dart';
