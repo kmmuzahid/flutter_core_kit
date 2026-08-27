@@ -1,5 +1,5 @@
 
-## 1.1.0-beta.3
+## 1.1.0
 
 * **Dual Password Management (`changePassword` & `resetPassword`)**:
   * Added dedicated `resetPassword` endpoint, method override (`resetPasswordMethod`), and facade method `auth.resetPassword()` / `CkAuthService.instance.resetPassword()` for unauthenticated forgot-password completion. Automatically routes to `showLogin` upon success.
