@@ -219,6 +219,12 @@ class CkAuth<TProfile> {
     Map<String, String>? headers,
   }) => CkAuthService.instance.changePassword(body: body, headers: headers);
 
+  /// Reset password.
+  Future<CkAuthResult<void>> resetPassword({
+    required Map<String, dynamic> body,
+    Map<String, String>? headers,
+  }) => CkAuthService.instance.resetPassword(body: body, headers: headers);
+
   /// Authenticate with Google.
   Future<CkAuthResult<dynamic>> signInWithGoogle(CkGoogleAuthData data) =>
       CkAuthService.instance.signInWithGoogle(data);

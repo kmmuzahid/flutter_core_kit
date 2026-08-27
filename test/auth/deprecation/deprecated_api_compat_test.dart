@@ -19,7 +19,8 @@ const _endpoints = CkAuthEndpoints(
   getProfile: '/profile',
   updateProfile: '/profile',
   logout: '/logout',
-  changePassword: '/reset',
+  changePassword: '/change',
+  resetPassword: 'reset',
 );
 
 void main() {

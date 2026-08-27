@@ -12,6 +12,7 @@ enum CkAuthLoadingType {
   logout,
   fetchProfile,
   updateProfile,
+  resetPassword,
 }
 
 /// Manages per-operation loading state using [CkBehaviorStream].

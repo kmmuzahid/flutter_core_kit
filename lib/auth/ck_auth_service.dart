@@ -15,6 +15,7 @@ import 'package:core_kit/auth/state/auth_state_controller.dart';
 import 'package:core_kit/auth/state/profile_extractor.dart';
 import 'package:core_kit/auth/token/auth_storage_keys.dart';
 import 'package:core_kit/auth/token/auth_token_manager.dart';
+import 'package:core_kit/core_kit_internal.dart';
 import 'package:core_kit/network/ck_transport.dart';
 import 'package:core_kit/network/request_input.dart';
 import 'package:core_kit/storage/ck_storage.dart';
@@ -680,7 +681,46 @@ class CkAuthService<TProfile> {
   }) {
     return loadingController.wrap(CkAuthLoadingType.updatePassword, () async {
       if (config.mockAuth) {
-        config.handlers?.showLogin();
+        CkAuthService.instance.logout();
+        return const CkAuthResult<void>.success(
+          statusCode: 200,
+          rawResponse: {'message': 'Mock password update successful'},
+        );
+      }
+
+      final response = await CkTransport.request(
+        input: RequestInput(
+          endpoint: config.endpoints.changePassword,
+          method: config.endpoints.changePasswordMethod,
+          jsonBody: body,
+          headers: headers,
+        ),
+        responseBuilder: (data) => data,
+        showMessage: true,
+      );
+
+      if (response.isSuccess) {
+        CkAuthService.instance.logout();
+        return CkAuthResult<void>.success(
+          statusCode: response.statusCode,
+          rawResponse: response.data,
+        );
+      }
+      return CkAuthResult<void>.failure(
+        message: response.message,
+        statusCode: response.statusCode,
+        rawResponse: response.data,
+      );
+    });
+  }
+
+  Future<CkAuthResult<void>> resetPassword({
+    required Map<String, dynamic> body,
+    Map<String, String>? headers,
+  }) {
+    return loadingController.wrap(CkAuthLoadingType.resetPassword, () async {
+      if (config.mockAuth) {
+        config.handlers?.showLogin.call();
         return const CkAuthResult<void>.success(
           statusCode: 200,
           rawResponse: {'message': 'Mock password update successful'},
@@ -698,8 +738,8 @@ class CkAuthService<TProfile> {
 
       final response = await CkTransport.request(
         input: RequestInput(
-          endpoint: config.endpoints.changePassword,
-          method: config.endpoints.changePasswordMethod,
+          endpoint: config.endpoints.resetPassword,
+          method: config.endpoints.resetPasswordMethod,
           jsonBody: body,
           headers: finalHeaders,
           requiresToken: false,
@@ -709,9 +749,7 @@ class CkAuthService<TProfile> {
       );
 
       if (response.isSuccess) {
-        if (config.handlers != null) {
-          config.handlers!.showLogin();
-        }
+        config.handlers?.showLogin.call();
         return CkAuthResult<void>.success(
           statusCode: response.statusCode,
           rawResponse: response.data,
