@@ -1,4 +1,13 @@
 
+## 1.1.2
+
+* **Swift Package Manager (SPM) Ready**:
+  * All native plugin dependencies (`permission_handler`, `flutter_secure_storage`, `share_plus`, `file_picker`, `cached_network_image`) are upgraded to their latest major SPM-ready releases, providing seamless integration with Flutter's Swift Package Manager on iOS and macOS.
+* **Documentation & Link Fixes**:
+  * Fixed relative `LICENSE` badge and footer links causing 404 errors on pub.dev.
+  * Fixed repository and issue tracker URLs in `pubspec.yaml` to eliminate 404 errors on pub.dev's "View/report issues" link.
+  * Updated Docsify sidebar links to use anchor query navigation `/?id=...` to avoid 404 errors when navigating sections.
+
 ## 1.1.1
 
 * **HTML Rendering Engine Migration (`CkText`)**:

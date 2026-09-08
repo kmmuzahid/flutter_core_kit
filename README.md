@@ -4,7 +4,8 @@
 [![Pub Points](https://img.shields.io/pub/points/core_kit?color=blue&label=pub%20points)](https://pub.dev/packages/core_kit/score)
 [![Pub Popularity](https://img.shields.io/pub/popularity/core_kit?color=blue&label=popularity)](https://pub.dev/packages/core_kit)
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20macos%20%7C%20windows%20%7C%20linux%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![SPM Ready](https://img.shields.io/badge/Swift_Package_Manager-compatible-FA7343.svg?logo=swift&logoColor=white)](https://docs.flutter.dev/packages-and-plugins/swift-package-manager)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kmmuzahid/flutter_core_kit/blob/main/LICENSE)
 
 📦 **Pub.dev Package:** [https://pub.dev/packages/core_kit](https://pub.dev/packages/core_kit)  
 📖 **API Reference:** [https://pub.dev/documentation/core_kit/latest/](https://pub.dev/documentation/core_kit/latest/)   
@@ -14,6 +15,7 @@
 > - **Zero-Boilerplate Networking & Auth:** Pre-configured Dio client with automatic JWT token refresh, social auth hooks, and ready-to-go OTP flows.
 > - **Self-Scaling UI Components:** 35+ fully responsive custom widgets (including text fields, appbars, paginated lists/grids, and star ratings) that match your layout design size automatically.
 > - **State & Storage Helpers:** Secure local key-value storage out of the box with automatic state-based loading indicators and dialog overlays.
+> - **🍎 Swift Package Manager (SPM) Ready:** All native dependencies are up to date and fully compatible with Flutter's Swift Package Manager on iOS & macOS without CocoaPods legacy friction.
 
 > [!TIP]
 > **🚀 Get Started Instantly with the Pre-configured Template!**
@@ -110,6 +112,7 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 | **Transport** | `CkTransport` + `CkResponse`, automatic token refresh, retries |
 | **Storage** | `CkStorage` — secure storage with SharedPreferences fallback |
 | **Auth** | `CkAuthService`, OTP flows, social login hooks, profile caching, declarative auto-navigation, splash screen routing |
+| **Ecosystem & SPM** | Fully compatible with **Swift Package Manager (SPM)** on iOS & macOS without CocoaPods legacy dependency issues |
 
 ---
 
@@ -190,7 +193,7 @@ Add `core_kit` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  core_kit: ^1.1.0-beta.2
+  core_kit: ^1.1.1
 ```
 
 Or run:
@@ -198,6 +201,10 @@ Or run:
 ```bash
 flutter pub add core_kit
 ```
+
+> [!NOTE]
+> **🍎 Swift Package Manager (SPM) Ready:**
+> CoreKit is tested and fully compatible with Flutter's **Swift Package Manager (SPM)** plugin ecosystem for iOS and macOS. All underlying native plugins (`permission_handler`, `flutter_secure_storage`, `share_plus`, `file_picker`, etc.) are upgraded to their latest SPM-ready major releases.
 
 ### 2. Direct from GitHub (Alternative)
 
@@ -2194,7 +2201,7 @@ CkSpotlight(
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](https://github.com/kmmuzahid/flutter_core_kit/blob/main/LICENSE).
 
 ## Author
 
