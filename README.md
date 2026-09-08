@@ -2,7 +2,6 @@
 
 [![Pub Version](https://img.shields.io/pub/v/core_kit?color=blue&label=pub.dev&logo=dart)](https://pub.dev/packages/core_kit)
 [![Pub Points](https://img.shields.io/pub/points/core_kit?color=blue&label=pub%20points)](https://pub.dev/packages/core_kit/score)
-[![Pub Popularity](https://img.shields.io/pub/popularity/core_kit?color=blue&label=popularity)](https://pub.dev/packages/core_kit)
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20macos%20%7C%20windows%20%7C%20linux%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
 [![SPM Ready](https://img.shields.io/badge/Swift_Package_Manager-compatible-FA7343.svg?logo=swift&logoColor=white)](https://docs.flutter.dev/packages-and-plugins/swift-package-manager)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kmmuzahid/flutter_core_kit/blob/main/LICENSE)
@@ -193,7 +192,7 @@ Add `core_kit` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  core_kit: ^1.1.1
+  core_kit: ^1.1.3
 ```
 
 Or run:

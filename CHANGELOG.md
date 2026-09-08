@@ -1,3 +1,7 @@
+## 1.1.3
+
+* **Documentation & Badge Cleanup**:
+  * Removed broken `Pub Popularity` badge from `README.md` which was returning a 404 error on pub.dev.
 
 ## 1.1.2
 
