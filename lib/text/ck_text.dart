@@ -1,5 +1,5 @@
 import 'package:core_kit/core_kit_internal.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:material_ui/material_ui.dart';
 
 class CkText extends StatelessWidget {
@@ -123,40 +123,49 @@ class CkText extends StatelessWidget {
     final isHtml = _isHtml(text);
     Widget buildText() {
       if (isHtml) {
-        final htmlData = formattedData
-            .replaceAll(RegExp(r'</p>', caseSensitive: false), '</p><br/>')
-            .replaceAll(RegExp(r'</h1>', caseSensitive: false), '</h1><br/>')
-            .replaceAll(RegExp(r'</h2>', caseSensitive: false), '</h2><br/>')
-            .replaceAll(RegExp(r'</h3>', caseSensitive: false), '</h3><br/>')
-            .replaceAll(RegExp(r'</h4>', caseSensitive: false), '</h4><br/>')
-            .replaceAll(RegExp(r'</h5>', caseSensitive: false), '</h5><br/>')
-            .replaceAll(RegExp(r'</h6>', caseSensitive: false), '</h6><br/>');
+        final effectiveFontSize = effectiveTextStyle.fontSize ?? 16.0;
+        final effectiveColor =
+            textColor ?? effectiveTextStyle.color ?? Colors.black;
+        final effectiveFontWeight =
+            fontWeight ?? effectiveTextStyle.fontWeight ?? FontWeight.w400;
+        final effectiveFontFamily =
+            coreKitInstance.fontFamily ?? 'sans-serif';
 
-        return Html(
-          data: htmlData,
-          style: {
-            'body': Style(
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              fontFamily: coreKitInstance.fontFamily,
-              maxLines: isDescription ? null : maxLines,
-              textOverflow: isDescription ? null : effectiveOverflow,
-              textAlign: textAlign,
-              fontSize: FontSize(effectiveTextStyle.fontSize ?? 16.0),
-              color: textColor ?? effectiveTextStyle.color,
-              fontWeight: fontWeight ?? effectiveTextStyle.fontWeight,
-            ),
-            'p': Style(
-              display: Display.inline,
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-            ),
-            'h1,h2,h3,h4,h5,h6': Style(
-              display: Display.inline,
-              margin: Margins.zero,
-              padding: HtmlPaddings.zero,
-              fontWeight: FontWeight.bold,
-            ),
+
+
+
+        return HtmlWidget(
+          formattedData,
+          textStyle: effectiveTextStyle.copyWith(
+            fontFamily: coreKitInstance.fontFamily,
+            fontSize: effectiveFontSize,
+            fontWeight: effectiveFontWeight,
+            color: effectiveColor,
+          ),
+          customStylesBuilder: (element) {
+            if (element.localName == 'body' ||
+                element.localName == 'html') {
+              return {
+                'margin': '0',
+                'padding': '0',
+                'font-family': effectiveFontFamily,
+                'font-size': '${effectiveFontSize}px',
+                'font-weight': '${effectiveFontWeight.value}',
+              };
+            }
+            if (element.localName == 'p') {
+              return {'display': 'inline', 'margin': '0', 'padding': '0'};
+            }
+            if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+                .contains(element.localName)) {
+              return {
+                'display': 'inline',
+                'margin': '0',
+                'padding': '0',
+                'font-weight': 'bold',
+              };
+            }
+            return null;
           },
         );
       }

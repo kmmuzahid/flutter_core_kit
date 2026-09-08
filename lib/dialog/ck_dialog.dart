@@ -29,7 +29,7 @@ Future CkDialogWithActions({
   required String title,
   String? subTitle,
   bool isDismissible = true,
-  final bool validationRequired = false,
+  bool validationRequired = false,
   required Function() onConfirm,
   Function()? onCancel,
   String action = 'Confirm',

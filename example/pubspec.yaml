@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.12.2
+  sdk: ^3.13.2
 
 dependencies:
   flutter:
@@ -14,9 +14,13 @@ dependencies:
   core_kit:
     path: ../
 
-  material_ui: any
-dependency_overrides:
-  win32: ^6.0.1
+  # Match the version declared in core_kit instead of 'any'
+  material_ui: ^1.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

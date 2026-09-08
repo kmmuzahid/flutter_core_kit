@@ -1,5 +1,14 @@
 
+## 1.1.1
+
+* **HTML Rendering Engine Migration (`CkText`)**:
+  * Replaced `flutter_html ^3.0.0` with `flutter_widget_from_html ^0.17.3` for HTML content rendering inside `CkText`.
+  * Migrated the internal HTML rendering widget from `Html` (flutter_html) to `HtmlWidget` (flutter_widget_from_html), eliminating the dependency on `flutter_html`'s `Style`, `Margins`, `HtmlPaddings`, `FontSize`, and `Display` APIs.
+  * Equivalent per-element styling (body, p, h1–h6) is now applied via `HtmlWidget.customStylesBuilder` using CSS property maps.
+  * Font family, size, weight, and color are forwarded through `HtmlWidget.textStyle`, maintaining visual parity with the previous implementation.
+
 ## 1.1.0
+
 
 * **Dual Password Management (`changePassword` & `resetPassword`)**:
   * Added dedicated `resetPassword` endpoint, method override (`resetPasswordMethod`), and facade method `auth.resetPassword()` / `CkAuthService.instance.resetPassword()` for unauthenticated forgot-password completion. Automatically routes to `showLogin` upon success.

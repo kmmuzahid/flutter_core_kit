@@ -75,9 +75,9 @@ class _CkImagePickerState extends State<CkImagePicker> {
                     height: widget.height.h,
                     decoration: BoxDecoration(
                       border: Border.all(color: borderColor, width: 1.5),
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainerLowest,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerLowest,
                     ),
                     child: _selectedImages != null || widget.src != null
                         ? CkImage(
@@ -85,6 +85,7 @@ class _CkImagePickerState extends State<CkImagePicker> {
                                 ? _selectedImages!.path
                                 : widget.src!,
                             fill: BoxFit.cover,
+                            borderRadius: widget.borderRadius,
                           )
                         : widget.intialWidget ??
                               widget.pickerIconWidget ??
