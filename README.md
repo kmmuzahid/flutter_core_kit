@@ -4,30 +4,25 @@
 [![Pub Points](https://img.shields.io/pub/points/core_kit?color=blue&label=pub%20points)](https://pub.dev/packages/core_kit/score)
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20macos%20%7C%20windows%20%7C%20linux%20%7C%20web-blue.svg)](https://pub.dev/packages/core_kit)
 [![SPM Ready](https://img.shields.io/badge/Swift_Package_Manager-compatible-FA7343.svg?logo=swift&logoColor=white)](https://docs.flutter.dev/packages-and-plugins/swift-package-manager)
+[![Starter Template](https://img.shields.io/badge/Starter_Template-template__cubit-00B4AB.svg?logo=github&logoColor=white)](https://github.com/kmmuzahid/template_cubit.git)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kmmuzahid/flutter_core_kit/blob/main/LICENSE)
 
+🚀 **Official Starter Template:** [https://github.com/kmmuzahid/template_cubit](https://github.com/kmmuzahid/template_cubit.git) *(Recommended)*  
 📦 **Pub.dev Package:** [https://pub.dev/packages/core_kit](https://pub.dev/packages/core_kit)  
 📖 **API Reference:** [https://pub.dev/documentation/core_kit/latest/](https://pub.dev/documentation/core_kit/latest/)   
 
-> [!NOTE]
-> **✨ It's like magic!** CoreKit drastically reduces boilerplate and saves you hours of development time. It provides a production-ready package bundling:
-> - **Zero-Boilerplate Networking & Auth:** Pre-configured Dio client with automatic JWT token refresh, social auth hooks, and ready-to-go OTP flows.
-> - **Self-Scaling UI Components:** 35+ fully responsive custom widgets (including text fields, appbars, paginated lists/grids, and star ratings) that match your layout design size automatically.
-> - **State & Storage Helpers:** Secure local key-value storage out of the box with automatic state-based loading indicators and dialog overlays.
-> - **🍎 Swift Package Manager (SPM) Ready:** All native dependencies are up to date and fully compatible with Flutter's Swift Package Manager on iOS & macOS without CocoaPods legacy friction.
-
 > [!TIP]
-> **🚀 Get Started Instantly with the Pre-configured Template!**
+> **🚀 Fastest Way to Get Started: Use the Official Starter Template!**
 >
-> Skip the boilerplate setup! Start building immediately by cloning the official template repository:
-> **[Cubit Template (GitHub)](https://github.com/kmmuzahid/template_cubit.git)**
+> We **strongly recommend** using the official starter template rather than manually wiring up architecture from scratch. Start building immediately by cloning:
+> **👉 [template_cubit (GitHub)](https://github.com/kmmuzahid/template_cubit.git)**
 >
-> This template comes ready-to-go, fully pre-configured with:
-> - **AutoRoute** (declarative, type-safe navigation with code generation)
-> - **Cubit/Bloc** (scalable, clean state management)
-> - **CoreKit** (production-ready UI components, responsive layout helpers, and authentication)
+> It comes completely pre-configured and production-ready with:
+> - **CoreKit** (production-ready UI components, responsive layout scaling, Dio networking, and authentication)
+> - **AutoRoute** (declarative, type-safe navigation with compile-time route generation)
+> - **Cubit / Bloc** (clean, scalable, and reactive state management)
 >
-> **Setup steps:**
+> **Quick Setup:**
 >
 > ```bash
 > # 1. Clone the template
@@ -51,6 +46,24 @@
 > > ```bash
 > > fvm dart run build_runner watch
 > > ```
+
+---
+
+## CoreKit Overview & Key Capabilities
+
+CoreKit provides a unified, production-grade foundation for Flutter applications by consolidating essential infrastructure, responsive design utilities, and reusable UI components into a single cohesive package:
+
+- **🚀 Instant App Bootstrap:** `CoreKit.router` and `CoreKit.builder` configure responsive scaling, splash routing, lifecycle, and theme injection in a single line.
+- **📐 Responsive Screen Scaling:** Extension helpers (`.w`, `.h`, `.sp`, `.r`) adapt any design size automatically across mobile, tablet, desktop, and web.
+- **🎨 35+ Production-Ready Widgets:** Self-scaling UI components including customizable buttons, paginated infinite lists/grids (`CkListView`, `CkGridView`), comment sheets, spotlight tours, and image pickers.
+- **⚡ Zero-Boilerplate Networking:** Pre-configured Dio client (`CkTransport`, `CkResponse`) with automatic JWT token refresh, retries, and file uploads.
+- **🔐 Full Authentication & Profile Engine:** Complete `CkAuthService` with login, sign-up, profile updates & caching, password reset/change, OTP verification workflows, and social login hooks.
+- **💾 Secure Storage & State:** Zero-latency secure storage (`CkStorage` with SharedPreferences fallback) and automated state-driven loading overlays.
+- **🛡️ Permissions & System Utilities:** Streamlined runtime permission manager (`CkPermission`) with system dialogs, unique device ID (`CkDeviceId`), and path helpers (`CkPath`).
+- **📍 Bundled Location Pickers:** Cascading Country, State, and City dropdown pickers with built-in offline regional data.
+- **🍎 Swift Package Manager (SPM) Ready:** Fully compatible with Flutter's SPM on iOS & macOS without CocoaPods legacy friction.
+
+---
 
 ## Visual Preview
 
@@ -79,25 +92,26 @@ Public APIs use the **`Ck` prefix** (for example `CkButton`, `CkText`, `CkTransp
 
 ## Table of Contents
 
-1. [Visual Preview](#visual-preview)
-2. [Features](#features)
-3. [UI Component List](#ui-component-list)
-4. [Design Guidelines](#design-guidelines-flutter-native-experience-with-ck)
-5. [Installation](#installation)
-6. [Quick Start](#quick-start)
-7. [Configuration](#configuration)
-8. [Splash Screen Routing](#splash-screen-routing)
-9. [Navigation & Global Access](#navigation--global-access)
-10. [UI Components](#ui-components)
-11. [Forms & Validation](#forms--validation)
-12. [Dialogs & Overlays](#dialogs--overlays)
-13. [Responsive Utilities](#responsive-utilities)
-14. [Transport (HTTP)](#transport-http)
-15. [Storage](#storage)
-16. [Authentication Module](#authentication-module)
-17. [Location Pickers](#location-pickers)
-18. [Utilities & Extensions](#utilities--extensions)
-19. [License](#license)
+1. [CoreKit Overview & Key Capabilities](#corekit-overview--key-capabilities)
+2. [Visual Preview](#visual-preview)
+3. [Features](#features)
+4. [UI Component List](#ui-component-list)
+5. [Design Guidelines](#design-guidelines-flutter-native-experience-with-ck)
+6. [Installation](#installation)
+7. [Quick Start](#quick-start)
+8. [Configuration](#configuration)
+9. [Splash Screen Routing](#splash-screen-routing)
+10. [Navigation & Global Access](#navigation--global-access)
+11. [UI Components](#ui-components)
+12. [Forms & Validation](#forms--validation)
+13. [Dialogs & Overlays](#dialogs--overlays)
+14. [Responsive Utilities](#responsive-utilities)
+15. [Transport (HTTP)](#transport-http)
+16. [Storage](#storage)
+17. [Authentication Module](#authentication-module)
+18. [Location Pickers](#location-pickers)
+19. [Utilities & Extensions](#utilities--extensions)
+20. [License](#license)
 
 ---
 
@@ -192,7 +206,7 @@ Add `core_kit` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  core_kit: ^1.1.3
+  core_kit: ^1.1.4
 ```
 
 Or run:

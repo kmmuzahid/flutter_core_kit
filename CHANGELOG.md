@@ -1,3 +1,9 @@
+## 1.1.4
+
+* **Documentation & Starter Template Improvements**:
+  * Added comprehensive `README.md` with GitHub-style Markdown (badges, TOC, full feature list, detailed API docs).
+  
+
 ## 1.1.3
 
 * **Documentation & Badge Cleanup**:

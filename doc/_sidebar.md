@@ -1,6 +1,8 @@
 * [CoreKit Home](/)
 
 * **Get Started**
+  * [🚀 Starter Template (GitHub)](https://github.com/kmmuzahid/template_cubit.git)
+  * [CoreKit Overview & Key Capabilities](/?id=corekit-overview--key-capabilities)
   * [Features](/?id=features)
   * [Installation](/?id=installation)
   * [Quick Start](/?id=quick-start)
