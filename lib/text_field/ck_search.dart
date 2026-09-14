@@ -193,7 +193,9 @@ class _CkSearchState extends State<CkSearch> {
   }
 
   Color hintColor() {
-    return coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
+    return widget.hintStyle?.color ??
+        coreKitInstance.inputConfig.hintStyle?.color ??
+        coreKitInstance.theme.inputDecorationTheme.hintStyle?.color ??
         coreKitInstance.outlineColor;
   }
 
@@ -301,6 +303,7 @@ class _CkSearchState extends State<CkSearch> {
       child: TextFormField(
         controller: _controller,
         focusNode: _focusNode,
+
         textAlign: widget.textAlign,
         readOnly: widget.isReadOnly,
         enableInteractiveSelection: !widget.isReadOnly,
@@ -310,10 +313,9 @@ class _CkSearchState extends State<CkSearch> {
         cursorColor: _focusNode.hasFocus
             ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
                   coreKitInstance.primaryColor)
-            : (widget.errorColor ??
-                  coreKitInstance.inputConfig.errorColor),
-        cursorErrorColor: widget.errorColor ??
-            coreKitInstance.inputConfig.errorColor,
+            : (widget.errorColor ?? coreKitInstance.inputConfig.errorColor),
+        cursorErrorColor:
+            widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
         onTapOutside: (event) {
           final renderBox = context.findRenderObject() as RenderBox?;
           if (renderBox != null) {
@@ -344,26 +346,11 @@ class _CkSearchState extends State<CkSearch> {
           counterText: '',
           fillColor: widget.backgroundColor,
           hintText: widget.hintText,
+
           hintStyle:
               widget.hintStyle ??
-              _getStyle(
-                fontSize:
-                    widget.fontSize ??
-                    coreKitInstance
-                        .theme
-                        .inputDecorationTheme
-                        .hintStyle
-                        ?.fontSize ??
-                    16.sp,
-                fontStyle:
-                    coreKitInstance
-                        .theme
-                        .inputDecorationTheme
-                        .hintStyle
-                        ?.fontStyle ??
-                    FontStyle.italic,
-                textColor: hintColor(),
-              ),
+              coreKitInstance.inputConfig.hintStyle ??
+              theme.inputDecorationTheme.hintStyle,
 
           // Prefix
           prefixIconConstraints: const BoxConstraints(
@@ -417,15 +404,11 @@ class _CkSearchState extends State<CkSearch> {
             width: widget.borderWidth.w,
           ),
           errorBorder: _buildBorder(
-            color:
-                widget.errorColor ??
-                coreKitInstance.inputConfig.errorColor,
+            color: widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
             width: widget.borderWidth.w,
           ),
           focusedErrorBorder: _buildBorder(
-            color:
-                widget.errorColor ??
-                coreKitInstance.inputConfig.errorColor,
+            color: widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
             width: widget.borderWidth.w,
           ),
           disabledBorder: _buildBorder(
