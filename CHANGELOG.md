@@ -1,3 +1,11 @@
+## 1.1.4+1
+
+* **Search Input Configuration Sync (`CkSearch`)**:
+  * Synchronized `CkSearch` hint styling with global `CkInputConfig.hintStyle` before falling back to `InputDecorationTheme.hintStyle`.
+  * Updated `hintColor()` resolution to respect widget-level `hintStyle`, global `CkInputConfig.hintStyle`, and theme decoration before defaulting to outline color.
+  * Removed hardcoded italic font style and forced font size overrides, allowing custom input configuration and theme styling to cascade seamlessly.
+
+
 ## 1.1.4
 
 * **Documentation & Starter Template Improvements**:
