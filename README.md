@@ -156,7 +156,7 @@ CoreKit provides a comprehensive set of custom widgets, prefixed with `Ck` for e
 | 📜 **`CkListView`** | ![List & Paginated](https://img.shields.io/badge/-List%20%26%20Paginated-blue?style=flat-square) | Paginated list view loader supporting pull-to-refresh & infinite scroll |
 | 📜 **`CkGridView`** | ![List & Paginated](https://img.shields.io/badge/-List%20%26%20Paginated-blue?style=flat-square) | Paginated grid view loader supporting pull-to-refresh & infinite scroll |
 | 📜 **`CkTabListView`** | ![List & Paginated](https://img.shields.io/badge/-List%20%26%20Paginated-blue?style=flat-square) | Tabbed layout where each tab hosts a paginated list |
-| 🔤 **`CkText`** | ![Typography](https://img.shields.io/badge/-Typography-teal?style=flat-square) | Standard text component with default styling and margins |
+| 🔤 **`CkText`** | ![Typography](https://img.shields.io/badge/-Typography-teal?style=flat-square) | Standard text component with responsive margins, auto-resizing, and configurable decimal formatting |
 | 🔤 **`CkRichText`** | ![Typography](https://img.shields.io/badge/-Typography-teal?style=flat-square) | Styled rich text supporting clickable segments |
 | 🧭 **`CkTabBar`** | ![Navigation](https://img.shields.io/badge/-Navigation-indigo?style=flat-square) | Custom horizontal tab bar |
 | 📝 **`CkForm`** | ![Form](https://img.shields.io/badge/-Form-blueviolet?style=flat-square) | Form wrapper for validation management |
@@ -206,7 +206,7 @@ Add `core_kit` to your `pubspec.yaml` dependencies:
 
 ```yaml
 dependencies:
-  core_kit: ^1.1.4
+  core_kit: ^1.1.4+2
 ```
 
 Or run:
@@ -624,6 +624,7 @@ final base = coreKitInstance.imageBaseUrl;
 ### Text
 
 ```dart
+// Standard text with direct typography shortcuts & responsive insets
 CkText(
   text: 'Hello World',
   fontSize: 18,
@@ -631,6 +632,27 @@ CkText(
   textColor: Colors.blue,
   top: 10,
   bottom: 10,
+)
+
+// Configurable decimal formatting in numbers (auto-rounds floating-point values)
+CkText(
+  text: 'Price: 12.345 USD',
+  decimalPlaces: 2, // Default: formats to "Price: 12.35 USD"
+)
+
+CkText(
+  text: 'Rating: 4.89 / 5.0',
+  decimalPlaces: 1, // Precision metrics: formats to "Rating: 4.9 / 5.0"
+)
+
+CkText(
+  text: 'Quantity: 12.345 units',
+  decimalPlaces: 0, // Rounds to nearest integer: "Quantity: 12 units"
+)
+
+CkText(
+  text: 'Release v1.0.4 at GPS 37.7749, -122.4194',
+  decimalPlaces: null, // Disables formatting: preserves versions & coordinates untouched
 )
 
 CkRichText(

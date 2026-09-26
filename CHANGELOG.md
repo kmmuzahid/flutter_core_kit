@@ -1,3 +1,16 @@
+## 1.1.4+2
+
+* **Configurable Decimal Formatting (`CkText`)**:
+  * Added `decimalPlaces` parameter (`int?`) with a default value of `2` to maintain full backward compatibility.
+  * Formats floating-point numbers in text dynamically using `toStringAsFixed(decimalPlaces!)`.
+  * Passing `decimalPlaces: null` skips regex number formatting completely, preserving semantic versions (e.g., `v1.0.4`), GPS coordinates, and raw numeric codes as-is.
+  * Supports precision metrics (`1` for ratings like `4.9`) and nearest integer rounding (`0`).
+  * Works seamlessly across all rendering modes (HTML content via `flutter_widget_from_html`, single-line auto-scale, adaptive multiline scaling, and description mode).
+* **Comprehensive IDE Hover DartDoc (`CkText`)**:
+  * Added detailed `///` documentation for both constructor parameters and field declarations across all `CkText` properties that differ from standard Flutter `Text` (including responsive insets, direct typography shortcuts, border container styling, leading/trailing widgets, auto-scaling thresholds, and gradients).
+* **Test Coverage**:
+  * Added dedicated widget and unit tests in `test/ck_text_test.dart` validating decimal precision, formatting bypass, HTML number parsing, and responsive layout behavior.
+
 ## 1.1.4+1
 
 * **Search Input Configuration Sync (`CkSearch`)**:
