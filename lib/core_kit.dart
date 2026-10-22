@@ -102,6 +102,7 @@ export 'package:core_kit/utils/ck_permission_handler.dart';
 export 'package:core_kit/utils/ck_permission_helper.dart';
 export 'package:core_kit/utils/ck_screen_utils.dart';
 export 'package:core_kit/utils/ck_share.dart';
+export 'package:core_kit/utils/ck_share_button.dart';
 export 'package:core_kit/utils/ck_utils.dart';
 export 'package:core_kit/utils/extension.dart';
 export 'package:dio/dio.dart';

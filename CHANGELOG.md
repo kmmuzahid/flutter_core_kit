@@ -1,3 +1,29 @@
+## 1.1.4+3
+
+* **Image URL & CDN Resolution (`CkShare`)**:
+  * Fixed an issue where passing an image URL with a domain (e.g., from a CDN or external host) caused sharing to fail because `coreKitInstance.imageBaseUrl` was always prepended.
+  * Added `CkShare.resolveImageUrl` to intelligently resolve image URLs across multiple formats:
+    * Full URLs with schemes (`http://`, `https://`) remain unchanged.
+    * Protocol-relative URLs (`//cdn.example.com/...`) are converted to `https://`.
+    * Domain-only URLs without a scheme (e.g., `cdn.example.com/...`, `res.cloudinary.com/...`) are resolved to `https://`.
+    * Relative image paths (`/images/...`, `images/...`, `avatar.jpg`) are seamlessly joined with `coreKitInstance.imageBaseUrl`, normalizing leading and trailing slashes to prevent double slashes.
+    * Safely handles empty or uninitialized `coreKitInstance.imageBaseUrl` without throwing `LateInitializationError`.
+  * Added error logging in `CkShare.content` for invalid URL parsing and non-200 HTTP download responses.
+* **Adaptive Share Button & Builder (`CkShareButton`)**:
+  * Introduced [CkShareButton](file:///Users/km/Documents/km%20muzahid/flutter_core_kit/lib/utils/ck_share_button.dart#L50) and convenient shortcuts `CkShare.button()` / `CkShare.builder()` providing instant visual loading feedback while network/CDN images download before presenting the native share sheet.
+  * **Fully Adaptive Edge Tracing (`CkShareLoaderStyle.adaptiveEdge`)**:
+    * Dynamically traces and loops an animated traveling beam along the exact perimeter of circular buttons, icons, or rounded rectangle buttons (`borderRadius`).
+    * Configurable `loaderColor`, `trackColor`, `strokeWidth`, `strokeLengthFactor`, and outward/inward `paddingOffset`.
+  * **Configurable Loader Styles**:
+    * `adaptiveEdge`: Smoothly orbits the child's perimeter while keeping content visible.
+    * `replace`: Temporarily replaces the child with a progress indicator.
+    * `overlay`: Shows a semi-transparent dim layer with a center progress indicator.
+  * **Dual Mode Support**:
+    * Direct child mode (`child: Icon(...)`) for zero-boilerplate tap handling and loading state management.
+    * Builder mode (`builder: (context, share, isLoading)`) for total custom layout control.
+* **Test Coverage**:
+  * Added unit and widget tests in `test/ck_share_test.dart` verifying all URL resolution cases, edge cases, whitespace trimming, relative path combinations, and `CkShareButton` rendering modes across shapes.
+
 ## 1.1.4+2
 
 * **Configurable Decimal Formatting (`CkText`)**:
