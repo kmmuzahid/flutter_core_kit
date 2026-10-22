@@ -18,7 +18,7 @@ class CkShare {
   }) async {
     try {
       final sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-      final tempDir = await getTemporaryDirectory();
+      final tempDir = await CkPath.getTemporaryDirectory();
       final file = File('${tempDir.path}/$sanitizedTitle.jpg');
       await file.writeAsBytes(imageUrl.buffer.asUint8List());
       final xFile = XFile(file.path);
@@ -128,7 +128,7 @@ class CkShare {
       }
 
       final sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-      final tempDir = await getTemporaryDirectory();
+      final tempDir = await CkPath.getTemporaryDirectory();
       final file = File('${tempDir.path}/$sanitizedTitle.jpg');
       await file.writeAsBytes(response.bodyBytes);
       final xFile = XFile(file.path);

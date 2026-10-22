@@ -109,5 +109,4 @@ export 'package:dio/dio.dart';
 export 'package:flutter_secure_storage/flutter_secure_storage.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:image_picker/image_picker.dart';
-export 'package:path_provider/path_provider.dart';
 export 'package:permission_handler/permission_handler.dart';

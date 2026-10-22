@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart' as pp;
+import 'package:core_kit/utils/ck_path_web.dart'
+    if (dart.library.io) 'package:core_kit/utils/ck_path_io.dart' as platform;
 import 'package:universal_io/io.dart';
 
 /// A utility class for accessing standard device directories and file paths.
@@ -30,113 +30,112 @@ abstract class CkPath {
   /// Path to the directory where any newly created files may be allocated to
   /// the system temporary folder.
   static Future<Directory> getTemporaryDirectory() =>
-      pp.getTemporaryDirectory();
+      platform.getTemporaryDirectory();
 
   /// Alias for [getTemporaryDirectory].
-  static Future<Directory> get tempDir => pp.getTemporaryDirectory();
+  static Future<Directory> get tempDir => platform.getTemporaryDirectory();
 
   /// Alias for [getTemporaryDirectory].
-  static Future<Directory> get temporaryDirectory => pp.getTemporaryDirectory();
+  static Future<Directory> get temporaryDirectory =>
+      platform.getTemporaryDirectory();
 
   /// Path to a directory where the application may place data that is
   /// user-generated, or that cannot otherwise be recreated by your application.
   static Future<Directory> getApplicationDocumentsDirectory() =>
-      pp.getApplicationDocumentsDirectory();
+      platform.getApplicationDocumentsDirectory();
 
   /// Alias for [getApplicationDocumentsDirectory].
   static Future<Directory> get documentsDir =>
-      pp.getApplicationDocumentsDirectory();
+      platform.getApplicationDocumentsDirectory();
 
   /// Alias for [getApplicationDocumentsDirectory].
   static Future<Directory> get documentsDirectory =>
-      pp.getApplicationDocumentsDirectory();
+      platform.getApplicationDocumentsDirectory();
 
   /// Alias for [getApplicationDocumentsDirectory].
-  static Future<Directory> get docsDir => pp.getApplicationDocumentsDirectory();
+  static Future<Directory> get docsDir =>
+      platform.getApplicationDocumentsDirectory();
 
   /// Path to a directory where the application may place application support
   /// files.
   static Future<Directory> getApplicationSupportDirectory() =>
-      pp.getApplicationSupportDirectory();
+      platform.getApplicationSupportDirectory();
 
   /// Alias for [getApplicationSupportDirectory].
   static Future<Directory> get supportDir =>
-      pp.getApplicationSupportDirectory();
+      platform.getApplicationSupportDirectory();
 
   /// Alias for [getApplicationSupportDirectory].
   static Future<Directory> get supportDirectory =>
-      pp.getApplicationSupportDirectory();
+      platform.getApplicationSupportDirectory();
 
   /// Path to the directory where application specific cache files can be stored.
   static Future<Directory> getApplicationCacheDirectory() =>
-      pp.getApplicationCacheDirectory();
+      platform.getApplicationCacheDirectory();
 
   /// Alias for [getApplicationCacheDirectory].
-  static Future<Directory> get cacheDir => pp.getApplicationCacheDirectory();
+  static Future<Directory> get cacheDir =>
+      platform.getApplicationCacheDirectory();
 
   /// Alias for [getApplicationCacheDirectory].
   static Future<Directory> get cacheDirectory =>
-      pp.getApplicationCacheDirectory();
+      platform.getApplicationCacheDirectory();
 
   /// Path to the directory where downloaded files are stored.
   /// Supported on Android, iOS, macOS, Windows, Linux.
   static Future<Directory?> getDownloadsDirectory() =>
-      pp.getDownloadsDirectory();
+      platform.getDownloadsDirectory();
 
   /// Alias for [getDownloadsDirectory].
-  static Future<Directory?> get downloadsDir => pp.getDownloadsDirectory();
+  static Future<Directory?> get downloadsDir =>
+      platform.getDownloadsDirectory();
 
   /// Alias for [getDownloadsDirectory].
   static Future<Directory?> get downloadsDirectory =>
-      pp.getDownloadsDirectory();
+      platform.getDownloadsDirectory();
 
   /// Path to the primary external storage directory (Android only).
   static Future<Directory?> getExternalStorageDirectory() =>
-      pp.getExternalStorageDirectory();
+      platform.getExternalStorageDirectory();
 
   /// Alias for [getExternalStorageDirectory].
   static Future<Directory?> get externalStorageDir =>
-      pp.getExternalStorageDirectory();
+      platform.getExternalStorageDirectory();
 
   /// Paths to directories where application specific external cache data can be stored (Android only).
   static Future<List<Directory>?> getExternalCacheDirectories() =>
-      pp.getExternalCacheDirectories();
+      platform.getExternalCacheDirectories();
 
   /// Paths to directories where application specific data can be stored (Android only).
   static Future<List<Directory>?> getExternalStorageDirectories({
-    pp.StorageDirectory? type,
-  }) => pp.getExternalStorageDirectories(type: type);
+    dynamic type,
+  }) => platform.getExternalStorageDirectories(type: type);
 
   // ---------------------------------------------------------------------------
   // String Path Getters
   // ---------------------------------------------------------------------------
 
   /// Returns the absolute path string of the temporary directory.
-  static Future<String> get tempPath async =>
-      (await pp.getTemporaryDirectory()).path;
+  static Future<String> get tempPath => platform.getTempPath();
 
   /// Returns the absolute path string of the application documents directory.
-  static Future<String> get documentsPath async =>
-      (await pp.getApplicationDocumentsDirectory()).path;
+  static Future<String> get documentsPath => platform.getDocumentsPath();
 
   /// Alias for [documentsPath].
-  static Future<String> get docsPath async => documentsPath;
+  static Future<String> get docsPath => platform.getDocumentsPath();
 
   /// Returns the absolute path string of the application support directory.
-  static Future<String> get supportPath async =>
-      (await pp.getApplicationSupportDirectory()).path;
+  static Future<String> get supportPath => platform.getSupportPath();
 
   /// Returns the absolute path string of the application cache directory.
-  static Future<String> get cachePath async =>
-      (await pp.getApplicationCacheDirectory()).path;
+  static Future<String> get cachePath => platform.getCachePath();
 
   /// Returns the absolute path string of the downloads directory, or `null` if not available.
-  static Future<String?> get downloadsPath async =>
-      (await pp.getDownloadsDirectory())?.path;
+  static Future<String?> get downloadsPath => platform.getDownloadsPath();
 
   /// Returns the absolute path string of external storage, or `null` if not available.
-  static Future<String?> get externalStoragePath async =>
-      (await pp.getExternalStorageDirectory())?.path;
+  static Future<String?> get externalStoragePath =>
+      platform.getExternalStoragePath();
 
   // ---------------------------------------------------------------------------
   // File Path & Creation Helpers
@@ -251,25 +250,7 @@ abstract class CkPath {
   }
 
   /// Deletes all files within the temporary directory without deleting the directory itself.
-  static Future<void> clearTemp() async {
-    try {
-      final dir = await getTemporaryDirectory();
-      if (dir.existsSync()) {
-        final entities = dir.listSync();
-        for (final entity in entities) {
-          try {
-            await entity.delete(recursive: true);
-          } catch (e) {
-            debugPrint(
-              'Failed to delete temp entity: ${entity.path}, error: $e',
-            );
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Error clearing temp directory: $e');
-    }
-  }
+  static Future<void> clearTemp() => platform.clearTemp();
 
   static String _resolveFileName({
     String? fileName,

@@ -1,7 +1,13 @@
-## 1.1.4+4
+## 1.1.5
 
+* **Platform Support & Web/WASM Compatibility**:
+  * Decoupled `CkPath` with conditional platform implementations: native platforms utilize `path_provider`, while Web and WASM targets use a safe, zero-`dart:io` stub.
+  * Removed direct `path_provider` re-export from `core_kit.dart` to unblock Web and WebAssembly compilation.
+* **Dependency & Pub.dev Enhancements**:
+  * Upgraded dependency constraints to support latest stable releases: `android_id` (`^0.6.0`), `file_picker` (`^13.1.0`), `skeletonizer` (`^3.0.0`), and `material_ui` (`^1.8.0`).
+  * Cleaned up documentation and markdown links to strictly adhere to pub.dev secure URL conventions.
 * **Deep Link Listening Support (`CkShare`)**:
-  * Added [CkShare.listenDeepLink](file:///Users/km/Documents/km%20muzahid/flutter_core_kit/lib/utils/ck_share.dart#L240) to listen to incoming deep links.
+  * Added `CkShare.listenDeepLink` to listen to incoming deep links.
   * Captures both cold-start launch URLs and runtime incoming links with a single, simple callback.
 * **Immediate Loader Dismissal on Native Sheet Presentation (`CkShareButton`)**:
   * Added `onReady` callback to `CkShare.content` and `CkShare.byteContent`.
@@ -21,7 +27,7 @@
     * Safely handles empty or uninitialized `coreKitInstance.imageBaseUrl` without throwing `LateInitializationError`.
   * Added error logging in `CkShare.content` for invalid URL parsing and non-200 HTTP download responses.
 * **Adaptive Share Button & Builder (`CkShareButton`)**:
-  * Introduced [CkShareButton](file:///Users/km/Documents/km%20muzahid/flutter_core_kit/lib/utils/ck_share_button.dart#L50) and convenient shortcuts `CkShare.button()` / `CkShare.builder()` providing instant visual loading feedback while network/CDN images download before presenting the native share sheet.
+  * Introduced `CkShareButton` and convenient shortcuts `CkShare.button()` / `CkShare.builder()` providing instant visual loading feedback while network/CDN images download before presenting the native share sheet.
   * **Fully Adaptive Edge Tracing (`CkShareLoaderStyle.adaptiveEdge`)**:
     * Dynamically traces and loops an animated traveling beam along the exact perimeter of circular buttons, icons, or rounded rectangle buttons (`borderRadius`).
     * Configurable `loaderColor`, `trackColor`, `strokeWidth`, `strokeLengthFactor`, and outward/inward `paddingOffset`.
