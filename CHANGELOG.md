@@ -1,3 +1,14 @@
+## 1.1.4+4
+
+* **Deep Link Listening Support (`CkShare`)**:
+  * Added [CkShare.listenDeepLink](file:///Users/km/Documents/km%20muzahid/flutter_core_kit/lib/utils/ck_share.dart#L240) to listen to incoming deep links.
+  * Captures both cold-start launch URLs and runtime incoming links with a single, simple callback.
+* **Immediate Loader Dismissal on Native Sheet Presentation (`CkShareButton`)**:
+  * Added `onReady` callback to `CkShare.content` and `CkShare.byteContent`.
+  * `CkShareButton` now automatically stops and resets the loading state the moment the native OS sharing sheet is presented on screen.
+  * Added `onShareReady` callback parameter across `CkShareButton`, `CkShareButton.builder`, `CkShare.button()`, and `CkShare.builder()`.
+  * Added safeguard in `CkShare.content` to handle empty image URLs gracefully.
+
 ## 1.1.4+3
 
 * **Image URL & CDN Resolution (`CkShare`)**:

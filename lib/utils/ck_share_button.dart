@@ -71,6 +71,7 @@ class CkShareButton extends StatefulWidget {
     this.customLoader,
     this.onTap,
     this.onShareStart,
+    this.onShareReady,
     this.onShareSuccess,
     this.onShareError,
   }) : assert(
@@ -91,6 +92,7 @@ class CkShareButton extends StatefulWidget {
     this.imageUrl,
     this.byteImage,
     this.onShareStart,
+    this.onShareReady,
     this.onShareSuccess,
     this.onShareError,
   }) : child = null,
@@ -171,7 +173,10 @@ class CkShareButton extends StatefulWidget {
   /// Called when image download and share processing starts.
   final VoidCallback? onShareStart;
 
-  /// Called when the share sheet has been presented.
+  /// Called when the native share dialog/bottomsheet is presented by the OS.
+  final VoidCallback? onShareReady;
+
+  /// Called when the share sheet has been presented / completed.
   final VoidCallback? onShareSuccess;
 
   /// Called if an error occurs during downloading or sharing.
@@ -220,31 +225,43 @@ class _CkShareButtonState extends State<CkShareButton>
     });
     _controller.repeat();
 
-    try {
-      if (widget.byteImage != null) {
-        await CkShare.instance.byteContent(
-          title: widget.title,
-          imageUrl: widget.byteImage!,
-          deepLinkUrl: widget.deepLinkUrl,
-        );
-      } else if (widget.imageUrl != null) {
-        await CkShare.instance.content(
-          title: widget.title,
-          imageUrl: widget.imageUrl!,
-          deepLinkUrl: widget.deepLinkUrl,
-        );
-      }
-      widget.onShareSuccess?.call();
-    } catch (e) {
-      widget.onShareError?.call(e);
-    } finally {
-      if (mounted) {
+    void stopLoading() {
+      if (mounted && _isLoading) {
         _controller.stop();
         _controller.reset();
         setState(() {
           _isLoading = false;
         });
       }
+    }
+
+    try {
+      if (widget.byteImage != null) {
+        await CkShare.instance.byteContent(
+          title: widget.title,
+          imageUrl: widget.byteImage!,
+          deepLinkUrl: widget.deepLinkUrl,
+          onReady: () {
+            stopLoading();
+            widget.onShareReady?.call();
+          },
+        );
+      } else if (widget.imageUrl != null) {
+        await CkShare.instance.content(
+          title: widget.title,
+          imageUrl: widget.imageUrl!,
+          deepLinkUrl: widget.deepLinkUrl,
+          onReady: () {
+            stopLoading();
+            widget.onShareReady?.call();
+          },
+        );
+      }
+      widget.onShareSuccess?.call();
+    } catch (e) {
+      widget.onShareError?.call(e);
+    } finally {
+      stopLoading();
     }
   }
 

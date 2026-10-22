@@ -259,6 +259,18 @@ void main() {
 
       expect(find.text('Share Button'), findsOneWidget);
     });
+
+    test('CkShare.listenDeepLink returns a cancellable subscription', () async {
+      Uri? received;
+      final sub = CkShare.listenDeepLink((uri) {
+        received = uri;
+      });
+
+      expect(sub, isNotNull);
+      expect(received, isNull);
+
+      await sub.cancel();
+    });
   });
 }
 

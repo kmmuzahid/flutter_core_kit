@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +14,7 @@ class CkShare {
     required String title,
     required ByteData imageUrl,
     required String deepLinkUrl,
+    VoidCallback? onReady,
   }) async {
     try {
       final sanitizedTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
@@ -28,6 +30,7 @@ class CkShare {
         fileNameOverrides: ['$sanitizedTitle.jpg'],
         previewThumbnail: xFile,
       );
+      onReady?.call();
       await SharePlus.instance.share(params);
       file.delete();
     } catch (e) {
@@ -103,8 +106,14 @@ class CkShare {
     required String title,
     required String imageUrl,
     required String deepLinkUrl,
+    VoidCallback? onReady,
   }) async {
     try {
+      if (imageUrl.trim().isEmpty) {
+        ckError('Image URL cannot be empty');
+        return;
+      }
+
       final resolvedUrl = resolveImageUrl(imageUrl);
       final uri = Uri.tryParse(resolvedUrl);
       if (uri == null) {
@@ -131,6 +140,7 @@ class CkShare {
         fileNameOverrides: ['$sanitizedTitle.jpg'],
         previewThumbnail: xFile,
       );
+      onReady?.call();
       await SharePlus.instance.share(params);
       file.delete();
     } catch (e) {
@@ -158,6 +168,7 @@ class CkShare {
     Widget? customLoader,
     VoidCallback? onTap,
     VoidCallback? onShareStart,
+    VoidCallback? onShareReady,
     VoidCallback? onShareSuccess,
     void Function(Object error)? onShareError,
   }) =>
@@ -179,6 +190,7 @@ class CkShare {
         customLoader: customLoader,
         onTap: onTap,
         onShareStart: onShareStart,
+        onShareReady: onShareReady,
         onShareSuccess: onShareSuccess,
         onShareError: onShareError,
         child: child,
@@ -197,6 +209,7 @@ class CkShare {
       bool isLoading,
     ) builder,
     VoidCallback? onShareStart,
+    VoidCallback? onShareReady,
     VoidCallback? onShareSuccess,
     void Function(Object error)? onShareError,
   }) =>
@@ -208,8 +221,66 @@ class CkShare {
         byteImage: byteImage,
         builder: builder,
         onShareStart: onShareStart,
+        onShareReady: onShareReady,
         onShareSuccess: onShareSuccess,
         onShareError: onShareError,
       );
+
+  static final StreamController<Uri> _deepLinkController =
+      StreamController<Uri>.broadcast();
+  static bool _deepLinkObserverRegistered = false;
+  static bool _initialDeepLinkHandled = false;
+
+  /// Listens to incoming deep links (both cold-start launch links and runtime links).
+  ///
+  /// Note: Follow the standard `share_plus` platform configuration guide
+  /// (e.g. iPad `sharePositionOrigin` and native deep link URL schemes in
+  /// `AndroidManifest.xml` and `Info.plist`).
+  ///
+  /// Example:
+  /// ```dart
+  /// final sub = CkShare.listenDeepLink((uri) {
+  ///   print('Deep link received: $uri');
+  /// });
+  /// ```
+  static StreamSubscription<Uri> listenDeepLink(void Function(Uri uri) onLink) {
+    if (!_deepLinkObserverRegistered) {
+      _deepLinkObserverRegistered = true;
+      WidgetsBinding.instance.addObserver(_CkDeepLinkObserver((uri) {
+        _deepLinkController.add(uri);
+      }));
+    }
+
+    final sub = _deepLinkController.stream.listen(onLink);
+
+    if (!_initialDeepLinkHandled) {
+      _initialDeepLinkHandled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          final defaultRoute =
+              WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+          if (defaultRoute.isNotEmpty && defaultRoute != '/') {
+            final uri = Uri.tryParse(defaultRoute);
+            if (uri != null) {
+              onLink(uri);
+            }
+          }
+        } catch (_) {}
+      });
+    }
+
+    return sub;
+  }
+}
+
+class _CkDeepLinkObserver with WidgetsBindingObserver {
+  final void Function(Uri uri) onLink;
+  _CkDeepLinkObserver(this.onLink);
+
+  @override
+  Future<bool> didPushRouteInformation(RouteInformation routeInformation) async {
+    onLink(routeInformation.uri);
+    return false;
+  }
 }
 

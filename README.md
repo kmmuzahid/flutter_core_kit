@@ -2085,15 +2085,41 @@ final fullPath = CkPath.join(tempPath, 'voice', 'rec.m4a');
 await CkPath.clearTemp();
 ```
 
-### Sharing
+### Sharing & Deep Linking
+
+Share network images, CDN URLs, or raw byte images directly to the native OS share sheet, with automated deep link listening and adaptive loading buttons.
 
 ```dart
+// 1. Direct share call (supports CDN URLs, full URLs, and relative paths)
 await CkShare.instance.content(
   title: 'Check this out',
-  imageUrl: 'banners/promo.jpg', // relative to imageBaseUrl
+  imageUrl: 'https://cdn.example.com/promo.jpg',
   deepLinkUrl: 'https://myapp.com/item/42',
 );
+
+// 2. Adaptive Share Button (animates a traveling loader around the button's edge while downloading)
+CkShareButton(
+  title: 'Check this out',
+  imageUrl: 'https://cdn.example.com/promo.jpg',
+  deepLinkUrl: 'https://myapp.com/item/42',
+  child: const Icon(Icons.share),
+);
+
+// 3. Listen to incoming deep links (cold-start + runtime links)
+final sub = CkShare.listenDeepLink((uri) {
+  print('Incoming deep link: $uri');
+  print('Path: ${uri.path}');
+  print('Query: ${uri.queryParameters}');
+});
+
+// Cancel when no longer needed
+sub.cancel();
 ```
+
+> [!NOTE]
+> **Platform Setup & SharePlus Configuration**:
+> When sharing content or listening to deep links, make sure to follow the platform setup instructions in [`share_plus`](https://pub.dev/packages/share_plus) (such as iPad `sharePositionOrigin` popover anchors and URL scheme/Universal Link configurations in iOS `Info.plist` and Android `AndroidManifest.xml`).
+
 
 ### Logger
 
