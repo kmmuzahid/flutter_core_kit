@@ -22,20 +22,23 @@ void main() {
       expect(joined, 'folder/subfolder/file.txt');
     });
 
-    test('ck_path_web returns fallback web directory stubs and paths', () async {
-      expect(await web_path.getTempPath(), '/tmp');
-      expect(await web_path.getDocumentsPath(), '/documents');
-      expect(await web_path.getSupportPath(), '/support');
-      expect(await web_path.getCachePath(), '/cache');
-      expect(await web_path.getDownloadsPath(), '/downloads');
-      expect(await web_path.getExternalStoragePath(), isNull);
+    test(
+      'ck_path_web returns fallback web directory stubs and paths',
+      () async {
+        expect(await web_path.getTempPath(), '/tmp');
+        expect(await web_path.getDocumentsPath(), '/documents');
+        expect(await web_path.getSupportPath(), '/support');
+        expect(await web_path.getCachePath(), '/cache');
+        expect(await web_path.getDownloadsPath(), '/downloads');
+        expect(await web_path.getExternalStoragePath(), isNull);
 
-      final tempDir = await web_path.getTemporaryDirectory();
-      expect(tempDir.path, '/tmp');
-      final docsDir = await web_path.getApplicationDocumentsDirectory();
-      expect(docsDir.path, '/documents');
+        final tempDir = await web_path.getTemporaryDirectory();
+        expect(tempDir.path, '/tmp');
+        final docsDir = await web_path.getApplicationDocumentsDirectory();
+        expect(docsDir.path, '/documents');
 
-      await web_path.clearTemp(); // does not throw
-    });
+        await web_path.clearTemp(); // does not throw
+      },
+    );
   });
 }

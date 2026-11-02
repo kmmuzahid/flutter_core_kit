@@ -19,8 +19,10 @@ CoreKitInstanceSingleton get coreKitInstance =>
 
 typedef NavigationBack = void Function();
 
-typedef CorkitInitBuilder =
-    Widget Function(BuildContext context, Widget? child);
+typedef CorkitInitBuilder = Widget Function(
+  BuildContext context,
+  Widget? child,
+);
 
 /// Configures the password visibility toggle icons shown in text fields.
 ///
@@ -171,7 +173,9 @@ abstract class CoreKitConfig {
       _context != null,
       '\n\ncoreKitInstance context is not available yet.\n'
       'Only use `context` inside these getters:\n'
+      '  - inputConfig\n'
       '  - appbarConfig\n'
+      '  - snackBarConfig\n'
       '  - permissionHandlerColors\n'
       '  - passwordObscureIcon\n'
       '  - permissionHelperConfig\n'
@@ -263,58 +267,58 @@ class _CoreKitRouterGateState extends State<CoreKitRouterGate> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _syncConfig();
     // Guard: only run once — didChangeDependencies fires on every dependency
-    // change (theme, locale, MediaQuery, etc.) but init must run exactly once.
+    // change (theme, locale, MediaQuery, etc.) but async init must run exactly once.
     if (_initStarted) return;
     _initStarted = true;
     _initializeCoreKit();
+  }
+
+  @override
+  void didUpdateWidget(covariant CoreKitRouterGate oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncConfig();
+  }
+
+  void _syncConfig() {
+    final instance = coreKitInstance;
+    final config = widget.config;
+
+    config.attachContext(context);
+
+    instance.appbarConfig = config.appbarConfig ?? CkAppBarConfig();
+    if (instance.appbarConfig.onBack == null) {
+      instance.appbarConfig = instance.appbarConfig.copyWith(
+        onBack: () => instance.navigatorKey.currentState?.pop(),
+      );
+    }
+    if (config.listLoaderConfig != null) {
+      instance.listLoaderConfig = config.listLoaderConfig!;
+    }
+    if (config.inputConfig != null) {
+      instance.inputConfig = config.inputConfig!;
+    }
+    if (config.snackBarConfig != null) {
+      instance.snackBarConfig = config.snackBarConfig!;
+    }
+    if (config.permissionHelperConfig != null) {
+      instance.permissionHelperConfig = config.permissionHelperConfig!;
+    }
+    if (config.permissionHandlerColors != null) {
+      instance.permissionHandlerColors = config.permissionHandlerColors!;
+    }
+    if (config.passwordObscureIcon != null) {
+      instance.passWordObscureIcon = config.passwordObscureIcon!;
+    }
   }
 
   Future<void> _initializeCoreKit() async {
     final completer = Completer<void>();
     final stopwatch = Stopwatch()..start();
 
-    // ── Synchronous pre-frame init ────────────────────────────────────────
-    // appbarConfig and listLoaderConfig do not need a BuildContext, so we
-    // apply them immediately — before addPostFrameCallback fires — so that
-    // any screen rendered on the very first frame (e.g. the splash screen)
-    // already sees the app's overridden config instead of the bare default.
-    {
-      final instance = coreKitInstance;
-      final config = widget.config;
-
-      instance.appbarConfig = config.appbarConfig ?? CkAppBarConfig();
-      if (instance.appbarConfig.onBack == null) {
-        instance.appbarConfig = instance.appbarConfig.copyWith(
-          onBack: () => instance.navigatorKey.currentState?.pop(),
-        );
-      }
-      if (config.listLoaderConfig != null) {
-        instance.listLoaderConfig = config.listLoaderConfig!;
-      }
-      if (config.inputConfig != null) {
-        instance.inputConfig = config.inputConfig!;
-      }
-      if (config.snackBarConfig != null) {
-        instance.snackBarConfig = config.snackBarConfig!;
-      }
-    }
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final instance = coreKitInstance;
       final config = widget.config;
-
-      config.attachContext(context);
-
-      if (config.permissionHelperConfig != null) {
-        instance.permissionHelperConfig = config.permissionHelperConfig!;
-      }
-      if (config.permissionHandlerColors != null) {
-        instance.permissionHandlerColors = config.permissionHandlerColors!;
-      }
-      if (config.passwordObscureIcon != null) {
-        instance.passWordObscureIcon = config.passwordObscureIcon!;
-      }
 
       // ── First-install wipe ────────────────────────────────────────────
       // On a fresh install, clear any stale secure-storage data left over

@@ -19,9 +19,8 @@ class CkPermissionHelper {
     bool showDialog = true,
     BuildContext? context,
   }) {
-    return CkPermission(
-      permission,
-    ).ensure(showDialog: showDialog, context: context);
+    return CkPermission(permission)
+        .ensure(showDialog: showDialog, context: context);
   }
 
   /// Displays the permission dialog for permanently denied permissions.

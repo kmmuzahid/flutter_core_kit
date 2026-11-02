@@ -161,8 +161,7 @@ void main() {
       expect(
         validatorCalled,
         isTrue,
-        reason:
-            'customAuthValidator must be called during restoreSession with tokens',
+        reason: 'customAuthValidator must be called during restoreSession with tokens',
       );
       // The auth state is set to unauthenticated by _stateController.setUnauthenticated()
       // inside logoutHandler.execute() — which runs AFTER the network call (or despite errors).

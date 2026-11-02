@@ -468,9 +468,8 @@ class CkPermission {
     bool showDialog = true,
     BuildContext? context,
   }) {
-    return CkPermission(
-      permission,
-    ).ensure(showDialog: showDialog, context: context);
+    return CkPermission(permission)
+        .ensure(showDialog: showDialog, context: context);
   }
 
   /// Ensures multiple [CkPermission] permissions concurrently.

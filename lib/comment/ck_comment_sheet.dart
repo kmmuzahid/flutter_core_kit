@@ -14,8 +14,11 @@ typedef CkIdExtractor<T> = String Function(T item);
 /// Builds everything for [item] except the avatar, reaction row and reply
 /// action (those are separate builders below) — typically the name/header
 /// row, the comment text and any attached media.
-typedef CkCommentContentBuilder<T> =
-    Widget Function(BuildContext context, T item, int depth);
+typedef CkCommentContentBuilder<T> = Widget Function(
+  BuildContext context,
+  T item,
+  int depth,
+);
 
 /// Builds the avatar for [item]. Fully self-contained, including its own
 /// tap handling (e.g. navigating to a profile screen) if any.
@@ -27,8 +30,11 @@ typedef CkCommentReactionBuilder<T> = Widget Function(T item);
 /// Builds the "reply" affordance for [item]. [expandReplies] is supplied by
 /// the sheet — call it from your widget's tap handler (in addition to any
 /// app-specific logic, like focusing a composer) to reveal [item]'s replies.
-typedef CkCommentReplyActionBuilder<T> =
-    Widget Function(T item, int depth, VoidCallback expandReplies);
+typedef CkCommentReplyActionBuilder<T> = Widget Function(
+  T item,
+  int depth,
+  VoidCallback expandReplies,
+);
 
 /// Returns the avatar size to use at a given nesting [depth] (0 = top level).
 typedef CkAvatarSizeForDepth = double Function(int depth);
@@ -38,8 +44,10 @@ typedef CkAvatarSizeForDepth = double Function(int depth);
 /// places according to [CkSendButtonPosition]. [controller] is the sheet's
 /// own composer text controller, so app-specific widgets (like an AI writer)
 /// can read/write the same text.
-typedef CkComposerFooterBuilder =
-    Widget Function(BuildContext context, TextEditingController controller);
+typedef CkComposerFooterBuilder = Widget Function(
+  BuildContext context,
+  TextEditingController controller,
+);
 
 /// Where the send button is rendered relative to the composer text box.
 enum CkSendButtonPosition {

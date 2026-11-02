@@ -97,29 +97,23 @@ void main() {
     );
 
     // PS-04 — CRITICAL REGRESSION TEST
-    test(
-      'second signUp call without re-verify does NOT bypass OTP (one-shot only)',
-      () async {
-        final service = await _buildService(handlers);
+    test('second signUp call without re-verify does NOT bypass OTP (one-shot only)', () async {
+      final service = await _buildService(handlers);
 
-        // Complete pre-signup flow once
-        await service.sendOtp(
-          trigger: CkOtpTrigger.signup,
-          recipient: 'a@b.com',
-        );
-        await service.verifyOtp(otp: '123456');
-        await service.signUp(body: {'email': 'a@b.com'}); // consumes the flag
+      // Complete pre-signup flow once
+      await service.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'a@b.com');
+      await service.verifyOtp(otp: '123456');
+      await service.signUp(body: {'email': 'a@b.com'}); // consumes the flag
 
-        // Second signUp — flag already consumed → OTP required again
-        handlers.reset();
-        final secondResult = await service.signUp(body: {'email': 'a@b.com'});
-        expect(
-          secondResult.requiresOtp,
-          isTrue,
-          reason: 'The one-shot bypass must NOT apply to subsequent signUps',
-        );
-        expect(handlers.showOtpVerificationCalled, isTrue);
-      },
-    );
+      // Second signUp — flag already consumed → OTP required again
+      handlers.reset();
+      final secondResult = await service.signUp(body: {'email': 'a@b.com'});
+      expect(
+        secondResult.requiresOtp,
+        isTrue,
+        reason: 'The one-shot bypass must NOT apply to subsequent signUps',
+      );
+      expect(handlers.showOtpVerificationCalled, isTrue);
+    });
   });
 }

@@ -34,16 +34,22 @@ void main() {
     });
 
     // SU-01
-    test('signUp with no OTP autoTrigger resolves success immediately', () async {
-      final service = await _buildService(handlers: handlers, autoTriggers: {});
-      final result = await service.signUp(
-        body: {'name': 'Test', 'email': 'a@b.com'},
-      );
-      // In mock mode with no autoTriggers, _resolvePostSignupAuth is called.
-      // With no loginCallback and no token in response, _preSignupOtpVerified=true.
-      // Since signUp(no autoOtp) → resolvePostSignupAuth → success.
-      expect(result.isSuccess, isTrue);
-    });
+    test(
+      'signUp with no OTP autoTrigger resolves success immediately',
+      () async {
+        final service = await _buildService(
+          handlers: handlers,
+          autoTriggers: {},
+        );
+        final result = await service.signUp(
+          body: {'name': 'Test', 'email': 'a@b.com'},
+        );
+        // In mock mode with no autoTriggers, _resolvePostSignupAuth is called.
+        // With no loginCallback and no token in response, _preSignupOtpVerified=true.
+        // Since signUp(no autoOtp) → resolvePostSignupAuth → success.
+        expect(result.isSuccess, isTrue);
+      },
+    );
 
     // SU-02
     test('signUp with signup in autoTriggers → requiresOtp=true', () async {
@@ -102,24 +108,18 @@ void main() {
     );
 
     // SU-08
-    test(
-      'signUp with mockAuth=true and _preSignupOtpVerified → resolves immediately',
-      () async {
-        final service = await _buildService(
-          handlers: handlers,
-          autoTriggers: {CkOtpTrigger.signup},
-        );
-        await service.sendOtp(
-          trigger: CkOtpTrigger.signup,
-          recipient: 'a@b.com',
-        );
-        await service.verifyOtp(otp: '123456');
+    test('signUp with mockAuth=true and _preSignupOtpVerified → resolves immediately', () async {
+      final service = await _buildService(
+        handlers: handlers,
+        autoTriggers: {CkOtpTrigger.signup},
+      );
+      await service.sendOtp(trigger: CkOtpTrigger.signup, recipient: 'a@b.com');
+      await service.verifyOtp(otp: '123456');
 
-        final result = await service.signUp(body: {'email': 'a@b.com'});
-        expect(result.isSuccess, isTrue);
-        expect(result.requiresOtp, isFalse);
-      },
-    );
+      final result = await service.signUp(body: {'email': 'a@b.com'});
+      expect(result.isSuccess, isTrue);
+      expect(result.requiresOtp, isFalse);
+    });
 
     // SU-09
     test(

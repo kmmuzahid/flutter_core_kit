@@ -316,8 +316,7 @@ class _CkPhoneNumberTextFieldState extends State<CkPhoneNumberTextField> {
         coreKitInstance.inputConfig.borderColor ??
         theme.dividerColor;
     final effectiveErrorColor =
-        widget.errorColor ??
-        coreKitInstance.inputConfig.errorColor;
+        widget.errorColor ?? coreKitInstance.inputConfig.errorColor;
 
     return TextFormField(
       cursorColor: _focusNode.hasFocus

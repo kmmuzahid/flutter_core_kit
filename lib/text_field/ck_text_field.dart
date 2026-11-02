@@ -301,10 +301,9 @@ class _CkTextFieldState extends State<CkTextField> {
       cursorColor: _focusNode.hasFocus
           ? (theme.inputDecorationTheme.focusedBorder?.borderSide.color ??
                 coreKitInstance.primaryColor)
-          : (widget.errorColor ??
-                coreKitInstance.inputConfig.errorColor),
-      cursorErrorColor: widget.errorColor ??
-          coreKitInstance.inputConfig.errorColor,
+          : (widget.errorColor ?? coreKitInstance.inputConfig.errorColor),
+      cursorErrorColor:
+          widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
       textAlign: widget.textAlign != TextAlign.left
           ? widget.textAlign
           : (coreKitInstance.inputConfig.textAlign ?? widget.textAlign),
@@ -471,14 +470,14 @@ class _CkTextFieldState extends State<CkTextField> {
                 ),
               )
             : (_getPrefix() != null
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      left: 10.w,
-                      right: widget.paddingHorizontal,
-                    ),
-                    child: _getPrefix(),
-                  )
-                : null),
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        left: 10.w,
+                        right: widget.paddingHorizontal,
+                      ),
+                      child: _getPrefix(),
+                    )
+                  : null),
 
         //sufix
         suffixIconConstraints: BoxConstraints(
@@ -496,14 +495,14 @@ class _CkTextFieldState extends State<CkTextField> {
             : widget.validationType == CkValidationType.validatePassword
             ? (_buildPasswordSuffixIcon())
             : (getSuffix() != null
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      right: 10,
-                      left: widget.paddingHorizontal,
-                    ),
-                    child: getSuffix(),
-                  )
-                : null),
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        right: 10,
+                        left: widget.paddingHorizontal,
+                      ),
+                      child: getSuffix(),
+                    )
+                  : null),
 
         prefixIconColor: _iconColor(),
         suffixIconColor: _iconColor(),
@@ -553,8 +552,7 @@ class _CkTextFieldState extends State<CkTextField> {
             ? InputBorder.none
             : _buildBorder(
                 color:
-                    widget.errorColor ??
-                    coreKitInstance.inputConfig.errorColor,
+                    widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
                 width:
                     (widget.borderWidth ??
                             coreKitInstance.inputConfig.borderWidth)
@@ -565,8 +563,7 @@ class _CkTextFieldState extends State<CkTextField> {
             ? InputBorder.none
             : _buildBorder(
                 color:
-                    widget.errorColor ??
-                    coreKitInstance.inputConfig.errorColor,
+                    widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
                 width:
                     (widget.borderWidth ??
                             coreKitInstance.inputConfig.borderWidth)
@@ -597,11 +594,7 @@ class _CkTextFieldState extends State<CkTextField> {
                 color:
                     widget.borderColor ??
                     coreKitInstance.inputConfig.borderColor ??
-                    theme
-                        .inputDecorationTheme
-                        .border
-                        ?.borderSide
-                        .color ??
+                    theme.inputDecorationTheme.border?.borderSide.color ??
                     coreKitInstance.outlineColor,
                 width:
                     (widget.borderWidth ??
@@ -630,9 +623,8 @@ class _CkTextFieldState extends State<CkTextField> {
     if (effectiveRadius != null) {
       radius = BorderRadius.circular(effectiveRadius.r);
     } else if (theme.inputDecorationTheme.border?.isOutline == true) {
-      radius =
-          (theme.inputDecorationTheme.border as OutlineInputBorder)
-              .borderRadius;
+      radius = (theme.inputDecorationTheme.border as OutlineInputBorder)
+          .borderRadius;
     } else {
       radius = BorderRadius.circular(12.r);
     }

@@ -491,9 +491,8 @@ class InputHelper {
       return CkString.requiredField;
     }
     if (value.length < minLength) {
-      return CkString.minLengthError(
-        minLength,
-      ).replaceAll('{minLength}', minLength.toString());
+      return CkString.minLengthError(minLength)
+          .replaceAll('{minLength}', minLength.toString());
     }
     return null;
   }
@@ -504,9 +503,8 @@ class InputHelper {
       return CkString.requiredField;
     }
     if (value.length > maxLength) {
-      return CkString.maxLengthError(
-        maxLength,
-      ).replaceAll('{maxLength}', maxLength.toString());
+      return CkString.maxLengthError(maxLength)
+          .replaceAll('{maxLength}', maxLength.toString());
     }
     return null;
   }

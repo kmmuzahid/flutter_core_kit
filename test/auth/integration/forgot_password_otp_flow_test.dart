@@ -83,13 +83,16 @@ void main() {
       expect(result.isSuccess, isTrue);
     });
 
-    test('changePassword mock mode always returns success and logs out', () async {
-      final service = await _buildService(handlers);
-      final result = await service.changePassword(
-        body: {'password': 'new_pass'},
-      );
-      expect(result.isSuccess, isTrue);
-    });
+    test(
+      'changePassword mock mode always returns success and logs out',
+      () async {
+        final service = await _buildService(handlers);
+        final result = await service.changePassword(
+          body: {'password': 'new_pass'},
+        );
+        expect(result.isSuccess, isTrue);
+      },
+    );
 
     test(
       'forgotPassword in mock mode sets lastTrigger to forgetPassword',

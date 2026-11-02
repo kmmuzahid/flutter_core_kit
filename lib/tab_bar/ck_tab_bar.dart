@@ -59,8 +59,7 @@ class _CkTabBarState extends State<CkTabBar> {
                 final isSelected = _selectedIndex == tabIndex;
 
                 final defaultSelectedStyle = BoxDecoration(
-                  color:
-                      secondaryColor, // Replace with AppColors.primaryColor if needed
+                  color: secondaryColor, // Replace with AppColors.primaryColor if needed
                   borderRadius: BorderRadius.circular(8),
                 );
 

@@ -58,22 +58,25 @@ void main() {
       );
     });
 
-    test('resolves relative paths with imageBaseUrl without double slashes', () {
-      coreKitInstance.imageBaseUrl = 'https://api.example.com/';
+    test(
+      'resolves relative paths with imageBaseUrl without double slashes',
+      () {
+        coreKitInstance.imageBaseUrl = 'https://api.example.com/';
 
-      expect(
-        CkShare.resolveImageUrl('/uploads/avatar.jpg'),
-        'https://api.example.com/uploads/avatar.jpg',
-      );
-      expect(
-        CkShare.resolveImageUrl('uploads/avatar.jpg'),
-        'https://api.example.com/uploads/avatar.jpg',
-      );
-      expect(
-        CkShare.resolveImageUrl('avatar.jpg'),
-        'https://api.example.com/avatar.jpg',
-      );
-    });
+        expect(
+          CkShare.resolveImageUrl('/uploads/avatar.jpg'),
+          'https://api.example.com/uploads/avatar.jpg',
+        );
+        expect(
+          CkShare.resolveImageUrl('uploads/avatar.jpg'),
+          'https://api.example.com/uploads/avatar.jpg',
+        );
+        expect(
+          CkShare.resolveImageUrl('avatar.jpg'),
+          'https://api.example.com/avatar.jpg',
+        );
+      },
+    );
 
     test('resolves relative paths when imageBaseUrl has no trailing slash', () {
       coreKitInstance.imageBaseUrl = 'https://api.example.com';
@@ -156,36 +159,39 @@ void main() {
       expect(lastLoadingState, false);
     });
 
-    testWidgets('supports CkShare.button and CkShare.builder static shortcuts', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Column(
-              children: [
-                CkShare.button(
-                  title: 'Title',
-                  deepLinkUrl: 'https://example.com',
-                  imageUrl: 'https://cdn.example.com/pic.jpg',
-                  child: const Icon(Icons.share, key: Key('shortcut_icon')),
-                ),
-                CkShare.builder(
-                  title: 'Title',
-                  deepLinkUrl: 'https://example.com',
-                  imageUrl: 'https://cdn.example.com/pic.jpg',
-                  builder: (context, share, isLoading) =>
-                      const Text('Shortcut Builder', key: Key('shortcut_text')),
-                ),
-              ],
+    testWidgets(
+      'supports CkShare.button and CkShare.builder static shortcuts',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Column(
+                children: [
+                  CkShare.button(
+                    title: 'Title',
+                    deepLinkUrl: 'https://example.com',
+                    imageUrl: 'https://cdn.example.com/pic.jpg',
+                    child: const Icon(Icons.share, key: Key('shortcut_icon')),
+                  ),
+                  CkShare.builder(
+                    title: 'Title',
+                    deepLinkUrl: 'https://example.com',
+                    imageUrl: 'https://cdn.example.com/pic.jpg',
+                    builder: (context, share, isLoading) => const Text(
+                      'Shortcut Builder',
+                      key: Key('shortcut_text'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byKey(const Key('shortcut_icon')), findsOneWidget);
-      expect(find.byKey(const Key('shortcut_text')), findsOneWidget);
-    });
+        expect(find.byKey(const Key('shortcut_icon')), findsOneWidget);
+        expect(find.byKey(const Key('shortcut_text')), findsOneWidget);
+      },
+    );
 
     testWidgets('supports replace and overlay loader styles', (tester) async {
       await tester.pumpWidget(
@@ -273,4 +279,3 @@ void main() {
     });
   });
 }
-

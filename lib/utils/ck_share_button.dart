@@ -132,7 +132,8 @@ class CkShareButton extends StatefulWidget {
     BuildContext context,
     Future<void> Function() share,
     bool isLoading,
-  )? builder;
+  )?
+  builder;
 
   /// How the loader is rendered during network image download.
   final CkShareLoaderStyle loaderStyle;
@@ -286,7 +287,8 @@ class _CkShareButtonState extends State<CkShareButton>
                   ? _AdaptiveEdgePainter(
                       progress: _controller.value,
                       color: effectiveLoaderColor,
-                      trackColor: widget.trackColor ??
+                      trackColor:
+                          widget.trackColor ??
                           effectiveLoaderColor.withValues(alpha: 0.15),
                       strokeWidth: widget.strokeWidth,
                       strokeLengthFactor: widget.strokeLengthFactor,
@@ -305,13 +307,13 @@ class _CkShareButtonState extends State<CkShareButton>
       case CkShareLoaderStyle.replace:
         content = _isLoading
             ? (widget.customLoader ??
-                SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator.adaptive(
-                    strokeWidth: widget.strokeWidth,
-                    valueColor: AlwaysStoppedAnimation(effectiveLoaderColor),
-                  ),
-                ))
+                  SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator.adaptive(
+                      strokeWidth: widget.strokeWidth,
+                      valueColor: AlwaysStoppedAnimation(effectiveLoaderColor),
+                    ),
+                  ))
             : effectiveChild;
         break;
 
@@ -325,7 +327,8 @@ class _CkShareButtonState extends State<CkShareButton>
                 child: Container(
                   color: Colors.black26,
                   alignment: Alignment.center,
-                  child: widget.customLoader ??
+                  child:
+                      widget.customLoader ??
                       SizedBox.square(
                         dimension: 24,
                         child: CircularProgressIndicator.adaptive(
@@ -343,9 +346,7 @@ class _CkShareButtonState extends State<CkShareButton>
     }
 
     return MouseRegion(
-      cursor: _isLoading
-          ? SystemMouseCursors.basic
-          : SystemMouseCursors.click,
+      cursor: _isLoading ? SystemMouseCursors.basic : SystemMouseCursors.click,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _isLoading ? null : _handleShare,

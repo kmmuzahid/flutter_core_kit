@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:core_kit/core_kit_internal.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -68,9 +69,7 @@ class CkShare {
       final domainRegex = RegExp(
         r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(:\d+)?$',
       );
-      final ipRegex = RegExp(
-        r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$',
-      );
+      final ipRegex = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$');
       if (domainRegex.hasMatch(host) ||
           ipRegex.hasMatch(host) ||
           host.startsWith('localhost')) {
@@ -171,30 +170,29 @@ class CkShare {
     VoidCallback? onShareReady,
     VoidCallback? onShareSuccess,
     void Function(Object error)? onShareError,
-  }) =>
-      CkShareButton(
-        key: key,
-        title: title,
-        deepLinkUrl: deepLinkUrl,
-        imageUrl: imageUrl,
-        byteImage: byteImage,
-        loaderStyle: loaderStyle,
-        shape: shape,
-        borderRadius: borderRadius,
-        strokeWidth: strokeWidth,
-        strokeLengthFactor: strokeLengthFactor,
-        loaderColor: loaderColor,
-        trackColor: trackColor,
-        paddingOffset: paddingOffset,
-        animationDuration: animationDuration,
-        customLoader: customLoader,
-        onTap: onTap,
-        onShareStart: onShareStart,
-        onShareReady: onShareReady,
-        onShareSuccess: onShareSuccess,
-        onShareError: onShareError,
-        child: child,
-      );
+  }) => CkShareButton(
+    key: key,
+    title: title,
+    deepLinkUrl: deepLinkUrl,
+    imageUrl: imageUrl,
+    byteImage: byteImage,
+    loaderStyle: loaderStyle,
+    shape: shape,
+    borderRadius: borderRadius,
+    strokeWidth: strokeWidth,
+    strokeLengthFactor: strokeLengthFactor,
+    loaderColor: loaderColor,
+    trackColor: trackColor,
+    paddingOffset: paddingOffset,
+    animationDuration: animationDuration,
+    customLoader: customLoader,
+    onTap: onTap,
+    onShareStart: onShareStart,
+    onShareReady: onShareReady,
+    onShareSuccess: onShareSuccess,
+    onShareError: onShareError,
+    child: child,
+  );
 
   /// Creates a [CkShareButton] using a [builder] callback for full custom control.
   static Widget builder({
@@ -207,24 +205,24 @@ class CkShare {
       BuildContext context,
       Future<void> Function() share,
       bool isLoading,
-    ) builder,
+    )
+    builder,
     VoidCallback? onShareStart,
     VoidCallback? onShareReady,
     VoidCallback? onShareSuccess,
     void Function(Object error)? onShareError,
-  }) =>
-      CkShareButton.builder(
-        key: key,
-        title: title,
-        deepLinkUrl: deepLinkUrl,
-        imageUrl: imageUrl,
-        byteImage: byteImage,
-        builder: builder,
-        onShareStart: onShareStart,
-        onShareReady: onShareReady,
-        onShareSuccess: onShareSuccess,
-        onShareError: onShareError,
-      );
+  }) => CkShareButton.builder(
+    key: key,
+    title: title,
+    deepLinkUrl: deepLinkUrl,
+    imageUrl: imageUrl,
+    byteImage: byteImage,
+    builder: builder,
+    onShareStart: onShareStart,
+    onShareReady: onShareReady,
+    onShareSuccess: onShareSuccess,
+    onShareError: onShareError,
+  );
 
   static final StreamController<Uri> _deepLinkController =
       StreamController<Uri>.broadcast();
@@ -246,9 +244,11 @@ class CkShare {
   static StreamSubscription<Uri> listenDeepLink(void Function(Uri uri) onLink) {
     if (!_deepLinkObserverRegistered) {
       _deepLinkObserverRegistered = true;
-      WidgetsBinding.instance.addObserver(_CkDeepLinkObserver((uri) {
-        _deepLinkController.add(uri);
-      }));
+      WidgetsBinding.instance.addObserver(
+        _CkDeepLinkObserver((uri) {
+          _deepLinkController.add(uri);
+        }),
+      );
     }
 
     final sub = _deepLinkController.stream.listen(onLink);
@@ -278,9 +278,10 @@ class _CkDeepLinkObserver with WidgetsBindingObserver {
   _CkDeepLinkObserver(this.onLink);
 
   @override
-  Future<bool> didPushRouteInformation(RouteInformation routeInformation) async {
+  Future<bool> didPushRouteInformation(
+    RouteInformation routeInformation,
+  ) async {
     onLink(routeInformation.uri);
     return false;
   }
 }
-

@@ -487,7 +487,7 @@ CoreKit(
 ```
 
 > [!IMPORTANT]
-> **Context rule:** `context` inside `CoreKitConfig` is only valid in getters that run after the first frame (`appbarConfig`, `permissionHelperConfig`, `passwordObscureIcon`, `permissionHandlerColors`). Do not use `context` in `imageBaseUrl`, `ckTransportConfig`, or `designSize`.
+> **Context rule:** `context` inside `CoreKitConfig` is valid in context-dependent getters (`inputConfig`, `appbarConfig`, `snackBarConfig`, `permissionHelperConfig`, `passwordObscureIcon`, `permissionHandlerColors`) and updates automatically when the theme or dependencies change. Do not use `context` in `imageBaseUrl`, `ckTransportConfig`, or `designSize`.
 
 > [!NOTE]
 > **Tokens:** You do not configure `CkTokenProvider` in your app. With `authConfig` set, [CkAuthService](#authentication-module) stores and refreshes tokens. Without auth, CoreKit uses an internal unauthenticated provider automatically.

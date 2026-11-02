@@ -1,3 +1,12 @@
+## 1.1.6
+
+* **Dynamic Context & Theme Reactivity (`CoreKitConfig`)**:
+  * Added `_syncConfig()` in `CoreKitRouterGate` to automatically synchronize global configurations whenever inherited dependencies change (`didChangeDependencies`) or when the widget updates (`didUpdateWidget`).
+  * Enabled safe usage of `context` within `inputConfig` and `snackBarConfig` getters (e.g., `Theme.of(context)`), allowing text fields, borders, colors, and snackbars to dynamically react to light/dark theme toggles and locale changes without requiring an app restart.
+  * Updated `CoreKitConfig.context` assertion diagnostics and `README.md` guidelines to clarify supported context-dependent getters.
+* **Test Coverage**:
+  * Added widget tests in `test/core_kit_theme_test.dart` verifying dynamic theme updates, border color shifts, and background transitions across `CkTextField` upon toggling `ThemeMode`.
+
 ## 1.1.5
 
 * **Platform Support & Web/WASM Compatibility**:

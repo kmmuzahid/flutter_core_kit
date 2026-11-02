@@ -254,9 +254,7 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
 
   OutlineInputBorder _buildBorder({required Color color, double? width}) {
     final effectiveRadius =
-        widget.borderRadius ??
-        coreKitInstance.inputConfig.borderRadius ??
-        12.0;
+        widget.borderRadius ?? coreKitInstance.inputConfig.borderRadius ?? 12.0;
     final effectiveWidth =
         width ??
         (widget.borderWidth ?? coreKitInstance.inputConfig.borderWidth).w;
@@ -315,8 +313,8 @@ class _CkMultilineTextFieldState extends State<CkMultilineTextField> {
                         coreKitInstance.primaryColor)
                   : (widget.errorColor ??
                         coreKitInstance.inputConfig.errorColor),
-              cursorErrorColor: widget.errorColor ??
-                  coreKitInstance.inputConfig.errorColor,
+              cursorErrorColor:
+                  widget.errorColor ?? coreKitInstance.inputConfig.errorColor,
               textCapitalization:
                   (widget.enableCapitalization &&
                       (coreKitInstance.inputConfig.enableCapitalization ??

@@ -38,60 +38,54 @@ void main() {
     });
 
     // DC-03
-    test(
-      'CkAuthService.signIn with deprecated username-based request resolves correctly',
-      () async {
-        CkStorage.resetForTests();
-        // Build config with loginBodyBuilder (deprecated)
-        final config = CkAuthConfig(
-          endpoints: _endpoints,
-          otpConfig: buildOtpConfig(autoTriggers: {}),
-          handlers: TestFlowHandlers().build(),
-          loginBodyBuilder: (cb) => {
-            'username':
-                cb.account, // using account (from deprecated username param)
-            'password': cb.password ?? '',
-          },
-          mockAuth: true,
-        );
+    test('CkAuthService.signIn with deprecated username-based request resolves correctly', () async {
+      CkStorage.resetForTests();
+      // Build config with loginBodyBuilder (deprecated)
+      final config = CkAuthConfig(
+        endpoints: _endpoints,
+        otpConfig: buildOtpConfig(autoTriggers: {}),
+        handlers: TestFlowHandlers().build(),
+        loginBodyBuilder: (cb) => {
+          'username':
+              cb.account, // using account (from deprecated username param)
+          'password': cb.password ?? '',
+        },
+        mockAuth: true,
+      );
 
-        final service = await CkAuthService.initForTests(
-          config: config,
-          tokenManager: CkAuthTokenManager(),
-        );
+      final service = await CkAuthService.initForTests(
+        config: config,
+        tokenManager: CkAuthTokenManager(),
+      );
 
-        // Use the deprecated username to build the request
-        final legacyCb = LoginCallback(username: 'old_user', password: 'pass');
-        final request = config.resolveLoginRequest(legacyCb);
+      // Use the deprecated username to build the request
+      final legacyCb = LoginCallback(username: 'old_user', password: 'pass');
+      final request = config.resolveLoginRequest(legacyCb);
 
-        final result = await service.signIn(request: request);
-        expect(result.isSuccess, isTrue);
-      },
-    );
+      final result = await service.signIn(request: request);
+      expect(result.isSuccess, isTrue);
+    });
 
     // DC-04
-    test(
-      'loginBodyBuilder is wrapped in CkLoginRequest.fromBody via resolveLoginRequest',
-      () {
-        final config = CkAuthConfig(
-          endpoints: _endpoints,
-          otpConfig: buildOtpConfig(autoTriggers: {}),
-          loginBodyBuilder: (cb) => {
-            'email': cb.account,
-            'pw': cb.password ?? '',
-          },
-          mockAuth: true,
-        );
+    test('loginBodyBuilder is wrapped in CkLoginRequest.fromBody via resolveLoginRequest', () {
+      final config = CkAuthConfig(
+        endpoints: _endpoints,
+        otpConfig: buildOtpConfig(autoTriggers: {}),
+        loginBodyBuilder: (cb) => {
+          'email': cb.account,
+          'pw': cb.password ?? '',
+        },
+        mockAuth: true,
+      );
 
-        final req = config.resolveLoginRequest(
-          LoginCallback(account: 'a@b.com', password: 'secret'),
-        );
-        // Should be wrapped into a CkLoginRequest with body
-        expect(req.body, isNotNull);
-        expect(req.body?['email'], equals('a@b.com'));
-        expect(req.body?['pw'], equals('secret'));
-      },
-    );
+      final req = config.resolveLoginRequest(
+        LoginCallback(account: 'a@b.com', password: 'secret'),
+      );
+      // Should be wrapped into a CkLoginRequest with body
+      expect(req.body, isNotNull);
+      expect(req.body?['email'], equals('a@b.com'));
+      expect(req.body?['pw'], equals('secret'));
+    });
 
     // DC-05
     test('sendOtp() with no params delegates to resendOtp()', () async {

@@ -1,5 +1,6 @@
 import 'package:core_kit/utils/ck_path_web.dart'
-    if (dart.library.io) 'package:core_kit/utils/ck_path_io.dart' as platform;
+    if (dart.library.io) 'package:core_kit/utils/ck_path_io.dart'
+    as platform;
 import 'package:universal_io/io.dart';
 
 /// A utility class for accessing standard device directories and file paths.

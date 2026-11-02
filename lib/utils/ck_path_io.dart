@@ -54,9 +54,7 @@ Future<void> clearTemp() async {
         try {
           await entity.delete(recursive: true);
         } catch (e) {
-          debugPrint(
-            'Failed to delete temp entity: ${entity.path}, error: $e',
-          );
+          debugPrint('Failed to delete temp entity: ${entity.path}, error: $e');
         }
       }
     }

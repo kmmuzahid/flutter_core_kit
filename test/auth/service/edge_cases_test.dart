@@ -95,16 +95,13 @@ void main() {
     });
 
     // EC-05
-    test(
-      'accessToken missing from response → _completeAuthentication returns failure',
-      () {
-        // Test through extractors: if accessToken returns null, auth should fail
-        final extractors = CkAuthExtractors.standard();
-        final data = {'someOtherKey': 'value'}; // no accessToken
-        expect(extractors.accessToken(data), isNull);
-        // This validates the guard: if access == null → return failure
-      },
-    );
+    test('accessToken missing from response → _completeAuthentication returns failure', () {
+      // Test through extractors: if accessToken returns null, auth should fail
+      final extractors = CkAuthExtractors.standard();
+      final data = {'someOtherKey': 'value'}; // no accessToken
+      expect(extractors.accessToken(data), isNull);
+      // This validates the guard: if access == null → return failure
+    });
 
     // EC-07
     test('dispose() on CkOtpFlowManager cancels timer without error', () {

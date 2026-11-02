@@ -145,30 +145,27 @@ void main() {
     // calledFromVerifyOtp=true path: verifyOtp sets _preSignupOtpVerified=true
     // then calls _resolvePostSignupAuth. The subsequent signUp should bypass
     // OTP entirely, proving the full flow through the dynamic param works end-to-end.
-    test(
-      'RPSA-07: verifyOtp+signUp end-to-end — dynamic param does not break flow',
-      () async {
-        final handlers = TestFlowHandlers();
-        final service = await _buildWithSignupOtp(handlers: handlers);
+    test('RPSA-07: verifyOtp+signUp end-to-end — dynamic param does not break flow', () async {
+      final handlers = TestFlowHandlers();
+      final service = await _buildWithSignupOtp(handlers: handlers);
 
-        // Step 1: trigger OTP
-        await service.sendOtp(
-          trigger: CkOtpTrigger.signup,
-          recipient: 'user@test.com',
-        );
-        // Step 2: verify OTP → _resolvePostSignupAuth called with dynamic Map
-        final verifyResult = await service.verifyOtp(otp: '999999');
-        expect(verifyResult.isSuccess, isTrue);
+      // Step 1: trigger OTP
+      await service.sendOtp(
+        trigger: CkOtpTrigger.signup,
+        recipient: 'user@test.com',
+      );
+      // Step 2: verify OTP → _resolvePostSignupAuth called with dynamic Map
+      final verifyResult = await service.verifyOtp(otp: '999999');
+      expect(verifyResult.isSuccess, isTrue);
 
-        // Step 3: signUp bypasses OTP because _preSignupOtpVerified=true
-        handlers.reset();
-        final signUpResult = await service.signUp(
-          body: {'email': 'user@test.com', 'password': 'abc'},
-        );
-        expect(signUpResult.isSuccess, isTrue);
-        expect(signUpResult.requiresOtp, isFalse);
-        expect(handlers.showOtpVerificationCalled, isFalse);
-      },
-    );
+      // Step 3: signUp bypasses OTP because _preSignupOtpVerified=true
+      handlers.reset();
+      final signUpResult = await service.signUp(
+        body: {'email': 'user@test.com', 'password': 'abc'},
+      );
+      expect(signUpResult.isSuccess, isTrue);
+      expect(signUpResult.requiresOtp, isFalse);
+      expect(handlers.showOtpVerificationCalled, isFalse);
+    });
   });
 }
